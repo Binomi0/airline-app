@@ -25,7 +25,7 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   const { mutateAsync: claimNFT, isLoading } = useClaimNFT(contract);
 
   return (
-    <Grid item xs={4}>
+    <Grid item xs={3}>
       <Card>
         <MediaRenderer width="100%" src={nft.metadata.image} />
         <CardHeader

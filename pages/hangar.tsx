@@ -21,7 +21,6 @@ import { useState } from "react";
 import { nftAircraftTokenAddress } from "../contracts/address";
 import MyAircrafts from "../components/MyAircrafts";
 import AircraftMarketPlace from "../components/AircraftMarketPlace";
-import LicenseMarketPlace from "../components/LicenseMarketPlace";
 
 interface AircraftAttributes {
   deposit: number;
@@ -45,13 +44,17 @@ const initialSnackState = {
   type: "info" as AlertColor,
 };
 
-const Hangar: NextPage = () => {
+interface HangarProps {
+  loading: boolean;
+}
+
+const Hangar: NextPage<HangarProps> = ({ loading }) => {
   const [snack, setSnack] = useState(initialSnackState);
   const address = useAddress();
   const { contract } = useContract(nftAircraftTokenAddress);
   const { data: nfts, isLoading, error } = useNFTs(contract);
 
-  if (isLoading || !nfts) {
+  if (isLoading || !nfts || loading) {
     return <LinearProgress />;
   }
 
@@ -89,11 +92,9 @@ const Hangar: NextPage = () => {
         <ConnectWallet />
       </Box>
 
-      <MyAircrafts />
-
       <AircraftMarketPlace />
 
-      <LicenseMarketPlace />
+      <MyAircrafts />
 
       <Grid container spacing={2}>
         <Grid item xs={4} p={2}>

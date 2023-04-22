@@ -16,3 +16,6 @@ export const getNFTAttributes = (nft: NFT) => {
 
   return [];
 };
+
+export const parseNumber = (value: number | bigint) =>
+  Intl.NumberFormat("es").format(value);

@@ -1,27 +1,7 @@
-import {
-  ConnectWallet,
-  Web3Button,
-  useContract,
-  useContractRead,
-  useContractWrite,
-} from "@thirdweb-dev/react";
+import { ConnectWallet } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Container,
-  Grid,
-  LinearProgress,
-  Link,
-  Typography,
-} from "@mui/material";
-import { useCallback } from "react";
-import airlineCoin from "../contracts/abi/AirlineCoin.json";
-
-const stakingAddress = "0x005A07a7F98bB9dD75E7130Da5E37CdE2D1E7E1C";
-const coinTokenAddress = "0xfdc7C97F7B006dDd1F0B48bf35BE5aeB7153d2b6";
-const rewardTokenAddress = "0x4eF73A2AC6DB13F309F824b7206672954aF62C4d";
+import { Box, Container, Grid, Link, Typography } from "@mui/material";
+import GasStatus from "../routes/gas/GasStatus";
 
 const Gas: NextPage = () => {
   return (
@@ -31,10 +11,7 @@ const Gas: NextPage = () => {
         <ConnectWallet />
       </Box>
 
-      <Box my={10}>
-        <Typography variant="h2">Aquí puedes repostar tus aeronaves</Typography>
-        <Typography>Para empezar deposita el token AIRL en staking</Typography>
-      </Box>
+      <GasStatus />
 
       <Grid container spacing={2}>
         <Grid item xs={4} p={2}>

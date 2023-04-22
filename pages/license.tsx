@@ -14,59 +14,26 @@ import {
   Typography,
 } from "@mui/material";
 import { useCallback } from "react";
+import AircraftMarketPlace from "../components/AircraftMarketPlace";
+import LicenseMarketPlace from "../components/LicenseMarketPlace";
 
 type LicenseType = "A" | "B" | "C" | "D";
 
-const user: Record<string, string[]> = {
-  license: ["", "", "", ""],
-};
-
-const items: Record<string, string | number>[] = [
-  {
-    id: "D",
-    price: 10,
-    name: "Licencia D",
-    description: "Licencia Delta, básica con la que empezar si eres nuevo",
-    type: "D",
-  },
-  {
-    id: "C",
-    price: 20,
-    name: "Licencia C",
-    description: "Licencia Charlie, para pilotos que han superado la D",
-    type: "C",
-  },
-  {
-    id: "B",
-    price: 50,
-    name: "Licencia B",
-    description: "Licencia Bravo, para pilotos que han superado la C",
-    type: "B",
-  },
-  {
-    id: "A",
-    price: 100,
-    name: "Licencia A",
-    description: "Licencia Alpha, para pilotos que han superado la B",
-    type: "A",
-  },
-];
-
 const License: NextPage = () => {
-  const canGetLicense = useCallback((license: LicenseType) => {
-    switch (license) {
-      case "D":
-        return true;
-      case "C":
-        return user.license.includes("D");
-      case "B":
-        return user.license.includes("C");
-      case "A":
-        return user.license.includes("B");
-      default:
-        return false;
-    }
-  }, []);
+  // const canGetLicense = useCallback((license: LicenseType) => {
+  //   switch (license) {
+  //     case "D":
+  //       return true;
+  //     case "C":
+  //       return user.license.includes("D");
+  //     case "B":
+  //       return user.license.includes("C");
+  //     case "A":
+  //       return user.license.includes("B");
+  //     default:
+  //       return false;
+  //   }
+  // }, []);
   return (
     <Container>
       <Box my={10} textAlign="center">
@@ -74,31 +41,7 @@ const License: NextPage = () => {
         <ConnectWallet />
       </Box>
 
-      <Box my={10}>
-        <Grid container spacing={2}>
-          {items.map((item) => (
-            <Grid item xs={4} key={item.id}>
-              <Card>
-                <CardHeader title={item.name} subheader={item.description} />
-                <CardContent>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography>Price</Typography>
-                    <Typography variant="body2">{item.price}</Typography>
-                  </Stack>
-                </CardContent>
-                <CardActions>
-                  <Button
-                    disabled={!canGetLicense(item.type as LicenseType)}
-                    variant="contained"
-                  >
-                    Comprar
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
+      <LicenseMarketPlace />
 
       <Grid container spacing={2}>
         <Grid item xs={4} p={2}>
