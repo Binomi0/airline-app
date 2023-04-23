@@ -18,11 +18,12 @@ import {
   useNFTBalance,
 } from "@thirdweb-dev/react";
 import React from "react";
-import { getNFTAttributes } from "../utils";
+import { getNFTAttributes } from "utils";
 import {
   nftAircraftTokenAddress,
   nftLicenseTokenAddress,
-} from "../contracts/address";
+} from "contracts/address";
+import { useRouter } from "next/router";
 
 const maps: Record<string, string> = {
   0: "0",
@@ -32,6 +33,7 @@ const maps: Record<string, string> = {
   4: "3",
 };
 const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
+  const router = useRouter();
   const address = useAddress();
   const { contract } = useContract(nftAircraftTokenAddress);
   const { contract: license } = useContract(nftLicenseTokenAddress);
@@ -47,6 +49,11 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
     <Grid item xs={3}>
       <Card>
         <Box
+          onClick={() =>
+            router.push(
+              `/aircraft/${nftAircraftTokenAddress}/${nft.metadata.id}`
+            )
+          }
           sx={{
             position: "relative",
             top: 0,

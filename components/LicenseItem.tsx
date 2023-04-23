@@ -18,8 +18,8 @@ import {
   useNFT,
 } from "@thirdweb-dev/react";
 import React from "react";
-import { getNFTAttributes } from "../utils";
-import { nftLicenseTokenAddress } from "../contracts/address";
+import { getNFTAttributes } from "utils";
+import { nftLicenseTokenAddress } from "contracts/address";
 
 const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
   nft,

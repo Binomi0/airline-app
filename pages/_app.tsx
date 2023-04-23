@@ -11,7 +11,7 @@ import theme from "../src/theme";
 import createEmotionCache from "../src/createEmotionCache";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { Router } from "next/router";
-import { LinearProgress } from "@mui/material";
+import { VaProvider } from "../context/VaProvider";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -31,7 +31,7 @@ export default function MyApp(props: MyAppProps) {
     setLoading(false);
   }, []);
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     Router.events.on("routeChangeStart", startLoading);
     Router.events.on("routeChangeComplete", endLoading);
 
@@ -40,6 +40,7 @@ export default function MyApp(props: MyAppProps) {
       Router.events.off("routeChangeComplete", endLoading);
     };
   }, [startLoading, endLoading]);
+
   return (
     <ThirdwebProvider activeChain={Sepolia}>
       <CacheProvider value={emotionCache}>
@@ -49,9 +50,11 @@ export default function MyApp(props: MyAppProps) {
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          <ErrorBoundary>
-            <Component {...pageProps} loading={loading} />
-          </ErrorBoundary>
+          <VaProvider>
+            <ErrorBoundary>
+              <Component {...pageProps} loading={loading} />
+            </ErrorBoundary>
+          </VaProvider>
         </ThemeProvider>
       </CacheProvider>
     </ThirdwebProvider>

@@ -1,7 +1,7 @@
 import { ConnectWallet } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
 import { Box, Container, Grid, Link, Typography } from "@mui/material";
-import GasStatus from "../routes/gas/GasStatus";
+import GasStatus from "routes/gas/GasStatus";
 
 const Gas: NextPage = () => {
   return (

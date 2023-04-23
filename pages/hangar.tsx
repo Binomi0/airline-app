@@ -18,9 +18,9 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { nftAircraftTokenAddress } from "../contracts/address";
-import MyAircrafts from "../components/MyAircrafts";
-import AircraftMarketPlace from "../components/AircraftMarketPlace";
+import { nftAircraftTokenAddress } from "contracts/address";
+import MyAircrafts from "components/MyAircrafts";
+import AircraftMarketPlace from "components/AircraftMarketPlace";
 
 interface AircraftAttributes {
   deposit: number;

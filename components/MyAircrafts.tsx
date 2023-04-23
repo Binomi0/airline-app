@@ -7,24 +7,19 @@ import {
   CardContent,
   Stack,
   CardActions,
-  Button,
   CircularProgress,
   Alert,
   AlertTitle,
 } from "@mui/material";
 import {
   MediaRenderer,
-  NFT,
   useAddress,
   useContract,
-  useNFT,
   useOwnedNFTs,
 } from "@thirdweb-dev/react";
 import React from "react";
-import { nftAircraftTokenAddress } from "../contracts/address";
-import { getNFTAttributes } from "../utils";
-
-const aircraftsId = 0;
+import { nftAircraftTokenAddress } from "contracts/address";
+import { getNFTAttributes } from "utils";
 
 const MyAircrafts = () => {
   const address = useAddress();

@@ -6,14 +6,14 @@ import {
   AlertTitle,
   LinearProgress,
 } from "@mui/material";
-import React, { useMemo } from "react";
+import React from "react";
 import {
   useAddress,
   useContract,
   useNFTs,
   useOwnedNFTs,
 } from "@thirdweb-dev/react";
-import { nftLicenseTokenAddress } from "../contracts/address";
+import { nftLicenseTokenAddress } from "contracts/address";
 import LicenseItem from "./LicenseItem";
 
 const LicenseMarketPlace: React.FC = () => {

@@ -6,11 +6,11 @@ import {
   AlertTitle,
   LinearProgress,
 } from "@mui/material";
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import { NFT, useContract, useNFTs } from "@thirdweb-dev/react";
-import { nftAircraftTokenAddress } from "../contracts/address";
+import { nftAircraftTokenAddress } from "contracts/address";
 import AircraftItem from "./AircraftItem";
-import { getNFTAttributes } from "../utils";
+import { getNFTAttributes } from "utils";
 
 const sortByLicense = (a: NFT, b: NFT) => {
   const attributesA = getNFTAttributes(a);

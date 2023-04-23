@@ -16,7 +16,7 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { nftLicenseTokenAddress } from "../contracts/address";
+import { nftLicenseTokenAddress } from "contracts/address";
 
 const Cargo: NextPage = () => {
   const address = useAddress();
