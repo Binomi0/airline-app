@@ -6,10 +6,29 @@ import {
   AlertTitle,
   LinearProgress,
 } from "@mui/material";
-import React, { useMemo } from "react";
-import { useContract, useNFTs } from "@thirdweb-dev/react";
+import React, { useCallback, useMemo } from "react";
+import { NFT, useContract, useNFTs } from "@thirdweb-dev/react";
 import { nftAircraftTokenAddress } from "../contracts/address";
 import AircraftItem from "./AircraftItem";
+import { getNFTAttributes } from "../utils";
+
+const sortByLicense = (a: NFT, b: NFT) => {
+  const attributesA = getNFTAttributes(a);
+  const attributesB = getNFTAttributes(b);
+
+  const valueA = attributesA?.find((i) => i.trait_type === "license");
+  const valueB = attributesB?.find((i) => i.trait_type === "license");
+
+  if (!valueA || !valueB) {
+    return 0;
+  }
+  if (valueA.value > valueB.value) {
+    return -1;
+  } else if (valueA.value < valueB.value) {
+    return 1;
+  }
+  return 0;
+};
 
 const AircraftMarketPlace: React.FC = () => {
   const { contract } = useContract(nftAircraftTokenAddress);
@@ -36,6 +55,7 @@ const AircraftMarketPlace: React.FC = () => {
       <Grid container spacing={2}>
         {nftList
           .filter((a) => a.metadata.id !== "0")
+          .sort(sortByLicense)
           .map((nft) => (
             <AircraftItem nft={nft} key={nft.metadata.id} />
           ))}

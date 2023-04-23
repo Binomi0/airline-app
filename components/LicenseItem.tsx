@@ -7,6 +7,7 @@ import {
   Typography,
   CardActions,
   Button,
+  Box,
 } from "@mui/material";
 import {
   MediaRenderer,
@@ -14,20 +15,47 @@ import {
   useAddress,
   useClaimNFT,
   useContract,
+  useNFT,
 } from "@thirdweb-dev/react";
 import React from "react";
 import { getNFTAttributes } from "../utils";
 import { nftLicenseTokenAddress } from "../contracts/address";
 
-const LicenseItem: React.FC<{ nft: NFT }> = ({ nft }) => {
+const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
+  nft,
+  owned,
+}) => {
   const address = useAddress();
   const { contract } = useContract(nftLicenseTokenAddress);
-  const { mutateAsync: claimNFT, isLoading } = useClaimNFT(contract);
+  const { mutateAsync: claimNFT, isLoading: isClaiming } =
+    useClaimNFT(contract);
 
   return (
     <Grid item xs={4}>
       <Card>
-        <MediaRenderer width="100%" src={nft.metadata.image} />
+        <Box
+          sx={{
+            position: "relative",
+            top: 0,
+            left: 0,
+            "&::before": {
+              position: "relative",
+              content: `${owned ? "'OWNED'" : "'LOCKED'"}`,
+              width: "50px",
+              height: "50px",
+              top: 10,
+              left: 10,
+              fontSize: "36px",
+              color: `${owned ? "green" : "red"}`,
+              background: "white",
+              padding: 1,
+              borderRadius: 2,
+              boxShadow: `0 0 8px 0px ${owned ? "green" : "red"}`,
+            },
+          }}
+        >
+          <MediaRenderer width="100%" src={nft.metadata.image} />
+        </Box>
         <CardHeader
           title={nft.metadata.name}
           subheader={nft.metadata.description}
@@ -50,7 +78,7 @@ const LicenseItem: React.FC<{ nft: NFT }> = ({ nft }) => {
         </CardContent>
         <CardActions>
           <Button
-            disabled={isLoading}
+            disabled={isClaiming || owned}
             variant="contained"
             onClick={() =>
               claimNFT({

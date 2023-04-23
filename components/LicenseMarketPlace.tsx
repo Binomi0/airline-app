@@ -7,15 +7,20 @@ import {
   LinearProgress,
 } from "@mui/material";
 import React, { useMemo } from "react";
-import { useContract, useNFTs } from "@thirdweb-dev/react";
+import {
+  useAddress,
+  useContract,
+  useNFTs,
+  useOwnedNFTs,
+} from "@thirdweb-dev/react";
 import { nftLicenseTokenAddress } from "../contracts/address";
 import LicenseItem from "./LicenseItem";
 
 const LicenseMarketPlace: React.FC = () => {
+  const address = useAddress();
   const { contract } = useContract(nftLicenseTokenAddress);
-  const { data: nfts, isLoading, error } = useNFTs(contract);
-
-  const nftList = useMemo(() => (nfts && nfts.length > 0 ? nfts : []), [nfts]);
+  const { data: nfts = [], isLoading, error } = useNFTs(contract);
+  const { data: owned = [] } = useOwnedNFTs(contract, address);
 
   if (isLoading) {
     return <LinearProgress />;
@@ -34,8 +39,12 @@ const LicenseMarketPlace: React.FC = () => {
     <Box my={4}>
       <Typography variant="h2">Licenses</Typography>
       <Grid container spacing={2}>
-        {nftList.map((nft) => (
-          <LicenseItem nft={nft} key={nft.metadata.id} />
+        {nfts.map((nft) => (
+          <LicenseItem
+            nft={nft}
+            key={nft.metadata.id}
+            owned={owned.some((n) => nft.metadata.id === n.metadata.id)}
+          />
         ))}
       </Grid>
     </Box>

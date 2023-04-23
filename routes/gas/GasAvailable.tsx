@@ -63,6 +63,7 @@ const GasAvailable = () => {
               }}
             />
             <Button
+              color="success"
               disabled={isStaking}
               onClick={async () => {
                 await coin?.erc20.setAllowance(

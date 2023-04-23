@@ -38,7 +38,7 @@ const GasDeposited = () => {
     <Grid item xs={4}>
       <Card>
         <Box p={1}>
-          <Typography variant="subtitle1">Depositaded</Typography>
+          <Typography variant="subtitle1">Deposited</Typography>
           <Typography variant="subtitle2" paragraph>
             {isStakingLoading ? (
               <CircularProgress size={14} />
@@ -60,7 +60,9 @@ const GasDeposited = () => {
                 endAdornment: (
                   <Button
                     onClick={() =>
-                      setUnstakeAmount(staking?.amountStaked.toString())
+                      setUnstakeAmount(
+                        (Number(staking?.amountStaked) / 1e18).toString()
+                      )
                     }
                     size="small"
                   >
@@ -70,6 +72,7 @@ const GasDeposited = () => {
               }}
             />
             <Button
+              color="error"
               size="small"
               variant="contained"
               disabled={isLoading}

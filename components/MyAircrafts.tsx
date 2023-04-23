@@ -42,6 +42,7 @@ const MyAircrafts = () => {
       </Alert>
     );
   }
+
   return nfts && nfts.length > 0 ? (
     <Box my={4}>
       <Typography variant="h2">My Aircrafts</Typography>

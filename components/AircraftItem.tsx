@@ -7,6 +7,7 @@ import {
   Typography,
   CardActions,
   Button,
+  Box,
 } from "@mui/material";
 import {
   MediaRenderer,
@@ -14,20 +15,60 @@ import {
   useAddress,
   useClaimNFT,
   useContract,
+  useNFTBalance,
 } from "@thirdweb-dev/react";
 import React from "react";
 import { getNFTAttributes } from "../utils";
-import { nftAircraftTokenAddress } from "../contracts/address";
+import {
+  nftAircraftTokenAddress,
+  nftLicenseTokenAddress,
+} from "../contracts/address";
 
+const maps: Record<string, string> = {
+  0: "0",
+  1: "1",
+  2: "2",
+  3: "0",
+  4: "3",
+};
 const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   const address = useAddress();
   const { contract } = useContract(nftAircraftTokenAddress);
+  const { contract: license } = useContract(nftLicenseTokenAddress);
   const { mutateAsync: claimNFT, isLoading } = useClaimNFT(contract);
+  const { data } = useNFTBalance(contract, address, nft.metadata.id);
+  const { data: licenseBalance } = useNFTBalance(
+    license,
+    address,
+    maps[nft.metadata.id]
+  );
 
   return (
     <Grid item xs={3}>
       <Card>
-        <MediaRenderer width="100%" src={nft.metadata.image} />
+        <Box
+          sx={{
+            position: "relative",
+            top: 0,
+            left: 0,
+            "&::before": {
+              position: "relative",
+              content: `${!data?.isZero() ? "'OWNED'" : "'LOCKED'"}`,
+              width: "50px",
+              height: "50px",
+              top: 100,
+              left: 50,
+              fontSize: "36px",
+              color: `${!data?.isZero() ? "green" : "red"}`,
+              background: "white",
+              padding: 1,
+              borderRadius: 2,
+              boxShadow: `0 0 8px 0px ${!data?.isZero() ? "green" : "red"}`,
+            },
+          }}
+        >
+          <MediaRenderer width="100%" src={nft.metadata.image} />
+        </Box>
         <CardHeader
           title={nft.metadata.name}
           subheader={nft.metadata.description}
@@ -50,7 +91,7 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
         </CardContent>
         <CardActions>
           <Button
-            disabled={isLoading}
+            disabled={isLoading || !data?.isZero()}
             variant="contained"
             onClick={() =>
               claimNFT({
@@ -60,7 +101,9 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
               })
             }
           >
-            Claim {nft.metadata.name}
+            {licenseBalance?.isZero()
+              ? "Require licencia"
+              : `Claim ${nft.metadata.name}`}
           </Button>
         </CardActions>
       </Card>

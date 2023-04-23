@@ -1,15 +1,14 @@
-import { Box, Typography, Grid, CircularProgress } from "@mui/material";
 import React from "react";
-import { parseNumber } from "../../utils";
 import { useContract, useContractRead } from "@thirdweb-dev/react";
-import { stakingAddress } from "../../contracts/address";
+import { Box, Typography, Grid, CircularProgress } from "@mui/material";
 import GasAvailable from "./GasAvailable";
 import GasDeposited from "./GasDeposited";
 import GasFarmed from "./GasFarmed";
+import { stakingAddress } from "../../contracts/address";
+import { parseNumber } from "../../utils";
 
 const GasStatus = () => {
   const { contract } = useContract(stakingAddress);
-
   const { data: gasSupply, isLoading: isSupplyLoading } = useContractRead(
     contract,
     "getRewardTokenBalance"
@@ -19,7 +18,7 @@ const GasStatus = () => {
     <Box my={10}>
       <Typography variant="h2">Gas Station</Typography>
       <Typography variant="h5" gutterBottom>
-        Para empezar deposita el token AIRL en staking
+        Before Start Checklist, deposit AIRL Token in staking.
       </Typography>
       <Typography paragraph>
         Available:{" "}

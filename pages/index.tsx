@@ -1,23 +1,6 @@
-import {
-  ConnectWallet,
-  Web3Button,
-  useContract,
-  useContractRead,
-  useContractWrite,
-} from "@thirdweb-dev/react";
+import { ConnectWallet } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Container,
-  Grid,
-  LinearProgress,
-  Link,
-  Typography,
-} from "@mui/material";
-import { useCallback } from "react";
-import airlineCoin from "../contracts/abi/AirlineCoin.json";
+import { Box, Container, Grid, Link, Typography } from "@mui/material";
 
 const Home: NextPage = () => {
   return (
@@ -54,6 +37,16 @@ const Home: NextPage = () => {
           </Link>
           <Typography>
             Stake tokens and earn Gas to refuel your aircrafts.
+          </Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <Link href="/cargo">
+            <Typography variant="h4" paragraph>
+              Cargo &rarr;
+            </Typography>
+          </Link>
+          <Typography>
+            Realiza alguno de los vuelos pendientes y gana tokens AIRL.
           </Typography>
         </Grid>
       </Grid>

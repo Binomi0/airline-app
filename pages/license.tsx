@@ -1,39 +1,9 @@
 import { ConnectWallet } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Container,
-  Grid,
-  Link,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { useCallback } from "react";
-import AircraftMarketPlace from "../components/AircraftMarketPlace";
+import { Box, Container, Grid, Link, Typography } from "@mui/material";
 import LicenseMarketPlace from "../components/LicenseMarketPlace";
 
-type LicenseType = "A" | "B" | "C" | "D";
-
 const License: NextPage = () => {
-  // const canGetLicense = useCallback((license: LicenseType) => {
-  //   switch (license) {
-  //     case "D":
-  //       return true;
-  //     case "C":
-  //       return user.license.includes("D");
-  //     case "B":
-  //       return user.license.includes("C");
-  //     case "A":
-  //       return user.license.includes("B");
-  //     default:
-  //       return false;
-  //   }
-  // }, []);
   return (
     <Container>
       <Box my={10} textAlign="center">
