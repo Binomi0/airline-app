@@ -1,5 +1,6 @@
 import React, {
   useCallback,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -37,7 +38,7 @@ const IVAOPage = () => {
   const [pilot, setPilot] = useState(0);
   const { pilots, atcs } = useVaProviderContext();
 
-  console.log("pilots", pilots);
+  // console.log("pilots", pilots);
   // console.log("atcs", atcs);
 
   const createCargo = useCallback(() => {
@@ -51,17 +52,21 @@ const IVAOPage = () => {
       setPilot(found);
       setStep(2);
     } else {
+      setStep(3);
     }
   }, [pilots]);
 
+  useEffect(() => {
+    if (!!pilots.length) {
+      console.log("iniciando step a 1");
+      setStep(1);
+    }
+  }, [pilots]);
+
+  console.log("step =>", step);
   return (
     <Container>
       <Box mt={10}>
-        {step === 0 && (
-          <Button variant="contained" size="large" onClick={createCargo}>
-            Start Tracking
-          </Button>
-        )}
         {step === 1 && (
           <Box>
             <Card>
@@ -110,6 +115,16 @@ const IVAOPage = () => {
             <Grid item xs={6}></Grid>
             <Grid item xs={6}></Grid>
           </Grid>
+        )}
+        {step === 3 && (
+          <Box>
+            <Typography variant="h1">Conéctate a IVAO</Typography>
+            <Box my={6}>
+              <Button variant="contained" onClick={handleClick}>
+                Ya estoy conectado
+              </Button>
+            </Box>
+          </Box>
         )}
       </Box>
     </Container>

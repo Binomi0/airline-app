@@ -9,7 +9,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "GET") return res.status(405).end();
   if (!nextCall || nextCall.isBefore(moment())) {
     try {
-      console.log("requesting data at %s", moment().format("HH:MM:SS"));
+      console.log("requesting IVAO data at %s", moment().format("HH:MM:SS"));
       const response = await axios.get(
         "https://api.ivao.aero/v2/tracker/whazzup"
       );
