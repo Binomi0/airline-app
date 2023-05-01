@@ -7,7 +7,7 @@ import {
   Stack,
   Button,
 } from "@mui/material";
-import React, { useLayoutEffect } from "react";
+import React, { useEffect } from "react";
 import {
   useAddress,
   useContract,
@@ -29,7 +29,7 @@ const GasFarmed = () => {
     "claimRewards"
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const timer = setInterval(refetch, 10000);
     return () => clearInterval(timer);
   }, [refetch]);

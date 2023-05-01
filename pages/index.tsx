@@ -49,6 +49,16 @@ const Home: NextPage = () => {
             Realiza alguno de los vuelos pendientes y gana tokens AIRL.
           </Typography>
         </Grid>
+        <Grid item xs={4}>
+          <Link href="/ivao">
+            <Typography variant="h4" paragraph>
+              IVAO &rarr;
+            </Typography>
+          </Link>
+          <Typography>
+            Monitoriza tus vuelos en IVAO y gana recompensas.
+          </Typography>
+        </Grid>
       </Grid>
     </Container>
   );

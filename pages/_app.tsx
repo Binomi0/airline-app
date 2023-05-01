@@ -12,6 +12,9 @@ import createEmotionCache from "../src/createEmotionCache";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { Router } from "next/router";
 import { VaProvider } from "../context/VaProvider";
+import { AppBar } from "@mui/material";
+import CustomAppBar from "components/AppBar";
+import Sidebar from "components/Sidebar";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -23,6 +26,7 @@ export interface MyAppProps extends AppProps {
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   const [loading, setLoading] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const startLoading = React.useCallback(() => {
     setLoading(true);
@@ -52,6 +56,8 @@ export default function MyApp(props: MyAppProps) {
           <CssBaseline />
           <VaProvider>
             <ErrorBoundary>
+              <CustomAppBar onOpen={setOpen} />
+              <Sidebar open={open} onOpen={setOpen} />
               <Component {...pageProps} loading={loading} />
             </ErrorBoundary>
           </VaProvider>

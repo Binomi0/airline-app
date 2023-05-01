@@ -8,7 +8,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useBalance, useContract, useContractWrite } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
 import { parseNumber } from "../../utils";
@@ -24,7 +24,7 @@ const GasAvailable = () => {
     "stake"
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const timer = setInterval(refetch, 10000);
     return () => clearInterval(timer);
   }, [refetch]);
