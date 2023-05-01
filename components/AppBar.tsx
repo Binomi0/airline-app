@@ -15,7 +15,7 @@ const CustomAppBar: React.FC<{ onOpen: (value: boolean) => void }> = ({
   const [active, setActive] = React.useState(false);
 
   return (
-    <AppBar position="sticky" color="primary">
+    <AppBar position="sticky" color="transparent">
       <Toolbar>
         <IconButton
           onClick={() => onOpen(true)}

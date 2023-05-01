@@ -4,17 +4,16 @@ import { AppProps } from "next/app";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider, EmotionCache } from "@emotion/react";
+import { Router } from "next/router";
 import { ThirdwebProvider } from "@thirdweb-dev/react";
 import { Sepolia } from "@thirdweb-dev/chains";
-import "../styles/globals.css";
-import theme from "../src/theme";
-import createEmotionCache from "../src/createEmotionCache";
-import ErrorBoundary from "../components/ErrorBoundary";
-import { Router } from "next/router";
-import { VaProvider } from "../context/VaProvider";
-import { AppBar } from "@mui/material";
 import CustomAppBar from "components/AppBar";
 import Sidebar from "components/Sidebar";
+import { VaProvider } from "context/VaProvider";
+import ErrorBoundary from "components/ErrorBoundary";
+import createEmotionCache from "../src/createEmotionCache";
+import theme from "../src/theme";
+import "../styles/globals.css";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
