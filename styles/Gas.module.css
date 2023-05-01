@@ -1,0 +1,5 @@
+.background {
+  background-image: url("../public/img/airplanes.png");
+  background-clip: border-box;
+  background-repeat: no-repeat;
+}

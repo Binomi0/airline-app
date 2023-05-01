@@ -1,47 +1,34 @@
-import { ConnectWallet } from "@thirdweb-dev/react";
+import { ConnectWallet, useBalance } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
-import { Box, Container, Grid, Link, Typography } from "@mui/material";
+import { Box, Container, Stack, Typography } from "@mui/material";
 import GasStatus from "routes/gas/GasStatus";
+import styles from "styles/Gas.module.css";
+import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
+import { rewardTokenAddress } from "contracts/address";
 
 const Gas: NextPage = () => {
+  const { data } = useBalance(rewardTokenAddress);
+
   return (
-    <Container>
-      <Box my={10} textAlign="center">
-        <Typography variant="h1">Virtual Airline</Typography>
-        <ConnectWallet />
+    <>
+      <Box className={styles.background} py={5}>
+        <Container>
+          <Stack direction="row-reverse">
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <LocalGasStationIcon />
+              <Typography variant="h2">{data?.displayValue}</Typography>
+              <Typography variant="h6">{data?.symbol}</Typography>
+            </Stack>
+          </Stack>
+          <Box my={10} textAlign="center">
+            <Typography variant="h1">Virtual Airline</Typography>
+            <ConnectWallet />
+          </Box>
+
+          <GasStatus />
+        </Container>
       </Box>
-
-      <GasStatus />
-
-      <Grid container spacing={2}>
-        <Grid item xs={4} p={2}>
-          <Link href="/">
-            <Typography variant="h4" paragraph>
-              Home &rarr;
-            </Typography>
-          </Link>
-          <Typography>Ir a la página principal</Typography>
-        </Grid>
-        <Grid item xs={4} p={2}>
-          <Link href="/hangar">
-            <Typography variant="h4" paragraph>
-              Hangar &rarr;
-            </Typography>
-          </Link>
-          <Typography>Aircrafts, buy and sell aircraft NFT&apos;s</Typography>
-        </Grid>
-        <Grid item xs={4} p={2}>
-          <Link href="/license">
-            <Typography variant="h4" paragraph>
-              Licencias &rarr;
-            </Typography>
-          </Link>
-          <Typography>
-            Grow, adquire a licence and start flying today.
-          </Typography>
-        </Grid>
-      </Grid>
-    </Container>
+    </>
   );
 };
 
