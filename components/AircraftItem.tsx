@@ -8,6 +8,7 @@ import {
   CardActions,
   Button,
   Box,
+  CardMedia,
 } from "@mui/material";
 import {
   MediaRenderer,
@@ -48,38 +49,20 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   return (
     <Grid item xs={3}>
       <Card>
+        <CardHeader
+          title={nft.metadata.name}
+          subheader={nft.metadata.description}
+        />
         <Box
           onClick={() =>
             router.push(
               `/aircraft/${nftAircraftTokenAddress}/${nft.metadata.id}`
             )
           }
-          sx={{
-            position: "relative",
-            top: 0,
-            left: 0,
-            "&::before": {
-              position: "relative",
-              content: `${!data?.isZero() ? "'OWNED'" : "'LOCKED'"}`,
-              width: "50px",
-              height: "50px",
-              top: 100,
-              left: 50,
-              fontSize: "36px",
-              color: `${!data?.isZero() ? "green" : "red"}`,
-              background: "white",
-              padding: 1,
-              borderRadius: 2,
-              boxShadow: `0 0 8px 0px ${!data?.isZero() ? "green" : "red"}`,
-            },
-          }}
         >
-          <MediaRenderer width="100%" src={nft.metadata.image} />
+          <MediaRenderer height="100%" src={nft.metadata.image} />
         </Box>
-        <CardHeader
-          title={nft.metadata.name}
-          subheader={nft.metadata.description}
-        />
+
         <CardContent>
           <Stack direction="row" justifyContent="space-between">
             <Typography>Price</Typography>

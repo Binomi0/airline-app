@@ -11,9 +11,7 @@ import {
   AlertTitle,
   Box,
   Container,
-  Grid,
   LinearProgress,
-  Link,
   Snackbar,
   Typography,
 } from "@mui/material";
@@ -21,21 +19,7 @@ import { useState } from "react";
 import { nftAircraftTokenAddress } from "contracts/address";
 import MyAircrafts from "components/MyAircrafts";
 import AircraftMarketPlace from "components/AircraftMarketPlace";
-
-interface AircraftAttributes {
-  deposit: number;
-  cargo: number;
-  license: string;
-}
-
-interface AirlineNFT {
-  metadata: {
-    attributes: AircraftAttributes[];
-    name: string;
-    description: string;
-    image: string;
-  };
-}
+import styles from "styles/Hangar.module.css";
 
 const initialSnackState = {
   open: false,
@@ -72,61 +56,34 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
   }
 
   return (
-    <Container>
-      <Snackbar
-        open={snack.open}
-        autoHideDuration={6000}
-        onClose={() => setSnack(initialSnackState)}
-      >
-        <Alert
-          onClose={() => setSnack(initialSnackState)}
-          severity={snack.type}
-          sx={{ width: "100%" }}
-        >
-          <AlertTitle>{snack.title}</AlertTitle>
-          <Typography>{snack.message}</Typography>
-        </Alert>
-      </Snackbar>
-      <Box my={10} textAlign="center">
-        <Typography variant="h1">Virtual Airline</Typography>
-        <ConnectWallet />
+    <>
+      <Box className={styles.background} py={5}>
+        <Container>
+          <Snackbar
+            open={snack.open}
+            autoHideDuration={6000}
+            onClose={() => setSnack(initialSnackState)}
+          >
+            <Alert
+              onClose={() => setSnack(initialSnackState)}
+              severity={snack.type}
+              sx={{ width: "100%" }}
+            >
+              <AlertTitle>{snack.title}</AlertTitle>
+              <Typography>{snack.message}</Typography>
+            </Alert>
+          </Snackbar>
+          <Box my={5} textAlign="center">
+            <Typography variant="h1">Virtual Airline</Typography>
+            <ConnectWallet />
+          </Box>
+
+          <AircraftMarketPlace />
+
+          <MyAircrafts />
+        </Container>
       </Box>
-
-      <AircraftMarketPlace />
-
-      <MyAircrafts />
-
-      <Grid container spacing={2}>
-        <Grid item xs={4} p={2}>
-          <Link href="/">
-            <Typography variant="h4" paragraph>
-              Home &rarr;
-            </Typography>
-          </Link>
-          <Typography>Ir a la página principal</Typography>
-        </Grid>
-        <Grid item xs={4} p={2}>
-          <Link href="/license">
-            <Typography variant="h4" paragraph>
-              Licencias &rarr;
-            </Typography>
-          </Link>
-          <Typography>
-            Grow, adquire a licence and start flying today.
-          </Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Link href="/gas">
-            <Typography variant="h4" paragraph>
-              Gas &rarr;
-            </Typography>
-          </Link>
-          <Typography>
-            Stake tokens and earn Gas to refuel your aircrafts.
-          </Typography>
-        </Grid>
-      </Grid>
-    </Container>
+    </>
   );
 };
 

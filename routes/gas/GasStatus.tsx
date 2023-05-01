@@ -15,7 +15,7 @@ const GasStatus = () => {
   );
 
   return (
-    <Box my={10}>
+    <Box my={5}>
       <Typography variant="h2">Gas Station</Typography>
       <Typography variant="h5" gutterBottom>
         Before Start Checklist, deposit AIRL Token in staking and start earning

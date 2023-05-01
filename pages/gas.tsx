@@ -20,7 +20,7 @@ const Gas: NextPage = () => {
               <Typography variant="h6">{data?.symbol}</Typography>
             </Stack>
           </Stack>
-          <Box my={10} textAlign="center">
+          <Box my={2} textAlign="center">
             <Typography variant="h1">Virtual Airline</Typography>
             <ConnectWallet />
           </Box>
