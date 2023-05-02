@@ -1,7 +1,9 @@
 .background {
   background-image: url("../public/img/airplanes.png");
   background-clip: border-box;
+  background-attachment: fixed;
   background-repeat: no-repeat;
 
-  background-size: contain;
+  border: 3px solid #73ad21;
+  position: relative;
 }

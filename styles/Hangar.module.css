@@ -2,9 +2,7 @@
   background-image: url("../public/img/airplanes3.png");
   background-clip: border-box;
   background-attachment: fixed;
-
-  border: 3px solid #73ad21;
-  position: relative;
+  background-repeat: no-repeat;
 
   border: 3px solid #73ad21;
   position: relative;
