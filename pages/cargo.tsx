@@ -27,7 +27,6 @@ const Cargo: NextPage = () => {
     <Container>
       <Box my={10} textAlign="center">
         <Typography variant="h1">Virtual Airline</Typography>
-        <ConnectWallet />
       </Box>
 
       <Grid container spacing={2}>

@@ -1,18 +1,6 @@
 .background {
-  background-image: url("../public/img/Cyb3rYoga.png");
-  background-clip: border-box;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-
-  border: 3px solid #73ad21;
-  position: relative;
-}
-
-.background::after {
-  content: "";
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-blend-mode: hard-light;
+  object-fit: cover;
+  object-position: center;
+  z-index: -1;
+  position: fixed !important;
 }

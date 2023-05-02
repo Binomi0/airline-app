@@ -1,22 +1,22 @@
-import { ConnectWallet } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
 import { Box, Container, Typography } from "@mui/material";
 import LicenseMarketPlace from "../components/LicenseMarketPlace";
 import styles from "styles/License.module.css";
+import image from "public/img/airplanes4.png";
+import Image from "next/image";
 
 const License: NextPage = () => {
   return (
     <>
-      <Box className={styles.background} py={5}>
-        <Container>
-          <Box my={5} textAlign="center">
-            <Typography variant="h1">Virtual Airline</Typography>
-            <ConnectWallet />
-          </Box>
+      <Image className={styles.background} src={image} alt="banner" fill />
 
-          <LicenseMarketPlace />
-        </Container>
-      </Box>
+      <Container>
+        <Box my={5} textAlign="center">
+          <Typography variant="h1">License Page</Typography>
+        </Box>
+
+        <LicenseMarketPlace />
+      </Container>
     </>
   );
 };

@@ -20,6 +20,8 @@ import { nftAircraftTokenAddress } from "contracts/address";
 import MyAircrafts from "components/MyAircrafts";
 import AircraftMarketPlace from "components/AircraftMarketPlace";
 import styles from "styles/Hangar.module.css";
+import Image from "next/image";
+import image from "public/img/airplanes3.png";
 
 const initialSnackState = {
   open: false,
@@ -57,32 +59,30 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
 
   return (
     <>
-      <Box className={styles.background} py={5}>
-        <Container>
-          <Snackbar
-            open={snack.open}
-            autoHideDuration={6000}
+      <Image className={styles.background} src={image} alt="banner" fill />
+      <Container>
+        <Snackbar
+          open={snack.open}
+          autoHideDuration={6000}
+          onClose={() => setSnack(initialSnackState)}
+        >
+          <Alert
             onClose={() => setSnack(initialSnackState)}
+            severity={snack.type}
+            sx={{ width: "100%" }}
           >
-            <Alert
-              onClose={() => setSnack(initialSnackState)}
-              severity={snack.type}
-              sx={{ width: "100%" }}
-            >
-              <AlertTitle>{snack.title}</AlertTitle>
-              <Typography>{snack.message}</Typography>
-            </Alert>
-          </Snackbar>
-          <Box my={5} textAlign="center">
-            <Typography variant="h1">Virtual Airline</Typography>
-            <ConnectWallet />
-          </Box>
+            <AlertTitle>{snack.title}</AlertTitle>
+            <Typography>{snack.message}</Typography>
+          </Alert>
+        </Snackbar>
+        <Box my={5} textAlign="center">
+          <Typography variant="h1">Virtual Airline</Typography>
+        </Box>
 
-          <AircraftMarketPlace />
+        <AircraftMarketPlace />
 
-          <MyAircrafts />
-        </Container>
-      </Box>
+        <MyAircrafts />
+      </Container>
     </>
   );
 };

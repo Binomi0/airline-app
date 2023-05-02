@@ -15,7 +15,6 @@ import {
   useAddress,
   useClaimNFT,
   useContract,
-  useNFT,
 } from "@thirdweb-dev/react";
 import React from "react";
 import { getNFTAttributes } from "utils";
@@ -50,6 +49,7 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
               background: "white",
               padding: 1,
               borderRadius: 2,
+              textShadow: `2px 2px ${owned ? "lightGreen" : "orange"}`,
               boxShadow: `0 0 8px 0px ${owned ? "green" : "red"}`,
             },
           }}
