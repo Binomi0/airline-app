@@ -53,10 +53,6 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
     );
   }
 
-  if (!address) {
-    return <div>no address</div>;
-  }
-
   return (
     <>
       <Image className={styles.background} src={image} alt="banner" fill />
@@ -79,9 +75,9 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
           <Typography variant="h1">Virtual Airline</Typography>
         </Box>
 
-        <AircraftMarketPlace />
+        {address && <AircraftMarketPlace />}
 
-        <MyAircrafts />
+        {address && <MyAircrafts />}
       </Container>
     </>
   );
