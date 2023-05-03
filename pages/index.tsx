@@ -1,9 +1,11 @@
-import { ConnectWallet } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
 import {
   Box,
+  Card,
+  CardContent,
   Container,
   Grid,
+  Grow,
   Link,
   Typography,
   useTheme,
@@ -12,97 +14,93 @@ import styles from "../styles/Home.module.css";
 import image from "public/img/Cyb3rYoga.png";
 import Image from "next/image";
 
-const Home: NextPage = () => {
+const GridItem: React.FC<{
+  link: string;
+  title: string;
+  text: string;
+  delay: number;
+}> = ({ link, title, text, delay }) => {
   const theme = useTheme();
 
   return (
-    <Box sx={{ position: "relative" }}>
-      <Image
-        priority
-        className={styles.background}
-        src={image}
-        alt="banner"
-        fill
-      />
-
-      <Container>
-        <Box my={5} textAlign="center">
-          <Typography variant="h1">Virtual Airline</Typography>
-        </Box>
-
-        <Grid container spacing={2}>
-          <Grid item xs={4} p={2}>
-            <Link href="/hangar">
+    <Grow in timeout={{ enter: delay }}>
+      <Grid item xs={12} md={6} lg={4} xl={3} p={2}>
+        <Link href={link} underline="none">
+          <Card className={styles.card}>
+            <CardContent>
               <Typography
                 variant="h4"
+                color="white"
                 paragraph
-                sx={{ textShadow: `2px 2px ${theme.palette.primary.dark}` }}
+                sx={{
+                  textShadow: `2px 2px ${theme.palette.primary.dark}`,
+                }}
               >
-                Hangar &rarr;
+                {title}
               </Typography>
-            </Link>
-            <Typography>Aircrafts, buy and sell aircraft NFT&apos;s</Typography>
-          </Grid>
-          <Grid item xs={4} p={2}>
-            <Link href="/license">
-              <Typography
-                variant="h4"
-                paragraph
-                sx={{ textShadow: `2px 2px ${theme.palette.primary.dark}` }}
-              >
-                Licencias &rarr;
+              <Typography className={styles.text} color="white">
+                {text}
               </Typography>
-            </Link>
-            <Typography>
-              Grow, adquire a licence and start flying today.
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Link href="/gas">
-              <Typography
-                variant="h4"
-                paragraph
-                sx={{ textShadow: `2px 2px ${theme.palette.primary.dark}` }}
-              >
-                Gas &rarr;
-              </Typography>
-            </Link>
-            <Typography>
-              Stake tokens and earn Gas to refuel your aircrafts.
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Link href="/cargo">
-              <Typography
-                variant="h4"
-                paragraph
-                sx={{ textShadow: `2px 2px ${theme.palette.primary.dark}` }}
-              >
-                Cargo &rarr;
-              </Typography>
-            </Link>
-            <Typography>
-              Realiza alguno de los vuelos pendientes y gana tokens AIRL.
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Link href="/ivao">
-              <Typography
-                variant="h4"
-                paragraph
-                sx={{ textShadow: `2px 2px ${theme.palette.primary.dark}` }}
-              >
-                IVAO &rarr;
-              </Typography>
-            </Link>
-            <Typography>
-              Monitoriza tus vuelos en IVAO y gana recompensas.
-            </Typography>
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+            </CardContent>
+          </Card>
+        </Link>
+      </Grid>
+    </Grow>
   );
 };
+
+const Home: NextPage = () => (
+  <Box position="relative">
+    <Image
+      alt="banner"
+      className={styles.background}
+      fill
+      placeholder="blur"
+      priority
+      src={image}
+    />
+
+    <Container>
+      <Box my={5} textAlign="center">
+        <Typography variant="h1">Virtual Airline</Typography>
+      </Box>
+
+      <Grid container spacing={2}>
+        <GridItem
+          delay={500}
+          link="/hangar"
+          title="Hangar &rarr;"
+          text="Aircrafts, buy and sell aircraft NFT's"
+        />
+        <GridItem
+          delay={1000}
+          link="/license"
+          title="Licencias &rarr;"
+          text="Grow, adquire a licence and start flying today."
+        />
+
+        <GridItem
+          delay={1500}
+          link="/gas"
+          title="Gas &rarr;"
+          text="Stake and earn Gas to refuel your aircrafts."
+        />
+        <GridItem
+          delay={2000}
+          link="/cargo"
+          title="Cargo &rarr;"
+          text="Realiza alguno de los vuelos pendientes y gana tokens
+                      AIRL."
+        />
+        <GridItem
+          delay={2500}
+          link="/ivao"
+          title="IVAO &rarr;"
+          text="Monitoriza tus vuelos en IVAO y gana recompensas."
+        />
+      </Grid>
+    </Container>
+  </Box>
+);
 
 export default Home;

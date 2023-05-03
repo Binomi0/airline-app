@@ -37,30 +37,16 @@ interface HangarProps {
 const Hangar: NextPage<HangarProps> = ({ loading }) => {
   const [snack, setSnack] = useState(initialSnackState);
   const address = useAddress();
-  const { contract } = useContract(nftAircraftTokenAddress);
-  const { data: nfts, isLoading, error } = useNFTs(contract);
-
-  if (isLoading || !nfts || loading) {
-    return <LinearProgress />;
-  }
-
-  if (error) {
-    console.log("errorNFTs", error);
-    return (
-      <Alert severity="error">
-        <AlertTitle>Ha ocurrido un error</AlertTitle>
-      </Alert>
-    );
-  }
 
   return (
     <Box sx={{ position: "relative" }}>
       <Image
-        priority
-        className={styles.background}
-        src={image}
         alt="banner"
+        className={styles.background}
         fill
+        placeholder="blur"
+        priority
+        src={image}
       />
       <Container>
         <Snackbar
@@ -78,10 +64,10 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
           </Alert>
         </Snackbar>
         <Box my={5} textAlign="center">
-          <Typography variant="h1">Virtual Airline</Typography>
+          <Typography variant="h1">Main Hangar</Typography>
         </Box>
 
-        {address && <AircraftMarketPlace />}
+        <AircraftMarketPlace />
 
         {address && <MyAircrafts />}
       </Container>

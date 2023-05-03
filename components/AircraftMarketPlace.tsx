@@ -40,18 +40,13 @@ const AircraftMarketPlace: React.FC = () => {
     return <LinearProgress />;
   }
 
-  if (error) {
-    console.log("error", error);
-    return (
-      <Alert severity="error">
-        <AlertTitle>Ha ocurrido un error</AlertTitle>
-      </Alert>
-    );
-  }
-
   return (
     <Box my={4}>
-      <Typography variant="h2">MarketPlace</Typography>
+      {!!error && (
+        <Alert severity="error">
+          <AlertTitle>Ha ocurrido un error</AlertTitle>
+        </Alert>
+      )}
       <Grid container spacing={2}>
         {nftList
           .filter((a) => a.metadata.id !== "0")

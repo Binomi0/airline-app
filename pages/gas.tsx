@@ -35,7 +35,7 @@ const Gas: NextPage = () => {
           </Stack>
         )}
         <Box my={2} textAlign="center">
-          <Typography variant="h1">Virtual Airline</Typography>
+          <Typography variant="h1">Gas Station</Typography>
         </Box>
 
         <GasStatus />

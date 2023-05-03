@@ -4,3 +4,22 @@
   z-index: -1;
   position: fixed !important;
 }
+
+.card {
+  text-decoration: none;
+  background-color: rgba(31, 17, 5, 0.6);
+  border-radius: 10px;
+  cursor: pointer;
+  /* padding: 15px;
+  border: 10px solid transparent;
+  border-image: url(https://i.stack.imgur.com/sjbeu.png) 30 round; */
+}
+
+.card:hover {
+  transform: scale(0.99);
+  box-shadow: 0px 0px 0px 2px #7dd3fc;
+}
+
+.text {
+  text-shadow: 1px 1px grey;
+}
