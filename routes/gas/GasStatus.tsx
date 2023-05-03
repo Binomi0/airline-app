@@ -2,7 +2,7 @@ import React from "react";
 import { useContract, useContractRead } from "@thirdweb-dev/react";
 import { Box, Typography, Grid, CircularProgress } from "@mui/material";
 import { stakingAddress } from "contracts/address";
-import { parseNumber } from "utils";
+import { formatNumber, parseNumber } from "utils";
 import GasAvailable from "./GasAvailable";
 import GasDeposited from "./GasDeposited";
 import GasFarmed from "./GasFarmed";
@@ -26,7 +26,7 @@ const GasStatus = () => {
         {isSupplyLoading ? (
           <CircularProgress size={14} />
         ) : (
-          parseNumber(Number(gasSupply?.toString()) / 1e18)
+          formatNumber(Number(gasSupply?.toString()) / 1e18)
         )}{" "}
         Liters
       </Typography>

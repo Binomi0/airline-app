@@ -14,16 +14,17 @@ import {
   useContractRead,
   useContractWrite,
 } from "@thirdweb-dev/react";
-import { stakingAddress } from "../../contracts/address";
+import { stakingAddress } from "contracts/address";
+import { formatNumber } from "utils";
 
 const GasFarmed = () => {
   const address = useAddress();
   const { contract } = useContract(stakingAddress);
-  const {
-    data: stakeInfo,
-    isLoading,
-    refetch,
-  } = useContractRead(contract, "getStakeInfo", [address]);
+  const { data: stakeInfo, refetch } = useContractRead(
+    contract,
+    "getStakeInfo",
+    [address]
+  );
   const { mutateAsync: claimRewards, isLoading: isClaiming } = useContractWrite(
     contract,
     "claimRewards"
@@ -39,15 +40,11 @@ const GasFarmed = () => {
       <Card>
         <Box p={1}>
           <Typography variant="subtitle1">Farmed Gasoline (AIRG)</Typography>
-          {isLoading ? (
-            <Box my={1} textAlign="center">
-              <CircularProgress size={48} />
-            </Box>
-          ) : (
-            <Typography variant="h3" paragraph>
-              {(Number(stakeInfo?._rewards) / 1e18).toString()} Liters
-            </Typography>
-          )}
+
+          <Typography variant="h3" paragraph>
+            {formatNumber(Number(stakeInfo?._rewards || 0) / 1e18)} Liters
+          </Typography>
+
           <Stack>
             <Button
               color="info"

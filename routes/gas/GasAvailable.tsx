@@ -3,7 +3,6 @@ import {
   Card,
   Box,
   Typography,
-  CircularProgress,
   Stack,
   TextField,
   Button,
@@ -11,14 +10,14 @@ import {
 import React, { useEffect, useState } from "react";
 import { useBalance, useContract, useContractWrite } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
-import { parseNumber } from "../../utils";
-import { coinTokenAddress, stakingAddress } from "../../contracts/address";
+import { formatNumber, parseNumber } from "utils";
+import { coinTokenAddress, stakingAddress } from "contracts/address";
 
 const GasAvailable = () => {
   const [stakeAmount, setStakeAmount] = useState("");
-  const { data: airl, isLoading } = useBalance(coinTokenAddress);
+  const { data: airl } = useBalance(coinTokenAddress);
   const { contract: coin } = useContract(coinTokenAddress, "token");
-  const { contract: staking, refetch } = useContract(stakingAddress);
+  const { contract: staking, refetch, isLoading } = useContract(stakingAddress);
   const { mutateAsync: stake, isLoading: isStaking } = useContractWrite(
     staking,
     "stake"
@@ -35,12 +34,7 @@ const GasAvailable = () => {
         <Box p={1}>
           <Typography variant="subtitle1">Available to deposit</Typography>
           <Typography variant="subtitle2" paragraph>
-            {isLoading ? (
-              <CircularProgress size={14} />
-            ) : (
-              parseNumber(Number(airl?.displayValue))
-            )}{" "}
-            AIRL
+            {formatNumber(Number(airl?.displayValue))} AIRL
           </Typography>
           <Stack spacing={2}>
             <TextField
@@ -64,7 +58,7 @@ const GasAvailable = () => {
             />
             <Button
               color="success"
-              disabled={isStaking}
+              disabled={isStaking || !stakeAmount}
               onClick={async () => {
                 await coin?.erc20.setAllowance(
                   stakingAddress,

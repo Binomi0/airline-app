@@ -54,8 +54,14 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
   }
 
   return (
-    <>
-      <Image className={styles.background} src={image} alt="banner" fill />
+    <Box sx={{ position: "relative" }}>
+      <Image
+        priority
+        className={styles.background}
+        src={image}
+        alt="banner"
+        fill
+      />
       <Container>
         <Snackbar
           open={snack.open}
@@ -79,7 +85,7 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
 
         {address && <MyAircrafts />}
       </Container>
-    </>
+    </Box>
   );
 };
 

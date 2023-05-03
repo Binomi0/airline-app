@@ -7,8 +7,14 @@ import Image from "next/image";
 
 const License: NextPage = () => {
   return (
-    <>
-      <Image className={styles.background} src={image} alt="banner" fill />
+    <Box sx={{ position: "relative" }}>
+      <Image
+        priority
+        className={styles.background}
+        src={image}
+        alt="banner"
+        fill
+      />
 
       <Container>
         <Box my={5} textAlign="center">
@@ -17,7 +23,7 @@ const License: NextPage = () => {
 
         <LicenseMarketPlace />
       </Container>
-    </>
+    </Box>
   );
 };
 

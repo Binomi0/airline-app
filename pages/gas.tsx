@@ -7,29 +7,40 @@ import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
 import { rewardTokenAddress } from "contracts/address";
 import Image from "next/image";
 import image from "public/img/airplanes.png";
+import { formatNumber } from "utils";
 
 const Gas: NextPage = () => {
   const { data } = useBalance(rewardTokenAddress);
 
   return (
-    <>
-      <Image className={styles.background} src={image} alt="banner" fill />
+    <Box sx={{ position: "relative" }}>
+      <Image
+        priority
+        className={styles.background}
+        src={image}
+        alt="banner"
+        fill
+      />
 
       <Container>
-        <Stack direction="row-reverse">
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <LocalGasStationIcon />
-            <Typography variant="h2">{data?.displayValue}</Typography>
-            <Typography variant="h6">{data?.symbol}</Typography>
+        {data && (
+          <Stack direction="row-reverse">
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <LocalGasStationIcon />
+              <Typography variant="h2">
+                {formatNumber(Number(data.displayValue))}
+              </Typography>
+              <Typography variant="h6">{data.symbol}</Typography>
+            </Stack>
           </Stack>
-        </Stack>
+        )}
         <Box my={2} textAlign="center">
           <Typography variant="h1">Virtual Airline</Typography>
         </Box>
 
         <GasStatus />
       </Container>
-    </>
+    </Box>
   );
 };
 

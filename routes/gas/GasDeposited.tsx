@@ -9,7 +9,7 @@ import {
   Button,
 } from "@mui/material";
 import React, { useState } from "react";
-import { parseNumber } from "../../utils";
+import { formatNumber } from "utils";
 import {
   useAddress,
   useBalance,
@@ -18,17 +18,13 @@ import {
   useContractWrite,
 } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
-import { rewardTokenAddress, stakingAddress } from "../../contracts/address";
+import { rewardTokenAddress, stakingAddress } from "contracts/address";
 
 const GasDeposited = () => {
   const address = useAddress();
   const [unstakeAmount, setUnstakeAmount] = useState("");
   const { contract } = useContract(stakingAddress);
-  const { data: staking, isLoading: isStakingLoading } = useContractRead(
-    contract,
-    "stakers",
-    [address]
-  );
+  const { data: staking } = useContractRead(contract, "stakers", [address]);
   const { mutateAsync: withdraw, isLoading } = useContractWrite(
     contract,
     "withdraw"
@@ -40,11 +36,9 @@ const GasDeposited = () => {
         <Box p={1}>
           <Typography variant="subtitle1">Deposited</Typography>
           <Typography variant="subtitle2" paragraph>
-            {isStakingLoading ? (
-              <CircularProgress size={14} />
-            ) : (
-              parseNumber(Number(staking?.amountStaked.toString()) / 1e18)
-            )}{" "}
+            {staking
+              ? formatNumber(Number(staking.amountStaked.toString()) / 1e18)
+              : formatNumber()}{" "}
             AIRL
           </Typography>
           <Stack spacing={2}>
@@ -75,7 +69,7 @@ const GasDeposited = () => {
               color="error"
               size="small"
               variant="contained"
-              disabled={isLoading}
+              disabled={isLoading || !unstakeAmount}
               onClick={() =>
                 withdraw({ args: [ethers.utils.parseEther(unstakeAmount)] })
               }

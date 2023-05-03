@@ -16,8 +16,14 @@ const Home: NextPage = () => {
   const theme = useTheme();
 
   return (
-    <>
-      <Image className={styles.background} src={image} alt="banner" fill />
+    <Box sx={{ position: "relative" }}>
+      <Image
+        priority
+        className={styles.background}
+        src={image}
+        alt="banner"
+        fill
+      />
 
       <Container>
         <Box my={5} textAlign="center">
@@ -95,7 +101,7 @@ const Home: NextPage = () => {
           </Grid>
         </Grid>
       </Container>
-    </>
+    </Box>
   );
 };
 

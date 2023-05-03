@@ -19,3 +19,9 @@ export const getNFTAttributes = (nft: NFT) => {
 
 export const parseNumber = (value: number | bigint) =>
   Intl.NumberFormat("es").format(value);
+
+export const formatNumber = (value: number = 0, decimals: number = 2) =>
+  Intl.NumberFormat("es", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(isNaN(value) ? 0 : value);
