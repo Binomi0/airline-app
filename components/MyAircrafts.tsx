@@ -24,22 +24,15 @@ import { getNFTAttributes } from "utils";
 const MyAircrafts = () => {
   const address = useAddress();
   const { contract } = useContract(nftAircraftTokenAddress);
-  const { data: nfts, isLoading, error } = useOwnedNFTs(contract, address);
-
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-
-  if (error) {
-    return (
-      <Alert severity="error">
-        <AlertTitle>Ha ocurrido un error</AlertTitle>
-      </Alert>
-    );
-  }
+  const { data: nfts = [], error } = useOwnedNFTs(contract, address);
 
   return nfts && nfts.length > 0 ? (
     <Box my={4}>
+      {!!error && (
+        <Alert severity="error">
+          <AlertTitle>Ha ocurrido un error</AlertTitle>
+        </Alert>
+      )}
       <Typography variant="h2">My Aircrafts</Typography>
       <Grid container spacing={2}>
         {nfts?.map((nft) => (

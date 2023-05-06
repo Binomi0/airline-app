@@ -10,17 +10,18 @@ import {
 import React, { useEffect } from "react";
 import {
   useAddress,
+  useBalance,
   useContract,
   useContractRead,
   useContractWrite,
 } from "@thirdweb-dev/react";
-import { stakingAddress } from "contracts/address";
+import { rewardTokenAddress, stakingAddress } from "contracts/address";
 import { formatNumber } from "utils";
 
 const GasFarmed = () => {
   const address = useAddress();
   const { contract } = useContract(stakingAddress);
-  const { data: stakeInfo, refetch } = useContractRead(
+  const { data: stakeInfo, refetch: getStakeInfo } = useContractRead(
     contract,
     "getStakeInfo",
     [address]
@@ -29,11 +30,12 @@ const GasFarmed = () => {
     contract,
     "claimRewards"
   );
+  const { refetch } = useBalance(rewardTokenAddress);
 
   useEffect(() => {
-    const timer = setInterval(refetch, 10000);
+    const timer = setInterval(getStakeInfo, 15000);
     return () => clearInterval(timer);
-  }, [refetch]);
+  }, [getStakeInfo]);
 
   return (
     <Grid item xs={4}>
@@ -51,8 +53,9 @@ const GasFarmed = () => {
               disabled={isClaiming}
               size="small"
               variant="contained"
-              onClick={() => {
-                claimRewards({ args: [] });
+              onClick={async () => {
+                await claimRewards({ args: [] });
+                refetch();
               }}
             >
               Get Gas

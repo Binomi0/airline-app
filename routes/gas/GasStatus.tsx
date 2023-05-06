@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useContract, useContractRead } from "@thirdweb-dev/react";
 import { Box, Typography, Grid, CircularProgress } from "@mui/material";
 import { stakingAddress } from "contracts/address";
@@ -9,10 +9,16 @@ import GasFarmed from "./GasFarmed";
 
 const GasStatus = () => {
   const { contract } = useContract(stakingAddress);
-  const { data: gasSupply, isLoading: isSupplyLoading } = useContractRead(
-    contract,
-    "getRewardTokenBalance"
-  );
+  const {
+    data: gasSupply,
+    isLoading: isSupplyLoading,
+    refetch: getRewardsTokenBalance,
+  } = useContractRead(contract, "getRewardTokenBalance");
+
+  useEffect(() => {
+    const timer = setInterval(getRewardsTokenBalance, 15000);
+    return () => clearInterval(timer);
+  }, [getRewardsTokenBalance]);
 
   return (
     <Box my={5}>

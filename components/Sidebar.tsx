@@ -11,9 +11,13 @@ import {
   useTheme,
 } from "@mui/material";
 import React from "react";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import { useRouter } from "next/router";
+import ConstructionIcon from "@mui/icons-material/Construction";
+import HomeIcon from "@mui/icons-material/Home";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
+import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
+import LocalAirportIcon from "@mui/icons-material/LocalAirport";
 
 const Sidebar: React.FC<{
   onOpen: (open: boolean) => void;
@@ -24,7 +28,7 @@ const Sidebar: React.FC<{
 
   const handleClick = React.useCallback(
     (text: string) => {
-      router.push(text !== "Home" ? text : "/");
+      router.push(text);
       onOpen(false);
     },
     [onOpen, router]
@@ -34,29 +38,63 @@ const Sidebar: React.FC<{
     <Drawer
       open={open}
       onClose={() => onOpen(false)}
-      PaperProps={{ sx: { backgroundColor: theme.palette.primary.dark } }}
+      PaperProps={{ sx: { backgroundColor: "rgba(255,255,255,0.75)" } }}
     >
       <Box p={2} color="white">
-        <Typography variant="h2">AIRLINE</Typography>
+        <Typography color="primary" variant="h2">
+          AIRLINE
+        </Typography>
       </Box>
       <Divider />
       <List>
-        {["Home", "hangar", "license", "gas", "cargo", "ivao"].map(
-          (text, index) => (
-            <ListItem
-              key={text}
-              disablePadding
-              onClick={() => handleClick(text)}
-            >
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          )
-        )}
+        <ListItem disablePadding onClick={() => handleClick("/")}>
+          <ListItemButton>
+            <ListItemIcon>
+              <HomeIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Home" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding onClick={() => handleClick("/hangar")}>
+          <ListItemButton>
+            <ListItemIcon>
+              <ConstructionIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Hangar" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding onClick={() => handleClick("/license")}>
+          <ListItemButton>
+            <ListItemIcon>
+              <WorkspacePremiumIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="License" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding onClick={() => handleClick("/gas")}>
+          <ListItemButton>
+            <ListItemIcon>
+              <LocalGasStationIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Gas Station" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding onClick={() => handleClick("/cargo")}>
+          <ListItemButton>
+            <ListItemIcon>
+              <AddHomeWorkIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Main Cargo" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding onClick={() => handleClick("/ivao")}>
+          <ListItemButton>
+            <ListItemIcon>
+              <LocalAirportIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="IVAO" />
+          </ListItemButton>
+        </ListItem>
       </List>
     </Drawer>
   );

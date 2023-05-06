@@ -22,7 +22,7 @@ const CustomAppBar: React.FC<{ onOpen: (value: boolean) => void }> = ({
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Decentralized Virtual Airline
         </Typography>
-        <ConnectWallet />
+        <ConnectWallet style={{ height: "50px" }} />
       </Toolbar>
     </AppBar>
   );

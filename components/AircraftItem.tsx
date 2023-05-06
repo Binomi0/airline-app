@@ -65,7 +65,7 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
 
         <CardContent>
           <Stack direction="row" justifyContent="space-between">
-            <Typography>Price</Typography>
+            <Typography variant="body1">Price</Typography>
             <Typography variant="body2">0.01</Typography>
           </Stack>
           {getNFTAttributes(nft).map((attribute) => (

@@ -11,6 +11,7 @@ import CustomAppBar from "components/AppBar";
 import Sidebar from "components/Sidebar";
 import { VaProvider } from "context/VaProvider";
 import ErrorBoundary from "components/ErrorBoundary";
+// import { factoryAddress } from "contracts/address";
 import createEmotionCache from "../src/createEmotionCache";
 import theme from "../src/theme";
 import "../styles/globals.css";
@@ -45,7 +46,22 @@ export default function MyApp(props: MyAppProps) {
   }, [startLoading, endLoading]);
 
   return (
-    <ThirdwebProvider activeChain={Sepolia}>
+    <ThirdwebProvider
+      activeChain={Sepolia}
+      // TODO: Sepolia network not supported yet
+      // supportedWallets={[
+      //   smartWallet({
+      //     factoryAddress,
+      //     thirdwebApiKey: process.env["NEXT_PUBLIC_API_KEY"] || "",
+      //     gasless: true,
+      //     personalWallets: [
+      //       metamaskWallet(),
+      //       coinbaseWallet(),
+      //       localWallet({ persist: true }),
+      //     ],
+      //   }),
+      // ]}
+    >
       <CacheProvider value={emotionCache}>
         <Head>
           <meta name="viewport" content="initial-scale=1, width=device-width" />

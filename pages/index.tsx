@@ -22,25 +22,17 @@ const GridItem: React.FC<{
 }> = ({ link, title, text, delay }) => {
   const theme = useTheme();
 
+  console.log("palette =>", theme.palette);
   return (
     <Grow in timeout={{ enter: delay }}>
-      <Grid item xs={12} md={6} lg={4} xl={3} p={2}>
+      <Grid item xs={12} md={6} lg={6} p={2}>
         <Link href={link} underline="none">
           <Card className={styles.card}>
-            <CardContent>
-              <Typography
-                variant="h4"
-                color="white"
-                paragraph
-                sx={{
-                  textShadow: `2px 2px ${theme.palette.primary.dark}`,
-                }}
-              >
+            <CardContent className={styles.text}>
+              <Typography component="h4" variant="h4" color="white" paragraph>
                 {title}
               </Typography>
-              <Typography className={styles.text} color="white">
-                {text}
-              </Typography>
+              <Typography color="white">{text}</Typography>
             </CardContent>
           </Card>
         </Link>
@@ -65,7 +57,7 @@ const Home: NextPage = () => (
         <Typography variant="h1">Virtual Airline</Typography>
       </Box>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={8}>
         <GridItem
           delay={500}
           link="/hangar"

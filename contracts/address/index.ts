@@ -7,3 +7,4 @@ export const nftAircraftTokenAddress =
   "0x72ba96225Df9f55f107D921F88Cb721C627653A4";
 export const nftLicenseTokenAddress =
   "0xDAe1fb0EBc33e6a57892D1aE6f6546D1ab787998";
+export const factoryAddress = "0x152546eaCCe1Bd86F11Ffd6ccf607bb77fc26E4E";

@@ -23,10 +23,22 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: roboto.style.fontFamily,
+    fontFamily: "Roboto",
+    allVariants: {
+      fontFamily: "Roboto",
+    },
     h1: {
       textShadow: "2px 2px 10px grey",
       fontWeight: 700,
+    },
+    h2: {
+      fontWeight: 500,
+    },
+    body1: {
+      fontWeight: 300,
+    },
+    body2: {
+      fontWeight: 500,
     },
   },
 });
