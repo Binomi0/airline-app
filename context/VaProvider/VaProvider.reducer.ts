@@ -7,6 +7,11 @@ export const vaProviderReducer: VaReducerHandler = (state, action) => {
         pilots: action.payload.pilots,
         atcs: action.payload.atcs.filter((atc) => atc.callsign.includes("LE")),
       };
+    case "SET_CURRENT_PILOT":
+      return {
+        ...state,
+        active: action.payload,
+      };
     default:
       return state;
   }

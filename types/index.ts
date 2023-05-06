@@ -1,3 +1,5 @@
+import ivaoPilot from "mocks/ivaoPilot";
+
 export interface AircraftAttributes {
   deposit: number;
   cargo: number;
@@ -12,3 +14,14 @@ export interface AirlineNFT {
     image: string;
   };
 }
+
+export type LastTrackState =
+  | "En Route"
+  | "Boarding"
+  | "Approach"
+  | "Departing"
+  | "On Blocks"
+  | "Initial Climb"
+  | "Landed";
+
+export type IvaoPilot = typeof ivaoPilot;

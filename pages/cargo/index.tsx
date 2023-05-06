@@ -1,4 +1,5 @@
 import type { NextPage } from "next";
+import Link from "next/link";
 import {
   Box,
   Card,
@@ -8,7 +9,7 @@ import {
   Grid,
   Grow,
   LinearProgress,
-  Link,
+  Link as MuiLink,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -28,39 +29,40 @@ const GridItem: React.FC<{
         <Link
           href={`
         cargo/${cargo.id}`}
-          underline="none"
         >
-          <Card className={styles.card}>
-            <CardHeader
-              title={
+          <MuiLink underline="none">
+            <Card className={styles.card}>
+              <CardHeader
+                title={
+                  <Typography
+                    variant="subtitle2"
+                    color="white"
+                  >{`${cargo.origin}/${cargo.destination}`}</Typography>
+                }
+                subheader={
+                  <Typography
+                    color="white"
+                    variant="caption"
+                  >{`Prize: ${cargo.prize} AIRL`}</Typography>
+                }
+              />
+              <CardContent>
                 <Typography
-                  variant="subtitle2"
+                  variant="h4"
                   color="white"
-                >{`${cargo.origin}/${cargo.destination}`}</Typography>
-              }
-              subheader={
-                <Typography
-                  color="white"
-                  variant="caption"
-                >{`Prize: ${cargo.prize} AIRL`}</Typography>
-              }
-            />
-            <CardContent>
-              <Typography
-                variant="h4"
-                color="white"
-                paragraph
-                sx={{
-                  textShadow: `2px 2px ${theme.palette.primary.dark}`,
-                }}
-              >
-                New Cargo
-              </Typography>
-              <Typography className={styles.text} color="white">
-                {cargo.description}
-              </Typography>
-            </CardContent>
-          </Card>
+                  paragraph
+                  sx={{
+                    textShadow: `2px 2px ${theme.palette.primary.dark}`,
+                  }}
+                >
+                  New Cargo
+                </Typography>
+                <Typography className={styles.text} color="white">
+                  {cargo.description}
+                </Typography>
+              </CardContent>
+            </Card>
+          </MuiLink>
         </Link>
       </Grid>
     </Grow>
@@ -95,7 +97,7 @@ const Cargo: NextPage<{ loading: boolean }> = ({ loading }) =>
 
 export default Cargo;
 
-const cargos: Cargo[] = [
+export const cargos: Cargo[] = [
   {
     id: 1,
     origin: "LEAL",
@@ -104,8 +106,10 @@ const cargos: Cargo[] = [
     weight: "100",
     description: "100 kg de peanuts de Alicante a Valencia",
     prize: 50,
+    aircraft: 3,
   },
   {
+    aircraft: 3,
     id: 2,
     origin: "LEVC",
     destination: "LEMI",
@@ -115,6 +119,7 @@ const cargos: Cargo[] = [
     prize: 100,
   },
   {
+    aircraft: 1,
     id: 3,
     origin: "LEAL",
     destination: "LEVC",
@@ -126,6 +131,7 @@ const cargos: Cargo[] = [
 ];
 
 interface Cargo {
+  aircraft: number;
   id: number;
   origin: string;
   destination: string;

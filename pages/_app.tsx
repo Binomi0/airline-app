@@ -15,6 +15,7 @@ import ErrorBoundary from "components/ErrorBoundary";
 import createEmotionCache from "../src/createEmotionCache";
 import theme from "../src/theme";
 import "../styles/globals.css";
+import { MainProvider } from "context/MainProvider";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -26,7 +27,6 @@ export interface MyAppProps extends AppProps {
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   const [loading, setLoading] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
 
   const startLoading = React.useCallback(() => {
     setLoading(true);
@@ -69,13 +69,15 @@ export default function MyApp(props: MyAppProps) {
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          <VaProvider>
-            <ErrorBoundary>
-              <CustomAppBar onOpen={setOpen} />
-              <Sidebar open={open} onOpen={setOpen} />
-              <Component {...pageProps} loading={loading} />
-            </ErrorBoundary>
-          </VaProvider>
+          <ErrorBoundary>
+            <MainProvider>
+              <CustomAppBar />
+              <Sidebar />
+              <VaProvider>
+                <Component {...pageProps} loading={loading} />
+              </VaProvider>
+            </MainProvider>
+          </ErrorBoundary>
         </ThemeProvider>
       </CacheProvider>
     </ThirdwebProvider>

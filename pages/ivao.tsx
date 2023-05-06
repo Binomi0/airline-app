@@ -7,10 +7,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useVaProviderContext } from "../context/VaProvider";
-import { IvaoSession } from "utils/constants";
+import type { IvaoPilot } from "types";
 import FlightDetails from "components/FlightDetails";
 
-const filterLEOrigins = (pilot: IvaoSession) =>
+const filterLEOrigins = (pilot: IvaoPilot) =>
   pilot.flightPlan.departureId?.includes("LE");
 
 const IVAOPage = () => {

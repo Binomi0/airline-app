@@ -2,15 +2,16 @@ import React from "react";
 import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { ConnectWallet } from "@thirdweb-dev/react";
+import { useMainProviderContext } from "context/MainProvider";
 
-const CustomAppBar: React.FC<{ onOpen: (value: boolean) => void }> = ({
-  onOpen,
-}) => {
+const CustomAppBar: React.FC = () => {
+  const { toggleSidebar } = useMainProviderContext();
+
   return (
     <AppBar position="sticky" color="transparent">
       <Toolbar>
         <IconButton
-          onClick={() => onOpen(true)}
+          onClick={toggleSidebar}
           size="large"
           edge="start"
           color="inherit"

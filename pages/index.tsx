@@ -19,27 +19,22 @@ const GridItem: React.FC<{
   title: string;
   text: string;
   delay: number;
-}> = ({ link, title, text, delay }) => {
-  const theme = useTheme();
-
-  console.log("palette =>", theme.palette);
-  return (
-    <Grow in timeout={{ enter: delay }}>
-      <Grid item xs={12} md={6} lg={6} p={2}>
-        <Link href={link} underline="none">
-          <Card className={styles.card}>
-            <CardContent className={styles.text}>
-              <Typography component="h4" variant="h4" color="white" paragraph>
-                {title}
-              </Typography>
-              <Typography color="white">{text}</Typography>
-            </CardContent>
-          </Card>
-        </Link>
-      </Grid>
-    </Grow>
-  );
-};
+}> = ({ link, title, text, delay }) => (
+  <Grow in timeout={{ enter: delay }}>
+    <Grid item xs={12} md={6} lg={6} p={2}>
+      <Link href={link} underline="none">
+        <Card className={styles.card}>
+          <CardContent className={styles.text}>
+            <Typography component="h4" variant="h4" color="white" paragraph>
+              {title}
+            </Typography>
+            <Typography color="white">{text}</Typography>
+          </CardContent>
+        </Card>
+      </Link>
+    </Grid>
+  </Grow>
+);
 
 const Home: NextPage = () => (
   <Box position="relative">
@@ -74,7 +69,7 @@ const Home: NextPage = () => (
         <GridItem
           delay={1500}
           link="/gas"
-          title="Gas &rarr;"
+          title="Gas Station &rarr;"
           text="Stake and earn Gas to refuel your aircrafts."
         />
         <GridItem

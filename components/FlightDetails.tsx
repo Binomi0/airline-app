@@ -13,13 +13,13 @@ import {
 } from "@mui/material";
 import moment from "moment";
 import React, { ReactNode } from "react";
-import { IvaoSession, LastTrackState } from "utils/constants";
 import FlightLandIcon from "@mui/icons-material/FlightLand";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
 import FlightIcon from "@mui/icons-material/Flight";
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import ConnectingAirportsIcon from "@mui/icons-material/ConnectingAirports";
 import AirlinesIcon from "@mui/icons-material/Airlines";
+import type { LastTrackState, IvaoPilot } from "types";
 
 const stateIcons: Record<LastTrackState, ReactNode> = {
   "En Route": <ConnectingAirportsIcon color="primary" fontSize="large" />,
@@ -44,7 +44,7 @@ const stateColors: Record<
   Landed: "success",
 };
 
-const FlightDetails: React.FC<{ session: IvaoSession }> = ({ session }) => {
+const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
   const [size, setSize] = React.useState(6);
 
   const flightValue = React.useMemo(() => {
