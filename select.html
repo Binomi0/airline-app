@@ -1,0 +1,445 @@
+<select
+  tabindex="5"
+  onchange="update_aircraft()"
+  class="notranslate select-left monospace"
+  name="basetype"
+  id="basetype"
+  translate="no"
+  data-key="basetype"
+>
+  <option value="">None</option>
+  <option disabled="">--------------------</option>
+  <option class="notranslate" translate="no" value="A225">
+    A225 - Antonov AN-225
+  </option>
+  <option class="notranslate" translate="no" value="A306">
+    A306 - A300B4-600
+  </option>
+  <option class="notranslate" translate="no" value="A3ST">
+    A3ST - A300F4-608ST
+  </option>
+  <option class="notranslate" translate="no" value="A30B">
+    A30B - A300B4-200
+  </option>
+  <option class="notranslate" translate="no" value="A30F">
+    A30F - A300F4-600R
+  </option>
+  <option class="notranslate" translate="no" value="A310">
+    A310 - A310-304
+  </option>
+  <option class="notranslate" translate="no" value="A318">
+    A318 - A318-100
+  </option>
+  <option class="notranslate" translate="no" value="A319">
+    A319 - A319-100
+  </option>
+  <option class="notranslate" translate="no" value="A320">
+    A320 - A320-200
+  </option>
+  <option class="notranslate" translate="no" value="A20N">
+    A20N - A320-251N
+  </option>
+  <option class="notranslate" translate="no" value="A321">
+    A321 - A321-200
+  </option>
+  <option class="notranslate" translate="no" value="A21N">
+    A21N - A321-251N
+  </option>
+  <option class="notranslate" translate="no" value="A332">
+    A332 - A330-200
+  </option>
+  <option class="notranslate" translate="no" value="A333">
+    A333 - A330-300
+  </option>
+  <option class="notranslate" translate="no" value="A338">
+    A338 - A330-800
+  </option>
+  <option class="notranslate" translate="no" value="A339">
+    A339 - A330-900
+  </option>
+  <option class="notranslate" translate="no" value="A342">
+    A342 - A340-200
+  </option>
+  <option class="notranslate" translate="no" value="A343">
+    A343 - A340-300
+  </option>
+  <option class="notranslate" translate="no" value="A345">
+    A345 - A340-500
+  </option>
+  <option class="notranslate" translate="no" value="A346">
+    A346 - A340-600
+  </option>
+  <option class="notranslate" translate="no" value="A359">
+    A359 - A350-900
+  </option>
+  <option class="notranslate" translate="no" value="A35K">
+    A35K - A350-1000
+  </option>
+  <option class="notranslate" translate="no" value="A388">
+    A388 - A380-800
+  </option>
+  <option class="notranslate" translate="no" value="AT43">
+    AT43 - ATR-42-300
+  </option>
+  <option class="notranslate" translate="no" value="AT45">
+    AT45 - ATR-42-500
+  </option>
+  <option class="notranslate" translate="no" value="AT46">
+    AT46 - ATR-42-600
+  </option>
+  <option class="notranslate" translate="no" value="AT72">
+    AT72 - ATR-72-201
+  </option>
+  <option class="notranslate" translate="no" value="AT73">
+    AT73 - ATR-72-211
+  </option>
+  <option class="notranslate" translate="no" value="AT75">
+    AT75 - ATR-72-500
+  </option>
+  <option class="notranslate" translate="no" value="AT76">
+    AT76 - ATR-72-600
+  </option>
+  <option class="notranslate" translate="no" value="B190">B190 - B1900D</option>
+  <option class="notranslate" translate="no" value="B350">
+    B350 - Kingair 350
+  </option>
+  <option class="notranslate" translate="no" value="B461">
+    B461 - BAe 146-100
+  </option>
+  <option class="notranslate" translate="no" value="B462">
+    B462 - BAe 146-200
+  </option>
+  <option class="notranslate" translate="no" value="B463">
+    B463 - BAe 146-300
+  </option>
+  <option class="notranslate" translate="no" value="B703">
+    B703 - B707-320B
+  </option>
+  <option class="notranslate" translate="no" value="B712">
+    B712 - B717-200
+  </option>
+  <option class="notranslate" translate="no" value="B721">
+    B721 - B727-100
+  </option>
+  <option class="notranslate" translate="no" value="B722">
+    B722 - B727-200
+  </option>
+  <option class="notranslate" translate="no" value="B732">
+    B732 - B737-200
+  </option>
+  <option class="notranslate" translate="no" value="B733">
+    B733 - B737-300
+  </option>
+  <option class="notranslate" translate="no" value="B734">
+    B734 - B737-400
+  </option>
+  <option class="notranslate" translate="no" value="B735">
+    B735 - B737-500
+  </option>
+  <option class="notranslate" translate="no" value="B736">
+    B736 - B737-600
+  </option>
+  <option class="notranslate" translate="no" value="B737">
+    B737 - B737-700
+  </option>
+  <option class="notranslate" translate="no" value="BBJ1">
+    BBJ1 - B737 BBJ
+  </option>
+  <option class="notranslate" translate="no" value="B738">
+    B738 - B737-800
+  </option>
+  <option class="notranslate" translate="no" value="BBJ2">
+    BBJ2 - B737 BBJ2
+  </option>
+  <option class="notranslate" translate="no" value="B38M">
+    B38M - B737 MAX 8
+  </option>
+  <option class="notranslate" translate="no" value="B739">
+    B739 - B737-900
+  </option>
+  <option class="notranslate" translate="no" value="BBJ3">
+    BBJ3 - B737 BBJ3
+  </option>
+  <option class="notranslate" translate="no" value="B742">
+    B742 - B747-200B
+  </option>
+  <option class="notranslate" translate="no" value="B744">
+    B744 - B747-400
+  </option>
+  <option class="notranslate" translate="no" value="B74F">
+    B74F - B747-400F
+  </option>
+  <option class="notranslate" translate="no" value="B748">B748 - B747-8</option>
+  <option class="notranslate" translate="no" value="B48F">
+    B48F - B747-8F
+  </option>
+  <option class="notranslate" translate="no" value="B752">
+    B752 - B757-200
+  </option>
+  <option class="notranslate" translate="no" value="B75F">
+    B75F - B757-200PF
+  </option>
+  <option class="notranslate" translate="no" value="B753">
+    B753 - B757-300
+  </option>
+  <option class="notranslate" translate="no" value="B762">
+    B762 - B767-200ER
+  </option>
+  <option class="notranslate" translate="no" value="B763">
+    B763 - B767-300ER
+  </option>
+  <option class="notranslate" translate="no" value="B76F">
+    B76F - B767-300F
+  </option>
+  <option class="notranslate" translate="no" value="B764">
+    B764 - B767-400ER
+  </option>
+  <option class="notranslate" translate="no" value="B772">
+    B772 - B777-200ER
+  </option>
+  <option class="notranslate" translate="no" value="B77F">B77F - B777-F</option>
+  <option class="notranslate" translate="no" value="B77L">
+    B77L - B777-200LR
+  </option>
+  <option class="notranslate" translate="no" value="B77W">
+    B77W - B777-300ER
+  </option>
+  <option class="notranslate" translate="no" value="B788">B788 - B787-8</option>
+  <option class="notranslate" translate="no" value="B789">B789 - B787-9</option>
+  <option class="notranslate" translate="no" value="B78X">
+    B78X - B787-10
+  </option>
+  <option class="notranslate" translate="no" value="BCS1">
+    BCS1 - A220-100
+  </option>
+  <option class="notranslate" translate="no" value="BCS3">
+    BCS3 - A220-300
+  </option>
+  <option class="notranslate" translate="no" value="BE20">
+    BE20 - Kingair
+  </option>
+  <option class="notranslate" translate="no" value="BE36">
+    BE36 - Bonanza A36
+  </option>
+  <option class="notranslate" translate="no" value="BE58">
+    BE58 - Baron 58
+  </option>
+  <option class="notranslate" translate="no" value="C172">
+    C172 - Cessna 172R
+  </option>
+  <option class="notranslate" translate="no" value="C208">
+    C208 - Cessna 208B
+  </option>
+  <option class="notranslate" translate="no" value="C25A">
+    C25A - Citation CJ2
+  </option>
+  <option class="notranslate" translate="no" value="C25C">
+    C25C - Citation CJ4
+  </option>
+  <option class="notranslate" translate="no" value="C310">
+    C310 - Cessna 310R
+  </option>
+  <option class="notranslate" translate="no" value="C337">
+    C337 - Cessna 337H
+  </option>
+  <option class="notranslate" translate="no" value="C404">
+    C404 - C404 Titan
+  </option>
+  <option class="notranslate" translate="no" value="C414">
+    C414 - Cessna 414AW
+  </option>
+  <option class="notranslate" translate="no" value="C510">
+    C510 - C510 Mustang
+  </option>
+  <option class="notranslate" translate="no" value="C550">
+    C550 - Citation II
+  </option>
+  <option class="notranslate" translate="no" value="C56X">
+    C56X - Citation 560XL
+  </option>
+  <option class="notranslate" translate="no" value="C700">
+    C700 - Longitude
+  </option>
+  <option class="notranslate" translate="no" value="C750">
+    C750 - Citation X
+  </option>
+  <option class="notranslate" translate="no" value="CL30">
+    CL30 - Challenger 300
+  </option>
+  <option class="notranslate" translate="no" value="CL60">
+    CL60 - Challenger 650
+  </option>
+  <option class="notranslate" translate="no" value="CONI">CONI - L-049</option>
+  <option class="notranslate" translate="no" value="CONS">
+    CONS - L-1049G
+  </option>
+  <option class="notranslate" translate="no" value="CRJ2">
+    CRJ2 - CRJ-200
+  </option>
+  <option class="notranslate" translate="no" value="CRJ5">
+    CRJ5 - CRJ-550
+  </option>
+  <option class="notranslate" translate="no" value="CRJ7">
+    CRJ7 - CRJ-700
+  </option>
+  <option class="notranslate" translate="no" value="CRJ9">
+    CRJ9 - CRJ-900
+  </option>
+  <option class="notranslate" translate="no" value="CRJX">
+    CRJX - CRJ-1000
+  </option>
+  <option class="notranslate" translate="no" value="DA62">
+    DA62 - Diamond DA62
+  </option>
+  <option class="notranslate" translate="no" value="DC10">
+    DC10 - DC-10-30
+  </option>
+  <option class="notranslate" translate="no" value="DC3">
+    DC3 - Douglas DC-3
+  </option>
+  <option class="notranslate" translate="no" value="DC6">
+    DC6 - Douglas DC-6
+  </option>
+  <option class="notranslate" translate="no" value="DC85">
+    DC85 - DC-8-55
+  </option>
+  <option class="notranslate" translate="no" value="DC86">
+    DC86 - DC-8-63
+  </option>
+  <option class="notranslate" translate="no" value="DH8A">
+    DH8A - DHC8-102
+  </option>
+  <option class="notranslate" translate="no" value="DH8B">
+    DH8B - DHC8-200
+  </option>
+  <option class="notranslate" translate="no" value="DH8C">
+    DH8C - DHC8-311
+  </option>
+  <option class="notranslate" translate="no" value="DH8D">
+    DH8D - DHC8-402
+  </option>
+  <option class="notranslate" translate="no" value="DHC2">DHC2 - Beaver</option>
+  <option class="notranslate" translate="no" value="DHC6">
+    DHC6 - Twin Otter
+  </option>
+  <option class="notranslate" translate="no" value="E135">
+    E135 - EMB-135LR
+  </option>
+  <option class="notranslate" translate="no" value="E13L">
+    E13L - EMB-135BJ
+  </option>
+  <option class="notranslate" translate="no" value="E140">
+    E140 - ERJ-140LR
+  </option>
+  <option class="notranslate" translate="no" value="E145">
+    E145 - EMB-145LR
+  </option>
+  <option class="notranslate" translate="no" value="E170">
+    E170 - EMB-170
+  </option>
+  <option class="notranslate" translate="no" value="E175">
+    E175 - EMB-175
+  </option>
+  <option class="notranslate" translate="no" value="E190">
+    E190 - EMB-190
+  </option>
+  <option class="notranslate" translate="no" value="E195">
+    E195 - EMB-195
+  </option>
+  <option class="notranslate" translate="no" value="E50P">
+    E50P - Phenom 100
+  </option>
+  <option class="notranslate" translate="no" value="E55P">
+    E55P - Phenom 300
+  </option>
+  <option class="notranslate" translate="no" value="EA50">
+    EA50 - Eclipse 550
+  </option>
+  <option class="notranslate" translate="no" value="F50">
+    F50 - Fokker F50
+  </option>
+  <option class="notranslate" translate="no" value="F70">
+    F70 - Fokker 70
+  </option>
+  <option class="notranslate" translate="no" value="F100">
+    F100 - Fokker 100
+  </option>
+  <option class="notranslate" translate="no" value="FA50">
+    FA50 - Falcon 50EX
+  </option>
+  <option class="notranslate" translate="no" value="GLF4">
+    GLF4 - GLF.IV-SP
+  </option>
+  <option class="notranslate" translate="no" value="H25B">
+    H25B - Hawker 800A
+  </option>
+  <option class="notranslate" translate="no" value="HDJT">
+    HDJT - Hondajet
+  </option>
+  <option class="notranslate" translate="no" value="JS41">
+    JS41 - BAe JS-41
+  </option>
+  <option class="notranslate" translate="no" value="KODI">
+    KODI - Kodiak 100
+  </option>
+  <option class="notranslate" translate="no" value="L101">
+    L101 - L1011-500
+  </option>
+  <option class="notranslate" translate="no" value="LJ25">
+    LJ25 - Learjet 25
+  </option>
+  <option class="notranslate" translate="no" value="LJ45">
+    LJ45 - Learjet 45
+  </option>
+  <option class="notranslate" translate="no" value="MD11">MD11 - MD-11</option>
+  <option class="notranslate" translate="no" value="MD1F">MD1F - MD-11F</option>
+  <option class="notranslate" translate="no" value="MD82">
+    MD82 - DC-9-82
+  </option>
+  <option class="notranslate" translate="no" value="MD83">
+    MD83 - DC-9-83
+  </option>
+  <option class="notranslate" translate="no" value="MD88">MD88 - MD-88</option>
+  <option class="notranslate" translate="no" value="MD90">
+    MD90 - MD-90-30
+  </option>
+  <option class="notranslate" translate="no" value="P06T">
+    P06T - Tecnam P2006T
+  </option>
+  <option class="notranslate" translate="no" value="P46T">
+    P46T - Piper M500
+  </option>
+  <option class="notranslate" translate="no" value="M600">
+    M600 - Piper M600
+  </option>
+  <option class="notranslate" translate="no" value="PC12">
+    PC12 - Pilatus PC12
+  </option>
+  <option class="notranslate" translate="no" value="RJ70">
+    RJ70 - Avro RJ70
+  </option>
+  <option class="notranslate" translate="no" value="RJ85">
+    RJ85 - Avro RJ85
+  </option>
+  <option class="notranslate" translate="no" value="RJ1H">
+    RJ1H - Avro RJ100
+  </option>
+  <option class="notranslate" translate="no" value="SF34">
+    SF34 - Saab 340B
+  </option>
+  <option class="notranslate" translate="no" value="SF50">
+    SF50 - Vision Jet
+  </option>
+  <option class="notranslate" translate="no" value="SR22">
+    SR22 - Cirrus SR22
+  </option>
+  <option class="notranslate" translate="no" value="SW4">
+    SW4 - Metroliner
+  </option>
+  <option class="notranslate" translate="no" value="T154">
+    T154 - TU-154B2
+  </option>
+  <option class="notranslate" translate="no" value="TBM9">
+    TBM9 - TBM 900
+  </option>
+</select>
