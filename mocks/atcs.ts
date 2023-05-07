@@ -1,4 +1,6 @@
-const atc = {
+import { Atc } from "types";
+
+export const atc = {
   time: 12778,
   id: 52132052,
   userId: 706680,
@@ -87,8 +89,6 @@ function createAtc(index: number, callsign: string) {
     },
   } as Atc;
 }
-
-export type Atc = typeof atc;
 
 export const atcs: Atc[] = [
   createAtc(0, "LEAL_TWR"),

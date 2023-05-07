@@ -1,3 +1,4 @@
+import { atc } from "mocks";
 import ivaoPilot from "mocks/ivaoPilot";
 
 export interface AircraftAttributes {
@@ -25,3 +26,11 @@ export type LastTrackState =
   | "Landed";
 
 export type IvaoPilot = typeof ivaoPilot;
+
+export interface FRoute {
+  origin: string;
+  destination: string;
+}
+
+export type Flight = Record<string, FRoute[]>;
+export type Atc = typeof atc;

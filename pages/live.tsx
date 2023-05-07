@@ -16,8 +16,6 @@ const LivePage = () => {
   const [error, setError] = React.useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  console.log(pilots);
-
   const handleClick = React.useCallback(() => {
     if (!inputRef.current?.value) return;
 

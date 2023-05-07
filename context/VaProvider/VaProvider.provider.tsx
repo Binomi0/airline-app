@@ -1,40 +1,69 @@
 import React, { FC, useCallback, useEffect, useReducer } from "react";
 import vaProviderReducer from "./VaProvider.reducer";
-import { IVAOClients } from "./VaProvider.types";
+import { IVAOClients, VaReducerState } from "./VaProvider.types";
 import { VaProviderContext } from "./VaProvider.context";
 import axios from "axios";
-import { IvaoPilot } from "types";
-import { Atc, atcs } from "mocks/atcs";
+import type { Atc, FRoute, Flight, IvaoPilot } from "types";
 
 export const INITIAL_STATE: IVAOClients = {
   pilots: [],
   atcs: [],
   active: undefined,
+  flights: {},
+  origins: [],
+  filter: ["LE", "GC"],
 };
 
-type Flight = Record<string, { origin: string; destination: string }[]>;
+const reduceOthers = (origin: string, others: Atc[]): FRoute[] =>
+  others.reduce((acc: FRoute[], curr: Atc) => {
+    if (acc.some((ac) => ac.destination === curr.callsign.split("_")[0])) {
+      return acc;
+    }
+    return [
+      ...acc,
+      {
+        origin,
+        destination: curr.callsign.split("_")[0],
+      },
+    ];
+  }, [] as FRoute[]);
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE });
   const { Provider } = VaProviderContext;
 
-  const setClients = useCallback((clients: Readonly<IVAOClients>) => {
-    // const atcs = clients.atcs.filter((atc) => atc.callsign.includes("LE"));
-    const towers = clients.atcs.filter((a) => a.callsign.includes("TWR"));
-    console.log("towers =>", towers);
-    // console.log("spainAtcs =>", spainAtcs);
-    const flights = towers.reduce((acc: Flight, curr: Atc) => {
-      const others = towers.filter((a) => a.id !== curr.id);
-      return {
-        ...acc,
-        [curr.callsign]: others.map((o) => ({
-          origin: curr.callsign.split("_")[0],
-          destination: o.callsign.split("_")[0],
-        })),
-      };
-    }, {});
+  const setFlights = useCallback(
+    (atcs: Readonly<Atc[]>) => {
+      const towers = atcs.filter(
+        (a) =>
+          a.callsign.includes("TWR") &&
+          state.filter.some((i) => a.callsign.startsWith(i))
+      );
 
-    console.log("flights", flights);
+      const flights: Flight = towers.reduce((acc: Flight, curr: Atc) => {
+        const others: Atc[] = towers.filter((t) => {
+          return (
+            t.id !== curr.id &&
+            t.callsign.split("_")[0] !== curr.callsign.split("_")[0]
+          );
+        });
+
+        const origin = curr.callsign.split("_")[0];
+        if (acc[origin]) {
+          return acc;
+        }
+        return {
+          ...acc,
+          [origin]: reduceOthers(origin, others),
+        };
+      }, {});
+
+      dispatch({ type: "SET_FLIGHTS", payload: flights });
+    },
+    [state.filter]
+  );
+
+  const setClients = useCallback((clients: Readonly<IVAOClients>) => {
     dispatch({ type: "SET_CLIENTS", payload: clients });
   }, []);
 
@@ -44,22 +73,36 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     []
   );
 
+  const setFilter = useCallback((value: string) => {
+    dispatch({ type: "SET_FILTER", payload: value });
+  }, []);
+
   const getClients = useCallback(async () => {
     const response = await axios.get("/api/ivao/whazzup");
 
     setClients(response.data);
-  }, [setClients]);
+    setFlights(response.data.atcs as Readonly<Atc[]>);
+  }, [setClients, setFlights]);
+
+  // useEffect(() => {
+  //   const timer = setInterval(getClients, 15000);
+  //   return () => clearInterval(timer);
+  // }, [getClients]);
 
   useEffect(() => {
     getClients();
   }, [getClients]);
-
   return (
     <Provider
       value={{
         pilots: state.pilots,
         atcs: state.atcs,
         active: state.active,
+        flights: state.flights,
+        filter: state.filter,
+        origins: state.origins,
+        setFlights,
+        setFilter,
         setCurrentPilot,
         setClients,
       }}
