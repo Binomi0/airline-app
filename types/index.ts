@@ -34,3 +34,14 @@ export interface FRoute {
 
 export type Flight = Record<string, FRoute[]>;
 export type Atc = typeof atc;
+export interface Cargo {
+  origin: string;
+  destination: string;
+  distance: number;
+  details: CargoDetails;
+}
+
+export interface CargoDetails {
+  name: string;
+  description: string;
+}

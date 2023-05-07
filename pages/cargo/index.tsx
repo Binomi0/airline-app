@@ -1,11 +1,15 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { NextPage } from "next";
 import {
+  Alert,
+  AlertTitle,
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
   Container,
+  Fade,
   FormControl,
   Grid,
   Grow,
@@ -21,8 +25,16 @@ import Image from "next/image";
 import styles from "styles/Home.module.css";
 import image from "public/img/airplanes9.png";
 import { useVaProviderContext } from "context/VaProvider";
-import { FRoute } from "types";
+import { Atc, FRoute } from "types";
 import { Flight } from "types";
+import { getDistanceByCoords } from "utils";
+import useCargo from "hooks/useCargo";
+import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
+
+const initialState = {
+  origin: "",
+  destination: "",
+};
 
 const GridItem: React.FC<{
   flights: FRoute[];
@@ -30,9 +42,12 @@ const GridItem: React.FC<{
   origin: string;
   onSelect: (origin: string, destination: string) => void;
 }> = ({ flights, delay, origin, onSelect }) => {
-  const handleChange = (event: SelectChangeEvent) => {
-    onSelect(origin, event.target.value as string);
-  };
+  const handleChange = useCallback(
+    (event: SelectChangeEvent) => {
+      onSelect(origin, event.target.value as string);
+    },
+    [onSelect, origin]
+  );
 
   return (
     <Grow in timeout={{ enter: delay }}>
@@ -75,47 +90,18 @@ const GridItem: React.FC<{
 };
 
 const Cargo: NextPage<{ loading: boolean }> = ({ loading }) => {
-  const { flights, atcs } = useVaProviderContext();
-  const [selected, setSelected] = useState<FRoute>({
-    origin: "",
-    destination: "",
-  });
+  const address = useAddress();
+  const { flights } = useVaProviderContext();
+  const [selected, setSelected] = useState<FRoute>(initialState);
+  const { newCargo, cargo } = useCargo();
 
-  const handleSelect = useCallback((origin: string, destination: string) => {
-    setSelected({ origin, destination });
-  }, []);
-
-  const distance = useMemo(() => {
-    if (!selected.origin) return 0;
-    const originTower = atcs.find((a) =>
-      a.callsign.startsWith(selected.origin)
-    );
-    if (!originTower) return 0;
-    const arrivalTower = atcs.find((a) =>
-      a.callsign.startsWith(selected.destination)
-    );
-    if (!arrivalTower) return 0;
-    const originCoords = {
-      latitude: originTower.lastTrack.latitude,
-      longitude: originTower.lastTrack.longitude,
-    };
-    const arrivalCoords = {
-      latitude: arrivalTower.lastTrack.latitude,
-      longitude: arrivalTower.lastTrack.longitude,
-    };
-
-    const horizontal = Math.pow(
-      arrivalCoords.longitude - originCoords.longitude,
-      2
-    );
-    const vertical = Math.pow(
-      arrivalCoords.latitude - originCoords.latitude,
-      2
-    );
-
-    const result = Math.sqrt(horizontal + vertical);
-    return result * 100;
-  }, [atcs, selected]);
+  const handleSelect = useCallback(
+    (origin: string, destination: string) => {
+      newCargo(origin, destination);
+      setSelected({ origin, destination });
+    },
+    [newCargo]
+  );
 
   if (loading || !flights) {
     return <LinearProgress />;
@@ -133,10 +119,11 @@ const Cargo: NextPage<{ loading: boolean }> = ({ loading }) => {
       <Container>
         <Box my={10} textAlign="center">
           <Typography variant="h1">Virtual Airline</Typography>
+          {!address && <ConnectWallet />}
         </Box>
 
-        <Grid container spacing={2}>
-          {!!selected.origin && (
+        <Fade in={!!selected.origin} unmountOnExit>
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <Stack
                 direction="row"
@@ -164,7 +151,7 @@ const Cargo: NextPage<{ loading: boolean }> = ({ loading }) => {
                     {Intl.NumberFormat("es", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    }).format(distance)}{" "}
+                    }).format(cargo?.distance || 0)}{" "}
                     km
                   </Typography>
                 </Box>
@@ -172,11 +159,43 @@ const Cargo: NextPage<{ loading: boolean }> = ({ loading }) => {
                   <Typography variant="h2">{selected.destination}</Typography>
                 </Box>
               </Stack>
+              <Box my={4}>
+                <Alert severity="info">
+                  <AlertTitle>Cargo: {cargo?.details?.name}</AlertTitle>
+                  <Typography variant="subtitle2">
+                    {cargo?.details?.description}
+                  </Typography>
+                </Alert>
+              </Box>
+              <Box my={4}>
+                <Stack spacing={2}>
+                  <Button
+                    disabled={!address}
+                    color="secondary"
+                    variant="contained"
+                    fullWidth
+                    onClick={() => {}}
+                  >
+                    Volar inmediatamente
+                  </Button>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => setSelected(initialState)}
+                  >
+                    Cancelar
+                  </Button>
+                </Stack>
+              </Box>
             </Grid>
-          )}
-          {!selected.origin &&
-            Object.keys(flights).length > 0 &&
-            Object.entries(flights as Flight).map(([key, value], index) => (
+          </Grid>
+        </Fade>
+        <Fade
+          in={!selected.origin && Object.keys(flights).length > 0}
+          unmountOnExit
+        >
+          <Grid container spacing={2}>
+            {Object.entries(flights as Flight).map(([key, value], index) => (
               <GridItem
                 onSelect={handleSelect}
                 key={key}
@@ -185,12 +204,9 @@ const Cargo: NextPage<{ loading: boolean }> = ({ loading }) => {
                 delay={500 * (index + 1)}
               />
             ))}
-          {
-            <Box>
-              <Typography>No hay vuelos</Typography>
-            </Box>
-          }
-        </Grid>
+            <Typography>No hay vuelos</Typography>
+          </Grid>
+        </Fade>
       </Container>
     </Box>
   );
