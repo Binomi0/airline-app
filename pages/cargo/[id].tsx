@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { useRouter } from "next/router";
 import {
   Alert,
@@ -16,11 +16,9 @@ import {
   ConnectWallet,
   useAddress,
   useContract,
-  useNFT,
   useNFTBalance,
 } from "@thirdweb-dev/react";
 import { nftAircraftTokenAddress } from "contracts/address";
-import { cargos } from ".";
 import Link from "next/link";
 import axios from "config/axios";
 
@@ -28,11 +26,8 @@ const CargoItem = () => {
   const router = useRouter();
   const address = useAddress();
   const { contract } = useContract(nftAircraftTokenAddress);
-  const cargo = React.useMemo(
-    () => cargos.find((c) => c.id.toString() === (router.query.id as string)),
-    [router.query.id]
-  );
-  const { data } = useNFTBalance(contract, address, cargo?.aircraft);
+
+  const { data } = useNFTBalance(contract, address, 1);
 
   const handleClick = useCallback(() => {
     axios.post("/api/flight/new", { cargoId: router.query.id });

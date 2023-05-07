@@ -27,7 +27,8 @@
     "next-auth": "^4.22.1",
     "react": "^18.2",
     "react-dom": "^18.2",
-    "react-window": "^1.8.9"
+    "react-window": "^1.8.9",
+    "sharp": "^0.32.1"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
