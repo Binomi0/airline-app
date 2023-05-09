@@ -11,7 +11,8 @@ export const INITIAL_STATE: IVAOClients = {
   active: undefined,
   flights: {},
   origins: [],
-  filter: ["LE", "GC"],
+  filter: [""],
+  // filter: ["LE", "GC"],
 };
 
 const reduceOthers = (origin: string, others: Atc[]): FRoute[] =>

@@ -39,9 +39,25 @@ export interface Cargo {
   destination: string;
   distance: number;
   details: CargoDetails;
+  aircrafts: Aircraft[];
+  weight: number;
 }
 
 export interface CargoDetails {
   name: string;
   description: string;
+}
+
+export enum Aircraft {
+  C700 = "1",
+  B737 = "2",
+  C172 = "3",
+  AN225 = "4",
+}
+
+export enum AircraftName {
+  "C700",
+  "B737",
+  "C172",
+  "AN225",
 }

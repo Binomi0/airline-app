@@ -48,6 +48,10 @@ export default function MyApp(props: MyAppProps) {
   return (
     <ThirdwebProvider
       activeChain={Sepolia}
+      authConfig={{
+        domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
+        authUrl: "/api/auth",
+      }}
       // TODO: Sepolia network not supported yet
       // supportedWallets={[
       //   smartWallet({
