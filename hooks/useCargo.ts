@@ -1,7 +1,7 @@
 import { useVaProviderContext } from "context/VaProvider";
 import { cargos } from "mocks/cargos";
 import { useCallback, useMemo, useState } from "react";
-import { Aircraft, Cargo, CargoDetails } from "types";
+import { Aircraft, Cargo, CargoDetails, FRoute } from "types";
 import { getDistanceByCoords } from "utils";
 
 function getRandomInt(max: number) {
@@ -22,7 +22,7 @@ function getCargoWeight(aircrafts: Aircraft[]) {
 }
 
 interface UseCargo {
-  newCargo: (origin: string, destination: string) => void;
+  newCargo: (route: FRoute) => void;
   cargo?: Cargo;
 }
 
@@ -31,7 +31,7 @@ const useCargo = (): UseCargo => {
   const [cargo, setCargo] = useState<Cargo>();
 
   const newCargo = useCallback(
-    (origin: string, destination: string) => {
+    ({ origin, destination }: FRoute) => {
       const distance = getDistanceByCoords(atcs, { origin, destination });
 
       const details = cargos[getRandomInt(8)];

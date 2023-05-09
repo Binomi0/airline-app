@@ -1,27 +1,44 @@
 import axios from "axios";
 import moment, { Moment } from "moment";
 import { NextApiRequest, NextApiResponse } from "next";
+import fs from "fs";
+
+const CLIENTS_PATH = "./pages/api/ivao/data/clients.json";
 
 let nextCall: Moment;
-let clients: Record<string, string> = {};
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "GET") return res.status(405).end();
-  if (!nextCall || nextCall.isBefore(moment())) {
+  const now = moment();
+
+  if (!nextCall || nextCall.isBefore(now)) {
+    nextCall = now.add(20, "seconds");
     try {
-      console.log("requesting IVAO data at %s", moment().format("HH:MM:SS"));
+      console.log("requesting IVAO data at %s", now.format("HH:mm:ss"));
+
       const response = await axios.get(
         "https://api.ivao.aero/v2/tracker/whazzup"
       );
-      nextCall = moment().add(20, "seconds");
-      clients = response.data.clients;
+      fs.writeFileSync(CLIENTS_PATH, JSON.stringify(response.data.clients), {
+        encoding: "utf-8",
+      });
 
-      return res.status(200).send({ ...clients });
+      return res.status(200).send(response.data.clients);
     } catch (error) {
+      console.log("error =>", error);
+      return res.status(500).send([]);
+    }
+  } else {
+    try {
+      const clients = fs.readFileSync(CLIENTS_PATH, "utf-8");
+
+      return res.status(202).send(JSON.parse(clients));
+    } catch (error) {
+      console.log("error =>", error);
+
       return res.status(500).send([]);
     }
   }
-  return res.status(202).send({ ...clients });
 };
 
 export default handler;

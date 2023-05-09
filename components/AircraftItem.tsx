@@ -25,14 +25,23 @@ import {
   nftLicenseTokenAddress,
 } from "contracts/address";
 import { useRouter } from "next/router";
+import { Aircraft } from "types";
+
+const licenses: Record<string, string> = {
+  A: "0",
+  B: "1",
+  C: "2",
+  D: "3",
+};
 
 const maps: Record<string, string> = {
   0: "0",
-  1: "1",
-  2: "2",
-  3: "0",
-  4: "3",
+  1: Aircraft.C700,
+  2: Aircraft.B737,
+  3: Aircraft.C172,
+  4: Aircraft.AN225,
 };
+
 const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   const router = useRouter();
   const address = useAddress();
@@ -40,11 +49,18 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   const { contract: license } = useContract(nftLicenseTokenAddress);
   const { mutateAsync: claimNFT, isLoading } = useClaimNFT(contract);
   const { data } = useNFTBalance(contract, address, nft.metadata.id);
+  const licenseId = getNFTAttributes(nft).find(
+    (attribute) => attribute.trait_type === "license"
+  )?.value;
+  console.log("licenseId =>", licenseId);
+
   const { data: licenseBalance } = useNFTBalance(
     license,
     address,
-    maps[nft.metadata.id]
+    licenses[licenseId || ""]
   );
+
+  console.log("licenseBalance =>", licenseBalance?.toString());
 
   return (
     <Grid item xs={3}>
@@ -79,23 +95,33 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
             </Stack>
           ))}
         </CardContent>
-        <CardActions>
-          <Button
-            disabled={isLoading || !data?.isZero()}
-            variant="contained"
-            onClick={() =>
-              claimNFT({
-                to: address,
-                quantity: 1,
-                tokenId: nft.metadata.id,
-              })
-            }
-          >
-            {licenseBalance?.isZero()
-              ? "Require licencia"
-              : `Claim ${nft.metadata.name}`}
-          </Button>
-        </CardActions>
+        {data?.isZero() && (
+          <CardActions>
+            {!licenseBalance?.isZero() ? (
+              <Button
+                disabled={isLoading}
+                variant="contained"
+                onClick={() => router.push("/license")}
+              >
+                Require licencia
+              </Button>
+            ) : (
+              <Button
+                disabled={isLoading}
+                variant="contained"
+                onClick={() =>
+                  claimNFT({
+                    to: address,
+                    quantity: 1,
+                    tokenId: nft.metadata.id,
+                  })
+                }
+              >
+                Claim {nft.metadata.name}
+              </Button>
+            )}
+          </CardActions>
+        )}
       </Card>
     </Grid>
   );
