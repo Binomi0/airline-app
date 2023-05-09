@@ -2,8 +2,9 @@ import axios from "axios";
 import moment, { Moment } from "moment";
 import { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
+import path from "path";
 
-const CLIENTS_PATH = "./pages/api/ivao/data/clients.json";
+const CLIENTS_PATH = "./pages/api/ivao/data";
 
 let nextCall: Moment;
 
@@ -19,9 +20,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const response = await axios.get(
         "https://api.ivao.aero/v2/tracker/whazzup"
       );
-      fs.writeFileSync(CLIENTS_PATH, JSON.stringify(response.data.clients), {
-        encoding: "utf-8",
-      });
+
+      if (!fs.existsSync(CLIENTS_PATH)) {
+        fs.mkdirSync(CLIENTS_PATH, 0o744);
+      }
+      fs.writeFileSync(
+        path.join(CLIENTS_PATH, "clients.json"),
+        JSON.stringify(response.data.clients),
+        {
+          encoding: "utf-8",
+        }
+      );
 
       return res.status(200).send(response.data.clients);
     } catch (error) {
