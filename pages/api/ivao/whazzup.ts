@@ -1,12 +1,11 @@
 import axios from "axios";
 import moment, { Moment } from "moment";
 import { NextApiRequest, NextApiResponse } from "next";
-import fs from "fs";
-import path from "path";
 
 const CLIENTS_PATH = "./pages/api/ivao/data";
 
 let nextCall: Moment;
+let clients;
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "GET") return res.status(405).end();
@@ -21,33 +20,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         "https://api.ivao.aero/v2/tracker/whazzup"
       );
 
-      if (!fs.existsSync(CLIENTS_PATH)) {
-        fs.mkdirSync(CLIENTS_PATH, 0o744);
-      }
-      fs.writeFileSync(
-        path.join(CLIENTS_PATH, "clients.json"),
-        JSON.stringify(response.data.clients),
-        {
-          encoding: "utf-8",
-        }
-      );
+      clients = response.data.clients;
 
-      return res.status(200).send(response.data.clients);
+      return res.status(200).send(clients);
     } catch (error) {
       console.log("error =>", error);
-      return res.status(500).send([]);
-    }
-  } else {
-    try {
-      const clients = fs.readFileSync(CLIENTS_PATH, "utf-8");
-
-      return res.status(202).send(JSON.parse(clients));
-    } catch (error) {
-      console.log("error =>", error);
-
       return res.status(500).send([]);
     }
   }
+  return res.status(500).send([]);
 };
 
 export default handler;
