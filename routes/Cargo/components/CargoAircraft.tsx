@@ -14,55 +14,37 @@ import {
 } from "@mui/material";
 import {
   useAddress,
+  useClaimNFT,
   useContract,
+  useLazyMint,
   useNFTs,
   useOwnedNFTs,
+  useSetClaimConditions,
 } from "@thirdweb-dev/react";
-import { nftAircraftTokenAddress } from "contracts/address";
-import moment from "moment";
+import { flightNftAddress, nftAircraftTokenAddress } from "contracts/address";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import { Cargo } from "types";
 import { getNFTAttributes } from "utils";
 
+function randomIntFromInterval(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1) + min) / 100;
+}
+
 const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
   const address = useAddress();
   const { contract } = useContract(nftAircraftTokenAddress);
+  const { contract: flightContract } = useContract(flightNftAddress);
   const { data: owned, isLoading } = useOwnedNFTs(contract, address);
   const { data: nfts } = useNFTs(contract);
+  const { mutateAsync: lazyMint, isLoading: isMinting } =
+    useLazyMint(flightContract);
+  const { mutateAsync: claimNFT, isLoading: isClaiming } =
+    useClaimNFT(flightContract);
+  const { mutate: setClaimConditions, error } =
+    useSetClaimConditions(flightContract);
 
-  console.log("[CargoAircraft] owned =>", owned);
-
-  const hasAircraft = useCallback(
-    (id: string) => {
-      if (!owned) return false;
-      console.log("id =>", id);
-      return owned.some((nft) => nft.metadata.id === id);
-    },
-    [owned]
-  );
-
-  // const available = React.useMemo(() => {
-  //   if (!cargo || !nfts) return [];
-  //   console.log("cargo =>", cargo);
-  //   return nfts
-  //     .map((item) => {
-  //       if (!hasAircraft(item.metadata.id)) return null;
-
-  //       const capacity = getNFTAttributes(item)?.find(
-  //         (a) => a.trait_type === "cargo"
-  //       )?.value;
-
-  //       const ready = cargo.aircrafts.filter((acId) =>
-  //         owned?.some((nft) => nft.metadata.id === acId)
-  //       );
-
-  //       console.log("Ready =>", ready);
-
-  //       return cargo.weight <= Number(capacity) ? item : null;
-  //     })
-  //     .filter((f) => !!f);
-  // }, [cargo, nfts, owned, hasAircraft]);
+  console.log("error =>", error);
 
   const maxAircraftWeight = useCallback(
     (id: string): number => {
@@ -75,32 +57,62 @@ const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
       );
 
       return attribute ? Number(attribute.value) : 0;
-
-      // const value = Number(attribute?.value);
-      // return attribute ? ((value * 0.6) / value) * 100 : 0;
     },
     [owned]
   );
 
   const currentWeight = useCallback(
-    (id: string) => {
-      const maxWeight = maxAircraftWeight(id);
-      if (!maxAircraftWeight) return 0;
-
-      return maxWeight * 0.6;
-    },
+    (id: string) => maxAircraftWeight(id) * randomIntFromInterval(35, 75),
     [maxAircraftWeight]
   );
 
   const progressBar = useCallback(
-    (id: string) => {
-      const weight = currentWeight(id);
-      if (!weight) return 0;
-
-      return (currentWeight(id) / maxAircraftWeight(id)) * 100;
-    },
+    (id: string) => (currentWeight(id) / maxAircraftWeight(id)) * 100,
     [maxAircraftWeight, currentWeight]
   );
+
+  const handleLazyMint = useCallback(async () => {
+    await lazyMint({
+      // Metadata of the NFTs to upload
+
+      metadatas: [
+        {
+          name: `${cargo?.origin} - ${cargo?.destination}`,
+          description: `User: ${address}, flight on ${Date.now()} this cargo`,
+          image: "ipfs://QmWgvZzrNpQyyRyrEtsDUM7kyguAZurbSa2XKAHpRy415z",
+          attributes: [{ cargo }],
+        },
+      ],
+    });
+  }, [lazyMint, cargo, address]);
+
+  // const handleSetClaimConditions = useCallback(() => {
+  //   setClaimConditions({
+  //     phases: [
+  //       {
+  //         metadata: { name: "Phase 1" },
+  //         price: 10,
+  //         currencyAddress: "0x773F0e20Ab2E9afC479C82105E924C2E0Ada5aa9",
+  //         maxClaimablePerWallet: 1,
+  //         maxClaimableSupply: 1,
+  //         startTime: new Date(),
+  //       },
+  //     ],
+  //   });
+  // }, [setClaimConditions]);
+
+  const handleClaim = useCallback(async () => {
+    await claimNFT({
+      to: address,
+      quantity: 1,
+      tokenId: 0,
+      options: {
+        checkERC20Allowance: true,
+        currencyAddress: "0x773F0e20Ab2E9afC479C82105E924C2E0Ada5aa9",
+        pricePerToken: 0,
+      },
+    });
+  }, [claimNFT, address]);
 
   if (!nfts || isLoading) {
     return <LinearProgress />;
@@ -137,10 +149,15 @@ const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
                   />
                   <Typography textAlign="center" variant="caption">
                     Cargo weight:{" "}
-                    <b>{currentWeight(aircraft.metadata.id)} Kg</b>
+                    <b>
+                      {Intl.NumberFormat("en").format(
+                        currentWeight(aircraft.metadata.id)
+                      )}{" "}
+                      Kg
+                    </b>
                   </Typography>
                   <Typography textAlign="center" variant="caption">
-                    Max Weight:{" "}
+                    Max Capacity:{" "}
                     <b>
                       {
                         getNFTAttributes(aircraft).find(
@@ -159,9 +176,18 @@ const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
                   color="secondary"
                   variant="contained"
                   fullWidth
-                  onClick={() => {}}
+                  onClick={handleClaim}
                 >
-                  Volar ahora
+                  Claim
+                </Button>
+                <Button
+                  disabled={!address}
+                  color="secondary"
+                  variant="contained"
+                  fullWidth
+                  onClick={handleLazyMint}
+                >
+                  LazyMint
                 </Button>
               </CardActions>
             </Card>

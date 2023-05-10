@@ -5,13 +5,21 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import { Router } from "next/router";
-import { ThirdwebProvider } from "@thirdweb-dev/react";
+import {
+  ThirdwebProvider,
+  coinbaseWallet,
+  localWallet,
+  metamaskWallet,
+  safeWallet,
+  smartWallet,
+  walletConnect,
+} from "@thirdweb-dev/react";
 import { Sepolia } from "@thirdweb-dev/chains";
 import CustomAppBar from "components/AppBar";
 import Sidebar from "components/Sidebar";
 import { VaProvider } from "context/VaProvider";
 import ErrorBoundary from "components/ErrorBoundary";
-// import { factoryAddress } from "contracts/address";
+import { factoryAddress } from "contracts/address";
 import createEmotionCache from "../src/createEmotionCache";
 import theme from "../src/theme";
 import "../styles/globals.css";
@@ -48,23 +56,29 @@ export default function MyApp(props: MyAppProps) {
   return (
     <ThirdwebProvider
       activeChain={Sepolia}
+      supportedChains={[Sepolia]}
       authConfig={{
         domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
         authUrl: "/api/auth",
       }}
       // TODO: Sepolia network not supported yet
-      // supportedWallets={[
-      //   smartWallet({
-      //     factoryAddress,
-      //     thirdwebApiKey: process.env["NEXT_PUBLIC_API_KEY"] || "",
-      //     gasless: true,
-      //     personalWallets: [
-      //       metamaskWallet(),
-      //       coinbaseWallet(),
-      //       localWallet({ persist: true }),
-      //     ],
-      //   }),
-      // ]}
+      supportedWallets={[
+        smartWallet({
+          factoryAddress,
+          thirdwebApiKey: process.env["NEXT_PUBLIC_API_KEY"] || "",
+          gasless: true,
+          personalWallets: [
+            // metamaskWallet(),
+            // coinbaseWallet(),
+            localWallet({ persist: true }),
+          ],
+        }),
+        metamaskWallet(),
+        coinbaseWallet(),
+        walletConnect(),
+        safeWallet(),
+        localWallet({ persist: true }),
+      ]}
     >
       <CacheProvider value={emotionCache}>
         <Head>

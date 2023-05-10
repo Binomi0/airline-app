@@ -4,8 +4,6 @@ pragma solidity ^0.8.0;
 import "@thirdweb-dev/contracts/base/ERC721Drop.sol";
 
 contract AircraftNFT is ERC721Drop {
-    address public deployer;
-
     constructor(
         string memory _name,
         string memory _symbol,
@@ -20,17 +18,5 @@ contract AircraftNFT is ERC721Drop {
             _royaltyBps,
             _primarySaleRecipient
         )
-    {
-        deployer = msg.sender;
-    }
-
-    function _canSetContractURI()
-        internal
-        view
-        virtual
-        override
-        returns (bool)
-    {
-        return msg.sender == deployer;
-    }
+    {}
 }

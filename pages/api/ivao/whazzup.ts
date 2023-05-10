@@ -1,11 +1,10 @@
 import axios from "axios";
+import { IVAOClients } from "context/VaProvider/VaProvider.types";
 import moment, { Moment } from "moment";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const CLIENTS_PATH = "./pages/api/ivao/data";
-
 let nextCall: Moment;
-let clients;
+let clients: { pilots: IVAOClients[]; atcs: IVAOClients[] }[];
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "GET") return res.status(405).end();
@@ -20,15 +19,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         "https://api.ivao.aero/v2/tracker/whazzup"
       );
 
+      if (!response.data.clients.pilots) {
+        return res.status(202).send(clients);
+      }
       clients = response.data.clients;
 
-      return res.status(200).send(clients);
+      return res.status(200).send(response.data.clients);
     } catch (error) {
       console.log("error =>", error);
       return res.status(500).send([]);
     }
   }
-  return res.status(500).send([]);
+  return res.status(202).send(clients);
 };
 
 export default handler;

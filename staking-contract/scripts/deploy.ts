@@ -35,10 +35,21 @@ async function main() {
   );
   await stakingAirline.deployed();
 
+  const FlightsNFT = await ethers.getContractFactory("Flights");
+
   console.log("STAKING =>", stakingAirline.address);
 
   const [owner, otherAccount] = await ethers.getSigners();
 
+  const flights = await FlightsNFT.deploy(
+    "Flights",
+    "AIRF",
+    "",
+    "",
+    owner.address
+  );
+
+  console.log("flights", flights);
   console.log(
     "airlineReward balance =>",
     await airLineReward.balanceOf(owner.address)
