@@ -1,4 +1,5 @@
 import { NFT } from "@thirdweb-dev/sdk";
+import License from "pages/license";
 import { Aircraft, Atc, Cargo, CargoDetails } from "types";
 
 type AttributeType = {
@@ -74,13 +75,36 @@ export function getCallsign() {
   return `${process.env.NEXT_PUBLIC_CALLSIGN}${ident}`;
 }
 
-export function getAircraftCargo(distance: number, details: CargoDetails) {
-  if (distance < 700) {
-    return [Aircraft.AN225, Aircraft.B737, Aircraft.C700, Aircraft.C172];
+export function getCargoWeight(aircraft: NFT) {
+  const attribute = getNFTAttributes(aircraft).find(
+    (attribute) => attribute.trait_type === "cargo"
+  );
+
+  if (!attribute) {
+    throw new Error("Missing attribute");
   }
-  return [Aircraft.AN225, Aircraft.B737, Aircraft.C700];
+
+  return Number(attribute.value) * randomIntFromInterval(40, 70) || 0;
 }
 
-export function getCargoWeight(aircrafts: Aircraft[]) {
-  return getRandomInt(aircrafts.length);
+export function getCargoPrize(distance: number, aircraft: NFT) {
+  const attribute = getNFTAttributes(aircraft).find(
+    (attr) => attr.trait_type === "license"
+  );
+  if (attribute) {
+    const base = Math.floor(distance / 100);
+    switch (attribute.value) {
+      case "D":
+        return base * (1 + randomIntFromInterval(35, 75));
+      case "C":
+        return base * (1 + randomIntFromInterval(35, 75) * 10);
+      case "B":
+        return base * (1 + randomIntFromInterval(35, 75) * 100);
+      case "A":
+        return base * (1 + randomIntFromInterval(35, 75) * 1000);
+      default:
+        return base * (1 + randomIntFromInterval(35, 75));
+    }
+  }
+  return 0;
 }

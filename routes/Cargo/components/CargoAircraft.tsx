@@ -1,7 +1,5 @@
 import {
-  Alert,
-  AlertTitle,
-  Box,
+  Avatar,
   Button,
   Card,
   CardActions,
@@ -13,27 +11,42 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  NFT,
+  MediaRenderer,
   useAddress,
   useClaimNFT,
   useContract,
   useLazyMint,
-  useNFTs,
-  useOwnedNFTs,
+  useNFT,
   useSetClaimConditions,
 } from "@thirdweb-dev/react";
-import { flightNftAddress, nftAircraftTokenAddress } from "contracts/address";
-import Link from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
-import { Aircraft, Cargo, License, LicenseType } from "types";
-import { getNFTAttributes, randomIntFromInterval } from "utils";
+import {
+  flightNftAddress,
+  nftAircraftTokenAddress,
+  nftLicenseTokenAddress,
+} from "contracts/address";
+import React, { useCallback, useMemo } from "react";
+import { Cargo } from "types";
+import { getNFTAttributes } from "utils";
 
-const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
+interface Aircraft {
+  combustible: string;
+  cargo: string;
+  license: string;
+}
+const licenses: Record<string, string> = {
+  A: "0",
+  B: "1",
+  C: "2",
+  D: "3",
+};
+
+const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({
+  cargo,
+  onCancel,
+}) => {
   const address = useAddress();
-  const { contract } = useContract(nftAircraftTokenAddress);
   const { contract: flightContract } = useContract(flightNftAddress);
-  const { data: owned, isLoading } = useOwnedNFTs(contract, address);
-  const { data: nfts } = useNFTs(contract);
+  const { contract: licenseContract } = useContract(nftLicenseTokenAddress);
   const { mutateAsync: lazyMint, isLoading: isMinting } =
     useLazyMint(flightContract);
   const { mutateAsync: claimNFT, isLoading: isClaiming } =
@@ -41,63 +54,31 @@ const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
   const { mutate: setClaimConditions, error } =
     useSetClaimConditions(flightContract);
 
-  const getAircraftPrize = useCallback(
-    (aircraft: NFT) => {
-      const item = getNFTAttributes(aircraft).find(
-        (attribute) => attribute.trait_type === "license"
-      );
+  const aircraftAttributes: Aircraft = useMemo(() => {
+    if (!cargo) return {} as Aircraft;
+    const attributes = getNFTAttributes(cargo?.aircraft).reduce(
+      (acc, curr) =>
+        ({
+          ...acc,
+          [curr.trait_type]: curr.value,
+        } as Aircraft),
+      {} as Aircraft
+    );
 
-      if (!item || !cargo) {
-        throw new Error("missing item type");
-      }
-
-      console.log("prize =>", cargo.prize);
-      console.log("item.value =>", item.value);
-      switch (item.value) {
-        case License.D:
-          return cargo.prize;
-        case License.C:
-          return Math.floor(Number(cargo.prize * 10));
-        case License.B:
-          return Math.floor(Number(cargo.prize) * 100);
-        case License.A:
-          return Math.floor(Number(cargo.prize) * 1000);
-        default:
-          return 0;
-      }
-    },
-    [cargo]
+    return attributes;
+  }, [cargo]);
+  const { data: license } = useNFT(
+    licenseContract,
+    licenses[aircraftAttributes.license]
   );
 
-  const maxAircraftWeight = useCallback(
-    (id: string): number => {
-      if (!owned) return 0;
-      const aircraft = owned.find((nft) => nft.metadata.id === id);
-      if (!id || !aircraft) return 0;
-
-      const attribute = getNFTAttributes(aircraft).find(
-        (attribute) => attribute.trait_type === "cargo"
-      );
-
-      return attribute ? Number(attribute.value) : 0;
-    },
-    [owned]
-  );
-
-  const currentWeight = useCallback(
-    (id: string) => maxAircraftWeight(id) * randomIntFromInterval(35, 75),
-    [maxAircraftWeight]
-  );
-
-  const progressBar = useCallback(
-    (id: string) => (currentWeight(id) / maxAircraftWeight(id)) * 100,
-    [maxAircraftWeight, currentWeight]
+  const progressBar = useMemo(
+    () => (Number(cargo?.weight) / Number(aircraftAttributes.cargo)) * 100,
+    [cargo, aircraftAttributes]
   );
 
   const handleLazyMint = useCallback(async () => {
     await lazyMint({
-      // Metadata of the NFTs to upload
-
       metadatas: [
         {
           name: `${cargo?.origin} - ${cargo?.destination}`,
@@ -108,21 +89,6 @@ const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
       ],
     });
   }, [lazyMint, cargo, address]);
-
-  // const handleSetClaimConditions = useCallback(() => {
-  //   setClaimConditions({
-  //     phases: [
-  //       {
-  //         metadata: { name: "Phase 1" },
-  //         price: 10,
-  //         currencyAddress: "0x773F0e20Ab2E9afC479C82105E924C2E0Ada5aa9",
-  //         maxClaimablePerWallet: 1,
-  //         maxClaimableSupply: 1,
-  //         startTime: new Date(),
-  //       },
-  //     ],
-  //   });
-  // }, [setClaimConditions]);
 
   const handleClaim = useCallback(async () => {
     await claimNFT({
@@ -137,111 +103,94 @@ const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
     });
   }, [claimNFT, address]);
 
-  if (!nfts || isLoading) {
+  if (!cargo) {
     return <LinearProgress />;
   }
 
   return (
     <Grid container spacing={2}>
-      {!isLoading && !owned && (
-        <Box>
-          <Typography>
-            No tienes aeronaves compatibles con este vuelo.
-          </Typography>
-          <Link href="/hangar">
-            <Typography variant="overline">
-              Consigue una aeronave aquí.
-            </Typography>
-          </Link>
-        </Box>
-      )}
-      {!isLoading && !!owned && owned.length > 0 ? (
-        owned.map((aircraft) => (
-          <Grid item xs={12} sm={6} key={aircraft.metadata.id}>
-            <Card>
-              <CardHeader
-                title={aircraft.metadata.name}
-                subheader={aircraft.metadata.description}
+      <Grid item xs={12} sm={6} key={cargo.aircraft.metadata.id}>
+        <Card>
+          <CardHeader
+            title={cargo.aircraft.metadata.name}
+            subheader={cargo.aircraft.metadata.description}
+            avatar={
+              <Avatar variant="square">
+                <MediaRenderer
+                  width="50px"
+                  height="50px"
+                  src={cargo.aircraft.metadata.image}
+                />
+              </Avatar>
+            }
+            action={
+              <Avatar>
+                <MediaRenderer
+                  width="50px"
+                  height="50px"
+                  src={license?.metadata.image}
+                />
+              </Avatar>
+            }
+          />
+          <CardContent>
+            <Stack>
+              <LinearProgress
+                color="success"
+                variant="determinate"
+                value={progressBar}
               />
-              <CardContent>
-                <Stack>
-                  <LinearProgress
-                    color="success"
-                    variant="determinate"
-                    value={progressBar(aircraft.metadata.id)}
-                  />
-                  <Typography textAlign="center" variant="caption">
-                    Cargo weight:{" "}
-                    <b>
-                      {Intl.NumberFormat("en").format(
-                        currentWeight(aircraft.metadata.id)
-                      )}{" "}
-                      Kg
-                    </b>
-                  </Typography>
-                  <Typography textAlign="center" variant="caption">
-                    Max Capacity:{" "}
-                    <b>
-                      {
-                        getNFTAttributes(aircraft).find(
-                          (a) => a.trait_type === "cargo"
-                        )?.value
-                      }{" "}
-                      Kg
-                    </b>
-                  </Typography>
-                  <Typography>
-                    Callsign: <b>{cargo?.callsign}</b>
-                  </Typography>
-                  <Typography>
-                    Prize:{" "}
-                    <b>
-                      {Intl.NumberFormat("en", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(getAircraftPrize(aircraft) as number)}
-                    </b>
-                  </Typography>
-                </Stack>
-              </CardContent>
-
-              <CardActions>
-                <Button
-                  disabled={!address}
-                  color="secondary"
-                  variant="contained"
-                  fullWidth
-                  onClick={handleClaim}
-                >
-                  Claim
-                </Button>
-                <Button
-                  disabled={!address}
-                  color="secondary"
-                  variant="contained"
-                  fullWidth
-                  onClick={handleLazyMint}
-                >
-                  LazyMint
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))
-      ) : (
-        <Box px={2}>
-          <Alert severity="error">
-            <AlertTitle>
-              No tienes aeronaves compatibles con este vuelo.
-            </AlertTitle>
-            <Link href="/hangar">
-              <Typography variant="overline">
-                Consigue una aeronave aquí.
+              <Typography textAlign="center" variant="caption">
+                Cargo weight:{" "}
+                <b>{Intl.NumberFormat("en").format(cargo.weight)} Kg</b>
               </Typography>
-            </Link>
-          </Alert>
-        </Box>
-      )}
+              <Typography textAlign="center" variant="caption">
+                Max Capacity:{" "}
+                <b>
+                  {
+                    getNFTAttributes(cargo.aircraft).find(
+                      (a) => a.trait_type === "cargo"
+                    )?.value
+                  }{" "}
+                  Kg
+                </b>
+              </Typography>
+              <Typography>
+                Callsign: <b>{cargo?.callsign}</b>
+              </Typography>
+              <Typography>
+                Prize:{" "}
+                <b>
+                  {Intl.NumberFormat("en", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(cargo?.prize || 0)}
+                </b>
+              </Typography>
+            </Stack>
+          </CardContent>
+
+          <CardActions>
+            <Button
+              disabled={!address}
+              color="secondary"
+              variant="contained"
+              fullWidth
+              onClick={handleClaim}
+            >
+              Reservar
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              fullWidth
+              onClick={onCancel}
+            >
+              cancelar
+            </Button>
+          </CardActions>
+        </Card>
+      </Grid>
     </Grid>
   );
 };

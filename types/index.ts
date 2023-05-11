@@ -1,3 +1,4 @@
+import { NFT } from "@thirdweb-dev/sdk";
 import { atc } from "mocks";
 import ivaoPilot from "mocks/ivaoPilot";
 
@@ -39,7 +40,7 @@ export interface Cargo {
   destination: string;
   distance: number;
   details: CargoDetails;
-  aircrafts: Aircraft[];
+  aircraft: NFT;
   weight: number;
   callsign: string;
   prize: number;

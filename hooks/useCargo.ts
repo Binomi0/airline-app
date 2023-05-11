@@ -1,17 +1,18 @@
+import { NFT } from "@thirdweb-dev/sdk";
 import { useVaProviderContext } from "context/VaProvider";
 import { cargos } from "mocks/cargos";
 import { useCallback, useState } from "react";
 import { Cargo, FRoute } from "types";
 import {
-  getAircraftCargo,
   getCallsign,
   getCargoWeight,
   getDistanceByCoords,
   getRandomInt,
+  getCargoPrize,
 } from "utils";
 
 interface UseCargo {
-  newCargo: (route: FRoute) => void;
+  newCargo: (route: FRoute, owned: NFT) => void;
   cargo?: Cargo;
 }
 
@@ -20,20 +21,19 @@ const useCargo = (): UseCargo => {
   const [cargo, setCargo] = useState<Cargo>();
 
   const newCargo = useCallback(
-    ({ origin, destination }: FRoute) => {
-      const distance = getDistanceByCoords(atcs, { origin, destination });
+    (route: FRoute, aircraft: NFT) => {
+      const distance = getDistanceByCoords(atcs, route);
       const details = cargos[getRandomInt(8)];
-      const aircrafts = getAircraftCargo(distance, details);
-      const weight = getCargoWeight(aircrafts);
+      const weight = getCargoWeight(aircraft);
       const callsign = getCallsign();
-      const prize = Math.floor(distance / 100);
+      const prize = getCargoPrize(distance, aircraft);
 
       setCargo({
-        origin,
-        destination,
+        origin: route.origin,
+        destination: route.destination,
         distance,
         details,
-        aircrafts,
+        aircraft,
         weight,
         callsign,
         prize,

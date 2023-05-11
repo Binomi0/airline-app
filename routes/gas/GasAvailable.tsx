@@ -48,6 +48,7 @@ const GasAvailable = () => {
               InputProps={{
                 endAdornment: (
                   <Button
+                    variant="contained"
                     onClick={() => setStakeAmount(airl?.displayValue || "")}
                     size="small"
                   >

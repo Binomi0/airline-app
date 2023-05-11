@@ -1,23 +1,26 @@
-import { Fade, Grid, LinearProgress } from "@mui/material";
-import { useAddress } from "@thirdweb-dev/react";
-import { useVaProviderContext } from "context/VaProvider";
+import { Fade, Grid } from "@mui/material";
+import { NFT, useAddress } from "@thirdweb-dev/react";
 import CargoItem from "./CargoItem";
 import React, { Dispatch, SetStateAction, useCallback } from "react";
-import { Cargo, FRoute, Flight } from "types";
+import { FRoute, Flight } from "types";
 
 const CargoList: React.FC<{
-  newCargo: (route: FRoute) => void;
+  newCargo: (route: FRoute, aircraft: NFT) => void;
   setSelected: Dispatch<SetStateAction<FRoute>>;
   flights: Flight;
-}> = ({ newCargo, setSelected, flights }) => {
+  aircraft?: NFT;
+}> = ({ newCargo, setSelected, flights, aircraft }) => {
   const address = useAddress();
 
   const handleSelect = useCallback(
     (origin: string, destination: string) => {
-      newCargo({ origin, destination });
+      if (!aircraft) {
+        throw new Error("Missing aircraft");
+      }
+      newCargo({ origin, destination }, aircraft);
       setSelected({ origin, destination });
     },
-    [newCargo, setSelected]
+    [newCargo, setSelected, aircraft]
   );
 
   return (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createRef, useState } from "react";
 import type { NextPage } from "next";
 import {
   Alert,
@@ -16,7 +16,7 @@ import image from "public/img/airplanes9.png";
 import { useVaProviderContext } from "context/VaProvider";
 import { FRoute } from "types";
 import useCargo from "hooks/useCargo";
-import { ConnectWallet, useAddress, useUser } from "@thirdweb-dev/react";
+import { ConnectWallet, NFT, useAddress, useUser } from "@thirdweb-dev/react";
 import NoAddress from "routes/Cargo/components/NoAddress";
 import CargoReady from "routes/Cargo/components/CargoReady";
 import CargoList from "routes/Cargo/components/CargoList";
@@ -26,7 +26,10 @@ const initialState: FRoute = {
   destination: "",
 };
 
-const CargoView: NextPage<{ loading: boolean }> = ({ loading }) => {
+const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({
+  loading,
+  aircraft,
+}) => {
   const address = useAddress();
   const { isLoggedIn } = useUser();
   const { newCargo, cargo } = useCargo();
@@ -48,7 +51,6 @@ const CargoView: NextPage<{ loading: boolean }> = ({ loading }) => {
       />
       <Container>
         <Box my={6} textAlign="center">
-          <Typography variant="h1">Virtual Airline</Typography>
           {!address && <ConnectWallet />}
         </Box>
 
@@ -65,6 +67,7 @@ const CargoView: NextPage<{ loading: boolean }> = ({ loading }) => {
         <Fade in={isLoggedIn && !!address && !selected.origin} unmountOnExit>
           <Box>
             <CargoList
+              aircraft={aircraft}
               flights={flights}
               newCargo={newCargo}
               setSelected={setSelected}

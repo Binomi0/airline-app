@@ -6,12 +6,11 @@ import {
   Typography,
   Alert,
   AlertTitle,
-  Button,
 } from "@mui/material";
 import { useAddress } from "@thirdweb-dev/react";
 import React from "react";
 import CargoAircraft from "routes/Cargo/components/CargoAircraft";
-import { Cargo, FRoute } from "types";
+import { Cargo } from "types";
 
 const CargoReady: React.FC<{
   cargo?: Cargo;
@@ -29,21 +28,24 @@ const CargoReady: React.FC<{
             alignItems="center"
           >
             <Box>
+              <Typography>Para conectar</Typography>
               <Typography variant="h2">{cargo?.origin}</Typography>
             </Box>
             <Box
               sx={{
-                height: 20,
+                height: 24,
                 background: "white",
                 p: 0,
                 mx: 2,
                 flex: 1,
                 textAlign: "center",
+                borderRadius: 10,
               }}
             >
               <Typography
-                fontWeight={500}
-                color="primary.main"
+                color="common.black"
+                fontWeight={700}
+                // color="primary.main"
                 letterSpacing={2}
               >
                 {Intl.NumberFormat("es", {
@@ -67,18 +69,7 @@ const CargoReady: React.FC<{
           </Box>
 
           <Box my={4}>
-            <CargoAircraft cargo={cargo} />
-          </Box>
-
-          <Box my={4}>
-            <Button
-              variant="contained"
-              color="error"
-              fullWidth
-              onClick={onCancel}
-            >
-              ATRAS
-            </Button>
+            <CargoAircraft cargo={cargo} onCancel={onCancel} />
           </Box>
         </Grid>
       </Grid>

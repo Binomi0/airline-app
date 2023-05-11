@@ -7,7 +7,6 @@ const serverSidePropsHandler = async (
   try {
     const user = await getUser(ctx.req);
 
-    console.log("user =>", user);
     return {
       props: {
         user,

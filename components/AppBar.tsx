@@ -7,6 +7,7 @@ import {
   IconButton,
   Stack,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -33,8 +34,10 @@ const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery("(min-width:768px)");
   const address = useAddress();
   const { toggleSidebar } = useMainProviderContext();
-  const { data: airlBalance } = useBalance(coinTokenAddress);
-  const { data: gasBalance } = useBalance(rewardTokenAddress);
+  const { data: airlBalance, isLoading: airlLoading } =
+    useBalance(coinTokenAddress);
+  const { data: gasBalance, isLoading: airgLoading } =
+    useBalance(rewardTokenAddress);
   const { contract: licenseContract } = useContract(
     nftLicenseTokenAddress,
     "edition-drop"
@@ -69,45 +72,59 @@ const CustomAppBar: React.FC = () => {
               <AvatarGroup>
                 {ownedLicense
                   .map((license) => (
-                    <Avatar key={license.metadata.id}>
-                      <MediaRenderer
-                        width="50px"
-                        height="50px"
-                        src={license?.metadata.image}
-                      />
-                    </Avatar>
+                    <Tooltip
+                      arrow
+                      title={(license.metadata.name as string).split(" - ")[1]}
+                      key={license.metadata.id}
+                    >
+                      <Avatar>
+                        <MediaRenderer
+                          width="50px"
+                          height="50px"
+                          src={license?.metadata.image}
+                        />
+                      </Avatar>
+                    </Tooltip>
                   ))
                   .reverse()}
               </AvatarGroup>
             )
           )}
-          {matches && (
-            <Stack direction="row" alignItems="center" mx={2} spacing={1}>
-              <LocalGasStationIcon color="inherit" fontSize="medium" />
-              <Typography variant="h6">
-                {Intl.NumberFormat("en", {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                }).format(
-                  new BigNumber(gasBalance?.displayValue || 0).toNumber()
-                )}{" "}
-                AIRG
-              </Typography>
-            </Stack>
+          {airlLoading ? (
+            <CircularProgress size={25} />
+          ) : (
+            matches && (
+              <Stack direction="row" alignItems="center" mx={2} spacing={1}>
+                <LocalGasStationIcon color="inherit" fontSize="medium" />
+                <Typography variant="h6">
+                  {Intl.NumberFormat("en", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  }).format(
+                    new BigNumber(gasBalance?.displayValue || 0).toNumber()
+                  )}{" "}
+                  AIRG
+                </Typography>
+              </Stack>
+            )
           )}
-          {matches && (
-            <Stack direction="row" alignItems="center" mx={2} spacing={1}>
-              <AirplaneTicketIcon color="inherit" fontSize="medium" />
-              <Typography variant="h6">
-                {Intl.NumberFormat("en", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(
-                  new BigNumber(airlBalance?.displayValue || 0).toNumber()
-                )}{" "}
-                AIRL
-              </Typography>
-            </Stack>
+          {airgLoading ? (
+            <CircularProgress size={25} />
+          ) : (
+            matches && (
+              <Stack direction="row" alignItems="center" mx={2} spacing={1}>
+                <AirplaneTicketIcon color="inherit" fontSize="medium" />
+                <Typography variant="h6">
+                  {Intl.NumberFormat("en", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(
+                    new BigNumber(airlBalance?.displayValue || 0).toNumber()
+                  )}{" "}
+                  AIRL
+                </Typography>
+              </Stack>
+            )
           )}
           <ConnectWallet style={{ height: "50px" }} />
         </Stack>

@@ -52,15 +52,11 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   const licenseId = getNFTAttributes(nft).find(
     (attribute) => attribute.trait_type === "license"
   )?.value;
-  console.log("licenseId =>", licenseId);
-
   const { data: licenseBalance } = useNFTBalance(
     license,
     address,
     licenses[licenseId || ""]
   );
-
-  console.log("licenseBalance =>", licenseBalance?.toString());
 
   return (
     <Grid item xs={12} lg={3}>

@@ -59,6 +59,7 @@ const GasDeposited = () => {
                       )
                     }
                     size="small"
+                    variant="contained"
                   >
                     MAX
                   </Button>
