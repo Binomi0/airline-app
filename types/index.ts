@@ -41,6 +41,8 @@ export interface Cargo {
   details: CargoDetails;
   aircrafts: Aircraft[];
   weight: number;
+  callsign: string;
+  prize: number;
 }
 
 export interface CargoDetails {
@@ -61,3 +63,12 @@ export enum AircraftName {
   "C172",
   "AN225",
 }
+
+export enum License {
+  A = "A",
+  B = "B",
+  C = "C",
+  D = "D",
+}
+
+export type LicenseType = License.A | License.B | License.C | License.D;

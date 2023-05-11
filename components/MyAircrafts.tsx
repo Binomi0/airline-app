@@ -36,7 +36,7 @@ const MyAircrafts = () => {
       <Typography variant="h2">My Aircrafts</Typography>
       <Grid container spacing={2}>
         {nfts?.map((nft) => (
-          <Grid item xs={4} key={nft.metadata.id}>
+          <Grid item xs={12} lg={4} key={nft.metadata.id}>
             <Card>
               <MediaRenderer width="100%" src={nft.metadata.image} />
               <CardHeader

@@ -6,6 +6,6 @@ export const nativeTokenWrapperAddress =
 export const nftAircraftTokenAddress =
   "0x72ba96225Df9f55f107D921F88Cb721C627653A4";
 export const nftLicenseTokenAddress =
-  "0xDAe1fb0EBc33e6a57892D1aE6f6546D1ab787998";
+  "0x8d483c2Ec89CEe3058839D5DeDb92AfBAB6340a5";
 export const factoryAddress = "0x152546eaCCe1Bd86F11Ffd6ccf607bb77fc26E4E";
 export const flightNftAddress = "0xF2219dA181DCE1636511D5f65F7B5a1B1c9C5103";

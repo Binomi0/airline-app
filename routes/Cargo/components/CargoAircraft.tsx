@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  NFT,
   useAddress,
   useClaimNFT,
   useContract,
@@ -24,12 +25,8 @@ import {
 import { flightNftAddress, nftAircraftTokenAddress } from "contracts/address";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
-import { Cargo } from "types";
-import { getNFTAttributes } from "utils";
-
-function randomIntFromInterval(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1) + min) / 100;
-}
+import { Aircraft, Cargo, License, LicenseType } from "types";
+import { getNFTAttributes, randomIntFromInterval } from "utils";
 
 const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
   const address = useAddress();
@@ -44,7 +41,33 @@ const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
   const { mutate: setClaimConditions, error } =
     useSetClaimConditions(flightContract);
 
-  console.log("error =>", error);
+  const getAircraftPrize = useCallback(
+    (aircraft: NFT) => {
+      const item = getNFTAttributes(aircraft).find(
+        (attribute) => attribute.trait_type === "license"
+      );
+
+      if (!item || !cargo) {
+        throw new Error("missing item type");
+      }
+
+      console.log("prize =>", cargo.prize);
+      console.log("item.value =>", item.value);
+      switch (item.value) {
+        case License.D:
+          return cargo.prize;
+        case License.C:
+          return Math.floor(Number(cargo.prize * 10));
+        case License.B:
+          return Math.floor(Number(cargo.prize) * 100);
+        case License.A:
+          return Math.floor(Number(cargo.prize) * 1000);
+        default:
+          return 0;
+      }
+    },
+    [cargo]
+  );
 
   const maxAircraftWeight = useCallback(
     (id: string): number => {
@@ -165,6 +188,18 @@ const CargoAircraft: React.FC<{ cargo?: Cargo }> = ({ cargo }) => {
                         )?.value
                       }{" "}
                       Kg
+                    </b>
+                  </Typography>
+                  <Typography>
+                    Callsign: <b>{cargo?.callsign}</b>
+                  </Typography>
+                  <Typography>
+                    Prize:{" "}
+                    <b>
+                      {Intl.NumberFormat("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(getAircraftPrize(aircraft) as number)}
                     </b>
                   </Typography>
                 </Stack>

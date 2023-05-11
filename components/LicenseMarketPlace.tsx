@@ -38,6 +38,7 @@ const LicenseMarketPlace: React.FC = () => {
   return (
     <Box my={4}>
       <Typography variant="h2">Licenses</Typography>
+      <Typography>Start with LAPL Light aviation pilot license</Typography>
       <Grid container spacing={2}>
         {nfts.map((nft) => (
           <LicenseItem

@@ -63,7 +63,7 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   console.log("licenseBalance =>", licenseBalance?.toString());
 
   return (
-    <Grid item xs={3}>
+    <Grid item xs={12} lg={3}>
       <Card>
         <CardHeader
           title={nft.metadata.name}

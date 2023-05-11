@@ -1,0 +1,62 @@
+[
+  {
+    "name": "LIGHT AVIATION PILOT LICENSE - LAPL",
+    "description": "This is a license that does not require experience or previous knowledge of aeronautics, thanks to this license you will be able to fly light recreational aircraft with a maximum weight. If you are looking for a hobby as exciting as flying, this could be your best option. Within this division we can find different options.",
+    "image": "ipfs://QmWAmM2efDuSpnqeVuVnkT9qC6qMAZkcRRgQJqxD6a2qbu",
+    "attributes": [
+      {
+        "trait_type": "type",
+        "value": "LAPC"
+      },
+      {
+        "trait_type": "price",
+        "value": "1"
+      }
+    ]
+  },
+  {
+    "name": "PRIVATE PILOT LICENCE - PPL(A)",
+    "description": "This is the licence that will allow you to fly aircraft not intended for commercial exploitation, for private purposes, i.e. not for profit. It is the first step to follow if your objective is to become a commercial pilot. You can start the course at the age of 16 years old and you must be 17 years old to be able to take the exam.",
+    "image": "ipfs://QmcwrT5FFmKyEyTQRSbx8yGni2BXUqm4fouHVJEdc2za8V",
+    "attributes": [
+      {
+        "trait_type": "type",
+        "value": "PPL(A)"
+      },
+      {
+        "trait_type": "price",
+        "value": "10"
+      }
+    ]
+  },
+  {
+    "name": "COMMERCIAL PILOTO LICENCE - CPL (A)",
+    "description": "Upon completion of the Modular Commercial Airplane Pilot Course, CPL(A), you will be able to fly aircraft as pilot in command or co-pilot of any aircraft engaged in operations other than commercial air transport, act as pilot in command in commercial air transport of any single-pilot aircraft and/or act as co-pilot in commercial air transport subject to specific restrictions according to the regulations in force.",
+    "image": "ipfs://QmNP1iA8QRiSQZ2uiKx5G6k6AqW7FBdTS7xemBKKp3jby8",
+    "attributes": [
+      {
+        "trait_type": "type",
+        "value": "CPL(A)"
+      },
+      {
+        "trait_type": "price",
+        "value": "100"
+      }
+    ]
+  },
+  {
+    "name": "AIRLINE TRANSPORT PILOT LICENCE - (ATPL FROZEN)",
+    "description": "License with which you will be able to act as pilot in command (PIC) or co-pilot of any aircraft dedicated to operations other than commercial air transport; act as pilot in command in commercial air transport operations in any aircraft certified for a single pilot and act as co-pilot in commercial air transport of airlines. The program is developed in stages following different modules from less to more complex, obtaining upon completion the Commercial Pilot License CPL(A) and ATPL(A) Frozen.",
+    "image": "ipfs://QmRGxLFDnMRGyGK2ioVhPUtyfcaUYY3e3GsC8vURGrx2Wj",
+    "attributes": [
+      {
+        "trait_type": "type",
+        "value": "ATPL"
+      },
+      {
+        "trait_type": "price",
+        "value": "1000"
+      }
+    ]
+  }
+]

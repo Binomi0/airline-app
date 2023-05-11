@@ -13,12 +13,16 @@ import {
   MediaRenderer,
   NFT,
   useAddress,
+  useBalance,
   useClaimNFT,
   useContract,
+  useNFT,
 } from "@thirdweb-dev/react";
-import React from "react";
+import React, { useCallback } from "react";
 import { getNFTAttributes } from "utils";
 import { nftLicenseTokenAddress } from "contracts/address";
+import { coinTokenAddress } from "contracts/address";
+import BigNumber from "bignumber.js";
 
 const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
   nft,
@@ -28,9 +32,34 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
   const { contract } = useContract(nftLicenseTokenAddress);
   const { mutateAsync: claimNFT, isLoading: isClaiming } =
     useClaimNFT(contract);
+  const { data: airlBalance } = useBalance(coinTokenAddress);
+
+  const handleClaimLicense = useCallback(() => {
+    if (!airlBalance) return;
+
+    const attribute = getNFTAttributes(nft).find(
+      (attr) => attr.trait_type === "price"
+    );
+    if (!attribute) {
+      throw new Error("missing price in nft");
+    }
+
+    const hasEnough = new BigNumber(airlBalance.displayValue).isGreaterThan(
+      attribute.value
+    );
+    if (hasEnough) {
+      claimNFT({
+        to: address,
+        quantity: 1,
+        tokenId: nft.metadata.id,
+      });
+    } else {
+      console.log(`You do not have enough AIRL tokens, ${attribute.value}`);
+    }
+  }, [claimNFT, address, airlBalance, nft]);
 
   return (
-    <Grid item xs={4}>
+    <Grid item xs={12} md={6} lg={4}>
       <Card>
         <Box
           sx={{
@@ -61,10 +90,6 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
           subheader={nft.metadata.description}
         />
         <CardContent>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography>Price</Typography>
-            <Typography variant="body2">0.01</Typography>
-          </Stack>
           {getNFTAttributes(nft).map((attribute) => (
             <Stack
               direction="row"
@@ -72,25 +97,23 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
               key={attribute.trait_type}
             >
               <Typography>{attribute.trait_type}</Typography>
-              <Typography variant="body2">{attribute.value}</Typography>
+              <Typography variant="body2">
+                {attribute.value} {attribute.trait_type === "price" && "AIRL"}
+              </Typography>
             </Stack>
           ))}
         </CardContent>
-        <CardActions>
-          <Button
-            disabled={isClaiming || owned}
-            variant="contained"
-            onClick={() =>
-              claimNFT({
-                to: address,
-                quantity: 1,
-                tokenId: nft.metadata.id,
-              })
-            }
-          >
-            Claim {nft.metadata.name}
-          </Button>
-        </CardActions>
+        {!owned && (
+          <CardActions>
+            <Button
+              disabled={isClaiming}
+              variant="contained"
+              onClick={handleClaimLicense}
+            >
+              Claim {nft.metadata.name}
+            </Button>
+          </CardActions>
+        )}
       </Card>
     </Grid>
   );
