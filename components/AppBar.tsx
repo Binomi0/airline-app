@@ -67,15 +67,17 @@ const CustomAppBar: React.FC = () => {
             ownedLicense &&
             ownedLicense?.length > 0 && (
               <AvatarGroup>
-                {ownedLicense?.map((license) => (
-                  <Avatar key={license.metadata.id}>
-                    <MediaRenderer
-                      width="50px"
-                      height="50px"
-                      src={license?.metadata.image}
-                    />
-                  </Avatar>
-                ))}
+                {ownedLicense
+                  .map((license) => (
+                    <Avatar key={license.metadata.id}>
+                      <MediaRenderer
+                        width="50px"
+                        height="50px"
+                        src={license?.metadata.image}
+                      />
+                    </Avatar>
+                  ))
+                  .reverse()}
               </AvatarGroup>
             )
           )}

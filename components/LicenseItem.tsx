@@ -8,6 +8,7 @@ import {
   CardActions,
   Button,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import {
   MediaRenderer,
@@ -18,7 +19,7 @@ import {
   useContract,
   useNFT,
 } from "@thirdweb-dev/react";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { getNFTAttributes } from "utils";
 import { nftLicenseTokenAddress } from "contracts/address";
 import { coinTokenAddress } from "contracts/address";
@@ -57,6 +58,17 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
       console.log(`You do not have enough AIRL tokens, ${attribute.value}`);
     }
   }, [claimNFT, address, airlBalance, nft]);
+
+  const getNFTPrice = useCallback((nft: NFT) => {
+    const attribute = getNFTAttributes(nft).find(
+      (attr) => attr.trait_type === "price"
+    );
+    if (!attribute) {
+      throw new Error("missing types");
+    }
+
+    return attribute.value;
+  }, []);
 
   return (
     <Grid item xs={12} md={6} lg={4}>
@@ -110,7 +122,13 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
               variant="contained"
               onClick={handleClaimLicense}
             >
-              Claim {nft.metadata.name}
+              {isClaiming ? (
+                <CircularProgress size={25} />
+              ) : (
+                `Claim ${
+                  (nft.metadata.name as string)?.split(" - ")[1]
+                } for ${getNFTPrice(nft)} AIRL`
+              )}
             </Button>
           </CardActions>
         )}
