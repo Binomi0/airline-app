@@ -1,6 +1,17 @@
-import { ConnectWallet, useBalance } from "@thirdweb-dev/react";
-import type { NextPage } from "next";
-import { Box, Container, Stack, Typography } from "@mui/material";
+import {
+  ConnectWallet,
+  useAddress,
+  useBalance,
+  useUser,
+} from "@thirdweb-dev/react";
+import type { GetServerSidePropsContext, NextPage } from "next";
+import {
+  Box,
+  Container,
+  LinearProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
 import GasStatus from "routes/gas/GasStatus";
 import styles from "styles/Gas.module.css";
 import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
@@ -8,9 +19,32 @@ import { rewardTokenAddress } from "contracts/address";
 import Image from "next/image";
 import image from "public/img/airplanes.png";
 import { formatNumber } from "utils";
+import serverSidePropsHandler from "components/ServerSideHandler";
+import GppGoodIcon from "@mui/icons-material/GppGood";
 
 const Gas: NextPage = () => {
   const { data } = useBalance(rewardTokenAddress);
+  const address = useAddress();
+  const { user, isLoading, isLoggedIn } = useUser();
+
+  if (isLoading) {
+    return <LinearProgress />;
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <Box mt={10} textAlign="center">
+        <GppGoodIcon sx={{ fontSize: 72 }} color="primary" />
+        <Typography variant="h2" paragraph>
+          Sign in
+        </Typography>
+        <Typography variant="h4" paragraph>
+          Sign in with your wallet to checkout gas station.
+        </Typography>
+        <ConnectWallet />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ position: "relative" }}>
@@ -36,6 +70,7 @@ const Gas: NextPage = () => {
         )}
         <Box my={2} textAlign="center">
           <Typography variant="h1">Gas Station</Typography>
+          {!address && <ConnectWallet />}
         </Box>
 
         <GasStatus />
@@ -43,5 +78,8 @@ const Gas: NextPage = () => {
     </Box>
   );
 };
+
+export const getServerSideProps = (ctx: GetServerSidePropsContext) =>
+  serverSidePropsHandler(ctx);
 
 export default Gas;

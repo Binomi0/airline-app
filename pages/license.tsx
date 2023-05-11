@@ -4,8 +4,11 @@ import LicenseMarketPlace from "../components/LicenseMarketPlace";
 import styles from "styles/License.module.css";
 import image from "public/img/airplanes4.png";
 import Image from "next/image";
+import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
 
 const License: NextPage = () => {
+  const address = useAddress();
+
   return (
     <Box sx={{ position: "relative" }}>
       <Image
@@ -19,6 +22,7 @@ const License: NextPage = () => {
       <Container>
         <Box my={5} textAlign="center">
           <Typography variant="h1">License Page</Typography>
+          {!address && <ConnectWallet />}
         </Box>
 
         <LicenseMarketPlace />

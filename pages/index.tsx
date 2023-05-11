@@ -13,6 +13,7 @@ import styles from "../styles/Home.module.css";
 import image from "public/img/Cyb3rYoga.png";
 import Image from "next/image";
 import serverSidePropsHandler from "components/ServerSideHandler";
+import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
 
 const GridItem: React.FC<{
   link: string;
@@ -37,6 +38,8 @@ const GridItem: React.FC<{
 );
 
 const Home: NextPage = () => {
+  const address = useAddress();
+
   return (
     <Box position="relative">
       <Image
@@ -51,6 +54,7 @@ const Home: NextPage = () => {
       <Container>
         <Box my={5} textAlign="center">
           <Typography variant="h1">Virtual Airline</Typography>
+          {!address && <ConnectWallet />}
         </Box>
 
         <Grid container spacing={8}>

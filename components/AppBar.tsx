@@ -64,7 +64,7 @@ const CustomAppBar: React.FC = () => {
           {matches ? "Decentralized Virtual Airline" : "DVA"}
         </Typography>
         <Stack direction="row" alignItems="center" height={50} spacing={1}>
-          {isLoading ? (
+          {isLoading && address ? (
             <CircularProgress size={25} />
           ) : (
             ownedLicense &&
@@ -90,7 +90,7 @@ const CustomAppBar: React.FC = () => {
               </AvatarGroup>
             )
           )}
-          {airlLoading ? (
+          {airlLoading && address ? (
             <CircularProgress size={25} />
           ) : (
             matches && (
@@ -108,7 +108,7 @@ const CustomAppBar: React.FC = () => {
               </Stack>
             )
           )}
-          {airgLoading ? (
+          {airgLoading && address ? (
             <CircularProgress size={25} />
           ) : (
             matches && (

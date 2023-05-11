@@ -65,6 +65,7 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
         </Snackbar>
         <Box my={5} textAlign="center">
           <Typography variant="h1">Main Hangar</Typography>
+          {!address && <ConnectWallet />}
         </Box>
 
         <AircraftMarketPlace />

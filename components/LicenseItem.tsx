@@ -118,7 +118,7 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
         {!owned && (
           <CardActions>
             <Button
-              disabled={isClaiming}
+              disabled={isClaiming || !address}
               variant="contained"
               onClick={handleClaimLicense}
             >
