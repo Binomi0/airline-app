@@ -28,7 +28,6 @@ const CargoReady: React.FC<{
             alignItems="center"
           >
             <Box>
-              <Typography>Para conectar</Typography>
               <Typography variant="h2">{cargo?.origin}</Typography>
             </Box>
             <Box
