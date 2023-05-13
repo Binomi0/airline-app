@@ -6,6 +6,7 @@ import {
   Typography,
   CardActions,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import {
   NFT,
@@ -75,7 +76,11 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
                   })
                 }
               >
-                Claim {nft.metadata.name}
+                {isLoading ? (
+                  <CircularProgress />
+                ) : (
+                  `Claim ${nft.metadata.name}`
+                )}
               </Button>
             )}
           </CardActions>

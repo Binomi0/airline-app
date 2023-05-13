@@ -56,7 +56,7 @@ export default function MyApp(props: MyAppProps) {
   return (
     <ThirdwebProvider
       activeChain={Goerli}
-      supportedChains={[Goerli, Sepolia]}
+      supportedChains={[Goerli]}
       authConfig={{
         domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
         authUrl: "/api/auth",
