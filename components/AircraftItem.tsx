@@ -1,17 +1,13 @@
 import {
   Grid,
   Card,
-  CardHeader,
   CardContent,
   Stack,
   Typography,
   CardActions,
   Button,
-  Box,
-  CardMedia,
 } from "@mui/material";
 import {
-  MediaRenderer,
   NFT,
   useAddress,
   useClaimNFT,
@@ -25,22 +21,7 @@ import {
   nftLicenseTokenAddress,
 } from "contracts/address";
 import { useRouter } from "next/router";
-import { Aircraft } from "types";
-
-const licenses: Record<string, string> = {
-  A: "0",
-  B: "1",
-  C: "2",
-  D: "3",
-};
-
-const maps: Record<string, string> = {
-  0: "0",
-  1: Aircraft.C700,
-  2: Aircraft.B737,
-  3: Aircraft.C172,
-  4: Aircraft.AN225,
-};
+import AircraftCardHeader from "./Sidebar/Aircraft/CardHeader";
 
 const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   const router = useRouter();
@@ -52,34 +33,14 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   const licenseId = getNFTAttributes(nft).find(
     (attribute) => attribute.trait_type === "license"
   )?.value;
-  const { data: licenseBalance } = useNFTBalance(
-    license,
-    address,
-    licenses[licenseId || ""]
-  );
+  const { data: licenseBalance } = useNFTBalance(license, address, licenseId);
 
   return (
-    <Grid item xs={12} lg={3}>
+    <Grid item xs={12} lg={6}>
       <Card>
-        <CardHeader
-          title={nft.metadata.name}
-          subheader={nft.metadata.description}
-        />
-        <Box
-          onClick={() =>
-            router.push(
-              `/aircraft/${nftAircraftTokenAddress}/${nft.metadata.id}`
-            )
-          }
-        >
-          <MediaRenderer height="100%" src={nft.metadata.image} />
-        </Box>
+        <AircraftCardHeader nft={nft} />
 
         <CardContent>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography variant="body1">Price</Typography>
-            <Typography variant="body2">0.01</Typography>
-          </Stack>
           {getNFTAttributes(nft).map((attribute) => (
             <Stack
               direction="row"
@@ -91,9 +52,10 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
             </Stack>
           ))}
         </CardContent>
+
         {data?.isZero() && (
           <CardActions>
-            {!licenseBalance?.isZero() ? (
+            {licenseBalance?.isZero() ? (
               <Button
                 disabled={isLoading}
                 variant="contained"
@@ -123,4 +85,4 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
   );
 };
 
-export default AircraftItem;
+export default React.memo(AircraftItem);

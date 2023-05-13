@@ -2111,10 +2111,10 @@
   resolved "https://registry.yarnpkg.com/@thirdweb-dev/contracts/-/contracts-3.4.7-0.tgz#2279534f03ea0d40395576fa539faf9a71957483"
   integrity sha512-yMom2CiaHuj9UZdvbG4EMq1XKAji7GfWfricgIIK+cnBwQoI1PnPwKVMko/4V/h0Jw9p3yZDL6BTscjPSlnL2Q==
 
-"@thirdweb-dev/contracts@^3.4.5":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@thirdweb-dev/contracts/-/contracts-3.5.0.tgz#7c76984f28233c5fc12373b63166ecb7cd8a5cbb"
-  integrity sha512-EvIojvITRtmGwbW15tr+EW1PvoCVo59CPxL/cx808KSum1Us6F3oCPDi9lqj7JAK+bY3JxQF+SdCxNcBYd5ePA==
+"@thirdweb-dev/contracts@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/contracts/-/contracts-3.5.3.tgz#f6df2b94a62eb43b1121ab249683a8891d7f1c74"
+  integrity sha512-UU9P3niEhWXXGm4mfoFa5nUfnjoUtE3SlA6ZoTV2dVEo8VkbjwWjbwnCxNtjt3ltQ3fVCYHVL/KDD9YlEyv5Vg==
 
 "@thirdweb-dev/generated-abis@0.0.1":
   version "0.0.1"

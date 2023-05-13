@@ -47,13 +47,10 @@ const AircraftMarketPlace: React.FC = () => {
           <AlertTitle>Ha ocurrido un error</AlertTitle>
         </Alert>
       )}
-      <Grid container spacing={2}>
-        {nftList
-          .filter((a) => a.metadata.id !== "0")
-          .sort(sortByLicense)
-          .map((nft) => (
-            <AircraftItem nft={nft} key={nft.metadata.id} />
-          ))}
+      <Grid container spacing={6}>
+        {nftList.map((nft) => (
+          <AircraftItem nft={nft} key={nft.metadata.id} />
+        ))}
       </Grid>
     </Box>
   );

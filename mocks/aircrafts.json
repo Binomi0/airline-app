@@ -1,0 +1,126 @@
+[
+  {
+    "name": "Cessna 172",
+    "description": "The Cessna 172R is a popular single-engine, four-seat aircraft manufactured by Textron Aviation. It is widely recognized as a reliable and versatile trainer aircraft, suitable for flight training, recreational flying, and personal transportation. The Cessna 172R offers excellent stability, ease of handling, and a range of approximately 800 nautical miles. With its durable construction, simple systems, and intuitive controls, the Cessna 172R is a trusted choice for pilots around the world, serving as a reliable platform for honing flying skills and enjoying the freedom of flight.",
+    "image": "ipfs://QmaBdxuZJc3gLaPUXwWviBuJgP1NKnfbLDQnMkozoa25Ci",
+    "attributes": [
+      {
+        "trait_type": "price",
+        "value": "1"
+      },
+      {
+        "trait_type": "combustible",
+        "value": "212"
+      },
+      {
+        "trait_type": "cargo",
+        "value": "250"
+      },
+      {
+        "trait_type": "license",
+        "value": "0"
+      },
+      {
+        "trait_type": "passengers",
+        "value": "4"
+      },
+      {
+        "trait_type": "range",
+        "value": "1289"
+      }
+    ]
+  },
+  {
+    "name": "Cessna C700",
+    "description": "The Cessna Citation Longitude is a midsize business jet manufactured by Textron Aviation. It is known for its spacious cabin, advanced avionics, and long-range capabilities, making it ideal for corporate and private jet travel. The aircraft features state-of-the-art technology, comfortable seating, and a range of approximately 3,500 nautical miles, allowing for non-stop flights between major cities. The Citation Longitude offers exceptional performance, reliability, and luxurious amenities, making it a popular choice among discerning travelers in the business aviation sector.",
+    "image": "ipfs://Qmahzsd2cWBvVPji2VZZtHcjC52xARYVwETBAVtz319c5y",
+    "attributes": [
+      {
+        "trait_type": "price",
+        "value": "10"
+      },
+      {
+        "trait_type": "combustible",
+        "value": "6600"
+      },
+      {
+        "trait_type": "cargo",
+        "value": "730"
+      },
+      {
+        "trait_type": "license",
+        "value": "1"
+      },
+      {
+        "trait_type": "passengers",
+        "value": "12"
+      },
+      {
+        "trait_type": "range",
+        "value": "6500"
+      }
+    ]
+  },
+  {
+    "name": "Boeing 737 MAX",
+    "description": "The Boeing 737 MAX is an enhanced and more efficient version of the popular Boeing 737 passenger aircraft. However, it has faced controversy due to issues with its Maneuvering Characteristics Augmentation System (MCAS) that led to fatal accidents. After improvements and modifications, the 737 MAX has been authorized to fly again in several countries, but additional pilot training and reinforced safety measures are required.",
+    "image": "ipfs://QmcgdiQLZTe1ZRzwzsn4q6m1U5BWRffWNGM1PXfiRJdvYe",
+    "attributes": [
+      {
+        "trait_type": "price",
+        "value": "100"
+      },
+      {
+        "trait_type": "combustible",
+        "value": "33190"
+      },
+      {
+        "trait_type": "cargo",
+        "value": "20880"
+      },
+      {
+        "trait_type": "license",
+        "value": "2"
+      },
+      {
+        "trait_type": "passengers",
+        "value": "230"
+      },
+      {
+        "trait_type": "range",
+        "value": "6570"
+      }
+    ]
+  },
+  {
+    "name": "Antonov An-225 Mriya",
+    "description": "The Antonov An-225 Mriya is a one-of-a-kind cargo aircraft that holds the title of being the world's largest and heaviest airplane. Designed and built in Ukraine, the An-225 Mriya is an exceptional feat of engineering. With its massive size and unique six-engine configuration, it is capable of carrying extraordinarily heavy and oversized cargoes, such as large industrial machinery and even other aircraft. The An-225 Mriya's remarkable payload capacity, combined with its long-range capabilities, has made it an invaluable asset for transporting oversized cargo worldwide. Its presence in the aviation industry stands as a testament to the incredible capabilities of human ingenuity and engineering prowess.",
+    "image": "ipfs://QmT3vrgAWTahEqfgjYMSzwV8ViZU3PCWuadmaoZkpMLNHG",
+    "attributes": [
+      {
+        "trait_type": "price",
+        "value": "1000"
+      },
+      {
+        "trait_type": "combustible",
+        "value": "300000"
+      },
+      {
+        "trait_type": "cargo",
+        "value": "355000"
+      },
+      {
+        "trait_type": "license",
+        "value": "3"
+      },
+      {
+        "trait_type": "passengers",
+        "value": "0"
+      },
+      {
+        "trait_type": "range",
+        "value": "15400"
+      }
+    ]
+  }
+]

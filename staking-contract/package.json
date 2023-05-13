@@ -6,7 +6,7 @@
     "release": "npx thirdweb@latest release"
   },
   "dependencies": {
-    "@thirdweb-dev/contracts": "^3"
+    "@thirdweb-dev/contracts": "^3.5.3"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",

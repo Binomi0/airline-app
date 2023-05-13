@@ -6,8 +6,6 @@ import {
   CardHeader,
   CardContent,
   Stack,
-  CardActions,
-  CircularProgress,
   Alert,
   AlertTitle,
 } from "@mui/material";
@@ -38,7 +36,11 @@ const MyAircrafts = () => {
         {nfts?.map((nft) => (
           <Grid item xs={12} lg={4} key={nft.metadata.id}>
             <Card>
-              <MediaRenderer width="100%" src={nft.metadata.image} />
+              <MediaRenderer
+                height="100%"
+                width="100%"
+                src={nft.metadata.image}
+              />
               <CardHeader
                 title={nft.metadata.name}
                 subheader={nft.metadata.description}
@@ -63,7 +65,6 @@ const MyAircrafts = () => {
                   </>
                 )}
               </CardContent>
-              <CardActions></CardActions>
             </Card>
           </Grid>
         ))}

@@ -14,7 +14,7 @@ import {
   smartWallet,
   walletConnect,
 } from "@thirdweb-dev/react";
-import { Sepolia } from "@thirdweb-dev/chains";
+import { Sepolia, Goerli } from "@thirdweb-dev/chains";
 import CustomAppBar from "components/AppBar";
 import Sidebar from "components/Sidebar";
 import { VaProvider } from "context/VaProvider";
@@ -55,8 +55,8 @@ export default function MyApp(props: MyAppProps) {
 
   return (
     <ThirdwebProvider
-      activeChain={Sepolia}
-      supportedChains={[Sepolia]}
+      activeChain={Goerli}
+      supportedChains={[Goerli, Sepolia]}
       authConfig={{
         domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
         authUrl: "/api/auth",
@@ -68,7 +68,7 @@ export default function MyApp(props: MyAppProps) {
           thirdwebApiKey: process.env["NEXT_PUBLIC_API_KEY"] || "",
           gasless: true,
           personalWallets: [
-            // metamaskWallet(),
+            metamaskWallet(),
             // coinbaseWallet(),
             localWallet({ persist: true }),
           ],
