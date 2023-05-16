@@ -6,14 +6,15 @@ import {
   Container,
   Grid,
   Grow,
-  Link,
   Typography,
 } from "@mui/material";
-import styles from "../styles/Home.module.css";
+
+import Link from "next/link";
 import image from "public/img/Cyb3rYoga.png";
 import Image from "next/image";
 import serverSidePropsHandler from "components/ServerSideHandler";
 import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
+import styles from "../styles/Home.module.css";
 
 const GridItem: React.FC<{
   link: string;
@@ -23,7 +24,7 @@ const GridItem: React.FC<{
 }> = ({ link, title, text, delay }) => (
   <Grow in timeout={{ enter: delay }}>
     <Grid item xs={12} md={6} lg={6} p={2}>
-      <Link href={link} underline="none">
+      <Link href={link}>
         <Card className={styles.card}>
           <CardContent className={styles.text}>
             <Typography component="h4" variant="h4" color="white" paragraph>

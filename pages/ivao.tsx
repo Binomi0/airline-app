@@ -6,7 +6,7 @@ import {
   LinearProgress,
   Typography,
 } from "@mui/material";
-import { useVaProviderContext } from "../context/VaProvider";
+import { VaProvider, useVaProviderContext } from "../context/VaProvider";
 import type { IvaoPilot } from "types";
 import FlightDetails from "components/FlightDetails";
 
@@ -21,21 +21,23 @@ const IVAOPage = () => {
   }
 
   return (
-    <Container>
-      <Box mt={10}>
-        <Typography paragraph textAlign="center" variant="h1">
-          IVAO ES Active Flights
-        </Typography>
-        <Grid container spacing={2}>
-          {pilots
-            .filter(filterLEOrigins)
-            .slice(0, 10)
-            .map((session) => (
-              <FlightDetails session={session} key={session.id} />
-            ))}
-        </Grid>
-      </Box>
-    </Container>
+    <VaProvider>
+      <Container>
+        <Box mt={10}>
+          <Typography paragraph textAlign="center" variant="h1">
+            IVAO ES Active Flights
+          </Typography>
+          <Grid container spacing={2}>
+            {pilots
+              .filter(filterLEOrigins)
+              .slice(0, 10)
+              .map((session) => (
+                <FlightDetails session={session} key={session.id} />
+              ))}
+          </Grid>
+        </Box>
+      </Container>
+    </VaProvider>
   );
 };
 

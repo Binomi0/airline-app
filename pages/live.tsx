@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useVaProviderContext } from "context/VaProvider";
+import { VaProvider, useVaProviderContext } from "context/VaProvider";
 import React, { ChangeEvent, useRef } from "react";
 import StartIcon from "@mui/icons-material/Start";
 
@@ -31,7 +31,7 @@ const LivePage = () => {
   }, [pilots, setCurrentPilot]);
 
   return (
-    <>
+    <VaProvider>
       <Container>
         <Fade in={!active} unmountOnExit timeout={{ exit: 0 }}>
           <Box>
@@ -83,7 +83,7 @@ const LivePage = () => {
           </Box>
         </Fade>
       </Container>
-    </>
+    </VaProvider>
   );
 };
 

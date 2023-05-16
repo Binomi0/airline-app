@@ -17,13 +17,12 @@ import {
 import { Sepolia, Goerli } from "@thirdweb-dev/chains";
 import CustomAppBar from "components/AppBar";
 import Sidebar from "components/Sidebar";
-import { VaProvider } from "context/VaProvider";
 import ErrorBoundary from "components/ErrorBoundary";
 import { factoryAddress } from "contracts/address";
+import { MainProvider } from "context/MainProvider";
 import createEmotionCache from "../src/createEmotionCache";
 import theme from "../src/theme";
 import "../styles/globals.css";
-import { MainProvider } from "context/MainProvider";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -61,7 +60,6 @@ export default function MyApp(props: MyAppProps) {
         domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
         authUrl: "/api/auth",
       }}
-      // TODO: Sepolia network not supported yet
       supportedWallets={[
         smartWallet({
           factoryAddress,
@@ -91,9 +89,7 @@ export default function MyApp(props: MyAppProps) {
             <MainProvider>
               <CustomAppBar />
               <Sidebar />
-              <VaProvider>
-                <Component {...pageProps} loading={loading} />
-              </VaProvider>
+              <Component {...pageProps} loading={loading} />
             </MainProvider>
           </ErrorBoundary>
         </ThemeProvider>

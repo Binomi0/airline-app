@@ -6,22 +6,37 @@ import {
   Stack,
   TextField,
   Button,
+  CircularProgress,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useBalance, useContract, useContractWrite } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
-import { formatNumber, parseNumber } from "utils";
+import { formatNumber } from "utils";
 import { coinTokenAddress, stakingAddress } from "contracts/address";
+import GasAvailableForm from "./components/GasAvailableForm";
+
+let maxAmount = "";
 
 const GasAvailable = () => {
-  const [stakeAmount, setStakeAmount] = useState("");
+  const stakeAmountRef = useRef<HTMLInputElement>();
   const { data: airl } = useBalance(coinTokenAddress);
   const { contract: coin } = useContract(coinTokenAddress, "token");
-  const { contract: staking, refetch, isLoading } = useContract(stakingAddress);
-  const { mutateAsync: stake, isLoading: isStaking } = useContractWrite(
-    staking,
-    "stake"
-  );
+  const { contract: staking, refetch } = useContract(stakingAddress);
+  const { mutateAsync: stake } = useContractWrite(staking, "stake");
+  const [loading, setLoading] = useState(false);
+
+  const handleStake = useCallback(async () => {
+    setLoading(true);
+    await coin?.erc20.setAllowance(
+      stakingAddress,
+      ethers.utils.parseEther(stakeAmountRef?.current?.value || "0").toString()
+    );
+
+    await stake({
+      args: [ethers.utils.parseEther(stakeAmountRef?.current?.value || "0")],
+    });
+    setLoading(false);
+  }, [coin, stakeAmountRef, stake]);
 
   useEffect(() => {
     const timer = setInterval(refetch, 10000);
@@ -36,46 +51,11 @@ const GasAvailable = () => {
           <Typography variant="subtitle2" paragraph>
             {formatNumber(Number(airl?.displayValue))} AIRL
           </Typography>
-          <Stack spacing={2}>
-            <TextField
-              size="small"
-              focused
-              label="Amount to Stake"
-              variant="outlined"
-              type="number"
-              value={stakeAmount}
-              onChange={(e) => setStakeAmount(e.target.value)}
-              InputProps={{
-                endAdornment: (
-                  <Button
-                    variant="contained"
-                    onClick={() => setStakeAmount(airl?.displayValue || "")}
-                    size="small"
-                  >
-                    MAX
-                  </Button>
-                ),
-              }}
-            />
-            <Button
-              color="success"
-              disabled={isStaking || !stakeAmount}
-              onClick={async () => {
-                await coin?.erc20.setAllowance(
-                  stakingAddress,
-                  ethers.utils.parseEther(stakeAmount).toString()
-                );
-
-                stake({
-                  args: [ethers.utils.parseEther(stakeAmount)],
-                });
-              }}
-              size="small"
-              variant="contained"
-            >
-              Add to Staking
-            </Button>
-          </Stack>
+          <GasAvailableForm
+            max={airl?.displayValue || ""}
+            onStake={handleStake}
+            loading={loading}
+          />
         </Box>
       </Card>
     </Grid>
