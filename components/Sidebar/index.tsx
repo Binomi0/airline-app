@@ -1,5 +1,5 @@
 import { Box, Divider, Drawer, List, Typography } from "@mui/material";
-import React from "react";
+import React, { useCallback } from "react";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import HomeIcon from "@mui/icons-material/Home";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
@@ -13,6 +13,14 @@ import { useRouter } from "next/router";
 const Sidebar: React.FC = () => {
   const router = useRouter();
   const { sidebarOpen: open, toggleSidebar } = useMainProviderContext();
+
+  const handleClick = useCallback(
+    (route: string) => () => {
+      router.push(route);
+      toggleSidebar();
+    },
+    [router, toggleSidebar]
+  );
 
   return (
     <Drawer
@@ -28,37 +36,37 @@ const Sidebar: React.FC = () => {
       <Divider />
       <List>
         <SidebarItem
-          link="/"
+          onLink={handleClick("/")}
           text="Home"
           Icon={HomeIcon}
           selected={router.pathname === "/"}
         />
         <SidebarItem
-          link="/hangar"
+          onLink={handleClick("/hangar")}
           text="Hangar"
           Icon={ConstructionIcon}
           selected={router.pathname === "/hangar"}
         />
         <SidebarItem
-          link="/license"
+          onLink={handleClick("/license")}
           text="License"
           Icon={WorkspacePremiumIcon}
           selected={router.pathname === "/license"}
         />
         <SidebarItem
-          link="/gas"
+          onLink={handleClick("/gas")}
           text="Gas Station"
           Icon={LocalGasStationIcon}
           selected={router.pathname === "/gas"}
         />
         <SidebarItem
-          link="/cargo"
+          onLink={handleClick("/cargo")}
           text="Main Cargo"
           Icon={AddHomeWorkIcon}
           selected={router.pathname === "/cargo"}
         />
         <SidebarItem
-          link="/ivao"
+          onLink={handleClick("/ivao")}
           text="IVAO"
           Icon={LocalAirportIcon}
           selected={router.pathname === "/ivao"}
