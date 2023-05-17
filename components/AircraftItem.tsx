@@ -1,40 +1,18 @@
-import {
-  Grid,
-  Card,
-  CardContent,
-  Stack,
-  Typography,
-  CardActions,
-  Button,
-  CircularProgress,
-} from "@mui/material";
-import {
-  NFT,
-  useAddress,
-  useClaimNFT,
-  useContract,
-  useNFTBalance,
-} from "@thirdweb-dev/react";
+import { Grid, Card, CardContent, Stack, Typography } from "@mui/material";
+import { NFT } from "@thirdweb-dev/react";
 import React from "react";
 import { getNFTAttributes } from "utils";
-import {
-  nftAircraftTokenAddress,
-  nftLicenseTokenAddress,
-} from "contracts/address";
-import { useRouter } from "next/router";
-import AircraftCardHeader from "./Sidebar/Aircraft/CardHeader";
+import AircraftCardHeader from "./Aircraft/CardHeader";
+import AircraftActions from "./Aircraft/AircraftActions";
+import useAircraft from "hooks/useAircraft";
 
-const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
-  const router = useRouter();
-  const address = useAddress();
-  const { contract } = useContract(nftAircraftTokenAddress);
-  const { contract: license } = useContract(nftLicenseTokenAddress);
-  const { mutateAsync: claimNFT, isLoading } = useClaimNFT(contract);
-  const { data } = useNFTBalance(contract, address, nft.metadata.id);
-  const licenseId = getNFTAttributes(nft).find(
-    (attribute) => attribute.trait_type === "license"
-  )?.value;
-  const { data: licenseBalance } = useNFTBalance(license, address, licenseId);
+const AircraftItem: React.FC<{
+  nft: NFT;
+  isClaiming: boolean;
+  onClaim: (id: string) => void;
+  hasLicense?: boolean;
+}> = ({ nft, isClaiming, onClaim, hasLicense }) => {
+  const hasAircraft = useAircraft(nft.metadata.id);
 
   return (
     <Grid item xs={12} lg={6}>
@@ -54,37 +32,14 @@ const AircraftItem: React.FC<{ nft: NFT }> = ({ nft }) => {
           ))}
         </CardContent>
 
-        {data?.isZero() && (
-          <CardActions>
-            {licenseBalance?.isZero() ? (
-              <Button
-                disabled={isLoading}
-                variant="contained"
-                onClick={() => router.push("/license")}
-              >
-                Require licencia
-              </Button>
-            ) : (
-              <Button
-                disabled={isLoading}
-                variant="contained"
-                onClick={() =>
-                  claimNFT({
-                    to: address,
-                    quantity: 1,
-                    tokenId: nft.metadata.id,
-                  })
-                }
-              >
-                {isLoading ? (
-                  <CircularProgress />
-                ) : (
-                  `Claim ${nft.metadata.name}`
-                )}
-              </Button>
-            )}
-          </CardActions>
-        )}
+        <AircraftActions
+          isClaiming={isClaiming}
+          name={nft.metadata.name as string}
+          hasAircraft={hasAircraft}
+          hasLicense={hasLicense}
+          onClaim={onClaim}
+          id={nft.metadata.id ?? ""}
+        />
       </Card>
     </Grid>
   );

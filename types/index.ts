@@ -73,3 +73,8 @@ export enum License {
 }
 
 export type LicenseType = License.A | License.B | License.C | License.D;
+
+export type AttributeType = {
+  trait_type: string;
+  value: string;
+};

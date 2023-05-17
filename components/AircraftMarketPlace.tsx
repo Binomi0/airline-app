@@ -1,57 +1,55 @@
+import React, { useCallback } from "react";
 import {
   Box,
-  Typography,
   Grid,
   Alert,
   AlertTitle,
   LinearProgress,
+  Grow,
+  Fade,
 } from "@mui/material";
-import React, { useMemo } from "react";
-import { NFT, useContract, useNFTs } from "@thirdweb-dev/react";
-import { nftAircraftTokenAddress } from "contracts/address";
+import { useAddress, useClaimNFT, useContract } from "@thirdweb-dev/react";
+import useLicense from "hooks/useLicense";
+import { getLicenseIdFromAttributes, getNFTAttributes } from "utils";
+import useAircrafts from "hooks/useAircrafts";
 import AircraftItem from "./AircraftItem";
-import { getNFTAttributes } from "utils";
-
-const sortByLicense = (a: NFT, b: NFT) => {
-  const attributesA = getNFTAttributes(a);
-  const attributesB = getNFTAttributes(b);
-
-  const valueA = attributesA?.find((i) => i.trait_type === "license");
-  const valueB = attributesB?.find((i) => i.trait_type === "license");
-
-  if (!valueA || !valueB) {
-    return 0;
-  }
-  if (valueA.value > valueB.value) {
-    return -1;
-  } else if (valueA.value < valueB.value) {
-    return 1;
-  }
-  return 0;
-};
+import { nftAircraftTokenAddress } from "contracts/address";
 
 const AircraftMarketPlace: React.FC = () => {
-  const { contract } = useContract(nftAircraftTokenAddress);
-  const { data: nfts, isLoading, error } = useNFTs(contract);
+  const address = useAddress();
+  const licenses = useLicense();
+  const aircrafts = useAircrafts();
+  const { contract: aircraftContract } = useContract(nftAircraftTokenAddress);
+  const { mutateAsync, isLoading: isClaiming } = useClaimNFT(aircraftContract);
 
-  const nftList = useMemo(() => (nfts && nfts.length > 0 ? nfts : []), [nfts]);
-
-  if (isLoading) {
-    return <LinearProgress />;
-  }
+  const handleClaim = useCallback(
+    (id: string) => {
+      mutateAsync({
+        to: address,
+        quantity: 1,
+        tokenId: id,
+      });
+    },
+    [mutateAsync, address]
+  );
 
   return (
     <Box my={4}>
-      {!!error && (
-        <Alert severity="error">
-          <AlertTitle>Ha ocurrido un error</AlertTitle>
-        </Alert>
-      )}
-      <Grid container spacing={6}>
-        {nftList.map((nft) => (
-          <AircraftItem nft={nft} key={nft.metadata.id} />
-        ))}
-      </Grid>
+      <Fade in unmountOnExit>
+        <Grid container spacing={6}>
+          {aircrafts.map((aircraft) => (
+            <AircraftItem
+              nft={aircraft}
+              key={aircraft.metadata.id}
+              onClaim={handleClaim}
+              isClaiming={isClaiming}
+              hasLicense={licenses.current.get(
+                getLicenseIdFromAttributes(getNFTAttributes(aircraft))
+              )}
+            />
+          ))}
+        </Grid>
+      </Fade>
     </Box>
   );
 };

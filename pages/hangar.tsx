@@ -23,21 +23,18 @@ import styles from "styles/Hangar.module.css";
 import Image from "next/image";
 import image from "public/img/airplanes3.png";
 
-const initialSnackState = {
-  open: false,
-  title: "",
-  message: "",
-  type: "info" as AlertColor,
-};
-
 interface HangarProps {
   loading: boolean;
 }
 
 const Hangar: NextPage<HangarProps> = ({ loading }) => {
-  const [snack, setSnack] = useState(initialSnackState);
   const address = useAddress();
 
+  if (loading) {
+    return <LinearProgress />;
+  }
+
+  console.count("Hangar");
   return (
     <Box sx={{ position: "relative" }}>
       <Image
@@ -49,20 +46,6 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
         src={image}
       />
       <Container>
-        <Snackbar
-          open={snack.open}
-          autoHideDuration={6000}
-          onClose={() => setSnack(initialSnackState)}
-        >
-          <Alert
-            onClose={() => setSnack(initialSnackState)}
-            severity={snack.type}
-            sx={{ width: "100%" }}
-          >
-            <AlertTitle>{snack.title}</AlertTitle>
-            <Typography>{snack.message}</Typography>
-          </Alert>
-        </Snackbar>
         <Box my={5} textAlign="center">
           <Typography variant="h1">Main Hangar</Typography>
           {!address && <ConnectWallet />}
@@ -70,7 +53,7 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
 
         <AircraftMarketPlace />
 
-        {address && <MyAircrafts />}
+        {/* {address && <MyAircrafts />} */}
       </Container>
     </Box>
   );
