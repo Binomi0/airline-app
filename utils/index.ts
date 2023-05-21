@@ -1,6 +1,13 @@
 import { NFT } from "@thirdweb-dev/sdk";
 import License from "pages/license";
-import { Aircraft, Atc, AttributeType, Cargo, CargoDetails } from "types";
+import {
+  Aircraft,
+  Atc,
+  AttributeType,
+  Cargo,
+  CargoDetails,
+  IvaoPilot,
+} from "types";
 
 export const getNFTAttributes = (nft: NFT) => {
   if (
@@ -107,3 +114,6 @@ export function getCargoPrize(distance: number, aircraft: NFT) {
 export const getLicenseIdFromAttributes = (attributes: AttributeType[]) =>
   attributes.find((attribute) => attribute.trait_type === "license")?.value ||
   "";
+
+export const filterLEOrigins = (pilot: IvaoPilot) =>
+  pilot.flightPlan.departureId?.includes("LE");
