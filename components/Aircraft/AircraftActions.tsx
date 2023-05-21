@@ -19,9 +19,14 @@ const AircraftActions: React.FC<{
 
   if (hasAircraft) return null;
   return (
-    <CardActions>
+    <CardActions sx={{ px: 2 }}>
       {isClaiming && <LinearProgress />}
-      <Button disabled={isClaiming} variant="contained" onClick={handleClick}>
+      <Button
+        size="small"
+        disabled={isClaiming}
+        variant="contained"
+        onClick={handleClick}
+      >
         {hasLicense ? `Claim ${name}` : "Require licencia"}
       </Button>
     </CardActions>

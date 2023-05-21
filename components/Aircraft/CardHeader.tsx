@@ -5,6 +5,7 @@ import {
   Collapse,
   Box,
   IconButton,
+  Stack,
 } from "@mui/material";
 import { MediaRenderer, NFT } from "@thirdweb-dev/react";
 import { nftAircraftTokenAddress } from "contracts/address";
@@ -24,8 +25,11 @@ const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
   return (
     <>
       <CardHeader
+        sx={{
+          alignItems: "flex-start",
+        }}
         avatar={
-          <Avatar variant="square">
+          <Avatar variant="rounded">
             <MediaRenderer
               width="50px"
               height="50px"
