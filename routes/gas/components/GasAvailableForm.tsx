@@ -1,15 +1,23 @@
 import { Stack, TextField, Button, CircularProgress } from "@mui/material";
+import BigNumber from "bignumber.js";
 import React, { ChangeEvent } from "react";
 
 const GasAvailableForm: React.FC<{
   max: string;
-  onStake: () => void;
+  onStake: (value: string) => void;
   loading: boolean;
 }> = ({ max, onStake, loading }) => {
   const [value, setValue] = React.useState("");
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setValue(e.target.value);
+  }
+
+  function handleStake() {
+    const amount = new BigNumber(value);
+    if (amount.isZero() || amount.isNaN() || amount.isNegative()) return;
+    setValue("");
+    onStake(value);
   }
 
   return (
@@ -39,7 +47,7 @@ const GasAvailableForm: React.FC<{
       <Button
         color="success"
         disabled={loading || !value}
-        onClick={onStake}
+        onClick={handleStake}
         size="small"
         variant="contained"
       >
@@ -49,4 +57,4 @@ const GasAvailableForm: React.FC<{
   );
 };
 
-export default GasAvailableForm;
+export default React.memo(GasAvailableForm);

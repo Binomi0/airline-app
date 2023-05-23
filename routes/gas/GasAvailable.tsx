@@ -1,42 +1,45 @@
-import {
-  Grid,
-  Card,
-  Box,
-  Typography,
-  Stack,
-  TextField,
-  Button,
-  CircularProgress,
-} from "@mui/material";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Grid, Card, Box, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
 import { useBalance, useContract, useContractWrite } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
 import { formatNumber } from "utils";
 import { coinTokenAddress, stakingAddress } from "contracts/address";
 import GasAvailableForm from "./components/GasAvailableForm";
 
-let maxAmount = "";
-
 const GasAvailable = () => {
-  const stakeAmountRef = useRef<HTMLInputElement>();
   const { data: airl } = useBalance(coinTokenAddress);
   const { contract: coin } = useContract(coinTokenAddress, "token");
   const { contract: staking, refetch } = useContract(stakingAddress);
   const { mutateAsync: stake } = useContractWrite(staking, "stake");
   const [loading, setLoading] = useState(false);
 
-  const handleStake = useCallback(async () => {
-    setLoading(true);
-    await coin?.erc20.setAllowance(
-      stakingAddress,
-      ethers.utils.parseEther(stakeAmountRef?.current?.value || "0").toString()
-    );
+  const setAllowance = useCallback(
+    async (amount: string) => {
+      try {
+        await coin?.erc20.setAllowance(
+          stakingAddress,
+          ethers.utils.parseEther(amount).toString()
+        );
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    [coin]
+  );
 
-    await stake({
-      args: [ethers.utils.parseEther(stakeAmountRef?.current?.value || "0")],
-    });
-    setLoading(false);
-  }, [coin, stakeAmountRef, stake]);
+  const handleStake = useCallback(
+    async (amount: string) => {
+      setLoading(true);
+      if (await setAllowance(amount)) {
+        await stake({
+          args: [ethers.utils.parseEther(amount)],
+        });
+      }
+      setLoading(false);
+    },
+    [setAllowance, stake]
+  );
 
   useEffect(() => {
     const timer = setInterval(refetch, 10000);

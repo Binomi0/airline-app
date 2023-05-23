@@ -33,12 +33,6 @@ interface Aircraft {
   cargo: string;
   license: string;
 }
-const licenses: Record<string, string> = {
-  A: "0",
-  B: "1",
-  C: "2",
-  D: "3",
-};
 
 const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({
   cargo,
@@ -67,10 +61,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({
 
     return attributes;
   }, [cargo]);
-  const { data: license } = useNFT(
-    licenseContract,
-    licenses[aircraftAttributes.license]
-  );
+  const { data: license } = useNFT(licenseContract, aircraftAttributes.license);
 
   const progressBar = useMemo(
     () => (Number(cargo?.weight) / Number(aircraftAttributes.cargo)) * 100,
@@ -112,10 +103,13 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({
       <Grid item xs={12} sm={6} key={cargo.aircraft.metadata.id}>
         <Card>
           <CardHeader
+            sx={{
+              alignItems: "flex-start",
+            }}
             title={cargo.aircraft.metadata.name}
-            subheader={cargo.aircraft.metadata.description}
+            subheader={cargo.aircraft.metadata.description?.split(". ")[0]}
             avatar={
-              <Avatar variant="square">
+              <Avatar variant="rounded">
                 <MediaRenderer
                   width="50px"
                   height="50px"
@@ -164,7 +158,8 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({
                   {Intl.NumberFormat("en", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }).format(cargo?.prize || 0)}
+                  }).format(cargo?.prize || 0)}{" "}
+                  AIRL
                 </b>
               </Typography>
             </Stack>

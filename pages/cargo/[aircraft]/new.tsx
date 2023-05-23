@@ -40,9 +40,6 @@ const CargoAircraft: NextPage<{ loading: boolean }> = ({ loading }) => {
     }
   }, [owned, data, isLoading, isLoadingOwn, router, hasAircraft]);
 
-  console.log("isLoading =>", isLoading);
-  console.log("isLoadingOwn =>", isLoadingOwn);
-  console.log("address", address);
   return (
     <VaProvider>
       <Fade in={isLoading || isLoadingOwn}>
@@ -52,7 +49,7 @@ const CargoAircraft: NextPage<{ loading: boolean }> = ({ loading }) => {
       </Fade>
       <Fade in={!isLoading && !isLoadingOwn}>
         <Box>
-          {hasAircraft ? <CargoView loading={loading} aircraft={data} /> : null}{" "}
+          {hasAircraft ? <CargoView loading={loading} aircraft={data} /> : null}
         </Box>
       </Fade>
     </VaProvider>

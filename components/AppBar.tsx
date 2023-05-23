@@ -9,6 +9,7 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  useScrollTrigger,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
@@ -46,9 +47,10 @@ const CustomAppBar: React.FC = () => {
     licenseContract,
     address
   );
+  const trigger = useScrollTrigger();
 
   return (
-    <AppBar position="sticky" color="transparent">
+    <AppBar position="sticky" color={trigger ? "primary" : "transparent"}>
       <Toolbar>
         <IconButton
           onClick={toggleSidebar}

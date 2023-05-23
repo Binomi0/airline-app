@@ -24,6 +24,8 @@ import { getNFTAttributes } from "utils";
 import { nftLicenseTokenAddress } from "contracts/address";
 import { coinTokenAddress } from "contracts/address";
 import BigNumber from "bignumber.js";
+import AircraftCardHeader from "./Aircraft/CardHeader";
+import LicenseItemHeader from "./License/LicenseItemHeader";
 
 const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
   nft,
@@ -73,34 +75,8 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
   return (
     <Grid item xs={12} md={6} lg={4}>
       <Card>
-        <Box
-          sx={{
-            position: "relative",
-            top: 0,
-            left: 0,
-            "&::before": {
-              position: "relative",
-              content: `${owned ? "'OWNED'" : "'LOCKED'"}`,
-              width: "50px",
-              height: "50px",
-              top: 10,
-              left: 10,
-              fontSize: "36px",
-              color: `${owned ? "green" : "red"}`,
-              background: "white",
-              padding: 1,
-              borderRadius: 2,
-              textShadow: `2px 2px ${owned ? "lightGreen" : "orange"}`,
-              boxShadow: `0 0 8px 0px ${owned ? "green" : "red"}`,
-            },
-          }}
-        >
-          <MediaRenderer width="100%" src={nft.metadata.image} />
-        </Box>
-        <CardHeader
-          title={nft.metadata.name}
-          subheader={nft.metadata.description}
-        />
+        <LicenseItemHeader nft={nft} owned={owned} />
+
         <CardContent>
           {getNFTAttributes(nft).map((attribute) => (
             <Stack
@@ -115,6 +91,7 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
             </Stack>
           ))}
         </CardContent>
+
         {!owned && (
           <CardActions>
             <Button
