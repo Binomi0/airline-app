@@ -1,76 +1,42 @@
-import React, { useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
+import type { FC } from "react";
 import {
   Fade,
   Box,
   Typography,
-  TextField,
-  IconButton,
   Button,
+  Alert,
+  AlertTitle,
 } from "@mui/material";
 import { useVaProviderContext } from "context/VaProvider";
-import StartIcon from "@mui/icons-material/Start";
+import { useAddress } from "@thirdweb-dev/react";
 
-const LiveView = () => {
+const LiveView: FC<{ callsign: string }> = ({ callsign }) => {
+  const address = useAddress();
   const { pilots, setCurrentPilot, active } = useVaProviderContext();
-  const [error, setError] = React.useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const pilot = useMemo(
+    () => pilots.find((pilot) => pilot.callsign === callsign),
+    [callsign, pilots]
+  );
 
-  const handleClick = React.useCallback(() => {
-    if (!inputRef.current?.value) return;
-
-    const pilot = pilots.find(
-      ({ userId }) => userId.toString() === inputRef.current?.value
-    );
-    if (pilot) {
-      setError("");
-      setCurrentPilot(pilot);
-    } else {
-      setError("Pilot Not found");
-    }
-  }, [pilots, setCurrentPilot]);
+  useEffect(() => {
+    setCurrentPilot(pilot);
+  }, [pilot, setCurrentPilot]);
 
   return (
     <>
-      <Fade in={!active} unmountOnExit timeout={{ exit: 0 }}>
-        <Box>
-          <Box mt={10} textAlign="center">
-            <Typography variant="h1">Esperando conexión...</Typography>
-            <Typography variant="h3">
-              Conéctate a IVAO para continuar.
-            </Typography>
-          </Box>
-          <Box my={10} textAlign="center">
-            <TextField
-              inputRef={inputRef}
-              variant="outlined"
-              size="medium"
-              color="primary"
-              focused
-              error={!!error}
-              helperText={error}
-              label="Enter your IVAO ID"
-              inputProps={{
-                style: {
-                  textAlign: "center",
-                  color: "white",
-                  fontSize: 30,
-                },
-                maxLength: 6,
-              }}
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={handleClick}>
-                    <StartIcon color="primary" />
-                  </IconButton>
-                ),
-              }}
-            />
-          </Box>
+      <Fade in={!active && !pilot} unmountOnExit timeout={{ exit: 0 }}>
+        <Box mt={10} textAlign="center">
+          <Typography variant="h1">Esperando conexión...</Typography>
+          <Typography variant="h2">{callsign}</Typography>
+          <Typography variant="h3">Conéctate a IVAO para continuar.</Typography>
         </Box>
       </Fade>
-      <Fade in={!!active} unmountOnExit>
+      <Fade in={!!active && !!pilot} unmountOnExit>
         <Box mt={10}>
           <Typography paragraph>Already connected, tracking...</Typography>
+          <Typography>En tierra {pilot?.lastTrack.onGround}</Typography>
+          <Typography>Estado ({pilot?.lastTrack.state})</Typography>
           <Button
             variant="contained"
             color="secondary"

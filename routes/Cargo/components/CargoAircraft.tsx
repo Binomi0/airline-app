@@ -19,11 +19,13 @@ import {
   useNFT,
   useSetClaimConditions,
 } from "@thirdweb-dev/react";
+import axios from "axios";
 import {
   flightNftAddress,
   nftAircraftTokenAddress,
   nftLicenseTokenAddress,
 } from "contracts/address";
+import { useRouter } from "next/router";
 import React, { useCallback, useMemo } from "react";
 import { Cargo } from "types";
 import { getNFTAttributes } from "utils";
@@ -38,6 +40,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({
   cargo,
   onCancel,
 }) => {
+  const router = useRouter();
   const address = useAddress();
   const { contract: flightContract } = useContract(flightNftAddress);
   const { contract: licenseContract } = useContract(nftLicenseTokenAddress);
@@ -68,31 +71,45 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({
     [cargo, aircraftAttributes]
   );
 
-  const handleLazyMint = useCallback(async () => {
-    await lazyMint({
-      metadatas: [
-        {
-          name: `${cargo?.origin} - ${cargo?.destination}`,
-          description: `User: ${address}, flight on ${Date.now()} this cargo`,
-          image: "ipfs://QmWgvZzrNpQyyRyrEtsDUM7kyguAZurbSa2XKAHpRy415z",
-          attributes: [{ cargo }],
-        },
-      ],
-    });
-  }, [lazyMint, cargo, address]);
+  // MOVE THIS LOGIC WHEN FLIGHT HAS FINISHED
+  // const handleLazyMint = useCallback(async () => {
+  //   await lazyMint({
+  //     metadatas: [
+  //       {
+  //         name: `${cargo?.origin} - ${cargo?.destination}`,
+  //         description: `User: ${address}, flight on ${Date.now()} this cargo`,
+  //         image: "ipfs://QmWgvZzrNpQyyRyrEtsDUM7kyguAZurbSa2XKAHpRy415z",
+  //         attributes: [{ cargo }],
+  //       },
+  //     ],
+  //   });
+  // }, [lazyMint, cargo, address]);
 
-  const handleClaim = useCallback(async () => {
-    await claimNFT({
-      to: address,
-      quantity: 1,
-      tokenId: 0,
-      options: {
-        checkERC20Allowance: true,
-        currencyAddress: "0x773F0e20Ab2E9afC479C82105E924C2E0Ada5aa9",
-        pricePerToken: 0,
-      },
+  // MOVE THIS LOGIC WHEN FLIGHT HAS FINISHED
+  // const handleClaim = useCallback(async () => {
+  //   await claimNFT({
+  //     to: address,
+  //     quantity: 1,
+  //     tokenId: 0,
+  //     options: {
+  //       checkERC20Allowance: true,
+  //       currencyAddress: "0x773F0e20Ab2E9afC479C82105E924C2E0Ada5aa9",
+  //       pricePerToken: 0,
+  //     },
+  //   });
+  // }, [claimNFT, address]);
+
+  const handleRequestFlight = useCallback(async () => {
+    if (!cargo?.callsign) return;
+    localStorage.setItem(
+      `cargo-${cargo.callsign}`,
+      JSON.stringify({ address, cargo, status: "created" })
+    );
+    router.push({
+      pathname: "/live/[callsign]",
+      query: { callsign: cargo?.callsign },
     });
-  }, [claimNFT, address]);
+  }, [cargo, address, router]);
 
   if (!cargo) {
     return <LinearProgress />;
@@ -171,7 +188,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({
               color="secondary"
               variant="contained"
               fullWidth
-              onClick={handleClaim}
+              onClick={handleRequestFlight}
             >
               Reservar
             </Button>
