@@ -8,12 +8,19 @@ import Link from "next/link";
 const LivePage = () => {
   const router = useRouter();
   const callsign = router.query.callsign as string;
-  const currentFlight = localStorage.getItem(`cargo-${callsign}`);
+  const [current, setCurrent] = React.useState(false);
+
+  useEffect(() => {
+    const currentFlight = localStorage.getItem(`cargo-${callsign}`);
+    if (currentFlight) {
+      setCurrent(true);
+    }
+  }, [callsign]);
 
   return (
     <VaProvider>
       <Container>
-        {currentFlight ? (
+        {current ? (
           <LiveView callsign={router.query.callsign as string} />
         ) : (
           <Box my={10} textAlign="center">
