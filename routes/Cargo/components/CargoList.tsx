@@ -7,7 +7,7 @@ import { FRoute, Flight } from "types";
 const CargoList: React.FC<{
   newCargo: (route: FRoute, aircraft: NFT) => void;
   setSelected: Dispatch<SetStateAction<FRoute>>;
-  flights: Flight;
+  flights: [string, FRoute[]][];
   aircraft?: NFT;
 }> = ({ newCargo, setSelected, flights, aircraft }) => {
   const address = useAddress();
@@ -24,9 +24,9 @@ const CargoList: React.FC<{
   );
 
   return (
-    <Fade in={Object.keys(flights).length > 0 && !!address} unmountOnExit>
+    <Fade in={flights.length > 0 && !!address} unmountOnExit>
       <Grid container spacing={2}>
-        {Object.entries(flights as Flight).map(([key, value], index) => (
+        {flights.map(([key, value], index) => (
           <CargoItem
             onSelect={handleSelect}
             key={key}

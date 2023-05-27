@@ -14,7 +14,7 @@ import Image from "next/image";
 import styles from "styles/Home.module.css";
 import image from "public/img/airplanes9.png";
 import { useVaProviderContext } from "context/VaProvider";
-import { FRoute } from "types";
+import { FRoute, Flight } from "types";
 import useCargo from "hooks/useCargo";
 import { ConnectWallet, NFT, useAddress, useUser } from "@thirdweb-dev/react";
 import NoAddress from "routes/Cargo/components/NoAddress";
@@ -35,6 +35,7 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({
   const { newCargo, cargo } = useCargo();
   const { flights } = useVaProviderContext();
   const [selected, setSelected] = useState(initialState);
+  const flightList = Object.entries(flights as Flight);
 
   if (loading || !flights) {
     return <LinearProgress />;
@@ -68,15 +69,15 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({
           <Box>
             <CargoList
               aircraft={aircraft}
-              flights={flights}
+              flights={flightList}
               newCargo={newCargo}
               setSelected={setSelected}
             />
           </Box>
         </Fade>
-        <Fade in={Object.keys(flights).length < 2} unmountOnExit>
+        <Fade in={flightList.length < 2} unmountOnExit>
           <Box textAlign="center">
-            {Object.keys(flights).length === 0 && (
+            {flightList.length === 0 && (
               <Typography variant="h4" color="white">
                 No hay control en torre activo en este momento en España
               </Typography>
