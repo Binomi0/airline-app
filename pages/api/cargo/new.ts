@@ -1,7 +1,7 @@
 import { cargos } from "mocks/cargos";
 import { NextApiHandler } from "next";
 import { getUser } from "../auth/[...thirdweb]";
-import client from "lib/mongodb";
+import mongo from "lib/mongodb";
 
 const handler: NextApiHandler = async (req, res) => {
   if (req.method !== "POST") {
@@ -23,7 +23,8 @@ const handler: NextApiHandler = async (req, res) => {
   }
 
   try {
-    const db = client.db("cargo").collection("live");
+    await mongo.mongoInstance;
+    const db = mongo.client.db("cargo").collection("live");
     const current = await db.findOne({ address: user.address });
 
     if (current) {

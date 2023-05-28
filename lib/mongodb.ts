@@ -27,6 +27,12 @@ async function run() {
     await client.close();
   }
 }
-run().catch(console.dir);
 
-export default client;
+const mongoInstance = new Promise(async (resolve) => {
+  await run().catch(console.dir);
+  resolve(true);
+});
+
+const mongo = { mongoInstance, client };
+
+export default mongo;
