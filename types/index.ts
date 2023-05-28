@@ -41,6 +41,7 @@ export interface Cargo {
   distance: number;
   details: CargoDetails;
   aircraft: NFT;
+  aircraftId: string;
   weight: number;
   callsign: string;
   prize: number;

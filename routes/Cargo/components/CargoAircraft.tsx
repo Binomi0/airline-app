@@ -100,16 +100,9 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({
   // }, [claimNFT, address]);
 
   const handleRequestFlight = useCallback(async () => {
-    if (!cargo?.callsign) return;
-    localStorage.setItem(
-      `cargo-${cargo.callsign}`,
-      JSON.stringify({ address, cargo, status: "created" })
-    );
-    router.push({
-      pathname: "/live/[callsign]",
-      query: { callsign: cargo?.callsign },
-    });
-  }, [cargo, address, router]);
+    await axios.post("/api/cargo/new", cargo);
+    router.push("/live");
+  }, [cargo, router]);
 
   if (!cargo) {
     return <LinearProgress />;

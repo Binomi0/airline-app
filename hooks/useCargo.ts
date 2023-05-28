@@ -1,4 +1,6 @@
+import { useAddress } from "@thirdweb-dev/react";
 import { NFT } from "@thirdweb-dev/sdk";
+import axios from "axios";
 import { useVaProviderContext } from "context/VaProvider";
 import { cargos } from "mocks/cargos";
 import { useCallback, useState } from "react";
@@ -13,12 +15,28 @@ import {
 
 interface UseCargo {
   newCargo: (route: FRoute, owned: NFT) => void;
+  getCargo: () => Promise<void>;
   cargo?: Cargo;
+  isLoading: boolean;
 }
 
 const useCargo = (): UseCargo => {
+  const address = useAddress();
   const { atcs } = useVaProviderContext();
   const [cargo, setCargo] = useState<Cargo>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const getCargo = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get<Cargo>("/api/cargo");
+      setCargo(response.data);
+    } catch (error) {
+      console.log("error =>", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const newCargo = useCallback(
     (route: FRoute, aircraft: NFT) => {
@@ -27,22 +45,25 @@ const useCargo = (): UseCargo => {
       const weight = getCargoWeight(aircraft);
       const callsign = getCallsign();
       const prize = getCargoPrize(distance, aircraft);
-
-      setCargo({
+      const cargo = {
+        address,
         origin: route.origin,
         destination: route.destination,
         distance,
         details,
+        aircraftId: aircraft.metadata.id,
         aircraft,
         weight,
         callsign,
         prize,
-      });
+      };
+
+      setCargo(cargo);
     },
-    [atcs]
+    [atcs, address]
   );
 
-  return { newCargo, cargo };
+  return { newCargo, cargo, getCargo, isLoading };
 };
 
 export default useCargo;

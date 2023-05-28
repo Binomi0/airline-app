@@ -2,7 +2,7 @@ import { Fade, Grid } from "@mui/material";
 import { NFT, useAddress } from "@thirdweb-dev/react";
 import CargoItem from "./CargoItem";
 import React, { Dispatch, SetStateAction, useCallback } from "react";
-import { FRoute, Flight } from "types";
+import { FRoute } from "types";
 
 const CargoList: React.FC<{
   newCargo: (route: FRoute, aircraft: NFT) => void;
@@ -13,7 +13,7 @@ const CargoList: React.FC<{
   const address = useAddress();
 
   const handleSelect = useCallback(
-    (origin: string, destination: string) => {
+    async (origin: string, destination: string) => {
       if (!aircraft) {
         throw new Error("Missing aircraft");
       }
