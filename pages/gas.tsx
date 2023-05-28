@@ -12,7 +12,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import GasStatus from "routes/gas/GasStatus";
+import GasStationView from "routes/gas/GasStationView";
 import styles from "styles/Gas.module.css";
 import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
 import { rewardTokenAddress } from "contracts/address";
@@ -73,7 +73,7 @@ const Gas: NextPage = () => {
           {!address && <ConnectWallet />}
         </Box>
 
-        <GasStatus />
+        <GasStationView />
       </Container>
     </Box>
   );

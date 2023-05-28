@@ -42,6 +42,9 @@ const GasFarmed = () => {
       <Card>
         <Box p={1}>
           <Typography variant="subtitle1">Farmed Gasoline (AIRG)</Typography>
+          <Typography variant="caption">
+            Get <b>100 Liters/day</b> for each AIRL token staked
+          </Typography>
 
           <Typography variant="h3" paragraph>
             {formatNumber(Number(stakeInfo?._rewards || 0) / 1e18)} Liters

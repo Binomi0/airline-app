@@ -2,12 +2,12 @@ import React, { useEffect } from "react";
 import { useContract, useContractRead } from "@thirdweb-dev/react";
 import { Box, Typography, Grid, CircularProgress } from "@mui/material";
 import { stakingAddress } from "contracts/address";
-import { formatNumber, parseNumber } from "utils";
+import { formatNumber } from "utils";
 import GasAvailable from "./GasAvailable";
 import GasDeposited from "./GasDeposited";
 import GasFarmed from "./GasFarmed";
 
-const GasStatus = () => {
+const GasStationView = () => {
   const { contract } = useContract(stakingAddress);
   const {
     data: gasSupply,
@@ -44,4 +44,4 @@ const GasStatus = () => {
   );
 };
 
-export default GasStatus;
+export default GasStationView;
