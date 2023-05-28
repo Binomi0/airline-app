@@ -72,7 +72,7 @@ export function getRandomInt(max: number) {
 
 export function getCallsign() {
   // TODO: hardcoded value
-  return "EVE779";
+  return "TAP1122";
   const ident = Math.round(
     Math.floor(Math.random() * (10000 - 1000 + 1) + 1000)
   );
