@@ -2,7 +2,6 @@ import React from "react";
 import { Container } from "@mui/material";
 import { VaProvider } from "context/VaProvider";
 import LiveView from "routes/Live/LiveView";
-import Link from "next/link";
 import { GetServerSidePropsContext } from "next";
 import serverSidePropsHandler from "components/ServerSideHandler";
 

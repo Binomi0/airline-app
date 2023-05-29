@@ -57,7 +57,7 @@ export default function MyApp(props: MyAppProps) {
       activeChain={Goerli}
       supportedChains={[Goerli]}
       authConfig={{
-        domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
+        domain: process.env["NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN"] || "",
         authUrl: "/api/auth",
       }}
       supportedWallets={[

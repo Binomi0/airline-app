@@ -1,17 +1,25 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useCallback } from "react";
 import type { FC } from "react";
 import { Fade, Box, Typography, Button, LinearProgress } from "@mui/material";
 import { useVaProviderContext } from "context/VaProvider";
 import useCargo from "hooks/useCargo";
 import Link from "next/link";
+import { ConnectWallet, useAddress, useUser } from "@thirdweb-dev/react";
+import GppGoodIcon from "@mui/icons-material/GppGood";
 
 const LiveView: FC = () => {
+  const address = useAddress();
   const { cargo, getCargo, isLoading } = useCargo();
+  const { isLoggedIn, user } = useUser();
   const { pilots, setCurrentPilot, active } = useVaProviderContext();
   const pilot = useMemo(
     () => pilots.find((pilot) => pilot.callsign === cargo?.callsign),
     [pilots, cargo]
   );
+
+  const handleDisconnect = useCallback(() => {
+    setCurrentPilot();
+  }, [setCurrentPilot]);
 
   useEffect(() => {
     getCargo();
@@ -22,6 +30,21 @@ const LiveView: FC = () => {
   }, [pilot, setCurrentPilot]);
 
   if (isLoading) return <LinearProgress />;
+
+  if (!isLoggedIn || (user?.address && !address)) {
+    return (
+      <Box mt={10} textAlign="center">
+        <GppGoodIcon sx={{ fontSize: 72 }} color="primary" />
+        <Typography variant="h2" paragraph>
+          Sign in
+        </Typography>
+        <Typography variant="h4" paragraph>
+          Sign in with your wallet to start tracking.
+        </Typography>
+        <ConnectWallet />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -42,7 +65,7 @@ const LiveView: FC = () => {
           <Button
             variant="contained"
             color="secondary"
-            onClick={() => setCurrentPilot()}
+            onClick={handleDisconnect}
           >
             Disconnect
           </Button>
@@ -51,11 +74,11 @@ const LiveView: FC = () => {
       <Fade in={!cargo && !isLoading}>
         <Box my={10} textAlign="center">
           <Typography variant="h3" paragraph>
-            Tienes que configurar un vuelo para empezar el tracking.
+            No tienes vuelos activos para empezar
           </Typography>
           <Link href="/cargo">
             <Button variant="contained">
-              <Typography>Configurar nuevo vuelo</Typography>
+              <Typography>Configura un nuevo vuelo</Typography>
             </Button>
           </Link>
         </Box>

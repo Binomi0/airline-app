@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import {
   AppBar,
   Avatar,
   AvatarGroup,
+  Button,
   CircularProgress,
   IconButton,
   Stack,
@@ -30,6 +31,7 @@ import {
 } from "contracts/address";
 import BigNumber from "bignumber.js";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import axios from "axios";
 
 const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery("(min-width:768px)");
@@ -48,6 +50,22 @@ const CustomAppBar: React.FC = () => {
     address
   );
   const trigger = useScrollTrigger();
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [requested, setRequested] = useState(false);
+
+  const handleRequestFunds = useCallback(async () => {
+    setIsRequesting(true);
+    try {
+      const response = await axios.get("/api/request-funds");
+      if (response.status === 202) {
+        setRequested(true);
+      }
+    } catch (error) {
+      console.log("error funding =>", error);
+    } finally {
+      setIsRequesting(false);
+    }
+  }, []);
 
   return (
     <AppBar position="sticky" color={trigger ? "primary" : "transparent"}>
@@ -127,6 +145,18 @@ const CustomAppBar: React.FC = () => {
                 </Typography>
               </Stack>
             )
+          )}
+          {airlBalance?.value.isZero() && (
+            <Button
+              disabled={isRequesting || requested}
+              onClick={handleRequestFunds}
+            >
+              {requested ? (
+                <CircularProgress color="secondary" size={20} />
+              ) : (
+                "Solicitar AIRL"
+              )}
+            </Button>
           )}
           <ConnectWallet style={{ height: "50px" }} />
         </Stack>
