@@ -1,13 +1,5 @@
 import React, { useCallback } from "react";
-import {
-  Box,
-  Grid,
-  Alert,
-  AlertTitle,
-  LinearProgress,
-  Grow,
-  Fade,
-} from "@mui/material";
+import { Box, Grid, Fade } from "@mui/material";
 import { useAddress, useClaimNFT, useContract } from "@thirdweb-dev/react";
 import useLicense from "hooks/useLicense";
 import { getLicenseIdFromAttributes, getNFTAttributes } from "utils";

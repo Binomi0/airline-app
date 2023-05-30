@@ -1,12 +1,4 @@
-import {
-  CardHeader,
-  Avatar,
-  Button,
-  Collapse,
-  Box,
-  IconButton,
-  Stack,
-} from "@mui/material";
+import { CardHeader, Avatar, Collapse, Box, IconButton } from "@mui/material";
 import { MediaRenderer, NFT } from "@thirdweb-dev/react";
 import { nftAircraftTokenAddress } from "contracts/address";
 import router from "next/router";

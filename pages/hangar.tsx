@@ -1,23 +1,6 @@
-import {
-  ConnectWallet,
-  useContract,
-  useAddress,
-  useNFTs,
-} from "@thirdweb-dev/react";
+import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
-import {
-  Alert,
-  AlertColor,
-  AlertTitle,
-  Box,
-  Container,
-  LinearProgress,
-  Snackbar,
-  Typography,
-} from "@mui/material";
-import { useState } from "react";
-import { nftAircraftTokenAddress } from "contracts/address";
-import MyAircrafts from "components/MyAircrafts";
+import { Box, Container, LinearProgress, Typography } from "@mui/material";
 import AircraftMarketPlace from "components/AircraftMarketPlace";
 import styles from "styles/Hangar.module.css";
 import Image from "next/image";

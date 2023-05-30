@@ -9,6 +9,7 @@ import useAircraft from "hooks/useAircraft";
 const AircraftItem: React.FC<{
   nft: NFT;
   isClaiming: boolean;
+  // eslint-disable-next-line no-unused-vars
   onClaim: (id: string) => void;
   hasLicense?: boolean;
 }> = ({ nft, isClaiming, onClaim, hasLicense }) => {

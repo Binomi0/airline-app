@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 import React from "react";
-import AircraftItem from "components/AircraftItem";
 import {
   MediaRenderer,
   useAddress,
@@ -25,7 +24,6 @@ import {
 } from "@thirdweb-dev/react";
 import { getNFTAttributes } from "utils";
 import { NextPage } from "next";
-import error from "next/error";
 import { nftLicenseTokenAddress } from "contracts/address";
 
 const maps: Record<string, string> = {

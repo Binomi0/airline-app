@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import React, { useCallback } from "react";
 
 const AircraftActions: React.FC<{
+  // eslint-disable-next-line no-unused-vars
   onClaim: (id: string) => void;
   isClaiming: boolean;
   hasAircraft: boolean;

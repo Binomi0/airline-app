@@ -25,7 +25,7 @@ import GppGoodIcon from "@mui/icons-material/GppGood";
 const Gas: NextPage = () => {
   const { data } = useBalance(rewardTokenAddress);
   const address = useAddress();
-  const { user, isLoading, isLoggedIn } = useUser();
+  const { isLoading, isLoggedIn } = useUser();
 
   if (isLoading) {
     return <LinearProgress />;

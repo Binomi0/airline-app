@@ -1,4 +1,3 @@
-import { cargos } from "mocks/cargos";
 import { NextApiHandler } from "next";
 import { getUser } from "../auth/[...thirdweb]";
 import clientPromise from "lib/mongodb";

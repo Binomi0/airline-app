@@ -14,7 +14,10 @@ import {
   smartWallet,
   walletConnect,
 } from "@thirdweb-dev/react";
-import { Sepolia, Goerli } from "@thirdweb-dev/chains";
+import {
+  // Sepolia,
+  Goerli,
+} from "@thirdweb-dev/chains";
 import CustomAppBar from "components/AppBar";
 import Sidebar from "components/Sidebar";
 import ErrorBoundary from "components/ErrorBoundary";

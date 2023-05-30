@@ -1,30 +1,25 @@
 import {
   Grid,
   Card,
-  CardHeader,
   CardContent,
   Stack,
   Typography,
   CardActions,
   Button,
-  Box,
   CircularProgress,
 } from "@mui/material";
 import {
-  MediaRenderer,
   NFT,
   useAddress,
   useBalance,
   useClaimNFT,
   useContract,
-  useNFT,
 } from "@thirdweb-dev/react";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { getNFTAttributes } from "utils";
 import { nftLicenseTokenAddress } from "contracts/address";
 import { coinTokenAddress } from "contracts/address";
 import BigNumber from "bignumber.js";
-import AircraftCardHeader from "./Aircraft/CardHeader";
 import LicenseItemHeader from "./License/LicenseItemHeader";
 
 const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({

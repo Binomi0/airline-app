@@ -1,6 +1,6 @@
 import { Json } from "@thirdweb-dev/auth";
 import { ThirdwebAuthUser } from "@thirdweb-dev/auth/next";
-import { UserWithData } from "@thirdweb-dev/react";
+// import { UserWithData } from "@thirdweb-dev/react";
 import { GetServerSidePropsContext } from "next";
 import { getUser } from "pages/api/auth/[...thirdweb]";
 
