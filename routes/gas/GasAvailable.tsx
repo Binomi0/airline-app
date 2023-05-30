@@ -1,10 +1,10 @@
 import { Grid, Card, Box, Typography } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useBalance, useContract, useContractWrite } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
 import { formatNumber } from "utils";
 import { coinTokenAddress, stakingAddress } from "contracts/address";
-import GasAvailableForm from "./components/GasAvailableForm";
+import GasForm from "./components/GasForm";
 
 const GasAvailable = () => {
   const { data: airl } = useBalance(coinTokenAddress);
@@ -35,16 +35,12 @@ const GasAvailable = () => {
         await stake({
           args: [ethers.utils.parseEther(amount)],
         });
+        refetch();
       }
       setLoading(false);
     },
-    [setAllowance, stake]
+    [setAllowance, stake, refetch]
   );
-
-  useEffect(() => {
-    const timer = setInterval(refetch, 10000);
-    return () => clearInterval(timer);
-  }, [refetch]);
 
   return (
     <Grid item xs={4}>
@@ -54,10 +50,12 @@ const GasAvailable = () => {
           <Typography variant="subtitle2" paragraph>
             {formatNumber(Number(airl?.displayValue))} AIRL
           </Typography>
-          <GasAvailableForm
+          <GasForm
             max={airl?.displayValue || ""}
-            onStake={handleStake}
+            onClick={handleStake}
             loading={loading}
+            label="Amount to Stake"
+            buttonText="Add to Staking"
           />
         </Box>
       </Card>

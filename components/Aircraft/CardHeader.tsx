@@ -2,17 +2,23 @@ import { CardHeader, Avatar, Collapse, Box, IconButton } from "@mui/material";
 import { MediaRenderer, NFT } from "@thirdweb-dev/react";
 import { nftAircraftTokenAddress } from "contracts/address";
 import router from "next/router";
-import React, { useState } from "react";
+import React, { startTransition, useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
   const [open, setOpen] = useState(false);
 
-  const truncated = React.useMemo(
-    () => `${nft.metadata.description?.split(" ").slice(0, 8).join(" ")} ...`,
-    [nft.metadata.description]
-  );
+  const truncated = `${nft.metadata.description
+    ?.split(" ")
+    .slice(0, 8)
+    .join(" ")} ...`;
+
+  const handleToogle = () => {
+    startTransition(() => {
+      setOpen((s) => !s);
+    });
+  };
 
   return (
     <>
@@ -32,7 +38,7 @@ const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
         title={nft.metadata.name}
         subheader={open ? nft.metadata.description : truncated}
         action={
-          <IconButton onClick={() => setOpen((s) => !s)}>
+          <IconButton onClick={handleToogle}>
             {open ? (
               <KeyboardArrowUpIcon color="primary" fontSize="large" />
             ) : (

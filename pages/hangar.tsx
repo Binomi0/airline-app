@@ -17,7 +17,6 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
     return <LinearProgress />;
   }
 
-  console.count("Hangar");
   return (
     <Box sx={{ position: "relative" }}>
       <Image

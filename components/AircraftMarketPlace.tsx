@@ -15,12 +15,8 @@ const AircraftMarketPlace: React.FC = () => {
   const { mutateAsync, isLoading: isClaiming } = useClaimNFT(aircraftContract);
 
   const handleClaim = useCallback(
-    (id: string) => {
-      mutateAsync({
-        to: address,
-        quantity: 1,
-        tokenId: id,
-      });
+    (tokenId: string) => {
+      mutateAsync({ to: address, quantity: 1, tokenId });
     },
     [mutateAsync, address]
   );

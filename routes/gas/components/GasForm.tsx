@@ -1,23 +1,27 @@
 import { Stack, TextField, Button, CircularProgress } from "@mui/material";
 import BigNumber from "bignumber.js";
-import React, { ChangeEvent } from "react";
+import React, { memo } from "react";
+import type { ChangeEvent } from "react";
 
-const GasAvailableForm: React.FC<{
+const GasForm: React.FC<{
   max: string;
-  onStake: (value: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  onClick: (value: string) => void;
   loading: boolean;
-}> = ({ max, onStake, loading }) => {
+  label: string;
+  buttonText: string;
+}> = ({ max, onClick, loading, label, buttonText }) => {
   const [value, setValue] = React.useState("");
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setValue(e.target.value);
   }
 
-  function handleStake() {
+  function handleClick() {
     const amount = new BigNumber(value);
     if (amount.isZero() || amount.isNaN() || amount.isNegative()) return;
     setValue("");
-    onStake(value);
+    onClick(value);
   }
 
   return (
@@ -25,7 +29,7 @@ const GasAvailableForm: React.FC<{
       <TextField
         size="small"
         focused
-        label="Amount to Stake"
+        label={label}
         variant="outlined"
         type="number"
         onChange={handleChange}
@@ -47,14 +51,14 @@ const GasAvailableForm: React.FC<{
       <Button
         color="success"
         disabled={loading || !value}
-        onClick={handleStake}
+        onClick={handleClick}
         size="small"
         variant="contained"
       >
-        {loading ? <CircularProgress size={24} /> : "Add to Staking"}
+        {loading ? <CircularProgress size={24} /> : buttonText}
       </Button>
     </Stack>
   );
 };
 
-export default React.memo(GasAvailableForm);
+export default memo(GasForm);

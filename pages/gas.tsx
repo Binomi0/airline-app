@@ -46,6 +46,8 @@ const Gas: NextPage = () => {
     );
   }
 
+  if (!data) return null;
+
   return (
     <Box sx={{ position: "relative" }}>
       <Image
@@ -57,17 +59,15 @@ const Gas: NextPage = () => {
       />
 
       <Container>
-        {data && (
-          <Stack direction="row-reverse">
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <LocalGasStationIcon />
-              <Typography variant="h2">
-                {formatNumber(Number(data.displayValue))}
-              </Typography>
-              <Typography variant="h6">{data.symbol}</Typography>
-            </Stack>
+        <Stack direction="row-reverse">
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <LocalGasStationIcon />
+            <Typography variant="h2">
+              {formatNumber(Number(data.displayValue))}
+            </Typography>
+            <Typography variant="h6">{data.symbol}</Typography>
           </Stack>
-        )}
+        </Stack>
         <Box my={2} textAlign="center">
           <Typography variant="h1">Gas Station</Typography>
           {!address && <ConnectWallet />}
