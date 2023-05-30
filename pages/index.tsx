@@ -1,42 +1,11 @@
 import type { GetServerSidePropsContext, NextPage } from "next";
-import {
-  Box,
-  Card,
-  CardContent,
-  Container,
-  Grid,
-  Grow,
-  Typography,
-} from "@mui/material";
-
-import Link from "next/link";
-import image from "public/img/Cyb3rYoga.png";
 import Image from "next/image";
-import serverSidePropsHandler from "components/ServerSideHandler";
+import { Box, Container, Grid, Typography } from "@mui/material";
 import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
+import serverSidePropsHandler from "components/ServerSideHandler";
+import HomeGridItem from "components/HomeGridItem";
+import image from "public/img/Cyb3rYoga.png";
 import styles from "../styles/Home.module.css";
-
-const GridItem: React.FC<{
-  link: string;
-  title: string;
-  text: string;
-  delay: number;
-}> = ({ link, title, text, delay }) => (
-  <Grow in timeout={{ enter: delay }}>
-    <Grid item xs={12} md={6} lg={6} p={2}>
-      <Link href={link}>
-        <Card className={styles.card}>
-          <CardContent className={styles.text}>
-            <Typography component="h4" variant="h4" color="white" paragraph>
-              {title}
-            </Typography>
-            <Typography color="white">{text}</Typography>
-          </CardContent>
-        </Card>
-      </Link>
-    </Grid>
-  </Grow>
-);
 
 const Home: NextPage = () => {
   const address = useAddress();
@@ -59,33 +28,33 @@ const Home: NextPage = () => {
         </Box>
 
         <Grid container spacing={8}>
-          <GridItem
+          <HomeGridItem
             delay={500}
             link="/hangar"
             title="Hangar &rarr;"
             text="Aircrafts, buy and sell aircraft NFT's"
           />
-          <GridItem
+          <HomeGridItem
             delay={1000}
             link="/license"
             title="Licencias &rarr;"
             text="Grow, adquire a licence and start flying today."
           />
 
-          <GridItem
+          <HomeGridItem
             delay={1500}
             link="/gas"
             title="Gas Station &rarr;"
             text="Stake and earn Gas to refuel your aircrafts."
           />
-          <GridItem
+          <HomeGridItem
             delay={2000}
             link="/cargo"
             title="Cargo &rarr;"
             text="Realiza alguno de los vuelos pendientes y gana tokens
                       AIRL."
           />
-          <GridItem
+          <HomeGridItem
             delay={2500}
             link="/ivao"
             title="IVAO &rarr;"
