@@ -35,7 +35,7 @@ export interface MyAppProps extends AppProps {
 }
 
 export default function MyApp(props: MyAppProps) {
-  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
+  const { Component, emotionCache = clientSideEmotionCache } = props;
   const [loading, setLoading] = React.useState(false);
 
   const startLoading = React.useCallback(() => {
@@ -54,8 +54,6 @@ export default function MyApp(props: MyAppProps) {
       Router.events.off("routeChangeComplete", endLoading);
     };
   }, [startLoading, endLoading]);
-
-  console.log("props", pageProps.user);
 
   return (
     <ThirdwebProvider

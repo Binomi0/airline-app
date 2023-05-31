@@ -53,8 +53,6 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
     );
   }
 
-  console.log("isLoggedIn", isLoggedIn);
-
   if (owned.length === 0) {
     return (
       <Box>
