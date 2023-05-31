@@ -31,6 +31,7 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
   const { mutateAsync: claimNFT, isLoading: isClaiming } =
     useClaimNFT(contract);
   const { data: airlBalance } = useBalance(coinTokenAddress);
+  const { name, description, image } = nft.metadata;
 
   const handleClaimLicense = useCallback(() => {
     if (!airlBalance) return;
@@ -70,7 +71,12 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({
   return (
     <Grid item xs={12} md={6} lg={4}>
       <Card>
-        <LicenseItemHeader nft={nft} owned={owned} />
+        <LicenseItemHeader
+          name={name as string}
+          description={description as string}
+          image={image as string}
+          owned={owned}
+        />
 
         <CardContent>
           {getNFTAttributes(nft).map((attribute) => (

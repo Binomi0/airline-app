@@ -1,24 +1,27 @@
-import { CardHeader, Avatar, Collapse, Box, IconButton } from "@mui/material";
-import { MediaRenderer, NFT } from "@thirdweb-dev/react";
-import { nftAircraftTokenAddress } from "contracts/address";
-import router from "next/router";
 import React, { startTransition, useState } from "react";
+import router from "next/router";
+import { MediaRenderer, NFT } from "@thirdweb-dev/react";
+import { CardHeader, Avatar, Collapse, IconButton } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { nftAircraftTokenAddress } from "contracts/address";
 
 const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
   const [open, setOpen] = useState(false);
+  const { name, description, image, id } = nft.metadata;
+  const subheader = open
+    ? description
+    : `${description?.split(" ").slice(0, 8).join(" ")} ...`;
 
-  const truncated = `${nft.metadata.description
-    ?.split(" ")
-    .slice(0, 8)
-    .join(" ")} ...`;
-
-  const handleToogle = () => {
+  function handleToogle() {
     startTransition(() => {
       setOpen((s) => !s);
     });
-  };
+  }
+
+  function handleRedirect() {
+    router.push(`/aircraft/${nftAircraftTokenAddress}/${id}`);
+  }
 
   return (
     <>
@@ -28,15 +31,11 @@ const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
         }}
         avatar={
           <Avatar variant="rounded">
-            <MediaRenderer
-              width="50px"
-              height="50px"
-              src={nft.metadata.image}
-            />
+            <MediaRenderer width="50px" height="50px" src={image} />
           </Avatar>
         }
-        title={nft.metadata.name}
-        subheader={open ? nft.metadata.description : truncated}
+        title={name}
+        subheader={subheader}
         action={
           <IconButton onClick={handleToogle}>
             {open ? (
@@ -48,15 +47,9 @@ const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
         }
       />
       <Collapse in={open}>
-        <Box
-          onClick={() =>
-            router.push(
-              `/aircraft/${nftAircraftTokenAddress}/${nft.metadata.id}`
-            )
-          }
-        >
-          <MediaRenderer height="100%" width="100%" src={nft.metadata.image} />
-        </Box>
+        <div onClick={handleRedirect}>
+          <MediaRenderer height="100%" width="100%" src={image} />
+        </div>
       </Collapse>
     </>
   );

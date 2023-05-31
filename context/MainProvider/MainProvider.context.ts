@@ -8,7 +8,9 @@ export const MainProviderContext = createContext<MainContextProps | undefined>(
 export const useMainProviderContext = (): MainContextProps => {
   const context = useContext(MainProviderContext);
   if (context === undefined) {
-    throw new Error("useVaProviderContext must be used within a VaProvider");
+    throw new Error(
+      "useMainProviderContext must be used within a MainProvider"
+    );
   }
 
   return context;

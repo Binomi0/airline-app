@@ -18,7 +18,7 @@ import {
   // Sepolia,
   Goerli,
 } from "@thirdweb-dev/chains";
-import CustomAppBar from "components/AppBar";
+import AppBar from "components/AppBar";
 import Sidebar from "components/Sidebar";
 import ErrorBoundary from "components/ErrorBoundary";
 import { factoryAddress } from "contracts/address";
@@ -55,6 +55,8 @@ export default function MyApp(props: MyAppProps) {
     };
   }, [startLoading, endLoading]);
 
+  console.log("props", pageProps.user);
+
   return (
     <ThirdwebProvider
       activeChain={Goerli}
@@ -86,14 +88,13 @@ export default function MyApp(props: MyAppProps) {
           <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
         <ThemeProvider theme={theme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <ErrorBoundary>
             <MainProvider>
-              <CustomAppBar />
+              <AppBar />
               <Sidebar />
-              <Component {...pageProps} loading={loading} />
             </MainProvider>
+            <Component loading={loading} />
           </ErrorBoundary>
         </ThemeProvider>
       </CacheProvider>

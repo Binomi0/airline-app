@@ -1,19 +1,19 @@
 import { CardHeader, Avatar, Collapse, Box, IconButton } from "@mui/material";
-import { MediaRenderer, NFT } from "@thirdweb-dev/react";
+import { MediaRenderer } from "@thirdweb-dev/react";
 import React, { useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
-const LicenseItemHeader: React.FC<{ nft: NFT; owned: boolean }> = ({
-  nft,
-  owned,
-}) => {
+const LicenseItemHeader: React.FC<{
+  name: string;
+  description: string;
+  image: string;
+  owned: boolean;
+}> = ({ name, description, image, owned }) => {
   const [open, setOpen] = useState(false);
-
-  const truncated = React.useMemo(
-    () => `${nft.metadata.description?.split(" ").slice(0, 8).join(" ")} ...`,
-    [nft.metadata.description]
-  );
+  const subheader = open
+    ? description
+    : `${description?.split(" ").slice(0, 8).join(" ")} ...`;
 
   return (
     <>
@@ -23,15 +23,11 @@ const LicenseItemHeader: React.FC<{ nft: NFT; owned: boolean }> = ({
         }}
         avatar={
           <Avatar variant="rounded">
-            <MediaRenderer
-              width="50px"
-              height="50px"
-              src={nft.metadata.image}
-            />
+            <MediaRenderer width="50px" height="50px" src={image} />
           </Avatar>
         }
-        title={nft.metadata.name}
-        subheader={open ? nft.metadata.description : truncated}
+        title={name}
+        subheader={subheader}
         action={
           <IconButton onClick={() => setOpen((s) => !s)}>
             {open ? (
@@ -65,7 +61,7 @@ const LicenseItemHeader: React.FC<{ nft: NFT; owned: boolean }> = ({
             },
           }}
         >
-          <MediaRenderer width="100%" src={nft.metadata.image} />
+          <MediaRenderer width="100%" src={image} />
         </Box>
       </Collapse>
     </>

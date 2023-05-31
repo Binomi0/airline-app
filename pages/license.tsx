@@ -1,13 +1,14 @@
-import type { NextPage } from "next";
+import type { GetServerSidePropsContext, NextPage } from "next";
 import { Box, Container, Typography } from "@mui/material";
 import LicenseMarketPlace from "../components/LicenseMarketPlace";
 import styles from "styles/License.module.css";
 import image from "public/img/airplanes4.png";
 import Image from "next/image";
-import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
+import { ConnectWallet, useUser } from "@thirdweb-dev/react";
+import serverSidePropsHandler from "components/ServerSideHandler";
 
 const License: NextPage = () => {
-  const address = useAddress();
+  const { isLoggedIn } = useUser();
 
   return (
     <Box sx={{ position: "relative" }}>
@@ -22,7 +23,7 @@ const License: NextPage = () => {
       <Container>
         <Box my={5} textAlign="center">
           <Typography variant="h1">License Page</Typography>
-          {!address && <ConnectWallet />}
+          {!isLoggedIn && <ConnectWallet />}
         </Box>
 
         <LicenseMarketPlace />
@@ -30,5 +31,8 @@ const License: NextPage = () => {
     </Box>
   );
 };
+
+export const getServerSideProps = (ctx: GetServerSidePropsContext) =>
+  serverSidePropsHandler(ctx);
 
 export default License;
