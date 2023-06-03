@@ -1,49 +1,63 @@
 import { ThirdwebAuth } from '@thirdweb-dev/auth/next'
 import { PrivateKeyWallet } from '@thirdweb-dev/auth/evm'
-
-// NOTE: This users map is for demo purposes. Its used to show the power of
-// what you can accomplish with the Auth callbacks. In a production app,
-// you would want to store this data somewhere externally, like a database or
-// on-chain, as this in-memory map wont persist across requests.
-const users: Record<string, any> = {}
+import clientPromise from 'lib/mongodb'
+import { Collection, DB } from 'types'
 
 export const { ThirdwebAuthHandler, getUser } = ThirdwebAuth({
   domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || '',
   wallet: new PrivateKeyWallet(process.env.THIRDWEB_AUTH_PRIVATE_KEY || ''),
-  // NOTE: All these callbacks are optional! You can delete this section and
-  // the Auth flow will still work.
   callbacks: {
     onLogin: async (address) => {
-      // Here we can run side-effects like creating and updating user data
-      // whenever a user logs in.
-      if (!users[address]) {
-        users[address] = {
-          created_at: Date.now(),
-          last_login_at: Date.now(),
-          num_log_outs: 0
-        }
-      } else {
-        users[address].last_login_at = Date.now()
-      }
+      const client = await clientPromise
+      const db = client.db(DB.develop).collection(Collection.user)
 
-      // We can also provide any session data to store in the user's session.
-      return { role: ['admin'] }
+      try {
+        const user = await db.findOne({ address }, { projection: { _id: 1, role: 1 } })
+        if (!user) {
+          await db.insertOne({
+            address: address.toString(),
+            createdAt: Date.now(),
+            lastLogin: Date.now(),
+            role: 'user'
+          })
+          return { user: { role: ['user'] } }
+        } else {
+          await db.updateOne({ address: address.toString() }, { $set: { lastLogin: Date.now() } })
+        }
+
+        return { user: { role: [user.role] } }
+      } catch (error) {
+        console.log('error =>', error)
+        return null
+      }
     },
     onUser: async (user) => {
-      // Here we can run side-effects whenever a user is fetched from the client side
-      if (users[user.address]) {
-        users[user.address].user_last_accessed = Date.now()
-      }
+      const client = await clientPromise
+      const db = client.db(DB.develop).collection(Collection.user)
 
-      // And we can provide any extra user data to be sent to the client
-      // along with the default user object.
-      return users[user.address]
+      try {
+        const dbUser = await db.findOne({ address: user.address.toString() }, { projection: { _id: 1, role: 1 } })
+
+        if (!dbUser) {
+          await db.insertOne({ address: user.address.toString(), createdAt: Date.now(), lastLogin: Date.now() })
+          return { user: { role: ['user'] } }
+        } else {
+          await db.updateOne({ address: user.address.toString() }, { $set: { lastAccess: Date.now() } })
+        }
+
+        return { user: { role: [dbUser.role] } }
+      } catch (error) {
+        console.log('error =>', error)
+        return null
+      }
     },
     onLogout: async (user) => {
-      // Finally, we can run any side-effects whenever a user logs out.
-      if (users[user.address]) {
-        users[user.address].num_log_outs++
-      }
+      const client = await clientPromise
+      const db = client.db(DB.develop).collection(Collection.user)
+
+      await db.findOneAndUpdate({ address: user.address }, { $inc: { numLogOuts: 1 } })
+
+      return null
     }
   }
 })

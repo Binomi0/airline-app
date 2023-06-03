@@ -1,14 +1,14 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import { Box, Container, Grid, Typography } from '@mui/material'
-import { ConnectWallet, useAddress } from '@thirdweb-dev/react'
+import { ConnectWallet, useUser } from '@thirdweb-dev/react'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import HomeGridItem from 'components/HomeGridItem'
 import image from 'public/img/Cyb3rYoga.png'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
-  const address = useAddress()
+  const { user } = useUser()
 
   return (
     <Box position='relative'>
@@ -17,7 +17,7 @@ const Home: NextPage = () => {
       <Container>
         <Box my={5} textAlign='center'>
           <Typography variant='h1'>Virtual Airline</Typography>
-          {!address && <ConnectWallet />}
+          {!user?.address && <ConnectWallet />}
         </Box>
 
         <Grid container spacing={8}>

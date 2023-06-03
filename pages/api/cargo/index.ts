@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getUser } from '../auth/[...thirdweb]'
 import clientPromise from 'lib/mongodb'
+import { Collection, DB } from 'types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') return res.status(405).end()
@@ -13,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   try {
     const client = await clientPromise
-    const db = client.db('cargo').collection('live')
+    const db = client.db(DB.develop).collection(Collection.live)
     const cargo = await db.findOne({ address: user.address })
 
     return res.json(cargo)

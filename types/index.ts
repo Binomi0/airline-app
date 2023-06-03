@@ -79,3 +79,14 @@ export type AttributeType = {
   trait_type: string
   value: string
 }
+
+export enum DB {
+  develop = 'develop'
+}
+
+export enum Collection {
+  user = 'user',
+  cargo = 'cargo',
+  live = 'live',
+  wallet = 'wallet'
+}

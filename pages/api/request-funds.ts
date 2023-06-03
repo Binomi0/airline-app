@@ -4,6 +4,7 @@ import clientPromise from 'lib/mongodb'
 import { ThirdwebSDK } from '@thirdweb-dev/sdk'
 import { Goerli } from '@thirdweb-dev/chains'
 import { coinTokenAddress } from 'contracts/address'
+import { Collection, DB } from 'types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') return res.status(405).end()
@@ -17,7 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   const { address } = user
   const client = await clientPromise
-  const collection = client.db('funding').collection('used')
+  const collection = client.db(DB.develop).collection(Collection.wallet)
 
   try {
     const requested = await collection.findOne({ address })
