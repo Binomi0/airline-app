@@ -1,23 +1,12 @@
-import { CircularProgress, AvatarGroup, Tooltip, Avatar } from "@mui/material";
-import {
-  useContract,
-  useOwnedNFTs,
-  MediaRenderer,
-  useUser,
-} from "@thirdweb-dev/react";
-import { nftLicenseTokenAddress } from "contracts/address";
-import React from "react";
+import { CircularProgress, AvatarGroup, Tooltip, Avatar } from '@mui/material'
+import { useContract, useOwnedNFTs, MediaRenderer, useUser } from '@thirdweb-dev/react'
+import { nftLicenseTokenAddress } from 'contracts/address'
+import React from 'react'
 
 const LicenseBar = () => {
-  const { user } = useUser();
-  const { contract: licenseContract } = useContract(
-    nftLicenseTokenAddress,
-    "edition-drop"
-  );
-  const { data: ownedLicense, isLoading } = useOwnedNFTs(
-    licenseContract,
-    user?.address
-  );
+  const { user } = useUser()
+  const { contract: licenseContract } = useContract(nftLicenseTokenAddress, 'edition-drop')
+  const { data: ownedLicense, isLoading } = useOwnedNFTs(licenseContract, user?.address)
 
   return (
     <div>
@@ -29,17 +18,9 @@ const LicenseBar = () => {
           <AvatarGroup>
             {ownedLicense
               .map((license) => (
-                <Tooltip
-                  arrow
-                  title={(license.metadata.name as string).split(" - ")[1]}
-                  key={license.metadata.id}
-                >
+                <Tooltip arrow title={(license.metadata.name as string).split(' - ')[1]} key={license.metadata.id}>
                   <Avatar>
-                    <MediaRenderer
-                      width="50px"
-                      height="50px"
-                      src={license?.metadata.image}
-                    />
+                    <MediaRenderer width='50px' height='50px' src={license?.metadata.image} />
                   </Avatar>
                 </Tooltip>
               ))
@@ -48,7 +29,7 @@ const LicenseBar = () => {
         )
       )}
     </div>
-  );
-};
+  )
+}
 
-export default LicenseBar;
+export default LicenseBar

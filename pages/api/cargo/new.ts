@@ -1,42 +1,42 @@
-import { NextApiHandler } from "next";
-import { getUser } from "../auth/[...thirdweb]";
-import clientPromise from "lib/mongodb";
+import { NextApiHandler } from 'next'
+import { getUser } from '../auth/[...thirdweb]'
+import clientPromise from 'lib/mongodb'
 
 const handler: NextApiHandler = async (req, res) => {
-  if (req.method !== "POST") {
-    return res.status(405).end();
+  if (req.method !== 'POST') {
+    return res.status(405).end()
   }
 
-  const user = await getUser(req);
+  const user = await getUser(req)
 
   if (!user) {
     return res.status(401).json({
-      message: "Not authorized.",
-    });
+      message: 'Not authorized.'
+    })
   }
 
-  const cargo = req.body;
+  const cargo = req.body
 
   if (cargo.address !== user.address) {
-    return res.status(400).end();
+    return res.status(400).end()
   }
 
   try {
-    const client = await clientPromise;
-    const db = client.db("cargo").collection("live");
-    const current = await db.findOne({ address: user.address });
+    const client = await clientPromise
+    const db = client.db('cargo').collection('live')
+    const current = await db.findOne({ address: user.address })
 
     if (current) {
-      return res.status(202).json(current);
+      return res.status(202).json(current)
     }
 
-    const newCargo = await db.insertOne(cargo);
+    const newCargo = await db.insertOne(cargo)
 
-    return res.status(201).send(newCargo);
+    return res.status(201).send(newCargo)
   } catch (error) {
-    console.log("New Cargo ERROR =>", error);
-    return res.status(500).end();
+    console.log('New Cargo ERROR =>', error)
+    return res.status(500).end()
   }
-};
+}
 
-export default handler;
+export default handler

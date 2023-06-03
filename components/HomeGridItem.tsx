@@ -1,13 +1,13 @@
-import { Grow, Grid, Card, CardContent, Typography } from "@mui/material";
-import Link from "next/link";
-import styles from "../styles/Home.module.css";
-import { memo } from "react";
+import { Grow, Grid, Card, CardContent, Typography } from '@mui/material'
+import Link from 'next/link'
+import styles from '../styles/Home.module.css'
+import { memo } from 'react'
 
 interface IGridItem {
-  link: string;
-  title: string;
-  text: string;
-  delay: number;
+  link: string
+  title: string
+  text: string
+  delay: number
 }
 
 const HomeGridItem: React.FC<IGridItem> = ({ link, title, text, delay }) => (
@@ -16,15 +16,15 @@ const HomeGridItem: React.FC<IGridItem> = ({ link, title, text, delay }) => (
       <Link href={link}>
         <Card className={styles.card}>
           <CardContent className={styles.text}>
-            <Typography component="h4" variant="h4" color="white" paragraph>
+            <Typography component='h4' variant='h4' color='white' paragraph>
               {title}
             </Typography>
-            <Typography color="white">{text}</Typography>
+            <Typography color='white'>{text}</Typography>
           </CardContent>
         </Card>
       </Link>
     </Grid>
   </Grow>
-);
+)
 
-export default memo(HomeGridItem);
+export default memo(HomeGridItem)

@@ -1,14 +1,14 @@
-import { Grid, LinearProgress } from "@mui/material";
-import FlightDetails from "components/FlightDetails";
-import { useVaProviderContext } from "context/VaProvider";
-import React from "react";
-import { filterLEOrigins } from "utils";
+import { Grid, LinearProgress } from '@mui/material'
+import FlightDetails from 'components/FlightDetails'
+import { useVaProviderContext } from 'context/VaProvider'
+import React from 'react'
+import { filterLEOrigins } from 'utils'
 
 const IvaoView = () => {
-  const { pilots } = useVaProviderContext();
+  const { pilots } = useVaProviderContext()
 
   if (!pilots.length) {
-    return <LinearProgress />;
+    return <LinearProgress />
   }
 
   return (
@@ -20,7 +20,7 @@ const IvaoView = () => {
           <FlightDetails session={session} key={session.id} />
         ))}
     </Grid>
-  );
-};
+  )
+}
 
-export default IvaoView;
+export default IvaoView

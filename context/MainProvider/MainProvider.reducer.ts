@@ -1,14 +1,14 @@
-import { MainReducerHandler } from "./MainProvider.types";
+import { MainReducerHandler } from './MainProvider.types'
 
 export const mainProviderReducer: MainReducerHandler = (state, action) => {
   switch (action.type) {
-    case "TOGGLE_SIDEBAR":
+    case 'TOGGLE_SIDEBAR':
       return {
-        sidebarOpen: !state.sidebarOpen,
-      };
+        sidebarOpen: !state.sidebarOpen
+      }
     default:
-      return state;
+      return state
   }
-};
+}
 
-export default mainProviderReducer;
+export default mainProviderReducer

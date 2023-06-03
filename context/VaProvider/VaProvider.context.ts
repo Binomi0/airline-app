@@ -1,15 +1,13 @@
-import { createContext, useContext } from "react";
-import { VaContextProps } from "./VaProvider.types";
+import { createContext, useContext } from 'react'
+import { VaContextProps } from './VaProvider.types'
 
-export const VaProviderContext = createContext<VaContextProps | undefined>(
-  undefined
-);
+export const VaProviderContext = createContext<VaContextProps | undefined>(undefined)
 
 export const useVaProviderContext = (): VaContextProps => {
-  const context = useContext(VaProviderContext);
+  const context = useContext(VaProviderContext)
   if (context === undefined) {
-    throw new Error("useVaProviderContext must be used within a VaProvider");
+    throw new Error('useVaProviderContext must be used within a VaProvider')
   }
 
-  return context;
-};
+  return context
+}

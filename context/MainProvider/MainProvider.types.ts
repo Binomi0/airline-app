@@ -1,15 +1,12 @@
-type Actions = ToggleSidebar;
-type ToggleSidebar = Readonly<{ type: "TOGGLE_SIDEBAR" }>;
+type Actions = ToggleSidebar
+type ToggleSidebar = Readonly<{ type: 'TOGGLE_SIDEBAR' }>
 
 export type MainReducerState = {
-  sidebarOpen: boolean;
-};
+  sidebarOpen: boolean
+}
 
 export type MainContextProps = MainReducerState & {
-  toggleSidebar: () => void;
-};
+  toggleSidebar: () => void
+}
 
-export type MainReducerHandler = (
-  state: MainReducerState,
-  action: Actions
-) => MainReducerState;
+export type MainReducerHandler = (state: MainReducerState, action: Actions) => MainReducerState

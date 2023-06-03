@@ -1,7 +1,7 @@
 interface UseFlight {}
 
 const useFlight = (): UseFlight => {
-  return {};
-};
+  return {}
+}
 
-export default useFlight;
+export default useFlight

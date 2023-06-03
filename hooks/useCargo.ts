@@ -1,50 +1,44 @@
-import { useAddress } from "@thirdweb-dev/react";
-import { NFT } from "@thirdweb-dev/sdk";
-import axios from "axios";
-import { useVaProviderContext } from "context/VaProvider";
-import { cargos } from "mocks/cargos";
-import { useCallback, useState } from "react";
-import { Cargo, FRoute } from "types";
-import {
-  getCallsign,
-  getCargoWeight,
-  getDistanceByCoords,
-  getRandomInt,
-  getCargoPrize,
-} from "utils";
+import { useAddress } from '@thirdweb-dev/react'
+import { NFT } from '@thirdweb-dev/sdk'
+import axios from 'axios'
+import { useVaProviderContext } from 'context/VaProvider'
+import { cargos } from 'mocks/cargos'
+import { useCallback, useState } from 'react'
+import { Cargo, FRoute } from 'types'
+import { getCallsign, getCargoWeight, getDistanceByCoords, getRandomInt, getCargoPrize } from 'utils'
 
 interface UseCargo {
-  newCargo: (route: FRoute, owned: NFT) => void;
-  getCargo: () => Promise<void>;
-  cargo?: Cargo;
-  isLoading: boolean;
+  newCargo: (route: FRoute, owned: NFT) => void
+  getCargo: () => Promise<void>
+  cargo?: Cargo
+  isLoading: boolean
 }
 
 const useCargo = (): UseCargo => {
-  const address = useAddress();
-  const { atcs } = useVaProviderContext();
-  const [cargo, setCargo] = useState<Cargo>();
-  const [isLoading, setIsLoading] = useState(false);
+  const address = useAddress()
+  const { atcs } = useVaProviderContext()
+  const [cargo, setCargo] = useState<Cargo>()
+  const [isLoading, setIsLoading] = useState(false)
 
   const getCargo = useCallback(async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const response = await axios.get<Cargo>("/api/cargo");
-      setCargo(response.data);
+      const response = await axios.get<Cargo>('/api/cargo')
+      setCargo(response.data)
     } catch (error) {
-      console.log("error =>", error);
+      console.log('error =>', error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, []);
+  }, [])
 
   const newCargo = useCallback(
     (route: FRoute, aircraft: NFT) => {
-      const distance = getDistanceByCoords(atcs, route);
-      const details = cargos[getRandomInt(8)];
-      const weight = getCargoWeight(aircraft);
-      const callsign = getCallsign();
-      const prize = getCargoPrize(distance, aircraft);
+      const distance = getDistanceByCoords(atcs, route)
+      const details = cargos[getRandomInt(8)]
+      const weight = getCargoWeight(aircraft)
+      const callsign = getCallsign()
+      const prize = getCargoPrize(distance, aircraft)
       const cargo = {
         address,
         origin: route.origin,
@@ -55,15 +49,15 @@ const useCargo = (): UseCargo => {
         aircraft,
         weight,
         callsign,
-        prize,
-      };
+        prize
+      }
 
-      setCargo(cargo);
+      setCargo(cargo)
     },
     [atcs, address]
-  );
+  )
 
-  return { newCargo, cargo, getCargo, isLoading };
-};
+  return { newCargo, cargo, getCargo, isLoading }
+}
 
-export default useCargo;
+export default useCargo

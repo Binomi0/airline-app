@@ -9,53 +9,53 @@ import {
   Typography,
   LinearProgress,
   Box,
-  CardActions,
-} from "@mui/material";
-import moment from "moment";
-import React, { ReactNode } from "react";
-import FlightLandIcon from "@mui/icons-material/FlightLand";
-import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
-import FlightIcon from "@mui/icons-material/Flight";
-import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
-import ConnectingAirportsIcon from "@mui/icons-material/ConnectingAirports";
-import AirlinesIcon from "@mui/icons-material/Airlines";
-import type { LastTrackState, IvaoPilot } from "types";
+  CardActions
+} from '@mui/material'
+import moment from 'moment'
+import React, { ReactNode } from 'react'
+import FlightLandIcon from '@mui/icons-material/FlightLand'
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
+import FlightIcon from '@mui/icons-material/Flight'
+import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
+import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports'
+import AirlinesIcon from '@mui/icons-material/Airlines'
+import type { LastTrackState, IvaoPilot } from 'types'
 
 const stateIcons: Record<LastTrackState, ReactNode> = {
-  "En Route": <ConnectingAirportsIcon color="primary" fontSize="large" />,
-  Boarding: <FlightIcon color="info" fontSize="large" />,
-  Approach: <FlightLandIcon color="secondary" fontSize="large" />,
-  Departing: <FlightTakeoffIcon color="warning" fontSize="large" />,
-  "On Blocks": <AirplaneTicketIcon color="info" fontSize="large" />,
-  "Initial Climb": <FlightTakeoffIcon color="warning" fontSize="large" />,
-  Landed: <AirlinesIcon color="success" fontSize="large" />,
-};
+  'En Route': <ConnectingAirportsIcon color='primary' fontSize='large' />,
+  Boarding: <FlightIcon color='info' fontSize='large' />,
+  Approach: <FlightLandIcon color='secondary' fontSize='large' />,
+  Departing: <FlightTakeoffIcon color='warning' fontSize='large' />,
+  'On Blocks': <AirplaneTicketIcon color='info' fontSize='large' />,
+  'Initial Climb': <FlightTakeoffIcon color='warning' fontSize='large' />,
+  Landed: <AirlinesIcon color='success' fontSize='large' />
+}
 
 const stateColors: Record<
   LastTrackState,
-  "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning"
+  'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
 > = {
-  "En Route": "primary",
-  Boarding: "info",
-  Approach: "secondary",
-  Departing: "warning",
-  "On Blocks": "info",
-  "Initial Climb": "warning",
-  Landed: "success",
-};
+  'En Route': 'primary',
+  Boarding: 'info',
+  Approach: 'secondary',
+  Departing: 'warning',
+  'On Blocks': 'info',
+  'Initial Climb': 'warning',
+  Landed: 'success'
+}
 
 const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
-  const [size, setSize] = React.useState(6);
+  const [size, setSize] = React.useState(6)
 
   const flightValue = React.useMemo(() => {
-    if (!session?.lastTrack) return 0;
-    const { arrivalDistance, departureDistance } = session?.lastTrack;
+    if (!session?.lastTrack) return 0
+    const { arrivalDistance, departureDistance } = session?.lastTrack
 
-    const totalDistance = departureDistance + arrivalDistance;
-    const completed = totalDistance - arrivalDistance;
+    const totalDistance = departureDistance + arrivalDistance
+    const completed = totalDistance - arrivalDistance
 
-    return (completed / totalDistance) * 100;
-  }, [session?.lastTrack]);
+    return (completed / totalDistance) * 100
+  }, [session?.lastTrack])
 
   return (
     <Grid item xs={size} key={session.id}>
@@ -63,60 +63,46 @@ const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
         <CardHeader
           sx={{}}
           action={
-            <Button
-              size="small"
-              variant="contained"
-              color={stateColors[session.lastTrack.state as LastTrackState]}
-            >
+            <Button size='small' variant='contained' color={stateColors[session.lastTrack.state as LastTrackState]}>
               {session.lastTrack.state}
             </Button>
           }
           avatar={
             <Avatar
               sx={{
-                backgroundColor: "white",
+                backgroundColor: 'white'
               }}
             >
-              {session
-                ? stateIcons[session.lastTrack.state as LastTrackState]
-                : "?"}
+              {session ? stateIcons[session.lastTrack.state as LastTrackState] : '?'}
             </Avatar>
           }
           title={`FLIGHT DETECTED (${session.flightPlan.aircraftId}) - [${session.callsign}]`}
           subheader={`${session.flightPlan.departureId} - ${session.flightPlan.arrivalId} (${session.lastTrack.state})`}
         />
         <CardContent>
-          <Stack
-            height="24px"
-            direction="row"
-            justifyContent="space-between"
-            alignItems="flex-start"
-          >
+          <Stack height='24px' direction='row' justifyContent='space-between' alignItems='flex-start'>
             <Typography>
               {moment
                 .utc(session.flightPlan.departureTime * 1000)
-                .add(2, "hours")
-                .format("HH:mm")}
+                .add(2, 'hours')
+                .format('HH:mm')}
               h
             </Typography>
-            <Stack width="75%">
+            <Stack width='75%'>
               <LinearProgress
                 color={stateColors[session.lastTrack.state as LastTrackState]}
-                variant="determinate"
+                variant='determinate'
                 value={flightValue}
               />
-              <Typography textAlign="center" variant="caption">
-                {moment.utc(session.flightPlan.eet * 1000).format("H[h] mm[m]")}
+              <Typography textAlign='center' variant='caption'>
+                {moment.utc(session.flightPlan.eet * 1000).format('H[h] mm[m]')}
               </Typography>
             </Stack>
             <Typography>
               {moment
-                .utc(
-                  (session.flightPlan.departureTime + session.flightPlan.eet) *
-                    1000
-                )
-                .add(2, "hours")
-                .format("HH:mm")}
+                .utc((session.flightPlan.departureTime + session.flightPlan.eet) * 1000)
+                .add(2, 'hours')
+                .format('HH:mm')}
               h
               {/* (
                       {moment
@@ -128,18 +114,18 @@ const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
           <Box my={4}>Ground speed: {session.lastTrack.groundSpeed}</Box>
         </CardContent>
         {size === 12 && (
-          <CardActions sx={{ justifyContent: "flex-end" }}>
-            <Button size="large" variant="contained">
+          <CardActions sx={{ justifyContent: 'flex-end' }}>
+            <Button size='large' variant='contained'>
               BOTON 1
             </Button>
-            <Button size="large" variant="contained">
+            <Button size='large' variant='contained'>
               BOTON 2
             </Button>
           </CardActions>
         )}
       </Card>
     </Grid>
-  );
-};
+  )
+}
 
-export default FlightDetails;
+export default FlightDetails

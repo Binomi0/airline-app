@@ -1,17 +1,13 @@
-import { createContext, useContext } from "react";
-import { MainContextProps } from "./MainProvider.types";
+import { createContext, useContext } from 'react'
+import { MainContextProps } from './MainProvider.types'
 
-export const MainProviderContext = createContext<MainContextProps | undefined>(
-  undefined
-);
+export const MainProviderContext = createContext<MainContextProps | undefined>(undefined)
 
 export const useMainProviderContext = (): MainContextProps => {
-  const context = useContext(MainProviderContext);
+  const context = useContext(MainProviderContext)
   if (context === undefined) {
-    throw new Error(
-      "useMainProviderContext must be used within a MainProvider"
-    );
+    throw new Error('useMainProviderContext must be used within a MainProvider')
   }
 
-  return context;
-};
+  return context
+}

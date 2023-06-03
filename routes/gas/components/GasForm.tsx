@@ -1,64 +1,58 @@
-import { Stack, TextField, Button, CircularProgress } from "@mui/material";
-import BigNumber from "bignumber.js";
-import React, { memo } from "react";
-import type { ChangeEvent } from "react";
+import { Stack, TextField, Button, CircularProgress } from '@mui/material'
+import BigNumber from 'bignumber.js'
+import React, { memo } from 'react'
+import type { ChangeEvent } from 'react'
 
 const GasForm: React.FC<{
-  max: string;
+  max: string
   // eslint-disable-next-line no-unused-vars
-  onClick: (value: string) => void;
-  loading: boolean;
-  label: string;
-  buttonText: string;
+  onClick: (value: string) => void
+  loading: boolean
+  label: string
+  buttonText: string
 }> = ({ max, onClick, loading, label, buttonText }) => {
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState('')
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
-    setValue(e.target.value);
+    setValue(e.target.value)
   }
 
   function handleClick() {
-    const amount = new BigNumber(value);
-    if (amount.isZero() || amount.isNaN() || amount.isNegative()) return;
-    setValue("");
-    onClick(value);
+    const amount = new BigNumber(value)
+    if (amount.isZero() || amount.isNaN() || amount.isNegative()) return
+    setValue('')
+    onClick(value)
   }
 
   return (
     <Stack spacing={2}>
       <TextField
-        size="small"
+        size='small'
         focused
         label={label}
-        variant="outlined"
-        type="number"
+        variant='outlined'
+        type='number'
         onChange={handleChange}
         value={value}
         InputProps={{
           endAdornment: (
             <Button
-              variant="contained"
+              variant='contained'
               onClick={() => {
-                setValue(max);
+                setValue(max)
               }}
-              size="small"
+              size='small'
             >
               MAX
             </Button>
-          ),
+          )
         }}
       />
-      <Button
-        color="success"
-        disabled={loading || !value}
-        onClick={handleClick}
-        size="small"
-        variant="contained"
-      >
+      <Button color='success' disabled={loading || !value} onClick={handleClick} size='small' variant='contained'>
         {loading ? <CircularProgress size={24} /> : buttonText}
       </Button>
     </Stack>
-  );
-};
+  )
+}
 
-export default memo(GasForm);
+export default memo(GasForm)
