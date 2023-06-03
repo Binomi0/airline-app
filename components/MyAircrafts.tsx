@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import {
   MediaRenderer,
-  useAddress,
+  useUser,
   useContract,
   useOwnedNFTs,
 } from "@thirdweb-dev/react";
@@ -20,9 +20,9 @@ import { nftAircraftTokenAddress } from "contracts/address";
 import { getNFTAttributes } from "utils";
 
 const MyAircrafts = () => {
-  const address = useAddress();
+  const { user } = useUser();
   const { contract } = useContract(nftAircraftTokenAddress);
-  const { data: nfts = [], error } = useOwnedNFTs(contract, address);
+  const { data: nfts = [], error } = useOwnedNFTs(contract, user?.address);
 
   return nfts && nfts.length > 0 ? (
     <Box my={4}>

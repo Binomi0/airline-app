@@ -1,4 +1,9 @@
-import { CardActions, Button, LinearProgress } from "@mui/material";
+import {
+  CardActions,
+  Button,
+  LinearProgress,
+  CircularProgress,
+} from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useCallback } from "react";
 
@@ -28,7 +33,13 @@ const AircraftActions: React.FC<{
         variant="contained"
         onClick={handleClick}
       >
-        {hasLicense ? `Claim ${name}` : "Require licencia"}
+        {isClaiming ? (
+          <CircularProgress size={14} />
+        ) : hasLicense ? (
+          `Claim ${name}`
+        ) : (
+          "Require licencia"
+        )}
       </Button>
     </CardActions>
   );

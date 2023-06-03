@@ -1,26 +1,33 @@
-import React, { useCallback } from "react";
-import { Box, Grid, Fade } from "@mui/material";
-import { useAddress, useClaimNFT, useContract } from "@thirdweb-dev/react";
-import useLicense from "hooks/useLicense";
-import { getLicenseIdFromAttributes, getNFTAttributes } from "utils";
-import useAircrafts from "hooks/useAircrafts";
-import AircraftItem from "./AircraftItem";
-import { nftAircraftTokenAddress } from "contracts/address";
+import React, { useCallback } from 'react'
+import { Box, Grid, Fade, CircularProgress } from '@mui/material'
+import { useClaimNFT, useContract, useUser } from '@thirdweb-dev/react'
+import useLicense from 'hooks/useLicense'
+import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
+import useAircrafts from 'hooks/useAircrafts'
+import AircraftItem from './AircraftItem'
+import { nftAircraftTokenAddress } from 'contracts/address'
 
 const AircraftMarketPlace: React.FC = () => {
-  const address = useAddress();
-  const licenses = useLicense();
-  const aircrafts = useAircrafts();
-  const { contract: aircraftContract } = useContract(nftAircraftTokenAddress);
-  const { mutateAsync, isLoading: isClaiming } = useClaimNFT(aircraftContract);
+  const { user } = useUser()
+  const licenses = useLicense()
+  const { aircrafts, isLoading } = useAircrafts()
+  const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
+  const { mutateAsync, isLoading: isClaiming } = useClaimNFT(aircraftContract)
 
   const handleClaim = useCallback(
     (tokenId: string) => {
-      mutateAsync({ to: address, quantity: 1, tokenId });
+      mutateAsync({ to: user?.address, quantity: 1, tokenId })
     },
-    [mutateAsync, address]
-  );
+    [mutateAsync, user?.address]
+  )
 
+  if (isLoading) {
+    return (
+      <Box textAlign='center'>
+        <CircularProgress size={60} color='secondary' />
+      </Box>
+    )
+  }
   return (
     <Box my={4}>
       <Fade in unmountOnExit>
@@ -31,15 +38,13 @@ const AircraftMarketPlace: React.FC = () => {
               key={aircraft.metadata.id}
               onClaim={handleClaim}
               isClaiming={isClaiming}
-              hasLicense={licenses.current.get(
-                getLicenseIdFromAttributes(getNFTAttributes(aircraft))
-              )}
+              hasLicense={licenses.current.get(getLicenseIdFromAttributes(getNFTAttributes(aircraft)))}
             />
           ))}
         </Grid>
       </Fade>
     </Box>
-  );
-};
+  )
+}
 
-export default AircraftMarketPlace;
+export default AircraftMarketPlace

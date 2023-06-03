@@ -8,19 +8,19 @@ import {
 } from "@mui/material";
 import React from "react";
 import {
-  useAddress,
   useContract,
   useNFTs,
   useOwnedNFTs,
+  useUser,
 } from "@thirdweb-dev/react";
 import { nftLicenseTokenAddress } from "contracts/address";
 import LicenseItem from "./LicenseItem";
 
 const LicenseMarketPlace: React.FC = () => {
-  const address = useAddress();
+  const { user } = useUser();
   const { contract } = useContract(nftLicenseTokenAddress);
   const { data: nfts = [], isLoading, error } = useNFTs(contract);
-  const { data: owned = [] } = useOwnedNFTs(contract, address);
+  const { data: owned = [] } = useOwnedNFTs(contract, user?.address);
 
   if (isLoading) {
     return <LinearProgress />;

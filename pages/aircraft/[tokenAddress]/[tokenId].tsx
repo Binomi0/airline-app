@@ -16,11 +16,11 @@ import { useRouter } from "next/router";
 import React from "react";
 import {
   MediaRenderer,
-  useAddress,
   useClaimNFT,
   useContract,
   useNFT,
   useNFTBalance,
+  useUser,
 } from "@thirdweb-dev/react";
 import { getNFTAttributes } from "utils";
 import { NextPage } from "next";
@@ -36,19 +36,19 @@ const maps: Record<string, string> = {
 
 const AircraftView: NextPage = () => {
   const router = useRouter();
-  const address = useAddress();
+  const { user } = useUser();
   const { contract } = useContract(router.query.tokenAddress as string);
   const { contract: license } = useContract(nftLicenseTokenAddress);
   const { mutateAsync: claimNFT, isLoading } = useClaimNFT(contract);
   const { data: nft, error } = useNFT(contract, router.query.tokenId as string);
   const { data } = useNFTBalance(
     contract,
-    address,
+    user?.address,
     router.query.tokenId as string
   );
   const { data: licenseBalance } = useNFTBalance(
     license,
-    address,
+    user?.address,
     maps[router.query.tokenId as string]
   );
 
@@ -117,7 +117,7 @@ const AircraftView: NextPage = () => {
                 variant="contained"
                 onClick={() =>
                   claimNFT({
-                    to: address,
+                    to: user?.address,
                     quantity: 1,
                     tokenId: nft.metadata.id,
                   })

@@ -1,11 +1,11 @@
-import { useAddress, useContract, useNFTBalance } from "@thirdweb-dev/react";
+import { useContract, useNFTBalance, useUser } from "@thirdweb-dev/react";
 import { nftAircraftTokenAddress } from "contracts/address";
 
 const useAircraft = (id?: string) => {
-  const address = useAddress();
+  const { user } = useUser();
   const { contract } = useContract(nftAircraftTokenAddress);
 
-  const { data } = useNFTBalance(contract, address, id);
+  const { data } = useNFTBalance(contract, user?.address, id);
 
   return !data?.isZero();
 };

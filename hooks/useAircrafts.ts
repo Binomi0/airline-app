@@ -1,11 +1,11 @@
-import { useContract, useNFTs } from "@thirdweb-dev/react";
-import { nftAircraftTokenAddress } from "contracts/address";
+import { useContract, useNFTs } from '@thirdweb-dev/react'
+import { nftAircraftTokenAddress } from 'contracts/address'
 
 const useAircrafts = () => {
-  const { contract: aircraftContract } = useContract(nftAircraftTokenAddress);
-  const { data: nfts = [] } = useNFTs(aircraftContract);
+  const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
+  const { data: nfts = [], isLoading } = useNFTs(aircraftContract)
 
-  return nfts;
-};
+  return { aircrafts: nfts, isLoading }
+}
 
-export default useAircrafts;
+export default useAircrafts
