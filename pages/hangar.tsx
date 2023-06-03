@@ -1,5 +1,5 @@
 import { ConnectWallet, useUser } from '@thirdweb-dev/react'
-import type { GetServerSidePropsContext, NextPage } from 'next'
+import type { NextPage } from 'next'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
 import AircraftMarketPlace from 'components/AircraftMarketPlace'
 import styles from 'styles/Hangar.module.css'
@@ -35,6 +35,6 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
   )
 }
 
-export const getServerSideProps = (ctx: GetServerSidePropsContext) => serverSidePropsHandler(ctx)
+export const getServerSideProps = serverSidePropsHandler
 
 export default Hangar

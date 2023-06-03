@@ -1,9 +1,8 @@
-import React from "react";
-import { Container } from "@mui/material";
-import { VaProvider } from "context/VaProvider";
-import LiveView from "routes/Live/LiveView";
-import { GetServerSidePropsContext } from "next";
-import serverSidePropsHandler from "components/ServerSideHandler";
+import React from 'react'
+import { Container } from '@mui/material'
+import { VaProvider } from 'context/VaProvider'
+import LiveView from 'routes/Live/LiveView'
+import serverSidePropsHandler from 'components/ServerSideHandler'
 
 const LivePage = () => {
   return (
@@ -12,10 +11,9 @@ const LivePage = () => {
         <LiveView />
       </Container>
     </VaProvider>
-  );
-};
+  )
+}
 
-export const getServerSideProps = (ctx: GetServerSidePropsContext) =>
-  serverSidePropsHandler(ctx);
+export const getServerSideProps = serverSidePropsHandler
 
-export default LivePage;
+export default LivePage

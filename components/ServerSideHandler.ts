@@ -1,20 +1,21 @@
-import { Json } from "@thirdweb-dev/auth";
-import { ThirdwebAuthUser } from "@thirdweb-dev/auth/next";
+import { Json } from '@thirdweb-dev/auth'
+import { ThirdwebAuthUser } from '@thirdweb-dev/auth/next'
 // import { UserWithData } from "@thirdweb-dev/react";
-import { GetServerSidePropsContext } from "next";
-import { getUser } from "pages/api/auth/[...thirdweb]";
+import { GetServerSidePropsContext } from 'next'
+import { getUser } from 'pages/api/auth/[...thirdweb]'
 
 const serverSidePropsHandler = async (
   ctx: GetServerSidePropsContext
 ): Promise<{ props: { user: ThirdwebAuthUser<any, Json> | null } }> => {
   try {
-    const user = await getUser(ctx.req);
+    const user = await getUser(ctx.req)
 
+    console.log('sdsadsadsad')
     return {
       props: {
-        user,
-      },
-    };
+        user
+      }
+    }
     //   const refreshToken: string = getCookie("refreshToken", ctx) as string;
 
     //   if (!refreshToken) {
@@ -33,16 +34,16 @@ const serverSidePropsHandler = async (
     //     props: {},
     //   };
   } catch (err) {
-    console.log("Error in server =>", err);
+    console.log('Error in server =>', err)
     //   if (ctx.res.writeHead) {
     //     ctx.res.writeHead(302, { Location: AppRoutes.ACCESS });
     //     ctx.res.end();
     //   }
 
     return {
-      props: {} as never,
-    };
+      props: {} as never
+    }
   }
-};
+}
 
-export default serverSidePropsHandler;
+export default serverSidePropsHandler
