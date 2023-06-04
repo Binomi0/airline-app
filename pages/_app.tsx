@@ -26,6 +26,7 @@ import { MainProvider } from 'context/MainProvider'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
+import { SessionProvider } from 'next-auth/react'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -51,46 +52,49 @@ export default function MyApp(props: MyAppProps) {
   }, [])
 
   return (
-    <ThirdwebProvider
-      activeChain={Goerli}
-      supportedChains={[Goerli]}
-      authConfig={{
-        domain: process.env['NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN'] || '',
-        authUrl: '/api/auth'
-      }}
-      supportedWallets={[
-        smartWallet({
-          factoryAddress,
-          thirdwebApiKey: process.env['NEXT_PUBLIC_API_KEY'] || '',
-          gasless: true,
-          personalWallets: [
-            metamaskWallet(),
-            // coinbaseWallet(),
-            localWallet({ persist: true })
-          ]
-        }),
-        metamaskWallet(),
-        coinbaseWallet(),
-        walletConnect(),
-        safeWallet(),
-        localWallet({ persist: true })
-      ]}
-    >
-      <CacheProvider value={emotionCache}>
-        <Head>
-          <meta name='viewport' content='initial-scale=1, width=device-width' />
-        </Head>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <ErrorBoundary>
-            <MainProvider>
-              <AppBar />
-              <Sidebar />
-            </MainProvider>
-            <Component loading={loading} />
-          </ErrorBoundary>
-        </ThemeProvider>
-      </CacheProvider>
-    </ThirdwebProvider>
+    <SessionProvider session={props.pageProps.session}>
+      <ThirdwebProvider
+        activeChain={Goerli}
+        supportedChains={[Goerli]}
+        authConfig={{
+          domain: process.env['NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN'] || '',
+          authUrl: '/api/auth'
+        }}
+        supportedWallets={[
+          smartWallet({
+            enableConnectApp: true,
+            factoryAddress,
+            thirdwebApiKey: process.env['NEXT_PUBLIC_API_KEY'] || '',
+            gasless: true,
+            personalWallets: [
+              metamaskWallet(),
+              // coinbaseWallet(),
+              localWallet({ persist: true })
+            ]
+          }),
+          metamaskWallet(),
+          coinbaseWallet(),
+          walletConnect(),
+          safeWallet(),
+          localWallet({ persist: true })
+        ]}
+      >
+        <CacheProvider value={emotionCache}>
+          <Head>
+            <meta name='viewport' content='initial-scale=1, width=device-width' />
+          </Head>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <ErrorBoundary>
+              <MainProvider>
+                <AppBar />
+                <Sidebar />
+              </MainProvider>
+              <Component loading={loading} />
+            </ErrorBoundary>
+          </ThemeProvider>
+        </CacheProvider>
+      </ThirdwebProvider>
+    </SessionProvider>
   )
 }

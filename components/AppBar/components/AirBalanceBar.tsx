@@ -26,24 +26,21 @@ const AirBalanceBar = () => {
   }, [])
 
   return (
-    <div>
-      <Stack direction='row' alignItems='center' mx={2} spacing={1}>
-        <AirplaneTicketIcon color='inherit' fontSize='medium' />
-        <Typography variant='h6'>
-          {Intl.NumberFormat('en', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          }).format(new BigNumber(data?.displayValue || 0).toNumber())}{' '}
-          AIRL
-        </Typography>
-      </Stack>
-
+    <Stack direction='row' alignItems='center' mx={2} spacing={1}>
+      <AirplaneTicketIcon color='inherit' fontSize='medium' />
+      <Typography variant='h6'>
+        {Intl.NumberFormat('en', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(new BigNumber(data?.displayValue || 0).toNumber())}{' '}
+        AIRL
+      </Typography>
       {data?.value.isZero() && (
         <Button disabled={isRequesting || requested} onClick={handleRequestFunds}>
           {requested ? <CircularProgress color='secondary' size={20} /> : 'Solicitar AIRL'}
         </Button>
       )}
-    </div>
+    </Stack>
   )
 }
 
