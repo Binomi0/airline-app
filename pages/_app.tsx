@@ -33,6 +33,7 @@ export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache } = props
   const [loading, setLoading] = React.useState(false)
 
+  console.log('Environment => ')
   React.useEffect(() => {
     const toggleLoading = (status: boolean) => () => setLoading(status)
 
