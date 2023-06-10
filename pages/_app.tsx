@@ -27,7 +27,7 @@ import { MainProvider } from 'context/MainProvider'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
-import Script from 'next/script'
+// import Script from 'next/script'
 
 const tag = process.env['NEXT_PUBLIC_GOOGLE_ANALYTICS_TAG'] || ''
 
@@ -109,7 +109,7 @@ export default function MyApp(props: MyAppProps) {
             </ErrorBoundary>
           </ThemeProvider>
         </CacheProvider>
-        <Script
+        {/* <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NODE_ENV}`}
           strategy='afterInteractive'
         />
@@ -121,7 +121,7 @@ export default function MyApp(props: MyAppProps) {
 
             gtag('config', ${process.env.NODE_ENV});
         `}
-        </Script>
+        </Script> */}
       </ThirdwebProvider>
     </>
   )
