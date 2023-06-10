@@ -27,6 +27,7 @@ import { MainProvider } from 'context/MainProvider'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
+import Script from 'next/script'
 
 const tag = process.env['NEXT_PUBLIC_GOOGLE_ANALYTICS_TAG'] || ''
 
@@ -64,7 +65,7 @@ export default function MyApp(props: MyAppProps) {
 
   React.useEffect(() => {
     ReactGA.pageview(router.asPath, ['tracker1'])
-  }, [router])
+  }, [router.asPath])
 
   return (
     <>
@@ -108,6 +109,19 @@ export default function MyApp(props: MyAppProps) {
             </ErrorBoundary>
           </ThemeProvider>
         </CacheProvider>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NODE_ENV}`}
+          strategy='afterInteractive'
+        />
+        <Script id='google-analytics' strategy='afterInteractive'>
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', ${process.env.NODE_ENV});
+        `}
+        </Script>
       </ThirdwebProvider>
     </>
   )
