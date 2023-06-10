@@ -18,6 +18,7 @@ import {
   // Sepolia,
   Goerli
 } from '@thirdweb-dev/chains'
+import ReactGA from 'react-ga'
 import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
 import ErrorBoundary from 'components/ErrorBoundary'
@@ -26,10 +27,10 @@ import { MainProvider } from 'context/MainProvider'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
-import ReactGA from 'react-ga'
-import Script from 'next/script'
 
-ReactGA.initialize('G-GP0EC7LJ5N', {
+const tag = process.env['NEXT_PUBLIC_GOOGLE_ANALYTICS_TAG'] || ''
+
+ReactGA.initialize(tag, {
   debug: process.env['NODE_ENV'] === 'development',
   testMode: process.env['NODE_ENV'] === 'development',
   gaOptions: {
@@ -49,10 +50,7 @@ export default function MyApp(props: MyAppProps) {
   const [loading, setLoading] = React.useState(false)
   const router = useRouter()
 
-  console.log('Environment => ')
   React.useEffect(() => {
-    ReactGA.pageview(router.pathname, ['tracker1'])
-
     const toggleLoading = (status: boolean) => () => setLoading(status)
 
     Router.events.on('routeChangeStart', toggleLoading(true))
@@ -62,6 +60,10 @@ export default function MyApp(props: MyAppProps) {
       Router.events.off('routeChangeStart', toggleLoading(true))
       Router.events.off('routeChangeComplete', toggleLoading(false))
     }
+  }, [])
+
+  React.useEffect(() => {
+    ReactGA.pageview(router.asPath, ['tracker1'])
   }, [router])
 
   return (
@@ -107,15 +109,6 @@ export default function MyApp(props: MyAppProps) {
           </ThemeProvider>
         </CacheProvider>
       </ThirdwebProvider>
-      <Script id='google-analytics' strategy='afterInteractive'>
-        {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-
-              gtag('config', 'G-GP0EC7LJ5N');
-            `}
-      </Script>
     </>
   )
 }
