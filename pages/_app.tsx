@@ -19,15 +19,16 @@ import {
   Goerli
 } from '@thirdweb-dev/chains'
 import ReactGA from 'react-ga'
+import Script from 'next/script'
 import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
 import ErrorBoundary from 'components/ErrorBoundary'
 import { factoryAddress } from 'contracts/address'
 import { MainProvider } from 'context/MainProvider'
+import * as gtag from 'lib/gtag'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
-// import Script from 'next/script'
 
 const tag = process.env['NEXT_PUBLIC_GA_ID'] || ''
 
@@ -38,22 +39,24 @@ ReactGA.initialize(tag, {
     name: 'tracker1'
   }
 })
-declare global {
-  interface Window {
-    gtag: any
-  }
-}
+// declare global {
+//   interface Window {
+//     gtag: any
+//   }
+// }
 
-export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
-  // Use `window.gtag` if you initialized Google Analytics as this example:
-  // https://github.com/vercel/next.js/blob/canary/examples/with-google-analytics/pages/_app.js
-  window.gtag('event', name, {
-    event_category: label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
-    value: Math.round(name === 'CLS' ? value * 1000 : value), // values must be integers
-    event_label: id, // id unique to current page load
-    non_interaction: true // avoids affecting bounce rate.
-  })
-}
+// export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
+//   // Use `window.gtag` if you initialized Google Analytics as this example:
+//   // https://github.com/vercel/next.js/blob/canary/examples/with-google-analytics/pages/_app.js
+//   if (typeof window !== undefined) {
+//     window.gtag('event', name, {
+//       event_category: label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
+//       value: Math.round(name === 'CLS' ? value * 1000 : value), // values must be integers
+//       event_label: id, // id unique to current page load
+//       non_interaction: true // avoids affecting bounce rate.
+//     })
+//   }
+// }
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -113,6 +116,19 @@ export default function MyApp(props: MyAppProps) {
         <CacheProvider value={emotionCache}>
           <Head>
             <meta name='viewport' content='initial-scale=1, width=device-width' />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+
+              gtag('config', '${gtag.GA_TRACKING_ID}', {
+                page_path: window.location.pathname,
+              });
+            `
+              }}
+            />
           </Head>
           <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -125,19 +141,10 @@ export default function MyApp(props: MyAppProps) {
             </ErrorBoundary>
           </ThemeProvider>
         </CacheProvider>
-        {/* <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NODE_ENV}`}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
           strategy='afterInteractive'
         />
-        <Script id='google-analytics' strategy='afterInteractive'>
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', ${process.env.NODE_ENV});
-        `}
-        </Script> */}
       </ThirdwebProvider>
     </>
   )
