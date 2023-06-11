@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Head from 'next/head'
-import { AppProps } from 'next/app'
+import { AppProps, NextWebVitalsMetric } from 'next/app'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { CacheProvider, EmotionCache } from '@emotion/react'
@@ -29,7 +29,7 @@ import theme from '../src/theme'
 import '../styles/globals.css'
 // import Script from 'next/script'
 
-const tag = process.env['NEXT_PUBLIC_GOOGLE_ANALYTICS_TAG'] || ''
+const tag = process.env['NEXT_PUBLIC_GA_ID'] || ''
 
 ReactGA.initialize(tag, {
   debug: process.env['NODE_ENV'] === 'development',
@@ -38,6 +38,22 @@ ReactGA.initialize(tag, {
     name: 'tracker1'
   }
 })
+declare global {
+  interface Window {
+    gtag: any
+  }
+}
+
+export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
+  // Use `window.gtag` if you initialized Google Analytics as this example:
+  // https://github.com/vercel/next.js/blob/canary/examples/with-google-analytics/pages/_app.js
+  window.gtag('event', name, {
+    event_category: label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
+    value: Math.round(name === 'CLS' ? value * 1000 : value), // values must be integers
+    event_label: id, // id unique to current page load
+    non_interaction: true // avoids affecting bounce rate.
+  })
+}
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
