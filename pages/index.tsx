@@ -6,9 +6,23 @@ import serverSidePropsHandler from 'components/ServerSideHandler'
 import HomeGridItem from 'components/HomeGridItem'
 import image from 'public/img/Cyb3rYoga.png'
 import styles from '../styles/Home.module.css'
+import { useEffect } from 'react'
+import * as gtag from 'lib/gtag'
+import { useRouter } from 'next/router'
 
 const Home: NextPage = () => {
-  const { user } = useUser()
+  const { user, isLoggedIn } = useUser()
+  const { asPath } = useRouter()
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      gtag.event({ action: 'login', category: 'login', label: 'Iniciar sesión', value: 0 })
+      // ReactGA.event('login', { address: user?.address })
+    } else {
+      // ReactGA.event('pageview')
+      gtag.pageview(asPath)
+    }
+  }, [isLoggedIn, user?.address, asPath])
 
   return (
     <Box position='relative'>
