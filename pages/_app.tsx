@@ -1,10 +1,10 @@
 import * as React from 'react'
 import Head from 'next/head'
-import { AppProps, NextWebVitalsMetric } from 'next/app'
+import { AppProps } from 'next/app'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { CacheProvider, EmotionCache } from '@emotion/react'
-import { Router, useRouter } from 'next/router'
+import { Router } from 'next/router'
 import {
   ThirdwebProvider,
   coinbaseWallet,
@@ -18,7 +18,6 @@ import {
   // Sepolia,
   Goerli
 } from '@thirdweb-dev/chains'
-import ReactGA from 'react-ga'
 import Script from 'next/script'
 import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
@@ -30,20 +29,7 @@ import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
 
-const tag = process.env['NEXT_PUBLIC_GA_ID'] || ''
-
-ReactGA.initialize(tag, {
-  debug: process.env['NODE_ENV'] === 'development',
-  testMode: process.env['NODE_ENV'] === 'development',
-  gaOptions: {
-    name: 'tracker1'
-  }
-})
-// declare global {
-//   interface Window {
-//     gtag: any
-//   }
-// }
+const trackingId = gtag.GA_TRACKING_ID || ''
 
 // export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
 //   // Use `window.gtag` if you initialized Google Analytics as this example:
@@ -68,7 +54,6 @@ export interface MyAppProps extends AppProps {
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache } = props
   const [loading, setLoading] = React.useState(false)
-  const router = useRouter()
 
   React.useEffect(() => {
     const toggleLoading = (status: boolean) => () => setLoading(status)
@@ -81,10 +66,6 @@ export default function MyApp(props: MyAppProps) {
       Router.events.off('routeChangeComplete', toggleLoading(false))
     }
   }, [])
-
-  React.useEffect(() => {
-    ReactGA.pageview(router.asPath, ['tracker1'])
-  }, [router.asPath])
 
   return (
     <>
@@ -116,19 +97,6 @@ export default function MyApp(props: MyAppProps) {
         <CacheProvider value={emotionCache}>
           <Head>
             <meta name='viewport' content='initial-scale=1, width=device-width' />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-
-              gtag('config', '${gtag.GA_TRACKING_ID}', {
-                page_path: window.location.pathname,
-              });
-            `
-              }}
-            />
           </Head>
           <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -141,10 +109,16 @@ export default function MyApp(props: MyAppProps) {
             </ErrorBoundary>
           </ThemeProvider>
         </CacheProvider>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-          strategy='afterInteractive'
-        />
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${trackingId}`} strategy='afterInteractive' />
+        <Script id='google-analytics' strategy='afterInteractive'>
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', ${trackingId});
+        `}
+        </Script>
       </ThirdwebProvider>
     </>
   )
