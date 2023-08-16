@@ -1,2 +1,2 @@
-// export * from "./sepolia";
-export * from './goerli'
+export * from './sepolia'
+// export * from './goerli'

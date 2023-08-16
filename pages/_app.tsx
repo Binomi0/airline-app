@@ -15,8 +15,8 @@ import {
   walletConnect
 } from '@thirdweb-dev/react'
 import {
-  // Sepolia,
-  Goerli
+  Sepolia
+  // Goerli
 } from '@thirdweb-dev/chains'
 import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
@@ -27,6 +27,7 @@ import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
 import { SessionProvider } from 'next-auth/react'
+import { AlchemyProvider } from 'context/AlchemyProvider'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -54,8 +55,16 @@ export default function MyApp(props: MyAppProps) {
   return (
     <SessionProvider session={props.pageProps.session}>
       <ThirdwebProvider
-        activeChain={Goerli}
-        supportedChains={[Goerli]}
+        clientId={process.env['NEXT_PUBLIC_TW_CLIENT_ID']}
+        dAppMeta={{
+          name: 'Airline App',
+          description: 'Decentralized Virtual Airline',
+          logoUrl: 'https://example.com/logo.png',
+          url: 'https://airline-app-binomio.vercel.app',
+          isDarkMode: true
+        }}
+        activeChain={Sepolia}
+        supportedChains={[Sepolia]}
         authConfig={{
           domain: process.env['NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN'] || '',
           authUrl: '/api/auth'
@@ -64,7 +73,6 @@ export default function MyApp(props: MyAppProps) {
           smartWallet({
             enableConnectApp: true,
             factoryAddress,
-            thirdwebApiKey: process.env['NEXT_PUBLIC_API_KEY'] || '',
             gasless: true,
             personalWallets: [
               metamaskWallet(),
@@ -86,11 +94,13 @@ export default function MyApp(props: MyAppProps) {
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <ErrorBoundary>
-              <MainProvider>
-                <AppBar />
-                <Sidebar />
-              </MainProvider>
-              <Component loading={loading} />
+              <AlchemyProvider>
+                <MainProvider>
+                  <AppBar />
+                  <Sidebar />
+                </MainProvider>
+                <Component loading={loading} />
+              </AlchemyProvider>
             </ErrorBoundary>
           </ThemeProvider>
         </CacheProvider>

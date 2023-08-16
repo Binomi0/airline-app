@@ -1,17 +1,35 @@
-import React from 'react'
-import { AppBar, IconButton, Stack, Toolbar, Typography, useScrollTrigger } from '@mui/material'
+import React, { useCallback } from 'react'
+import { AppBar, Button, IconButton, Stack, Toolbar, Typography, useScrollTrigger } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
-import { ConnectWallet } from '@thirdweb-dev/react'
 import { useMainProviderContext } from 'context/MainProvider'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import LicenseBar from './components/LicenseBar'
 import GasBalanceBar from './components/GasBalanceBar'
 import AirBalanceBar from './components/AirBalanceBar'
+import useAccountSigner from 'hooks/useAccountSigner'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
+import useAlchemyWallet from 'hooks/useAlchemyWallet'
 
 const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
   const { toggleSidebar } = useMainProviderContext()
   const trigger = useScrollTrigger()
+  const { signUp, signIn, signer, signOut } = useAccountSigner()
+  const { smartAccountAddress } = useAlchemyProviderContext()
+  const { sendTransaction } = useAlchemyWallet(signer)
+
+  const handleSignUp = useCallback(() => {
+    signUp()
+  }, [signUp])
+
+  const handleSignIn = useCallback(() => {
+    console.log('handleSignIn1')
+    signIn()
+  }, [signIn])
+
+  const handleSignOut = useCallback(() => {
+    signOut()
+  }, [signOut])
 
   return (
     <AppBar position='sticky' color={trigger ? 'primary' : 'transparent'}>
@@ -22,6 +40,7 @@ const CustomAppBar: React.FC = () => {
         <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
           {matches ? 'Decentralized Virtual Airline' : 'DVA'}
         </Typography>
+        <Typography variant='caption'>{smartAccountAddress}</Typography>
         <Stack direction='row' alignItems='center' height={50} spacing={1}>
           <LicenseBar />
           {matches && (
@@ -30,7 +49,25 @@ const CustomAppBar: React.FC = () => {
               <AirBalanceBar />
             </>
           )}
-          <ConnectWallet style={{ height: '50px' }} />
+          {!signer ? (
+            <>
+              <Button variant='contained' color='secondary' onClick={handleSignIn}>
+                Connect
+              </Button>
+              <Button variant='contained' onClick={handleSignUp}>
+                Create
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant='contained' color='error' onClick={handleSignOut}>
+                Log Out
+              </Button>
+              <Button variant='contained' color='success' onClick={sendTransaction}>
+                Send
+              </Button>
+            </>
+          )}
         </Stack>
       </Toolbar>
     </AppBar>

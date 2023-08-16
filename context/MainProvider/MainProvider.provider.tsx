@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useReducer } from 'react'
-import MainProviderReducer from './MainProvider.reducer'
+import mainProviderReducer from './MainProvider.reducer'
 import { MainProviderContext } from './MainProvider.context'
 import { MainReducerState } from './MainProvider.types'
 
@@ -8,7 +8,7 @@ export const INITIAL_STATE: MainReducerState = {
 }
 
 export const MainProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(MainProviderReducer, {
+  const [state, dispatch] = useReducer(mainProviderReducer, {
     ...INITIAL_STATE
   })
   const { Provider } = MainProviderContext
