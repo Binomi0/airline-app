@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getUser } from './auth/[...thirdweb]'
 import clientPromise from 'lib/mongodb'
 import { ThirdwebSDK } from '@thirdweb-dev/sdk'
-import { Goerli } from '@thirdweb-dev/chains'
+import { Sepolia } from '@thirdweb-dev/chains'
 import { coinTokenAddress } from 'contracts/address'
 import { Collection, DB } from 'types'
 
@@ -26,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(202).end()
     }
 
-    const sdk = ThirdwebSDK.fromPrivateKey(process.env['THIRDWEB_AUTH_PRIVATE_KEY'], Goerli)
+    const sdk = ThirdwebSDK.fromPrivateKey(process.env['THIRDWEB_AUTH_PRIVATE_KEY'], Sepolia)
 
     // amount to fill to each connected address
     const amount = 2

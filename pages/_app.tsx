@@ -15,8 +15,8 @@ import {
   walletConnect
 } from '@thirdweb-dev/react'
 import {
-  // Sepolia,
-  Goerli
+  Sepolia
+  // Goerli
 } from '@thirdweb-dev/chains'
 import ReactGA from 'react-ga'
 import AppBar from 'components/AppBar'
@@ -70,8 +70,8 @@ export default function MyApp(props: MyAppProps) {
   return (
     <>
       <ThirdwebProvider
-        activeChain={Goerli}
-        supportedChains={[Goerli]}
+        activeChain={Sepolia}
+        supportedChains={[Sepolia]}
         authConfig={{
           domain: process.env['NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN'] || '',
           authUrl: '/api/auth'
