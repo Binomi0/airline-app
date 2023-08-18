@@ -1,23 +1,11 @@
 import { SimpleSmartContractAccount, SmartAccountProvider, type SimpleSmartAccountOwner, Hex } from '@alchemy/aa-core'
 import { sepolia } from 'viem/chains'
-import { toHex } from 'viem'
 import { useCallback, useEffect } from 'react'
 import { withAlchemyGasManager } from '@alchemy/aa-alchemy'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
 import { Wallet, ethers } from 'ethers'
-import { Network, Alchemy } from 'alchemy-sdk'
 import { coinTokenAddress } from 'contracts/address'
 import AirlineCoin from 'contracts/abi/AirlineCoin.json'
-import { useContract } from '@thirdweb-dev/react'
-import BigNumber from 'bignumber.js'
-
-// Optional Config object, but defaults to demo api-key and eth-mainnet.
-const settings = {
-  apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY_ETH_SEPOLIA, // Replace with your Alchemy API Key.
-  network: Network.ETH_SEPOLIA // Replace with your network.
-}
-
-const alchemy = new Alchemy(settings)
 
 const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -40,24 +28,25 @@ const useAlchemyWallet = (signer?: Wallet) => {
     const erc20Contract = new ethers.Contract(coinTokenAddress, AirlineCoin.abi)
 
     // Encode the transfer function call
-    const encodedApproveCallData = erc20Contract.interface.encodeFunctionData('approve', [target, amount]) as Hex
+    const encodedApproveCallData = erc20Contract.interface.encodeFunctionData('approve', [
+      smartAccountAddress,
+      amount
+    ]) as Hex
+    const { hash: tx1 } = await paymasterSigner.sendUserOperation({
+      target: coinTokenAddress,
+      data: encodedApproveCallData
+    })
+
+    await smartSigner.waitForUserOperationTransaction(tx1 as Hex)
+
     const encodedCallData = erc20Contract.interface.encodeFunctionData('transferFrom', [
       smartAccountAddress,
       target,
       amount
     ]) as Hex
-    const res = await smartSigner.account?.encodeExecute(smartAccountAddress, BigInt(0), encodedApproveCallData)
-
-    const { hash: tx1 } = await paymasterSigner.sendUserOperation({
-      target,
-      data: res as Hex
-    })
-    await smartSigner.waitForUserOperationTransaction(tx1 as Hex)
-
-    const res2 = await smartSigner.account.encodeExecute(smartAccountAddress, BigInt(0), encodedCallData)
     const { hash: tx2 } = await paymasterSigner.sendUserOperation({
-      target,
-      data: res2 as Hex
+      target: coinTokenAddress,
+      data: encodedCallData
     })
 
     console.log({ tx2 })
@@ -67,8 +56,10 @@ const useAlchemyWallet = (signer?: Wallet) => {
     if (!signer) return
 
     const owner: SimpleSmartAccountOwner = {
+      // @ts-ignore
       signMessage: async (msg) => signer.signMessage(msg),
       getAddress: async () => signer.address as Hex,
+      // @ts-ignore
       signTypedData: signer.signTypedData
     }
 
