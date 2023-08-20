@@ -1,35 +1,62 @@
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import { Wallet } from 'ethers'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import useAlchemyWallet from './useAlchemyWallet'
 
 const EMAIL = 'adolfo@onrubia.es'
 
 const useAccountSigner = () => {
-  const [signer, setSigner] = useState<Wallet>()
+  const { setBaseSigner, baseSigner } = useAlchemyProviderContext()
+  useAlchemyWallet(baseSigner)
+
+  const createCredential = useCallback(async (id: string) => {
+    try {
+      const responseChallenge = await axios.post('https://192.168.1.130:3000/request-register', {
+        _id: id,
+        email: EMAIL
+      })
+      const request = await startRegistration(responseChallenge.data)
+      const responseValidation = await axios.post<{ verified: boolean }>('https://192.168.1.130:3000/register', {
+        data: request,
+        email: EMAIL
+      })
+
+      return responseValidation.data.verified
+    } catch (err) {
+      console.error(err)
+      return false
+    }
+  }, [])
 
   const signUp = useCallback(async () => {
     const localCredentialId = localStorage.getItem('wallet-key')
-    // What if user already exists?
-    if (localCredentialId) return
 
-    const id = uuidv4()
-    localStorage.setItem('wallet-key', id)
-    const responseChallenge = await axios.post('https://192.168.1.130:3000/request-register', {
-      _id: id,
-      email: EMAIL
-    })
-    const request = await startRegistration(responseChallenge.data)
-    const responseValidation = await axios.post('https://192.168.1.130:3000/register', { data: request, email: EMAIL })
+    if (!localCredentialId) {
+      const id = uuidv4()
+      localStorage.setItem('wallet-key', id)
 
-    if (responseValidation.data.verified) {
-      const random = Wallet.createRandom()
-      localStorage.setItem('wallet-id', Buffer.from(random.privateKey).toString('base64'))
+      const isVerified = await createCredential(id)
+      if (isVerified) {
+        const random = Wallet.createRandom()
+        localStorage.setItem('wallet-id', Buffer.from(random.privateKey).toString('base64'))
 
-      setSigner(random)
+        setBaseSigner(random)
+      }
+    } else {
+      const isVerified = await createCredential(localCredentialId)
+      if (isVerified) {
+        const walletId = localStorage.getItem('wallet-id')
+        if (!walletId) {
+          throw new Error('Missing private key')
+        }
+        const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
+        setBaseSigner(signer)
+      }
     }
-  }, [])
+  }, [createCredential, setBaseSigner])
 
   const signIn = useCallback(async () => {
     const localCredentialId = localStorage.getItem('wallet-key')
@@ -49,19 +76,18 @@ const useAccountSigner = () => {
       }
 
       const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
-      setSigner(signer)
+      setBaseSigner(signer)
     }
-  }, [signUp])
+  }, [setBaseSigner, signUp])
 
   const signOut = useCallback(() => {
-    setSigner(undefined)
-  }, [])
+    setBaseSigner(undefined)
+  }, [setBaseSigner])
 
   return {
     signUp,
     signIn,
-    signOut,
-    signer
+    signOut
   }
 }
 

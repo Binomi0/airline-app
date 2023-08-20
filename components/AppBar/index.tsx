@@ -8,15 +8,13 @@ import GasBalanceBar from './components/GasBalanceBar'
 import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
-import useAlchemyWallet from 'hooks/useAlchemyWallet'
 
 const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
   const { toggleSidebar } = useMainProviderContext()
   const trigger = useScrollTrigger()
-  const { signUp, signIn, signer, signOut } = useAccountSigner()
+  const { signUp, signIn, signOut } = useAccountSigner()
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const { sendTransaction } = useAlchemyWallet(signer)
 
   const handleSignUp = useCallback(() => {
     signUp()
@@ -29,6 +27,10 @@ const CustomAppBar: React.FC = () => {
   const handleSignOut = useCallback(() => {
     signOut()
   }, [signOut])
+
+  const handleAddBackup = useCallback(() => {
+    signIn()
+  }, [signIn])
 
   return (
     <AppBar position='sticky' color={trigger ? 'primary' : 'transparent'}>
@@ -48,7 +50,7 @@ const CustomAppBar: React.FC = () => {
               <AirBalanceBar />
             </>
           )}
-          {!signer ? (
+          {!smartAccountAddress ? (
             <>
               <Button variant='contained' color='secondary' onClick={handleSignIn}>
                 Connect
@@ -62,8 +64,8 @@ const CustomAppBar: React.FC = () => {
               <Button variant='contained' color='error' onClick={handleSignOut}>
                 Log Out
               </Button>
-              <Button variant='contained' color='success' onClick={sendTransaction}>
-                Send
+              <Button variant='contained' color='success' onClick={handleAddBackup}>
+                Add Backup
               </Button>
             </>
           )}

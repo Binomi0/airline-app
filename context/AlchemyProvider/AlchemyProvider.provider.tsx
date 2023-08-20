@@ -18,7 +18,7 @@ export const AlchemyProvider: FC<{ children: React.ReactNode }> = ({ children })
   })
   const { Provider } = AlchemyProviderContext
 
-  const setBaseSigner = useCallback((signer: Wallet) => dispatch({ type: 'SET_BASE_SIGNER', payload: signer }), [])
+  const setBaseSigner = useCallback((signer?: Wallet) => dispatch({ type: 'SET_BASE_SIGNER', payload: signer }), [])
 
   const setSmartSigner = useCallback(
     (signer: SmartAccountProvider) => dispatch({ type: 'SET_SMART_SIGNER', payload: signer }),
