@@ -1,5 +1,5 @@
 import { Sepolia } from '@thirdweb-dev/chains'
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode } from 'react'
 import { factoryAddress } from 'contracts/address'
 import {
   ThirdwebProvider,
@@ -10,9 +10,6 @@ import {
   smartWallet,
   walletConnect
 } from '@thirdweb-dev/react'
-import { LocalWallet } from '@thirdweb-dev/wallets'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import encryptedJson from './wallet-9895.json'
 
 interface Props {
   children: ReactNode
@@ -20,11 +17,11 @@ interface Props {
 
 const CustomWeb3Provider = ({ children }: Props) => {
   const localWalletConfig = localWallet()
-  const { baseSigner } = useAlchemyProviderContext()
 
   return (
     <ThirdwebProvider
-      clientId={process.env['NEXT_PUBLIC_TW_CLIENT_ID']}
+      clientId={process.env['NEXT_PUBLIC_TW_SECRET_ID']}
+      secretKey={process.env['NEXT_PUBLIC_TW_SECRET_KEY']}
       dAppMeta={{
         name: 'Airline App',
         description: 'Decentralized Virtual Airline',

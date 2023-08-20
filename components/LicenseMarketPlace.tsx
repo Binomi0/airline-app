@@ -29,9 +29,16 @@ const LicenseMarketPlace: React.FC = () => {
       <Typography variant='h2'>Licenses</Typography>
       <Typography>Start with LAPL Light aviation pilot license</Typography>
       <Grid container spacing={2}>
-        {nfts.map((nft) => (
-          <LicenseItem nft={nft} key={nft.metadata.id} owned={owned.some((n) => nft.metadata.id === n.metadata.id)} />
-        ))}
+        {nfts.map(
+          (nft, i) =>
+            i < 4 && (
+              <LicenseItem
+                nft={nft}
+                key={nft.metadata.id}
+                owned={owned.some((n) => nft.metadata.id === n.metadata.id)}
+              />
+            )
+        )}
       </Grid>
     </Box>
   )
