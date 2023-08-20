@@ -1,6 +1,49 @@
 import { NFT } from '@thirdweb-dev/sdk'
 import License from 'pages/license'
 import { Aircraft, Atc, AttributeType, Cargo, CargoDetails, IvaoPilot } from 'types'
+import { verifyAuthenticationResponse } from '@simplewebauthn/server'
+
+// A unique identifier for your website
+const rpID = 'localhost'
+// The URL at which registrations and authentications should occur
+const origin = `http://${rpID}:3000`
+
+// @ts-ignore
+export const verifySignature = async function (authenticator, response, expectedChallenge) {
+  const bufferFromBase64 = (buffer: string) => Buffer.from(buffer, 'base64')
+  const credentialIDBuffer = bufferFromBase64(authenticator.credentialID)
+  const credentialPublicKeyBuffer = bufferFromBase64(authenticator.credentialPublicKey)
+
+  let verification
+  try {
+    verification = await verifyAuthenticationResponse({
+      response,
+      expectedChallenge,
+      expectedOrigin: origin,
+      expectedRPID: rpID,
+      authenticator: {
+        ...authenticator,
+        credentialID: new Uint8Array(
+          credentialIDBuffer.buffer,
+          credentialIDBuffer.byteOffset,
+          credentialIDBuffer.byteLength / Uint8Array.BYTES_PER_ELEMENT
+        ),
+        credentialPublicKey: new Uint8Array(
+          credentialPublicKeyBuffer.buffer,
+          credentialPublicKeyBuffer.byteOffset,
+          credentialPublicKeyBuffer.byteLength / Uint8Array.BYTES_PER_ELEMENT
+        )
+      }
+    })
+
+    return true
+  } catch (error) {
+    console.error(error)
+
+    return false
+    // return res.status(400).send({ error: error.message, verified: false });
+  }
+}
 
 export const getNFTAttributes = (nft: NFT) => {
   if (nft.metadata.attributes && Array.isArray(nft.metadata.attributes) && nft.metadata.attributes.length > 0) {

@@ -88,5 +88,6 @@ export enum Collection {
   user = 'user',
   cargo = 'cargo',
   live = 'live',
-  wallet = 'wallet'
+  wallet = 'wallet',
+  webauthn = 'webauthn'
 }

@@ -20,6 +20,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.1",
     "@simplewebauthn/browser": "^7.4.0",
+    "@simplewebauthn/server": "^7.4.0",
     "@thirdweb-dev/auth": "^3",
     "@thirdweb-dev/react": "^3",
     "@thirdweb-dev/sdk": "^3",

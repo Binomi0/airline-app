@@ -7,6 +7,8 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useAlchemyWallet from './useAlchemyWallet'
 
 const EMAIL = 'adolfo@onrubia.es'
+// const SERVER_URI = 'https://192.168.1.130:3000'
+const SERVER_URI = '/api/webauthn'
 
 const useAccountSigner = () => {
   const { setBaseSigner, baseSigner } = useAlchemyProviderContext()
@@ -14,12 +16,12 @@ const useAccountSigner = () => {
 
   const createCredential = useCallback(async (id: string) => {
     try {
-      const responseChallenge = await axios.post('https://192.168.1.130:3000/request-register', {
+      const responseChallenge = await axios.post(`${SERVER_URI}/request-register`, {
         _id: id,
         email: EMAIL
       })
       const request = await startRegistration(responseChallenge.data)
-      const responseValidation = await axios.post<{ verified: boolean }>('https://192.168.1.130:3000/register', {
+      const responseValidation = await axios.post<{ verified: boolean }>(`${SERVER_URI}/register`, {
         data: request,
         email: EMAIL
       })
@@ -62,9 +64,9 @@ const useAccountSigner = () => {
     const localCredentialId = localStorage.getItem('wallet-key')
     if (!localCredentialId) return signUp()
 
-    const responseChallenge = await axios.post('https://192.168.1.130:3000/login', { email: EMAIL })
+    const responseChallenge = await axios.post(`${SERVER_URI}/login`, { email: EMAIL })
     const request = await startAuthentication(responseChallenge.data)
-    const responseValidation = await axios.post('https://192.168.1.130:3000/login-challenge', {
+    const responseValidation = await axios.post(`${SERVER_URI}/login-challenge`, {
       data: request,
       email: EMAIL
     })

@@ -29,8 +29,8 @@ const CustomAppBar: React.FC = () => {
   }, [signOut])
 
   const handleAddBackup = useCallback(() => {
-    signIn()
-  }, [signIn])
+    signUp()
+  }, [signUp])
 
   return (
     <AppBar position='sticky' color={trigger ? 'primary' : 'transparent'}>
