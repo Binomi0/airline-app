@@ -1,15 +1,14 @@
 import React, { useCallback, useState } from 'react'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import { Button, CircularProgress, Stack, Typography } from '@mui/material'
-import BigNumber from 'bignumber.js'
 import axios from 'axios'
 import { coinTokenAddress } from 'contracts/address'
-import { useBalance } from '@thirdweb-dev/react'
+import useTokenBalance from 'hooks/useTokenBalance'
 
 const AirBalanceBar = () => {
+  const { balance } = useTokenBalance(coinTokenAddress)
   const [isRequesting, setIsRequesting] = useState(false)
   const [requested, setRequested] = useState(false)
-  const { data } = useBalance(coinTokenAddress)
 
   const handleRequestFunds = useCallback(async () => {
     setIsRequesting(true)
@@ -32,10 +31,10 @@ const AirBalanceBar = () => {
         {Intl.NumberFormat('en', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
-        }).format(new BigNumber(data?.displayValue || 0).toNumber())}{' '}
+        }).format(balance.toNumber())}{' '}
         AIRL
       </Typography>
-      {data?.value.isZero() && (
+      {balance?.isZero() && (
         <Button disabled={isRequesting || requested} onClick={handleRequestFunds}>
           {requested ? <CircularProgress color='secondary' size={20} /> : 'Solicitar AIRL'}
         </Button>

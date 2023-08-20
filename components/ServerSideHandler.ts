@@ -10,7 +10,6 @@ const serverSidePropsHandler = async (
   try {
     const user = await getUser(ctx.req)
 
-    console.log('sdsadsadsad')
     return {
       props: {
         user

@@ -1,13 +1,13 @@
-import { useContract, useNFTBalance, useUser } from '@thirdweb-dev/react'
+import { useContract, useNFTBalance } from '@thirdweb-dev/react'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { nftAircraftTokenAddress } from 'contracts/address'
 
 const useAircraft = (id?: string) => {
-  const { user } = useUser()
+  const { smartAccountAddress } = useAlchemyProviderContext()
   const { contract } = useContract(nftAircraftTokenAddress)
+  const { data } = useNFTBalance(contract, smartAccountAddress, id)
 
-  const { data } = useNFTBalance(contract, user?.address, id)
-
-  return !data?.isZero()
+  return { hasAircraft: smartAccountAddress ? !data?.isZero() : false }
 }
 
 export default useAircraft

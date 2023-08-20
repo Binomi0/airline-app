@@ -5,6 +5,11 @@ export const mainProviderReducer: AlchemyReducerHandler = (state, action) => {
     case 'SET_BASE_SIGNER':
       return {
         ...state,
+        baseSigner: action.payload
+      }
+    case 'SET_SMART_SIGNER':
+      return {
+        ...state,
         smartSigner: action.payload
       }
     case 'SET_PAYMASTER_SIGNER':

@@ -23,7 +23,6 @@ const CustomAppBar: React.FC = () => {
   }, [signUp])
 
   const handleSignIn = useCallback(() => {
-    console.log('handleSignIn1')
     signIn()
   }, [signIn])
 

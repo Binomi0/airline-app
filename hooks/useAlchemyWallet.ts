@@ -4,8 +4,9 @@ import { useCallback, useEffect } from 'react'
 import { withAlchemyGasManager } from '@alchemy/aa-alchemy'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
 import { Wallet, ethers } from 'ethers'
-import { coinTokenAddress } from 'contracts/address'
+import { coinTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
 import AirlineCoin from 'contracts/abi/AirlineCoin.json'
+import { useContract } from '@thirdweb-dev/react'
 
 const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -17,40 +18,43 @@ const useAlchemyWallet = (signer?: Wallet) => {
     smartAccountAddress,
     setSmartAccountAddress,
     setBaseSigner,
+    setSmartSigner,
     setPaymasterSigner
   } = useAlchemyProviderContext()
 
-  const sendTransaction = useCallback(async () => {
-    if (!paymasterSigner || !smartAccountAddress || !smartSigner?.account || !signer) return
+  const sendTransaction = useCallback(
+    async (target: string, value: string) => {
+      if (!paymasterSigner || !smartAccountAddress || !smartSigner?.account || !signer) return
 
-    const target = '0x98CDf5F4D4D7f5b97F84c82fC44F591a239290e4'
-    const amount = ethers.utils.parseEther('100')
-    const erc20Contract = new ethers.Contract(coinTokenAddress, AirlineCoin.abi)
+      const amount = ethers.utils.parseEther(value)
+      const erc20Contract = new ethers.Contract(coinTokenAddress, AirlineCoin.abi)
 
-    // Encode the transfer function call
-    const encodedApproveCallData = erc20Contract.interface.encodeFunctionData('approve', [
-      smartAccountAddress,
-      amount
-    ]) as Hex
-    const { hash: tx1 } = await paymasterSigner.sendUserOperation({
-      target: coinTokenAddress,
-      data: encodedApproveCallData
-    })
+      // Encode the transfer function call
+      const encodedApproveCallData = erc20Contract.interface.encodeFunctionData('approve', [
+        smartAccountAddress,
+        amount
+      ]) as Hex
+      const { hash: tx1 } = await paymasterSigner.sendUserOperation({
+        target: coinTokenAddress,
+        data: encodedApproveCallData
+      })
 
-    await smartSigner.waitForUserOperationTransaction(tx1 as Hex)
+      await smartSigner.waitForUserOperationTransaction(tx1 as Hex)
 
-    const encodedCallData = erc20Contract.interface.encodeFunctionData('transferFrom', [
-      smartAccountAddress,
-      target,
-      amount
-    ]) as Hex
-    const { hash: tx2 } = await paymasterSigner.sendUserOperation({
-      target: coinTokenAddress,
-      data: encodedCallData
-    })
+      const encodedCallData = erc20Contract.interface.encodeFunctionData('transferFrom', [
+        smartAccountAddress,
+        target,
+        amount
+      ]) as Hex
+      const { hash: tx2 } = await paymasterSigner.sendUserOperation({
+        target: coinTokenAddress,
+        data: encodedCallData
+      })
 
-    console.log({ tx2 })
-  }, [paymasterSigner, signer, smartAccountAddress, smartSigner])
+      console.log({ tx2 })
+    },
+    [paymasterSigner, signer, smartAccountAddress, smartSigner]
+  )
 
   const initialize = useCallback(async () => {
     if (!signer) return
@@ -87,16 +91,16 @@ const useAlchemyWallet = (signer?: Wallet) => {
       policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA || '',
       entryPoint: ENTRY_POINT
     })
-    console.log({ smartAccountAddress })
 
     if (!smartAccountAddress) {
       const address = await smartSigner.account.getAddress()
       setSmartAccountAddress(address)
     }
 
-    setBaseSigner(smartSigner)
+    setBaseSigner(signer)
+    setSmartSigner(smartSigner)
     setPaymasterSigner(newPaymasterSigner)
-  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, signer, smartAccountAddress])
+  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signer, smartAccountAddress])
 
   useEffect(() => {
     if (!signer) return

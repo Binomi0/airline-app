@@ -8,7 +8,7 @@ import { nftAircraftTokenAddress } from 'contracts/address'
 
 const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
   const [open, setOpen] = useState(false)
-  const { name, description, image, id } = nft.metadata
+  const { name, description, uri, image, id } = nft.metadata
   const subheader = open ? description : `${description?.split(' ').slice(0, 8).join(' ')} ...`
 
   function handleToogle() {

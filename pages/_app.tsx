@@ -5,29 +5,16 @@ import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { CacheProvider, EmotionCache } from '@emotion/react'
 import { Router } from 'next/router'
-import {
-  ThirdwebProvider,
-  coinbaseWallet,
-  localWallet,
-  metamaskWallet,
-  safeWallet,
-  smartWallet,
-  walletConnect
-} from '@thirdweb-dev/react'
-import {
-  Sepolia
-  // Goerli
-} from '@thirdweb-dev/chains'
 import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
 import ErrorBoundary from 'components/ErrorBoundary'
-import { factoryAddress } from 'contracts/address'
 import { MainProvider } from 'context/MainProvider'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
 import { SessionProvider } from 'next-auth/react'
 import { AlchemyProvider } from 'context/AlchemyProvider'
+import CustomWeb3Provider from 'components/CustomWeb3Provider'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -54,57 +41,25 @@ export default function MyApp(props: MyAppProps) {
 
   return (
     <SessionProvider session={props.pageProps.session}>
-      <ThirdwebProvider
-        clientId={process.env['NEXT_PUBLIC_TW_CLIENT_ID']}
-        dAppMeta={{
-          name: 'Airline App',
-          description: 'Decentralized Virtual Airline',
-          logoUrl: 'https://example.com/logo.png',
-          url: 'https://airline-app-binomio.vercel.app',
-          isDarkMode: true
-        }}
-        activeChain={Sepolia}
-        supportedChains={[Sepolia]}
-        authConfig={{
-          domain: process.env['NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN'] || '',
-          authUrl: '/api/auth'
-        }}
-        supportedWallets={[
-          smartWallet({
-            enableConnectApp: true,
-            factoryAddress,
-            gasless: true,
-            personalWallets: [
-              metamaskWallet(),
-              // coinbaseWallet(),
-              localWallet({ persist: true })
-            ]
-          }),
-          metamaskWallet(),
-          coinbaseWallet(),
-          walletConnect(),
-          safeWallet(),
-          localWallet({ persist: true })
-        ]}
-      >
-        <CacheProvider value={emotionCache}>
-          <Head>
-            <meta name='viewport' content='initial-scale=1, width=device-width' />
-          </Head>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <ErrorBoundary>
-              <AlchemyProvider>
+      <AlchemyProvider>
+        <CustomWeb3Provider>
+          <CacheProvider value={emotionCache}>
+            <Head>
+              <meta name='viewport' content='initial-scale=1, width=device-width' />
+            </Head>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <ErrorBoundary>
                 <MainProvider>
                   <AppBar />
                   <Sidebar />
                 </MainProvider>
                 <Component loading={loading} />
-              </AlchemyProvider>
-            </ErrorBoundary>
-          </ThemeProvider>
-        </CacheProvider>
-      </ThirdwebProvider>
+              </ErrorBoundary>
+            </ThemeProvider>
+          </CacheProvider>
+        </CustomWeb3Provider>
+      </AlchemyProvider>
     </SessionProvider>
   )
 }

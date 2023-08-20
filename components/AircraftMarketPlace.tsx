@@ -1,24 +1,29 @@
 import React, { useCallback } from 'react'
 import { Box, Grid, Fade, CircularProgress } from '@mui/material'
-import { useClaimNFT, useContract, useUser } from '@thirdweb-dev/react'
+import { NFT, useClaimNFT, useContract } from '@thirdweb-dev/react'
 import useLicense from 'hooks/useLicense'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
 import useAircrafts from 'hooks/useAircrafts'
 import AircraftItem from './AircraftItem'
 import { nftAircraftTokenAddress } from 'contracts/address'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const AircraftMarketPlace: React.FC = () => {
-  const { user } = useUser()
+  const { smartAccountAddress } = useAlchemyProviderContext()
   const licenses = useLicense()
   const { aircrafts, isLoading } = useAircrafts()
   const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
   const { mutateAsync, isLoading: isClaiming } = useClaimNFT(aircraftContract)
+  const hasLicense = useCallback(
+    (aircraft: NFT) => licenses.current.get(getLicenseIdFromAttributes(getNFTAttributes(aircraft))),
+    [licenses]
+  )
 
   const handleClaim = useCallback(
     (tokenId: string) => {
-      mutateAsync({ to: user?.address, quantity: 1, tokenId })
+      mutateAsync({ to: smartAccountAddress, quantity: 1, tokenId })
     },
-    [mutateAsync, user?.address]
+    [mutateAsync, smartAccountAddress]
   )
 
   if (isLoading) {
@@ -32,15 +37,18 @@ const AircraftMarketPlace: React.FC = () => {
     <Box my={4}>
       <Fade in unmountOnExit>
         <Grid container spacing={6}>
-          {aircrafts.map((aircraft) => (
-            <AircraftItem
-              nft={aircraft}
-              key={aircraft.metadata.id}
-              onClaim={handleClaim}
-              isClaiming={isClaiming}
-              hasLicense={licenses.current.get(getLicenseIdFromAttributes(getNFTAttributes(aircraft)))}
-            />
-          ))}
+          {aircrafts.map(
+            (aircraft, i) =>
+              i > 0 && (
+                <AircraftItem
+                  nft={aircraft}
+                  key={aircraft.metadata.id}
+                  onClaim={handleClaim}
+                  isClaiming={isClaiming}
+                  hasLicense={hasLicense(aircraft)}
+                />
+              )
+          )}
         </Grid>
       </Fade>
     </Box>

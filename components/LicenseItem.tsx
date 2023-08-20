@@ -1,38 +1,40 @@
 import { Grid, Card, CardContent, Stack, Typography, CardActions, Button, CircularProgress } from '@mui/material'
-import { NFT, useBalance, useClaimNFT, useContract, useUser } from '@thirdweb-dev/react'
+import { NFT, useContract } from '@thirdweb-dev/react'
 import React, { useCallback } from 'react'
 import { getNFTAttributes } from 'utils'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import { coinTokenAddress } from 'contracts/address'
-import BigNumber from 'bignumber.js'
 import LicenseItemHeader from './License/LicenseItemHeader'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import useTokenBalance from 'hooks/useTokenBalance'
+import useClaimNFT from 'hooks/useClaimNFT'
 
 const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({ nft, owned }) => {
-  const { user } = useUser()
+  const { smartAccountAddress } = useAlchemyProviderContext()
   const { contract } = useContract(nftLicenseTokenAddress)
-  const { mutateAsync: claimNFT, isLoading: isClaiming } = useClaimNFT(contract)
-  const { data: airlBalance } = useBalance(coinTokenAddress)
+  const { claimNFT, isClaiming } = useClaimNFT(contract)
+  const { balance: airlBalance } = useTokenBalance(coinTokenAddress)
   const { name, description, image } = nft.metadata
 
   const handleClaimLicense = useCallback(() => {
-    if (!airlBalance) return
+    console.log('handleClaimLicense')
+    if (!airlBalance || !smartAccountAddress) return
+    console.log('handleClaimLicense 2', airlBalance.toString())
 
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
     if (!attribute) {
       throw new Error('missing price in nft')
     }
+    console.log('handleClaimLicense 3')
 
-    const hasEnough = new BigNumber(airlBalance.displayValue).isGreaterThan(attribute.value)
+    const hasEnough = airlBalance.isGreaterThan(attribute.value)
+    console.log({ hasEnough })
     if (hasEnough) {
-      claimNFT({
-        to: user?.address,
-        quantity: 1,
-        tokenId: nft.metadata.id
-      })
+      claimNFT({ to: smartAccountAddress, nft, quantity: 1 })
     } else {
       console.log(`You do not have enough AIRL tokens, ${attribute.value}`)
     }
-  }, [claimNFT, user?.address, airlBalance, nft])
+  }, [claimNFT, smartAccountAddress, airlBalance, nft])
 
   const getNFTPrice = useCallback((nft: NFT) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
@@ -66,7 +68,7 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({ nft, owned }) => 
 
         {!owned && (
           <CardActions>
-            <Button disabled={isClaiming || !user?.address} variant='contained' onClick={handleClaimLicense}>
+            <Button disabled={isClaiming || !smartAccountAddress} variant='contained' onClick={handleClaimLicense}>
               {isClaiming ? (
                 <CircularProgress size={25} />
               ) : (

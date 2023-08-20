@@ -1,14 +1,15 @@
 import { Box, Typography, Grid, Alert, AlertTitle, LinearProgress } from '@mui/material'
 import React from 'react'
-import { useContract, useNFTs, useOwnedNFTs, useUser } from '@thirdweb-dev/react'
+import { useContract, useNFTs, useOwnedNFTs } from '@thirdweb-dev/react'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import LicenseItem from './LicenseItem'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const LicenseMarketPlace: React.FC = () => {
-  const { user } = useUser()
+  const { smartAccountAddress } = useAlchemyProviderContext()
   const { contract } = useContract(nftLicenseTokenAddress)
   const { data: nfts = [], isLoading, error } = useNFTs(contract)
-  const { data: owned = [] } = useOwnedNFTs(contract, user?.address)
+  const { data: owned = [] } = useOwnedNFTs(contract, smartAccountAddress)
 
   if (isLoading) {
     return <LinearProgress />

@@ -13,7 +13,7 @@ const AircraftItem: React.FC<{
   onClaim: (id: string) => void
   hasLicense?: boolean
 }> = ({ nft, isClaiming, onClaim, hasLicense }) => {
-  const hasAircraft = useAircraft(nft.metadata.id)
+  const { hasAircraft } = useAircraft(nft.metadata.id)
 
   return (
     <Grid item xs={12} lg={6}>

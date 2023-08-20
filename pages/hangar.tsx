@@ -1,4 +1,3 @@
-import { ConnectWallet, useUser } from '@thirdweb-dev/react'
 import type { NextPage } from 'next'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
 import AircraftMarketPlace from 'components/AircraftMarketPlace'
@@ -6,6 +5,7 @@ import styles from 'styles/Hangar.module.css'
 import Image from 'next/image'
 import image from 'public/img/airplanes3.png'
 import serverSidePropsHandler from 'components/ServerSideHandler'
+import { ConnectWallet, useUser } from '@thirdweb-dev/react'
 
 interface HangarProps {
   loading: boolean
