@@ -5,12 +5,14 @@ import { ethers } from 'ethers'
 import { formatNumber } from 'utils'
 import { coinTokenAddress, stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
+import useStaking from 'hooks/useStaking'
 
 const GasAvailable = () => {
   const { data: airl } = useBalance(coinTokenAddress)
   const { contract: coin } = useContract(coinTokenAddress, 'token')
   const { contract: staking, refetch } = useContract(stakingAddress)
   const { mutateAsync: stake } = useContractWrite(staking, 'stake')
+  const {} = useStaking(staking)
   const [loading, setLoading] = useState(false)
 
   const setAllowance = useCallback(

@@ -4,24 +4,28 @@ import { Box, Container, LinearProgress, Stack, Typography } from '@mui/material
 import GasStationView from 'routes/gas/GasStationView'
 import styles from 'styles/Gas.module.css'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
-import { rewardTokenAddress } from 'contracts/address'
+import { coinTokenAddress, rewardTokenAddress } from 'contracts/address'
 import Image from 'next/image'
 import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import GppGoodIcon from '@mui/icons-material/GppGood'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import useTokenBalance from 'hooks/useTokenBalance'
 
-const Gas: NextPage = () => {
-  const { data } = useBalance(rewardTokenAddress)
+interface Props {
+  loading: boolean
+}
+
+const Gas: NextPage<Props> = ({ loading }) => {
+  const { balance } = useTokenBalance(coinTokenAddress)
   const { smartAccountAddress: address } = useAlchemyProviderContext()
-  const { isLoading, isLoggedIn } = useUser()
 
-  if (isLoading) {
+  if (loading) {
     return <LinearProgress />
   }
 
-  if (!isLoggedIn) {
+  if (!address) {
     return (
       <Box mt={10} textAlign='center'>
         <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />
@@ -36,7 +40,7 @@ const Gas: NextPage = () => {
     )
   }
 
-  if (!data) return null
+  if (!balance) return null
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -46,13 +50,12 @@ const Gas: NextPage = () => {
         <Stack direction='row-reverse'>
           <Stack direction='row' alignItems='center' spacing={1}>
             <LocalGasStationIcon />
-            <Typography variant='h2'>{formatNumber(Number(data.displayValue))}</Typography>
-            <Typography variant='h6'>{data.symbol}</Typography>
+            <Typography variant='h2'>{formatNumber(balance.toNumber())}</Typography>
+            <Typography variant='h6'>AIRG</Typography>
           </Stack>
         </Stack>
         <Box my={2} textAlign='center'>
           <Typography variant='h1'>Gas Station</Typography>
-          {!address && <ConnectWallet />}
         </Box>
 
         <GasStationView />
