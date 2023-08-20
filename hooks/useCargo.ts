@@ -1,6 +1,6 @@
-import { useAddress } from '@thirdweb-dev/react'
 import { NFT } from '@thirdweb-dev/sdk'
 import axios from 'axios'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useVaProviderContext } from 'context/VaProvider'
 import { cargos } from 'mocks/cargos'
 import { useCallback, useState } from 'react'
@@ -15,7 +15,7 @@ interface UseCargo {
 }
 
 const useCargo = (): UseCargo => {
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { atcs } = useVaProviderContext()
   const [cargo, setCargo] = useState<Cargo>()
   const [isLoading, setIsLoading] = useState(false)

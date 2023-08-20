@@ -1,29 +1,49 @@
 import React, { useCallback } from 'react'
 import { Box, Grid, Fade, CircularProgress } from '@mui/material'
-import { NFT, useClaimNFT, useContract } from '@thirdweb-dev/react'
+import { NFT, useContract } from '@thirdweb-dev/react'
 import useLicense from 'hooks/useLicense'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
 import useAircrafts from 'hooks/useAircrafts'
 import AircraftItem from './AircraftItem'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import useClaimNFT from 'hooks/useClaimNFT'
+
+const mapLicenseFromAircraft = (license: string) => {
+  switch (license) {
+    case 'A':
+      return '3'
+    case 'B':
+      return '2'
+    case 'C':
+      return '1'
+    case 'D':
+      return '0'
+    default:
+      return ''
+  }
+}
 
 const AircraftMarketPlace: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const licenses = useLicense()
+  const licenses = useLicense(smartAccountAddress)
   const { aircrafts, isLoading } = useAircrafts()
   const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
-  const { mutateAsync, isLoading: isClaiming } = useClaimNFT(aircraftContract)
+  const { claimAircraftNFT, isClaiming } = useClaimNFT(aircraftContract)
   const hasLicense = useCallback(
-    (aircraft: NFT) => licenses.current.get(getLicenseIdFromAttributes(getNFTAttributes(aircraft))),
+    (aircraft: NFT) =>
+      licenses.current.get(mapLicenseFromAircraft(getLicenseIdFromAttributes(getNFTAttributes(aircraft)))),
     [licenses]
   )
 
   const handleClaim = useCallback(
-    (tokenId: string) => {
-      mutateAsync({ to: smartAccountAddress, quantity: 1, tokenId })
+    (aircraftNFT: NFT) => {
+      if (!smartAccountAddress) {
+        throw new Error('Missing account address')
+      }
+      claimAircraftNFT({ to: smartAccountAddress, quantity: 1, nft: aircraftNFT })
     },
-    [mutateAsync, smartAccountAddress]
+    [claimAircraftNFT, smartAccountAddress]
   )
 
   if (isLoading) {
@@ -43,7 +63,7 @@ const AircraftMarketPlace: React.FC = () => {
                 <AircraftItem
                   nft={aircraft}
                   key={aircraft.metadata.id}
-                  onClaim={handleClaim}
+                  onClaim={() => handleClaim(aircraft)}
                   isClaiming={isClaiming}
                   hasLicense={hasLicense(aircraft)}
                 />

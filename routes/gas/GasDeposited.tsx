@@ -1,13 +1,14 @@
 import { Grid, Card, Box, Typography } from '@mui/material'
 import React, { useCallback } from 'react'
 import { formatNumber } from 'utils'
-import { useAddress, useContract, useContractRead, useContractWrite } from '@thirdweb-dev/react'
+import { useContract, useContractRead, useContractWrite } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import { ethers } from 'ethers'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const GasDeposited = () => {
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract } = useContract(stakingAddress)
   const { data: staking } = useContractRead(contract, 'stakers', [address])
   const { mutateAsync: withdraw, isLoading } = useContractWrite(contract, 'withdraw')

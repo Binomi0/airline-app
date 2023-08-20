@@ -1,4 +1,4 @@
-import { ConnectWallet, useAddress, useBalance, useUser } from '@thirdweb-dev/react'
+import { ConnectWallet, useBalance, useUser } from '@thirdweb-dev/react'
 import type { NextPage } from 'next'
 import { Box, Container, LinearProgress, Stack, Typography } from '@mui/material'
 import GasStationView from 'routes/gas/GasStationView'
@@ -10,10 +10,11 @@ import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import GppGoodIcon from '@mui/icons-material/GppGood'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const Gas: NextPage = () => {
   const { data } = useBalance(rewardTokenAddress)
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { isLoading, isLoggedIn } = useUser()
 
   if (isLoading) {

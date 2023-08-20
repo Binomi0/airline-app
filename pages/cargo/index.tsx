@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NextPage } from 'next'
-import { ConnectWallet, NFT, useAddress, useContract, useOwnedNFTs, useUser, useLogout } from '@thirdweb-dev/react'
+import { ConnectWallet, NFT, useContract, useOwnedNFTs, useUser, useLogout } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import CargoView from 'routes/Cargo/CargoView'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
@@ -8,9 +8,10 @@ import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import GppGoodIcon from '@mui/icons-material/GppGood'
 import { VaProvider } from 'context/VaProvider'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { logout } = useLogout()
   const [aircraft, setAircraft] = useState<NFT>()
   const { user, isLoading, isLoggedIn } = useUser()

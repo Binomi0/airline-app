@@ -9,8 +9,7 @@ import useAircraft from 'hooks/useAircraft'
 const AircraftItem: React.FC<{
   nft: NFT
   isClaiming: boolean
-  // eslint-disable-next-line no-unused-vars
-  onClaim: (id: string) => void
+  onClaim: () => void
   hasLicense?: boolean
 }> = ({ nft, isClaiming, onClaim, hasLicense }) => {
   const { hasAircraft } = useAircraft(nft.metadata.id)
@@ -35,7 +34,6 @@ const AircraftItem: React.FC<{
           hasAircraft={hasAircraft}
           hasLicense={hasLicense}
           onClaim={onClaim}
-          id={nft.metadata.id ?? ''}
         />
       </Card>
     </Grid>

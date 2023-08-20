@@ -1,11 +1,12 @@
 import { Grid, Card, Box, Typography, Stack, Button } from '@mui/material'
 import React, { useEffect } from 'react'
-import { useAddress, useBalance, useContract, useContractRead, useContractWrite } from '@thirdweb-dev/react'
+import { useBalance, useContract, useContractRead, useContractWrite } from '@thirdweb-dev/react'
 import { rewardTokenAddress, stakingAddress } from 'contracts/address'
 import { formatNumber } from 'utils'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const GasFarmed = () => {
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract } = useContract(stakingAddress)
   const { data: stakeInfo, refetch: getStakeInfo } = useContractRead(contract, 'getStakeInfo', [address])
   const { mutateAsync: claimRewards, isLoading: isClaiming } = useContractWrite(contract, 'claimRewards')

@@ -4,14 +4,15 @@ import { Alert, AlertTitle, Box, Link as MuiLink, Container, Typography, Button 
 import Image from 'next/image'
 import image from 'public/img/real_replica_cessna_172.png'
 import styles from 'styles/Home.module.css'
-import { ConnectWallet, useAddress, useContract, useNFTBalance } from '@thirdweb-dev/react'
+import { ConnectWallet, useContract, useNFTBalance } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import Link from 'next/link'
 import axios from 'config/axios'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const CargoItem = () => {
   const router = useRouter()
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract } = useContract(nftAircraftTokenAddress)
 
   const { data } = useNFTBalance(contract, address, 1)

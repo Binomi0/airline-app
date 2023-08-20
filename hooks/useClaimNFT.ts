@@ -1,5 +1,5 @@
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import { coinTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
+import { coinTokenAddress, nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
 import { BaseContract, ethers } from 'ethers'
 import { useCallback, useState } from 'react'
 import { NFT, SmartContract } from '@thirdweb-dev/sdk'
@@ -14,6 +14,7 @@ interface ClaimNFTPayload {
 }
 
 interface UseClaimNFT {
+  claimAircraftNFT: (payload: ClaimNFTPayload) => Promise<string | undefined>
   claimNFT: (payload: ClaimNFTPayload) => Promise<string | undefined>
   isClaiming: boolean
 }
@@ -21,6 +22,48 @@ interface UseClaimNFT {
 const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
   const [isClaiming, setIsClaiming] = useState(false)
   const { smartAccountAddress, paymasterSigner } = useAlchemyProviderContext()
+
+  const claimAircraftNFT = useCallback(
+    async ({ to, quantity, nft }: ClaimNFTPayload) => {
+      if (!paymasterSigner || !contract || !smartAccountAddress) return
+      setIsClaiming(true)
+
+      const canClaim = await contract.erc1155.claimConditions.canClaim(nft.metadata.id, 1, smartAccountAddress)
+      if (!canClaim) {
+        setIsClaiming(false)
+        return
+      }
+
+      const activePhase = await contract.erc1155.claimConditions.getActive(nft.metadata.id, { withAllowList: true })
+
+      const erc1155Contract = new ethers.Contract(nftAircraftTokenAddress, contract.abi)
+      const encodedCallData = erc1155Contract.interface.encodeFunctionData('claim', [
+        to,
+        nft.metadata.id,
+        quantity,
+        activePhase.currencyAddress,
+        activePhase.price,
+        {
+          proof: ['0x0000000000000000000000000000000000000000000000000000000000000000'],
+          quantityLimitPerWallet: 0,
+          pricePerToken: 0,
+          currency: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+        },
+        '0x00'
+      ])
+
+      const { hash: claimHash } = await paymasterSigner.sendUserOperation({
+        target: nftAircraftTokenAddress,
+        data: encodedCallData as Hex
+      })
+
+      await paymasterSigner.waitForUserOperationTransaction(claimHash as Hex)
+
+      setIsClaiming(false)
+      return claimHash
+    },
+    [contract, paymasterSigner, smartAccountAddress]
+  )
 
   const claimNFT = useCallback(
     async ({ to, quantity, nft }: ClaimNFTPayload) => {
@@ -82,7 +125,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
     [contract, paymasterSigner, smartAccountAddress]
   )
 
-  return { claimNFT, isClaiming }
+  return { claimNFT, claimAircraftNFT, isClaiming }
 }
 
 export default useClaimNFT

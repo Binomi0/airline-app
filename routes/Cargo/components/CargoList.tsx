@@ -1,8 +1,9 @@
 import { Fade, Grid } from '@mui/material'
-import { NFT, useAddress } from '@thirdweb-dev/react'
+import { NFT } from '@thirdweb-dev/react'
 import CargoItem from './CargoItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
 import { FRoute } from 'types'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const CargoList: React.FC<{
   newCargo: (route: FRoute, aircraft: NFT) => void
@@ -10,7 +11,7 @@ const CargoList: React.FC<{
   flights: [string, FRoute[]][]
   aircraft?: NFT
 }> = ({ newCargo, setSelected, flights, aircraft }) => {
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
 
   const handleSelect = useCallback(
     async (origin: string, destination: string) => {

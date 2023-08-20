@@ -1,6 +1,7 @@
 import { Box, Fade, LinearProgress } from '@mui/material'
-import { useAddress, useContract, useNFT, useOwnedNFTs } from '@thirdweb-dev/react'
+import { useContract, useNFT, useOwnedNFTs } from '@thirdweb-dev/react'
 import serverSidePropsHandler from 'components/ServerSideHandler'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { VaProvider } from 'context/VaProvider'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { NextPage } from 'next'
@@ -10,7 +11,7 @@ import CargoView from 'routes/Cargo/CargoView'
 
 const CargoAircraft: NextPage<{ loading: boolean }> = ({ loading }) => {
   const router = useRouter()
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data, isLoading } = useNFT(contract, router.query.aircraft as string)
   const { data: owned, isLoading: isLoadingOwn } = useOwnedNFTs(contract, address)

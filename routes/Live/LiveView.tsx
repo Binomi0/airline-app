@@ -4,11 +4,12 @@ import { Fade, Box, Typography, Button, LinearProgress } from '@mui/material'
 import { useVaProviderContext } from 'context/VaProvider'
 import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
-import { ConnectWallet, useAddress, useUser } from '@thirdweb-dev/react'
+import { ConnectWallet, useUser } from '@thirdweb-dev/react'
 import GppGoodIcon from '@mui/icons-material/GppGood'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const LiveView: FC = () => {
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { cargo, getCargo, isLoading } = useCargo()
   const { isLoggedIn, user } = useUser()
   const { pilots, setCurrentPilot, active } = useVaProviderContext()

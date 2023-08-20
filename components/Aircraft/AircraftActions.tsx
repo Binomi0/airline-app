@@ -4,18 +4,17 @@ import React, { useCallback } from 'react'
 
 const AircraftActions: React.FC<{
   // eslint-disable-next-line no-unused-vars
-  onClaim: (id: string) => void
+  onClaim: () => void
   isClaiming: boolean
   hasAircraft: boolean
   hasLicense?: boolean
   name?: string
-  id: string
-}> = ({ onClaim, isClaiming, hasLicense, hasAircraft, name, id }) => {
+}> = ({ onClaim, isClaiming, hasLicense, hasAircraft, name }) => {
   const router = useRouter()
 
   const handleClick = useCallback(
-    () => (hasLicense ? onClaim(id) : router.push('/license')),
-    [hasLicense, router, onClaim, id]
+    () => (hasLicense ? onClaim() : router.push('/license')),
+    [hasLicense, router, onClaim]
   )
 
   if (hasAircraft) return null

@@ -7,10 +7,11 @@ import image from 'public/img/airplanes9.png'
 import { useVaProviderContext } from 'context/VaProvider'
 import { FRoute, Flight } from 'types'
 import useCargo from 'hooks/useCargo'
-import { ConnectWallet, NFT, useAddress, useUser } from '@thirdweb-dev/react'
+import { ConnectWallet, NFT, useUser } from '@thirdweb-dev/react'
 import NoAddress from 'routes/Cargo/components/NoAddress'
 import CargoReady from 'routes/Cargo/components/CargoReady'
 import CargoList from 'routes/Cargo/components/CargoList'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const initialState: FRoute = {
   origin: '',
@@ -18,7 +19,7 @@ const initialState: FRoute = {
 }
 
 const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, aircraft }) => {
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { isLoggedIn } = useUser()
   const { newCargo, cargo } = useCargo()
   const { flights } = useVaProviderContext()
