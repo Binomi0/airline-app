@@ -1,17 +1,16 @@
 import { useMemo, useEffect, useCallback } from 'react'
 import type { FC } from 'react'
-import { Fade, Box, Typography, Button, LinearProgress } from '@mui/material'
+import { Fade, Box, Typography, Button } from '@mui/material'
 import { useVaProviderContext } from 'context/VaProvider'
 import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
-import { ConnectWallet, useUser } from '@thirdweb-dev/react'
+import { ConnectWallet } from '@thirdweb-dev/react'
 import GppGoodIcon from '@mui/icons-material/GppGood'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const LiveView: FC = () => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { cargo, getCargo, isLoading } = useCargo()
-  const { isLoggedIn, user } = useUser()
   const { pilots, setCurrentPilot, active } = useVaProviderContext()
   const pilot = useMemo(() => pilots.find((pilot) => pilot.callsign === cargo?.callsign), [pilots, cargo])
 
@@ -27,9 +26,7 @@ const LiveView: FC = () => {
     setCurrentPilot(pilot)
   }, [pilot, setCurrentPilot])
 
-  if (isLoading) return <LinearProgress />
-
-  if (!isLoggedIn || (user?.address && !address)) {
+  if (!address) {
     return (
       <Box mt={10} textAlign='center'>
         <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />

@@ -1,4 +1,4 @@
-import { createRef, useState } from 'react'
+import { useState } from 'react'
 import type { NextPage } from 'next'
 import { Alert, AlertTitle, Box, Button, Container, Fade, LinearProgress, Typography } from '@mui/material'
 import Image from 'next/image'
@@ -7,7 +7,7 @@ import image from 'public/img/airplanes9.png'
 import { useVaProviderContext } from 'context/VaProvider'
 import { FRoute, Flight } from 'types'
 import useCargo from 'hooks/useCargo'
-import { ConnectWallet, NFT, useUser } from '@thirdweb-dev/react'
+import { ConnectWallet, NFT } from '@thirdweb-dev/react'
 import NoAddress from 'routes/Cargo/components/NoAddress'
 import CargoReady from 'routes/Cargo/components/CargoReady'
 import CargoList from 'routes/Cargo/components/CargoList'
@@ -20,7 +20,6 @@ const initialState: FRoute = {
 
 const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, aircraft }) => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
-  const { isLoggedIn } = useUser()
   const { newCargo, cargo } = useCargo()
   const { flights } = useVaProviderContext()
   const [selected, setSelected] = useState(initialState)
@@ -40,12 +39,12 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
 
         <NoAddress />
 
-        <Fade in={isLoggedIn && !!address && !!selected.origin} unmountOnExit>
+        <Fade in={!!address && !!selected.origin} unmountOnExit>
           <Box>
             <CargoReady cargo={cargo} onCancel={() => setSelected(initialState)} />
           </Box>
         </Fade>
-        <Fade in={isLoggedIn && !!address && !selected.origin} unmountOnExit>
+        <Fade in={!!address && !selected.origin} unmountOnExit>
           <Box>
             <CargoList aircraft={aircraft} flights={flightList} newCargo={newCargo} setSelected={setSelected} />
           </Box>
@@ -64,7 +63,7 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
             </Alert>
           </Box>
         </Fade>
-        <Fade in={!address || !isLoggedIn} unmountOnExit>
+        <Fade in={!address} unmountOnExit>
           <Box maxWidth={500} m='auto'>
             <Alert severity='warning'>
               <AlertTitle>ACCESO NO PERMITIDO</AlertTitle>

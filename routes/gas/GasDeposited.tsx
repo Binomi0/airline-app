@@ -1,22 +1,23 @@
 import { Grid, Card, Box, Typography } from '@mui/material'
 import React, { useCallback } from 'react'
 import { formatNumber } from 'utils'
-import { useContract, useContractRead, useContractWrite } from '@thirdweb-dev/react'
+import { useContract, useContractRead } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import { ethers } from 'ethers'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import useStaking from 'hooks/useStaking'
 
 const GasDeposited = () => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract } = useContract(stakingAddress)
+  const { withdraw, isLoading } = useStaking(contract)
   const { data: staking } = useContractRead(contract, 'stakers', [address])
-  const { mutateAsync: withdraw, isLoading } = useContractWrite(contract, 'withdraw')
   const maxAmount = (Number(staking?.amountStaked) / 1e18).toString()
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
-      withdraw({ args: [ethers.utils.parseEther(unstakeAmount)] })
+      withdraw(ethers.utils.parseEther(unstakeAmount))
     },
     [withdraw]
   )

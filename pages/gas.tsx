@@ -1,10 +1,10 @@
-import { ConnectWallet, useBalance, useUser } from '@thirdweb-dev/react'
+import { ConnectWallet } from '@thirdweb-dev/react'
 import type { NextPage } from 'next'
 import { Box, Container, LinearProgress, Stack, Typography } from '@mui/material'
 import GasStationView from 'routes/gas/GasStationView'
 import styles from 'styles/Gas.module.css'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
-import { coinTokenAddress, rewardTokenAddress } from 'contracts/address'
+import { rewardTokenAddress } from 'contracts/address'
 import Image from 'next/image'
 import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const Gas: NextPage<Props> = ({ loading }) => {
-  const { balance } = useTokenBalance(coinTokenAddress)
+  const { balance } = useTokenBalance(rewardTokenAddress)
   const { smartAccountAddress: address } = useAlchemyProviderContext()
 
   if (loading) {

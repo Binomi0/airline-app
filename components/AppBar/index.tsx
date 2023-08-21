@@ -44,7 +44,9 @@ const CustomAppBar: React.FC = () => {
           {matches ? 'Decentralized Virtual Airline' : 'DVA'}
         </Typography>
         <Box mr={2} bgcolor='secondary.main' borderRadius={5} px={2}>
-          <Typography fontWeight={600} variant='caption'>{maskAddress(smartAccountAddress)}</Typography>
+          <Typography fontWeight={600} variant='caption'>
+            {maskAddress(smartAccountAddress)}
+          </Typography>
         </Box>
         <Stack direction='row' alignItems='center' height={50} spacing={1}>
           <LicenseBar />
@@ -65,11 +67,11 @@ const CustomAppBar: React.FC = () => {
             </>
           ) : (
             <>
-              <Button variant='contained' color='error' onClick={handleSignOut}>
-                Log Out
-              </Button>
               <Button variant='contained' color='success' onClick={handleAddBackup}>
                 Add Backup
+              </Button>
+              <Button variant='contained' color='error' onClick={handleSignOut}>
+                Log Out
               </Button>
             </>
           )}

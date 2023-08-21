@@ -1,13 +1,14 @@
 import { Box, Typography, Grid, Card, CardHeader, CardContent, Stack, Alert, AlertTitle } from '@mui/material'
-import { MediaRenderer, useUser, useContract, useOwnedNFTs } from '@thirdweb-dev/react'
+import { MediaRenderer, useContract, useOwnedNFTs } from '@thirdweb-dev/react'
 import React from 'react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { getNFTAttributes } from 'utils'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const MyAircrafts = () => {
-  const { user } = useUser()
+  const { smartAccountAddress } = useAlchemyProviderContext()
   const { contract } = useContract(nftAircraftTokenAddress)
-  const { data: nfts = [], error } = useOwnedNFTs(contract, user?.address)
+  const { data: nfts = [], error } = useOwnedNFTs(contract, smartAccountAddress)
 
   return nfts && nfts.length > 0 ? (
     <Box my={4}>

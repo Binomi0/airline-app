@@ -26,7 +26,7 @@ const useTokenBalance = (token?: string) => {
     getBalance()
   }, [smartAccountAddress, getBalance, token])
 
-  return { balance }
+  return { balance, getBalance }
 }
 
 export default useTokenBalance

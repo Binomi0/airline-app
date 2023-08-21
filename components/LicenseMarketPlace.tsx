@@ -4,12 +4,14 @@ import { useContract, useNFTs, useOwnedNFTs } from '@thirdweb-dev/react'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import LicenseItem from './LicenseItem'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import useClaimNFT from 'hooks/useClaimNFT'
 
 const LicenseMarketPlace: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const { contract } = useContract(nftLicenseTokenAddress)
   const { data: nfts = [], isLoading, error } = useNFTs(contract)
   const { data: owned = [] } = useOwnedNFTs(contract, smartAccountAddress)
+  const { claimNFT, isClaiming } = useClaimNFT(contract)
 
   if (isLoading) {
     return <LinearProgress />
@@ -33,7 +35,9 @@ const LicenseMarketPlace: React.FC = () => {
           (nft, i) =>
             i < 4 && (
               <LicenseItem
+                isClaiming={isClaiming}
                 nft={nft}
+                claimNFT={claimNFT}
                 key={nft.metadata.id}
                 owned={owned.some((n) => nft.metadata.id === n.metadata.id)}
               />

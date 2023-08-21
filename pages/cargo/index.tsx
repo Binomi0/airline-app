@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { NextPage } from 'next'
-import { ConnectWallet, NFT, useContract, useOwnedNFTs, useUser, useLogout } from '@thirdweb-dev/react'
+import { ConnectWallet, NFT, useContract, useOwnedNFTs } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import CargoView from 'routes/Cargo/CargoView'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
@@ -12,23 +12,15 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
-  const { logout } = useLogout()
   const [aircraft, setAircraft] = useState<NFT>()
-  const { user, isLoading, isLoggedIn } = useUser()
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data: owned = [], isLoading: isLoadingNFTs } = useOwnedNFTs(contract, address)
 
-  useEffect(() => {
-    if (!address && user?.address) {
-      logout()
-    }
-  }, [address, user?.address, logout])
-
-  if (isLoading || (isLoadingNFTs && !!address)) {
+  if (isLoadingNFTs) {
     return <LinearProgress />
   }
 
-  if (!isLoggedIn || (user?.address && !address)) {
+  if (!address) {
     return (
       <Box mt={10} textAlign='center'>
         <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />
