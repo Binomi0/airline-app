@@ -4,9 +4,9 @@ import clientPromise from 'lib/mongodb'
 import { Collection, DB } from 'types'
 
 // Human-readable title for your website
-const rpName = 'ELIXIR'
+const rpName = 'AIRLINE'
 // A unique identifier for your website
-const rpID = 'localhost'
+const rpID = process.env.DOMAIN as string
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { _id: id, email } = req.body

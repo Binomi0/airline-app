@@ -3,9 +3,9 @@ import { Atc, AttributeType, Cargo, IvaoPilot } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 
 // A unique identifier for your website
-const rpID = 'localhost'
+const rpID = process.env.DOMAIN as string
 // The URL at which registrations and authentications should occur
-const origin = `http://${rpID}:3000`
+const origin = process.env.ORIGIN as string
 
 // @ts-ignore
 export const verifySignature = async function (authenticator, response, expectedChallenge) {

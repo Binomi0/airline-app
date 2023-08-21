@@ -4,9 +4,9 @@ import clientPromise from 'lib/mongodb'
 import { Collection, DB } from 'types'
 
 // A unique identifier for your website
-const rpID = 'localhost'
+const rpID = process.env.DOMAIN
 // The URL at which registrations and authentications should occur
-const origin = `http://${rpID}:3000`
+const origin = process.env.ORIGIN as string
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body } = req
