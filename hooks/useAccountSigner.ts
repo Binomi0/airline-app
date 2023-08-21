@@ -11,7 +11,7 @@ const EMAIL = 'adolfo@onrubia.es'
 const SERVER_URI = '/api/webauthn'
 
 const useAccountSigner = () => {
-  const { setBaseSigner, baseSigner } = useAlchemyProviderContext()
+  const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner, baseSigner } = useAlchemyProviderContext()
   useAlchemyWallet(baseSigner)
 
   const createCredential = useCallback(async (id: string) => {
@@ -84,7 +84,10 @@ const useAccountSigner = () => {
 
   const signOut = useCallback(() => {
     setBaseSigner(undefined)
-  }, [setBaseSigner])
+    setSmartAccountAddress(undefined)
+    setPaymasterSigner(undefined)
+    setSmartSigner(undefined)
+  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner])
 
   return {
     signUp,

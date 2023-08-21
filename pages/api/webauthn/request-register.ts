@@ -42,7 +42,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!user) {
     await db.insertOne({ id, email, challenge: challengeResponse.challenge })
   } else {
-    await db.findOneAndUpdate({ id }, { $set: { challenge: challengeResponse.challenge } })
+    await db.findOneAndUpdate({ email }, { $set: { challenge: challengeResponse.challenge } })
   }
 
   res.send(challengeResponse)

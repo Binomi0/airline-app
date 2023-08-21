@@ -1,6 +1,5 @@
 import { NFT } from '@thirdweb-dev/sdk'
-import License from 'pages/license'
-import { Aircraft, Atc, AttributeType, Cargo, CargoDetails, IvaoPilot } from 'types'
+import { Atc, AttributeType, Cargo, IvaoPilot } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 
 // A unique identifier for your website

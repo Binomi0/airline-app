@@ -18,20 +18,23 @@ export const AlchemyProvider: FC<{ children: React.ReactNode }> = ({ children })
   })
   const { Provider } = AlchemyProviderContext
 
-  const setBaseSigner = useCallback((signer?: Wallet) => dispatch({ type: 'SET_BASE_SIGNER', payload: signer }), [])
+  const setBaseSigner = useCallback(
+    (signer?: Readonly<Wallet>) => dispatch({ type: 'SET_BASE_SIGNER', payload: signer }),
+    []
+  )
 
   const setSmartSigner = useCallback(
-    (signer: SmartAccountProvider) => dispatch({ type: 'SET_SMART_SIGNER', payload: signer }),
+    (signer?: SmartAccountProvider) => dispatch({ type: 'SET_SMART_SIGNER', payload: signer }),
     []
   )
 
   const setPaymasterSigner = useCallback(
-    (signer: SmartAccountProvider) => dispatch({ type: 'SET_PAYMASTER_SIGNER', payload: signer }),
+    (signer?: SmartAccountProvider) => dispatch({ type: 'SET_PAYMASTER_SIGNER', payload: signer }),
     []
   )
 
   const setSmartAccountAddress = useCallback(
-    (address: Hex) => dispatch({ type: 'SET_SMART_ACCOUNT_ADDRESS', payload: address }),
+    (address?: Readonly<Hex>) => dispatch({ type: 'SET_SMART_ACCOUNT_ADDRESS', payload: address }),
     []
   )
 

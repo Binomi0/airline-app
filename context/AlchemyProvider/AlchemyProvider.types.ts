@@ -3,9 +3,9 @@ import { Wallet } from 'ethers'
 
 type Actions = SetBaseSigner | SetSmartSigner | SetPaymasterSigner | SetSmartAccountAddress
 type SetBaseSigner = Readonly<{ type: 'SET_BASE_SIGNER'; payload: Wallet | undefined }>
-type SetSmartSigner = Readonly<{ type: 'SET_SMART_SIGNER'; payload: SmartAccountProvider }>
-type SetPaymasterSigner = Readonly<{ type: 'SET_PAYMASTER_SIGNER'; payload: SmartAccountProvider }>
-type SetSmartAccountAddress = Readonly<{ type: 'SET_SMART_ACCOUNT_ADDRESS'; payload: Hex }>
+type SetSmartSigner = Readonly<{ type: 'SET_SMART_SIGNER'; payload: SmartAccountProvider | undefined }>
+type SetPaymasterSigner = Readonly<{ type: 'SET_PAYMASTER_SIGNER'; payload: SmartAccountProvider | undefined }>
+type SetSmartAccountAddress = Readonly<{ type: 'SET_SMART_ACCOUNT_ADDRESS'; payload: Hex | undefined }>
 
 export type AlchemyReducerState = {
   baseSigner?: Wallet
@@ -16,9 +16,9 @@ export type AlchemyReducerState = {
 
 export type AlchemyContextProps = AlchemyReducerState & {
   setBaseSigner: (signer?: Wallet) => void
-  setSmartSigner: (signer: SmartAccountProvider) => void
-  setPaymasterSigner: (signer: SmartAccountProvider) => void
-  setSmartAccountAddress: (address: Hex) => void
+  setSmartSigner: (signer?: SmartAccountProvider) => void
+  setPaymasterSigner: (signer?: SmartAccountProvider) => void
+  setSmartAccountAddress: (address?: Hex) => void
 }
 
 export type AlchemyReducerHandler = (state: AlchemyReducerState, action: Actions) => AlchemyReducerState

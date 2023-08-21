@@ -4,8 +4,10 @@ import { Button, CircularProgress, Stack, Typography } from '@mui/material'
 import axios from 'axios'
 import { coinTokenAddress } from 'contracts/address'
 import useTokenBalance from 'hooks/useTokenBalance'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const AirBalanceBar = () => {
+  const { smartAccountAddress } = useAlchemyProviderContext()
   const { balance } = useTokenBalance(coinTokenAddress)
   const [isRequesting, setIsRequesting] = useState(false)
   const [requested, setRequested] = useState(false)
@@ -34,7 +36,7 @@ const AirBalanceBar = () => {
         }).format(balance.toNumber())}{' '}
         AIRL
       </Typography>
-      {balance?.isZero() && (
+      {balance?.isZero() && smartAccountAddress && (
         <Button disabled={isRequesting || requested} onClick={handleRequestFunds}>
           {requested ? <CircularProgress color='secondary' size={20} /> : 'Solicitar AIRL'}
         </Button>

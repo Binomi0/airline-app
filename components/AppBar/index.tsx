@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { AppBar, Button, IconButton, Stack, Toolbar, Typography, useScrollTrigger } from '@mui/material'
+import { AppBar, Box, Button, IconButton, Stack, Toolbar, Typography, useScrollTrigger } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useMainProviderContext } from 'context/MainProvider'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -8,6 +8,8 @@ import GasBalanceBar from './components/GasBalanceBar'
 import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
+
+const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
 
 const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
@@ -41,7 +43,9 @@ const CustomAppBar: React.FC = () => {
         <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
           {matches ? 'Decentralized Virtual Airline' : 'DVA'}
         </Typography>
-        <Typography variant='caption'>{smartAccountAddress}</Typography>
+        <Box mr={2} bgcolor='secondary.main' borderRadius={5} px={2}>
+          <Typography fontWeight={600} variant='caption'>{maskAddress(smartAccountAddress)}</Typography>
+        </Box>
         <Stack direction='row' alignItems='center' height={50} spacing={1}>
           <LicenseBar />
           {matches && (

@@ -1,16 +1,17 @@
 import { CircularProgress, AvatarGroup, Tooltip, Avatar } from '@mui/material'
 import { useContract, useOwnedNFTs, MediaRenderer, useUser } from '@thirdweb-dev/react'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import React from 'react'
 
 const LicenseBar = () => {
-  const { user } = useUser()
+  const {smartAccountAddress} = useAlchemyProviderContext()
   const { contract: licenseContract } = useContract(nftLicenseTokenAddress, 'edition-drop')
-  const { data: ownedLicense, isLoading } = useOwnedNFTs(licenseContract, user?.address)
+  const { data: ownedLicense, isLoading } = useOwnedNFTs(licenseContract, smartAccountAddress)
 
   return (
     <div>
-      {isLoading && user?.address ? (
+      {isLoading && smartAccountAddress ? (
         <CircularProgress size={25} />
       ) : (
         ownedLicense &&

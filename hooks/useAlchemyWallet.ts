@@ -1,5 +1,5 @@
 import { SimpleSmartContractAccount, SmartAccountProvider, type SimpleSmartAccountOwner, Hex } from '@alchemy/aa-core'
-import { sepolia } from 'viem/chains'
+import { sepolia } from '@wagmi/chains'
 import { useCallback, useEffect } from 'react'
 import { withAlchemyGasManager } from '@alchemy/aa-alchemy'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
@@ -87,7 +87,7 @@ const useAlchemyWallet = (signer?: Wallet) => {
     )
 
     const newPaymasterSigner = withAlchemyGasManager(smartSigner, {
-      provider: smartSigner.rpcClient,
+      // provider: smartSigner.rpcClient,
       policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA || '',
       entryPoint: ENTRY_POINT
     })
