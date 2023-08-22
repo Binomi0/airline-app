@@ -36,29 +36,46 @@ const useAccountSigner = () => {
 
   const signUp = useCallback(
     async (email: string) => {
-      const id = uuidv4()
-      localStorage.setItem('wallet-key', id)
-      const localCredentialId = localStorage.getItem('wallet-id')
-
-      if (!localCredentialId) {
-        const isVerified = await createCredential(id, email)
-        if (isVerified) {
-          const random = Wallet.createRandom()
-          localStorage.setItem(id, Buffer.from(random.privateKey).toString('base64'))
-
-          setBaseSigner(random)
-        }
-      } else {
-        const isVerified = await createCredential(id, email)
-        if (isVerified) {
-          const walletId = localStorage.getItem(localCredentialId)
-          if (!walletId) {
-            throw new Error('Missing private key')
+      try {
+        const response = await axios.post('/api/user', { email })
+        if (response.data.success) {
+          const isVerified = await createCredential(response.data.id, email)
+          if (isVerified) {
+            const walletId = localStorage.getItem(response.data.id)
+            if (!walletId) {
+              throw new Error('Missing private key')
+            }
+            const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
+            setBaseSigner(signer)
           }
-          const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
-          setBaseSigner(signer)
+        } else {
+          await axios.post('/api/user/create', { email })
+          return true
+          // const id = uuidv4()
+          // localStorage.setItem('wallet-key', id)
         }
-      }
+      } catch (error) {}
+      // const localCredentialId = localStorage.getItem('wallet-id')
+
+      // if (!localCredentialId) {
+      //   const isVerified = await createCredential(id, email)
+      //   if (isVerified) {
+      //     const random = Wallet.createRandom()
+      //     localStorage.setItem(id, Buffer.from(random.privateKey).toString('base64'))
+
+      //     setBaseSigner(random)
+      //   }
+      // } else {
+      //   const isVerified = await createCredential(id, email)
+      //   if (isVerified) {
+      //     const walletId = localStorage.getItem(localCredentialId)
+      //     if (!walletId) {
+      //       throw new Error('Missing private key')
+      //     }
+      //     const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
+      //     setBaseSigner(signer)
+      //   }
+      // }
     },
     [createCredential, setBaseSigner]
   )

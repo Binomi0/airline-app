@@ -9,8 +9,9 @@ import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
 import { useAuthProviderContext } from 'context/AuthProvider'
+import axios from 'axios'
 
-type CreatingState = 'signIn' | 'signUp' | undefined
+type CreatingState = 'signIn' | 'signUp' | 'validate' | undefined
 
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
 const validateEmail = (email: string) => {
@@ -25,20 +26,42 @@ const CustomAppBar: React.FC = () => {
   const { signUp, signIn, signOut } = useAccountSigner()
   const { smartAccountAddress } = useAlchemyProviderContext()
   const [creating, setCreating] = useState<CreatingState>()
+  const [email, setEmail] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const codeRef = useRef<HTMLInputElement>(null)
   const { user } = useAuthProviderContext()
 
   const handleSignUp = useCallback((email: string) => validateEmail(email) && signUp(email), [signUp])
   const handleSignIn = useCallback((email: string) => validateEmail(email) && signIn(email), [signIn])
 
-  const handleAccess = useCallback(() => {
+  const handleValidateCode = useCallback(async () => {
+    const code = codeRef.current?.value
+    console.log('email: %s, code: %s', email, code)
+    if (!email || !code) return
+    try {
+      await axios.post('/api/user/validate', { code, email })
+      handleSignUp(email)
+    } catch (err) {
+      console.log('ERROR =>', err)
+    }
+    setCreating(undefined)
+  }, [email, handleSignUp])
+
+  const handleAccess = useCallback(async () => {
     if (!inputRef.current?.value) return
     const email = inputRef.current.value
 
-    console.log({ email })
     if (creating === 'signIn') handleSignIn(email)
-    else if (creating === 'signUp') handleSignUp(email)
-    setCreating(undefined)
+    else if (creating === 'signUp') {
+      const user = await axios.post('/api/user', { email }).then((r) => r.data)
+      console.log({ user })
+      if (user.emailVerified) {
+        handleSignUp(email)
+      } else {
+        setEmail(email)
+        setCreating('validate')
+      }
+    }
   }, [creating, handleSignIn, handleSignUp])
 
   const handleSignOut = useCallback(() => {
@@ -49,6 +72,7 @@ const CustomAppBar: React.FC = () => {
     if (user?.email) signUp(user?.email)
   }, [signUp, user?.email])
 
+  console.log({ creating })
   return (
     <>
       <AppBar position='sticky' color={trigger ? 'primary' : 'transparent'}>
@@ -81,7 +105,7 @@ const CustomAppBar: React.FC = () => {
             )}
             {!smartAccountAddress ? (
               <>
-                {creating ? (
+                {(creating === 'signUp' || creating === 'signIn') && (
                   <Stack direction='row' spacing={2}>
                     <TextField
                       inputProps={{
@@ -98,7 +122,26 @@ const CustomAppBar: React.FC = () => {
                       SEND
                     </Button>
                   </Stack>
-                ) : (
+                )}
+                {creating === 'validate' && (
+                  <Stack direction='row' spacing={2}>
+                    <TextField
+                      inputProps={{
+                        style: { color: 'white' }
+                      }}
+                      autoFocus
+                      variant='outlined'
+                      size='small'
+                      label='CODE'
+                      placeholder='Insert code'
+                      inputRef={codeRef}
+                    />
+                    <Button variant='contained' onClick={handleValidateCode}>
+                      SEND
+                    </Button>
+                  </Stack>
+                )}
+                {!creating && (
                   <>
                     <Button
                       variant='contained'
