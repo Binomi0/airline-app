@@ -6,24 +6,23 @@ import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useAlchemyWallet from './useAlchemyWallet'
 
-const EMAIL = 'adolfo@onrubia.es'
-// const SERVER_URI = 'https://192.168.1.130:3000'
 const SERVER_URI = '/api/webauthn'
 
 const useAccountSigner = () => {
-  const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner, baseSigner } = useAlchemyProviderContext()
+  const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner, baseSigner } =
+    useAlchemyProviderContext()
   useAlchemyWallet(baseSigner)
 
-  const createCredential = useCallback(async (id: string) => {
+  const createCredential = useCallback(async (id: string, email: string) => {
     try {
       const responseChallenge = await axios.post(`${SERVER_URI}/request-register`, {
         _id: id,
-        email: EMAIL
+        email
       })
       const request = await startRegistration(responseChallenge.data)
       const responseValidation = await axios.post<{ verified: boolean }>(`${SERVER_URI}/register`, {
         data: request,
-        email: EMAIL
+        email
       })
 
       return responseValidation.data.verified
@@ -33,47 +32,60 @@ const useAccountSigner = () => {
     }
   }, [])
 
-  const signUp = useCallback(async () => {
-    const localCredentialId = localStorage.getItem('wallet-key')
-
-    if (!localCredentialId) {
+  const signUp = useCallback(
+    async (email: string) => {
+      localStorage.setItem('user-login', email)
       const id = uuidv4()
       localStorage.setItem('wallet-key', id)
+      const localCredentialId = localStorage.getItem('wallet-id')
 
-      const isVerified = await createCredential(id)
-      if (isVerified) {
-        const random = Wallet.createRandom()
-        localStorage.setItem('wallet-id', Buffer.from(random.privateKey).toString('base64'))
+      if (!localCredentialId) {
+        console.log({ localCredentialId })
 
-        setBaseSigner(random)
-      }
-    } else {
-      const isVerified = await createCredential(localCredentialId)
-      if (isVerified) {
-        const walletId = localStorage.getItem('wallet-id')
-        if (!walletId) {
-          throw new Error('Missing private key')
+        const isVerified = await createCredential(id, email)
+        if (isVerified) {
+          console.log({ isVerified })
+          const random = Wallet.createRandom()
+          localStorage.setItem('wallet-id', Buffer.from(random.privateKey).toString('base64'))
+
+          setBaseSigner(random)
         }
-        const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
-        setBaseSigner(signer)
+      } else {
+        const isVerified = await createCredential(id, email)
+        if (isVerified) {
+          const walletId = localStorage.getItem('wallet-id')
+          if (!walletId) {
+            throw new Error('Missing private key')
+          }
+          const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
+          setBaseSigner(signer)
+        }
       }
-    }
-  }, [createCredential, setBaseSigner])
+    },
+    [createCredential, setBaseSigner]
+  )
 
   const signIn = useCallback(async () => {
     const localCredentialId = localStorage.getItem('wallet-key')
-    if (!localCredentialId) return signUp()
+    const email = localStorage.getItem('user-login')
+    if (!localCredentialId) {
+      if (email) {
+        signUp(email)
+      }
+      return
+    }
 
-    const responseChallenge = await axios.post(`${SERVER_URI}/login`, { email: EMAIL })
+    const responseChallenge = await axios.post(`${SERVER_URI}/login`, { email })
     const request = await startAuthentication(responseChallenge.data)
     const responseValidation = await axios.post(`${SERVER_URI}/login-challenge`, {
       data: request,
-      email: EMAIL
+      email
     })
 
     if (responseValidation.data.verified) {
       const walletId = localStorage.getItem('wallet-id')
       if (!walletId) {
+        // At this point user would want to import private key
         throw new Error('Missing walletId')
       }
 

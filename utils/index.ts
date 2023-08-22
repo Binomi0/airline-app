@@ -13,6 +13,8 @@ export const verifySignature = async function (authenticator, response, expected
   const credentialIDBuffer = bufferFromBase64(authenticator.credentialID)
   const credentialPublicKeyBuffer = bufferFromBase64(authenticator.credentialPublicKey)
 
+  console.log(process.env.DOMAIN)
+  console.log(process.env.ORIGIN)
   let verification
   try {
     verification = await verifyAuthenticationResponse({

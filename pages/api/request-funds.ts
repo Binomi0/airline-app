@@ -1,22 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getUser } from './auth/[...thirdweb]'
 import clientPromise from 'lib/mongodb'
 import { ThirdwebSDK } from '@thirdweb-dev/sdk'
-import { Goerli } from '@thirdweb-dev/chains'
+import { Sepolia } from '@thirdweb-dev/chains'
 import { coinTokenAddress } from 'contracts/address'
 import { Collection, DB } from 'types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method !== 'GET') return res.status(405).end()
-  if (!process.env['THIRDWEB_AUTH_PRIVATE_KEY']) return res.status(403).end()
+  if (req.method !== 'POST') return res.status(405).end()
+  if (!req.body.address) return res.status(400).end()
+  if (!process.env.THIRDWEB_AUTH_PRIVATE_KEY) return res.status(403).end()
 
-  const user = await getUser(req)
-  if (!user || !user.address) {
-    return res.status(401).json({
-      message: 'Not authorized.'
-    })
-  }
-  const { address } = user
+  const { address } = req.body
   const client = await clientPromise
   const collection = client.db(DB.develop).collection(Collection.wallet)
 
@@ -25,9 +19,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (requested) {
       return res.status(202).end()
     }
-
-    const sdk = ThirdwebSDK.fromPrivateKey(process.env['THIRDWEB_AUTH_PRIVATE_KEY'], Goerli)
-
+    const sdk = ThirdwebSDK.fromPrivateKey(
+      process.env.THIRDWEB_AUTH_PRIVATE_KEY, // Your wallet's private key (only required for write operations)
+      Sepolia,
+      {
+        secretKey: process.env.NEXT_PUBLIC_TW_SECRET_KEY // Use secret key if using on the server, get it from dashboard settings
+      }
+    )
     // amount to fill to each connected address
     const amount = 2
 

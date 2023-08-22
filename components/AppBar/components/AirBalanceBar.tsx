@@ -13,9 +13,10 @@ const AirBalanceBar = () => {
   const [requested, setRequested] = useState(false)
 
   const handleRequestFunds = useCallback(async () => {
+    if (!smartAccountAddress) return
     setIsRequesting(true)
     try {
-      const response = await axios.get('/api/request-funds')
+      const response = await axios.post('/api/request-funds', { address: smartAccountAddress })
       if (response.status === 202) {
         setRequested(true)
       }
