@@ -1,6 +1,6 @@
 import fs from 'fs'
 
-interface Authenticator {
+export interface Authenticator {
   credentialID: string
   credentialPublicKey: string
   counter: number

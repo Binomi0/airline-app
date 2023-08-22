@@ -12,8 +12,8 @@ import { MainProvider } from 'context/MainProvider'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
-import { SessionProvider } from 'next-auth/react'
 import { AlchemyProvider } from 'context/AlchemyProvider'
+import { AuthProvider } from 'context/AuthProvider'
 import CustomWeb3Provider from 'components/CustomWeb3Provider'
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -40,7 +40,7 @@ export default function MyApp(props: MyAppProps) {
   }, [])
 
   return (
-    <SessionProvider session={props.pageProps.session}>
+    <AuthProvider user={props.pageProps.user}>
       <AlchemyProvider>
         <CustomWeb3Provider>
           <CacheProvider value={emotionCache}>
@@ -54,12 +54,12 @@ export default function MyApp(props: MyAppProps) {
                   <AppBar />
                   <Sidebar />
                 </MainProvider>
-                <Component loading={loading} />
+                <Component loading={loading} {...props.pageProps} />
               </ErrorBoundary>
             </ThemeProvider>
           </CacheProvider>
         </CustomWeb3Provider>
       </AlchemyProvider>
-    </SessionProvider>
+    </AuthProvider>
   )
 }

@@ -8,8 +8,15 @@ import GasBalanceBar from './components/GasBalanceBar'
 import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
+import { useAuthProviderContext } from 'context/AuthProvider'
+
+type CreatingState = 'signIn' | 'signUp' | undefined
 
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
+const validateEmail = (email: string) => {
+  const expression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+  return expression.test(email)
+}
 
 const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
@@ -17,34 +24,30 @@ const CustomAppBar: React.FC = () => {
   const trigger = useScrollTrigger()
   const { signUp, signIn, signOut } = useAccountSigner()
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const [creating, setCreating] = useState(false)
+  const [creating, setCreating] = useState<CreatingState>()
   const inputRef = useRef<HTMLInputElement>(null)
+  const { user } = useAuthProviderContext()
 
-  const handleSignUp = useCallback(() => {
-    if (creating) {
-      setCreating(false)
-      if (!inputRef.current?.value) return
-      const expression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
-      if (expression.test(inputRef.current?.value)) {
-        signUp(inputRef.current.value)
-      }
-    } else {
-      setCreating(true)
-    }
-  }, [creating, signUp])
+  const handleSignUp = useCallback((email: string) => validateEmail(email) && signUp(email), [signUp])
+  const handleSignIn = useCallback((email: string) => validateEmail(email) && signIn(email), [signIn])
 
-  const handleSignIn = useCallback(() => {
-    signIn()
-  }, [signIn])
+  const handleAccess = useCallback(() => {
+    if (!inputRef.current?.value) return
+    const email = inputRef.current.value
+
+    console.log({ email })
+    if (creating === 'signIn') handleSignIn(email)
+    else if (creating === 'signUp') handleSignUp(email)
+    setCreating(undefined)
+  }, [creating, handleSignIn, handleSignUp])
 
   const handleSignOut = useCallback(() => {
     signOut()
   }, [signOut])
 
   const handleAddBackup = useCallback(() => {
-    const email = localStorage.getItem('user-login')
-    if (email) signUp(email)
-  }, [signUp])
+    if (user?.email) signUp(user?.email)
+  }, [signUp, user?.email])
 
   return (
     <>
@@ -91,16 +94,27 @@ const CustomAppBar: React.FC = () => {
                       placeholder='Insert your email'
                       inputRef={inputRef}
                     />
-                    <Button variant='contained' onClick={handleSignUp}>
-                      Crear Cuenta
+                    <Button variant='contained' onClick={handleAccess}>
+                      SEND
                     </Button>
                   </Stack>
                 ) : (
                   <>
-                    <Button variant='contained' color='secondary' onClick={handleSignIn}>
+                    <Button
+                      variant='contained'
+                      color='secondary'
+                      onClick={() => {
+                        setCreating('signIn')
+                      }}
+                    >
                       Connect
                     </Button>
-                    <Button variant='contained' onClick={handleSignUp}>
+                    <Button
+                      variant='contained'
+                      onClick={() => {
+                        setCreating('signUp')
+                      }}
+                    >
                       Create
                     </Button>
                   </>

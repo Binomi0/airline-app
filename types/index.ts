@@ -91,3 +91,20 @@ export enum Collection {
   wallet = 'wallet',
   webauthn = 'webauthn'
 }
+
+export interface User {
+  email?: string
+  address?: string
+}
+
+export interface Authenticator {
+  credentialID: string
+  credentialPublicKey: string
+  counter: number
+}
+
+export interface WebAuthnUser {
+  email: string
+  challenge: string
+  authenticators: Authenticator[]
+}

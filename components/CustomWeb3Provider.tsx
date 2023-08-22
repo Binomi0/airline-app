@@ -1,5 +1,5 @@
 import { Sepolia } from '@thirdweb-dev/chains'
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useCallback, useEffect } from 'react'
 import { factoryAddress } from 'contracts/address'
 import {
   ThirdwebProvider,
@@ -10,6 +10,9 @@ import {
   smartWallet,
   walletConnect
 } from '@thirdweb-dev/react'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { useAuthProviderContext } from 'context/AuthProvider'
+import { Wallet } from 'ethers'
 
 interface Props {
   children: ReactNode
@@ -17,6 +20,24 @@ interface Props {
 
 const CustomWeb3Provider = ({ children }: Props) => {
   const localWalletConfig = localWallet()
+  const { user } = useAuthProviderContext()
+  const { setBaseSigner } = useAlchemyProviderContext()
+
+  const authUser = useCallback(() => {
+    const id = localStorage.getItem('wallet-key')
+    if (!id) return
+
+    const base64Key = localStorage.getItem(id)
+    if (!base64Key) return
+
+    const key = Buffer.from(base64Key, 'base64').toString()
+    const wallet = new Wallet(key)
+    setBaseSigner(wallet)
+  }, [setBaseSigner])
+
+  useEffect(() => {
+    if (user) authUser()
+  }, [authUser, user])
 
   return (
     <ThirdwebProvider
@@ -31,11 +52,11 @@ const CustomWeb3Provider = ({ children }: Props) => {
       }}
       activeChain={Sepolia}
       supportedChains={[Sepolia]}
-      authConfig={{
-        domain: process.env['NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN'] || '',
-        authUrl: '/api/auth'
-      }}
-      autoConnect
+      // authConfig={{
+      //   domain: process.env['NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN'] || '',
+      //   authUrl: '/api/auth'
+      // }}
+      // autoConnect
       // signer={baseSigner}
       supportedWallets={[
         smartWallet({

@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { verifySignature } from 'utils'
 import clientPromise from 'lib/mongodb'
 import { Collection, DB } from 'types'
+import jwt from 'jsonwebtoken'
+import { setCookie } from 'cookies-next'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body } = req
@@ -34,6 +36,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).send({ error: error.message, verified: false })
   }
 
+  const token = jwt.sign({ data: { email: req.body.email } }, process.env.JWT_SECRET, { expiresIn: '1h' })
+  setCookie('token', token, { req, res })
   res.send(verification)
 }
 

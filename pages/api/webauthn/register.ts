@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { verifyRegistrationResponse } from '@simplewebauthn/server'
 import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import { Collection, DB, Authenticator } from 'types'
 
 // A unique identifier for your website
 const rpID = process.env.DOMAIN
@@ -11,10 +11,11 @@ const origin = process.env.ORIGIN as string
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body } = req
   const client = await clientPromise
-  const db = client.db(DB.develop).collection(Collection.webauthn)
-  const user = await db.findOne({ email: req.body.email })
-  process.env.DOMAIN
-  console.log(process.env.ORIGIN)
+  const db = client.db(DB.develop)
+  const webauthnCollection = db.collection(Collection.webauthn)
+  const userCollection = db.collection(Collection.user)
+  const user = await webauthnCollection.findOne({ email: req.body.email })
+
   let verification
   try {
     verification = await verifyRegistrationResponse({
@@ -34,14 +35,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // @ts-ignore
   const { credentialPublicKey, credentialID, counter } = registrationInfo
 
-  const newAuthenticator = {
+  const newAuthenticator: Authenticator = {
     credentialID: Buffer.from(credentialID).toString('base64'),
     credentialPublicKey: Buffer.from(credentialPublicKey).toString('base64'),
     counter
   }
 
   try {
-    await db.findOneAndUpdate(
+    await webauthnCollection.findOneAndUpdate(
       { email: req.body.email },
       {
         $set: {
@@ -54,7 +55,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(500).send({ error: 'Error al actualizar key' })
   }
   try {
-    await db.findOneAndUpdate(
+    await webauthnCollection.findOneAndUpdate(
       { email: req.body.email },
       {
         // @ts-ignore
@@ -66,6 +67,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (error) {
     console.error(error)
     return res.status(500).send({ error: 'Error al actualizar authenticators' })
+  }
+  try {
+    await userCollection.insertOne({ id: user?.id, email: user?.email })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).send({ error: 'Error al crear el usuario en la db users' })
   }
 
   res.status(200).send({ verified })

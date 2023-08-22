@@ -70,8 +70,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.error(err)
     return res.status(500).send(err)
   }
-
-  return res.status(201).end()
 }
 
 export default handler

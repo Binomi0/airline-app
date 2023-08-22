@@ -13,8 +13,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await clientPromise
   const db = client.db(DB.develop).collection(Collection.webauthn)
   const user = await db.findOne({ email: req.body.email })
-  process.env.DOMAIN
-  console.log(process.env.ORIGIN)
+
   const challengeResponse = generateRegistrationOptions({
     rpName,
     rpID,

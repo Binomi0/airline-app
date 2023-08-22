@@ -31,10 +31,23 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
       const canClaim = await contract.erc1155.claimConditions.canClaim(nft.metadata.id, 1, smartAccountAddress)
       if (!canClaim) {
         setIsClaiming(false)
-        return
+        throw new Error('user cannot claim this Aircraft')
       }
 
       const activePhase = await contract.erc1155.claimConditions.getActive(nft.metadata.id, { withAllowList: true })
+
+      const erc20Contract = new ethers.Contract(coinTokenAddress, AirlineCoin.abi)
+      const encodedApproveCallData = erc20Contract.interface.encodeFunctionData('approve', [
+        nftAircraftTokenAddress,
+        activePhase.price
+      ]) as Hex
+
+      const { hash: approveTx } = await paymasterSigner.sendUserOperation({
+        target: coinTokenAddress,
+        data: encodedApproveCallData
+      })
+
+      await paymasterSigner.waitForUserOperationTransaction(approveTx as Hex)
 
       const erc1155Contract = new ethers.Contract(nftAircraftTokenAddress, contract.abi)
       const encodedCallData = erc1155Contract.interface.encodeFunctionData('claim', [

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getUser } from '../auth/[...thirdweb]'
+import { getUser } from '../auth/[...nextauth]'
 import clientPromise from 'lib/mongodb'
 import { Collection, DB } from 'types'
 

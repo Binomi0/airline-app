@@ -1,9 +1,10 @@
-import React, { FC, useCallback, useReducer } from 'react'
+import React, { FC, useCallback, useEffect, useReducer } from 'react'
 import alchemyProviderReducer from './AlchemyProvider.reducer'
 import { AlchemyProviderContext } from './AlchemyProvider.context'
 import { AlchemyReducerState } from './AlchemyProvider.types'
 import { Hex, SmartAccountProvider } from '@alchemy/aa-core'
 import { Wallet } from 'ethers'
+import useAlchemyWallet from 'hooks/useAlchemyWallet'
 
 export const INITIAL_STATE: AlchemyReducerState = {
   baseSigner: undefined,

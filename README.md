@@ -2,6 +2,8 @@
 
 Create a project using this example:
 
+MHg3YjY3Mjg2MjE5YTI1MmQwOGJjNTQ0MTY3NmI2ZDlmMDRlNWYxOGU0Zjc4YjhhZDYzMzljOGExNThhNjQ5MzUw
+
 ```bash
 npx thirdweb create --template next-typescript-starter
 ```
