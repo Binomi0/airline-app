@@ -9,7 +9,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     return res.status(200).send(response)
   } catch (error) {
-    console.log('error =>', error)
+    console.error('error =>', error)
     return res.status(500).json(error)
   }
 }

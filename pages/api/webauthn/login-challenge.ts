@@ -37,12 +37,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).send({ error: error.message, verified: false })
   }
 
-  const token = jwt.sign({ data: { email: req.body.email } }, process.env.JWT_SECRET, { expiresIn: '1m' })
+  const token = jwt.sign({ data: { email: req.body.email } }, process.env.JWT_SECRET, { expiresIn: '1h' })
   setCookie('token', token, { req, res })
   const userCollection = db.collection(Collection.user)
   const data = await userCollection.findOne({ email: req.body.email })
-  console.log({ data })
-  res.send({ verified: verification.verified, id: data?.id })
+  console.info({ data })
+  res.send({ verified: verification.verified, id: data?.id, emailVerified: data?.emailVerified })
 }
 
 export default handler

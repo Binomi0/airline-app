@@ -16,14 +16,13 @@ export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     ...INITIAL_STATE
   })
   const { Provider } = AuthProviderContext
-  const { data: session, status, update } = useSession()
+  const { update } = useSession()
 
   // Polling the session every 1 hour
   useEffect(() => {
     // TIP: You can also use `navigator.onLine` and some extra event handlers
     // to check if the user is online and only update the session if they are.
     // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine
-    console.log('IS ONLINE =>', navigator.onLine)
     if (!navigator.onLine) return
     const interval = setInterval(() => update(), 1000 * 60 * 60)
     return () => clearInterval(interval)
@@ -39,10 +38,11 @@ export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
 
   const signIn = useCallback(
     (user?: User) => {
+      console.log()
       dispatch({ type: 'SIGN_IN', payload: user })
-      update()
+      !state.user && update()
     },
-    [update]
+    [update, state.user]
   )
 
   const signOut = useCallback(() => {

@@ -8,7 +8,7 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 const AirBalanceBar = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const { balance } = useTokenBalance(coinTokenAddress)
+  const { balance, refetch } = useTokenBalance(coinTokenAddress)
   const [isRequesting, setIsRequesting] = useState(false)
   const [requested, setRequested] = useState(false)
 
@@ -26,6 +26,11 @@ const AirBalanceBar = () => {
       setIsRequesting(false)
     }
   }, [smartAccountAddress])
+
+  React.useEffect(() => {
+    const timer = setInterval(refetch, 15000)
+    return () => clearInterval(timer)
+  }, [refetch])
 
   return (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>

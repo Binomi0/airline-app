@@ -15,6 +15,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const db = client.db(DB.develop).collection(Collection.webauthn)
   const user = await db.findOne({ email: req.body.email })
   const id = uuidv4()
+
   const challengeResponse = generateRegistrationOptions({
     rpName,
     rpID,

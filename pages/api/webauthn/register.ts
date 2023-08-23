@@ -15,8 +15,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const webauthnCollection = db.collection(Collection.webauthn)
   const user = await webauthnCollection.findOne({ email: req.body.email })
 
-  console.log({ webauthn: user })
-
   let verification
   try {
     verification = await verifyRegistrationResponse({
@@ -69,12 +67,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.error(error)
     return res.status(500).send({ error: 'Error al actualizar authenticators' })
   }
-  try {
-    return res.status(200).send({ webauthn: user, verified })
-  } catch (error) {
-    console.error(error)
-    return res.status(500).send({ error: 'Error al crear el usuario en la db users' })
-  }
+
+  return res.status(200).send({ verified })
 }
 
 export default handler

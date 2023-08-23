@@ -22,7 +22,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         role: 'user'
       })
 
-      console.log({ collection })
+      console.log('NEW TRANSACTION ITEM =>', collection)
 
       // await collection.insertOne({
       //   email: req.user,

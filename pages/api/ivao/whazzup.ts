@@ -13,7 +13,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!nextCall || nextCall.isBefore(now)) {
     nextCall = now.add(20, 'seconds')
     try {
-      console.log('requesting IVAO data at %s', now.format('HH:mm:ss'))
+      console.info('requesting IVAO data at %s', now.format('HH:mm:ss'))
 
       const response = await axios.get('https://api.ivao.aero/v2/tracker/whazzup')
 
@@ -24,7 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       return res.status(200).send(response.data.clients)
     } catch (error) {
-      console.log('error =>', error)
+      console.error('error =>', error)
       return res.status(500).send([])
     }
   }

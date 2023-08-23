@@ -1,6 +1,6 @@
 import { Grid, Card, CardContent, Stack, Typography, CardActions, Button, CircularProgress } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { getNFTAttributes } from 'utils'
 import { coinTokenAddress } from 'contracts/address'
 import LicenseItemHeader from './License/LicenseItemHeader'
@@ -18,7 +18,7 @@ interface Props {
 
 const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const { balance: airlBalance, getBalance } = useTokenBalance(coinTokenAddress)
+  const { balance: airlBalance, refetch: getBalance } = useTokenBalance(coinTokenAddress)
   const { name, description, image } = nft.metadata
 
   const handleClaimLicense = useCallback(async () => {
@@ -29,7 +29,8 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
       throw new Error('missing price in nft')
     }
 
-    const hasEnough = airlBalance.isGreaterThan(attribute.value)
+    const balance = await getBalance()
+    const hasEnough = balance?.isGreaterThan(attribute.value)
     if (hasEnough) {
       await claimNFT({ to: smartAccountAddress, nft, quantity: 1 })
       getBalance()
@@ -46,6 +47,11 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
 
     return attribute.value
   }, [])
+
+  useEffect(() => {
+    const timer = setInterval(getBalance, 15000)
+    return () => clearInterval(timer)
+  }, [getBalance])
 
   return (
     <Grid item xs={12} md={6} lg={4}>

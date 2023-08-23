@@ -8,12 +8,14 @@ const useTokenBalance = (token?: string) => {
   const [balance, setBalance] = useState<BigNumber>(new BigNumber(0))
 
   const getBalance = useCallback(async () => {
+    if (!smartAccountAddress) return
     try {
       const response = await axios.post('/api/token/balance', { address: smartAccountAddress, token })
       const [balance] = response.data.tokenBalances
       const balanceBigNumber = new BigNumber(balance.tokenBalance).div(1e18)
 
       setBalance(balanceBigNumber)
+      return balanceBigNumber
     } catch (error) {
       console.error(error)
       setBalance(new BigNumber(0))
@@ -26,7 +28,7 @@ const useTokenBalance = (token?: string) => {
     getBalance()
   }, [smartAccountAddress, getBalance, token])
 
-  return { balance, getBalance }
+  return { balance, refetch: getBalance }
 }
 
 export default useTokenBalance

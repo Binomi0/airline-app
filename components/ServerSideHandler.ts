@@ -16,11 +16,9 @@ interface Props {
 
 const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<Props> => {
   const token = getCookie('token', { req: ctx.req, res: ctx.res }) as string
-  console.log({ token })
   if (token) {
     try {
       const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
-      console.log({ decoded })
       const { email } = decoded.data
       if (!email) {
         deleteCookie('token')

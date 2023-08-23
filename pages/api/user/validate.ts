@@ -21,22 +21,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const vcode = new BigNumber(req.body.code)
 
       if (code.isEqualTo(vcode)) {
-        transporter.sendMail(
-          {
-            from: process.env.EMAIL_FROM,
-            to: req.body.email,
-            subject: 'Airline | Wellcome!',
-            text: '¡Bienvenido! Register process already finished, thanks!',
-            html: '<p>¡Bienvenido! Register process already finished, thanks!</p>'
-          },
-          (err, info) => {
-            if (err) {
-              console.log('[sendMail] ERROR =>', err)
-              return
-            }
-            console.log({ info })
-          }
-        )
+        await transporter.sendMail({
+          from: process.env.EMAIL_FROM,
+          to: req.body.email,
+          subject: 'Airline | Wellcome!',
+          text: '¡Bienvenido! Register process already finished, thanks!',
+          html: '<p>¡Bienvenido! Register process already finished, thanks!</p>'
+        })
 
         await db.findOneAndUpdate(
           { email: req.body.email },
@@ -46,7 +37,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
       return res.status(403).end()
     } catch (err) {
-      console.log('[handler] validate() ERROR =>', err)
+      console.error('[handler] validate() ERROR =>', err)
       return res.status(500).send(err)
     }
   }

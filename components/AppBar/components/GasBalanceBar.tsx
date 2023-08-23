@@ -5,7 +5,12 @@ import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
 import useTokenBalance from 'hooks/useTokenBalance'
 
 const GasBalanceBar = () => {
-  const { balance } = useTokenBalance(rewardTokenAddress)
+  const { balance, refetch } = useTokenBalance(rewardTokenAddress)
+
+  React.useEffect(() => {
+    const timer = setInterval(refetch, 15000)
+    return () => clearInterval(timer)
+  }, [refetch])
 
   return (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>

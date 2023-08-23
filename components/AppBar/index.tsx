@@ -22,14 +22,23 @@ import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
 import { useAuthProviderContext } from 'context/AuthProvider'
 import axios from 'config/axios'
+import { useSession } from 'next-auth/react'
 
 type CreatingState = 'signIn' | 'signUp' | 'validate' | undefined
+type AppBarSnackStatus = 'success' | 'error' | 'warning' | 'info'
+interface AppBarSnack {
+  open: boolean
+  message: string
+  status: AppBarSnackStatus
+}
 
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
 const validateEmail = (email: string) => {
   const expression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
   return expression.test(email)
 }
+
+const initialSnackState: AppBarSnack = { open: false, message: '', status: 'success' }
 
 const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
@@ -41,8 +50,8 @@ const CustomAppBar: React.FC = () => {
   const [email, setEmail] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const codeRef = useRef<HTMLInputElement>(null)
-  const { user } = useAuthProviderContext()
-  const [snackOpen, setSnackOpen] = useState(false)
+  const { data: session } = useSession()
+  const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
 
   const handleSignUp = useCallback((email: string) => validateEmail(email) && signUp(email), [signUp])
   const handleSignIn = useCallback((email: string) => validateEmail(email) && signIn(email), [signIn])
@@ -55,8 +64,10 @@ const CustomAppBar: React.FC = () => {
     try {
       await axios.post('/api/user/validate', { code, email })
       handleSignUp(email)
+      setSnack({ open: true, message: 'Validation code is OK!', status: 'success' })
     } catch (err) {
-      console.log('[handleValidateCode] ERROR =>', err)
+      setSnack({ open: true, message: 'Validation code wrong :(', status: 'warning' })
+      console.error('[handleValidateCode] ERROR =>', err)
     }
 
     setCreating(undefined)
@@ -69,54 +80,62 @@ const CustomAppBar: React.FC = () => {
     const email = inputRef.current.value
 
     if (creating === 'signIn') {
-      console.log('Signing in')
       handleSignIn(email)
       setCreating(undefined)
+      setSnack({ open: true, message: 'Wellcome back!', status: 'success' })
     } else if (creating === 'signUp') {
-      console.log('Signing up')
       try {
         const user = await axios.post('/api/user', { email }).then((r) => r.data)
         if (user.success) {
           handleSignUp(email)
           setCreating(undefined)
+          setSnack({ open: true, message: 'Account Created!', status: 'success' })
         } else {
           const response = await axios.post('/api/user/create', { email })
           if (response.data.success) {
             setEmail(email)
             setCreating('validate')
+            setSnack({
+              open: true,
+              message: 'Review your mail inbox, a validation code has been sent!',
+              status: 'info'
+            })
+          } else {
+            setCreating(undefined)
           }
         }
       } catch (err) {
-        console.log('[handleAccess] ERROR =>', err)
+        setCreating(undefined)
+        console.error('[handleAccess] ERROR =>', err)
       }
     }
   }, [creating, handleSignIn, handleSignUp])
 
   const handleSignOut = useCallback(() => {
     signOut()
+    setSnack({ open: true, message: 'See you soon!', status: 'info' })
   }, [signOut])
 
   const handleAddBackup = useCallback(() => {
-    if (user?.email) signUp(user?.email)
-  }, [signUp, user?.email])
+    console.log('[handleAddBackup] user =>', session?.user?.email)
+    if (session?.user?.email) signUp(session?.user?.email)
+  }, [session?.user?.email, signUp])
 
   useEffect(() => {
-    setSnackOpen(status === 'missingKey')
+    setSnack({ open: status === 'missingKey', message: 'Missing Key', status: 'error' })
+    setSnack({ open: status === 'error', message: 'An error has occoured', status: 'error' })
   }, [status])
-
-  console.log({ status })
-  console.log({ snackOpen })
 
   return (
     <>
       <Snackbar
         anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-        open={snackOpen}
+        open={snack.open}
         autoHideDuration={6000}
-        onClose={() => setSnackOpen(false)}
+        onClose={() => setSnack(initialSnackState)}
       >
-        <Alert onClose={() => setSnackOpen(false)} severity='success' sx={{ width: '100%' }}>
-          Missing key
+        <Alert onClose={() => setSnack(initialSnackState)} severity={snack.status} sx={{ width: '100%' }}>
+          {snack.message}
         </Alert>
       </Snackbar>
       <AppBar position='sticky' color={trigger ? 'primary' : 'transparent'}>
@@ -162,7 +181,7 @@ const CustomAppBar: React.FC = () => {
                       placeholder='Insert your email'
                       inputRef={inputRef}
                     />
-                    <Button variant='contained' onClick={handleAccess}>
+                    <Button disabled={status === 'loading'} variant='contained' onClick={handleAccess}>
                       SEND
                     </Button>
                   </Stack>
@@ -188,6 +207,7 @@ const CustomAppBar: React.FC = () => {
                 {!creating && (
                   <>
                     <Button
+                      disabled={status === 'loading'}
                       variant='contained'
                       color='secondary'
                       onClick={() => {
@@ -197,6 +217,7 @@ const CustomAppBar: React.FC = () => {
                       Connect
                     </Button>
                     <Button
+                      disabled={status === 'loading'}
                       variant='contained'
                       onClick={() => {
                         setCreating('signUp')
@@ -209,10 +230,10 @@ const CustomAppBar: React.FC = () => {
               </>
             ) : (
               <>
-                <Button variant='contained' color='success' onClick={handleAddBackup}>
+                <Button disabled={status === 'loading'} variant='contained' color='success' onClick={handleAddBackup}>
                   Add Backup
                 </Button>
-                <Button variant='contained' color='error' onClick={handleSignOut}>
+                <Button disabled={status === 'loading'} variant='contained' color='error' onClick={handleSignOut}>
                   Log Out
                 </Button>
               </>

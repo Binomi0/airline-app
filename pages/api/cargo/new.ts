@@ -35,7 +35,7 @@ const handler: NextApiHandler = async (req, res) => {
 
     return res.status(201).send(newCargo)
   } catch (error) {
-    console.log('New Cargo ERROR =>', error)
+    console.error('New Cargo ERROR =>', error)
     return res.status(500).end()
   }
 }

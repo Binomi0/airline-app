@@ -22,27 +22,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           emailVerified: false
         })
 
-        transporter.sendMail(
-          {
-            from: process.env.EMAIL_FROM,
-            to: req.body.email,
-            subject: 'Airline | Verify your email',
-            text: `Verification code: ${randomNumber}`,
-            html: `<p>Verification code: ${randomNumber}</p>`
-          },
-          (err, info) => {
-            if (err) {
-              console.log('[sendMail] ERROR =>', err)
-              return
-            }
-            console.log({ info })
-          }
-        )
+        await transporter.sendMail({
+          from: process.env.EMAIL_FROM,
+          to: req.body.email,
+          subject: 'Airline | Verify your email',
+          text: `Verification code: ${randomNumber}`,
+          html: `<p>Verification code: ${randomNumber}</p>`
+        })
         return res.status(200).send({ success: true })
       }
       return res.status(200).send({ success: true })
     } catch (err) {
-      console.log('[handler] create() ERROR =>', err)
+      console.error('[handler] create() ERROR =>', err)
       return res.status(500).send(err)
     }
   }
