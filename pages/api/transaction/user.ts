@@ -1,7 +1,6 @@
-import { mongoose, connectDB } from 'lib/mongoose'
+import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
-import { Collection, DB } from 'types'
 import TransactionModel from 'models/Transaction'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {

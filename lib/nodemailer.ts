@@ -10,6 +10,8 @@ const transporter = createTransport({
     pass: process.env.EMAIL_SERVER_PASSWORD
   }
 })
+
+// eslint-disable-next-line
 transporter.verify(function (error, success) {
   if (error) {
     console.log(error)
