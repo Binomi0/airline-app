@@ -1,60 +1,74 @@
-import axios from 'axios'
-import { v4 as uuidv4 } from 'uuid'
+import axios from 'config/axios'
 import { Wallet } from 'ethers'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useAlchemyWallet from './useAlchemyWallet'
 import { deleteCookie } from 'cookies-next'
-// import { useSession } from 'next-auth/react'
 
 const SERVER_URI = '/api/webauthn'
+type AccountSignerStatus = 'loading' | 'error' | 'success' | 'missingKey' | undefined
 
 const useAccountSigner = () => {
   const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner, baseSigner } =
     useAlchemyProviderContext()
   useAlchemyWallet(baseSigner)
+  const [status, setStatus] = useState<AccountSignerStatus>()
 
-  const createCredential = useCallback(async (id: string, email: string) => {
+  const createCredential = useCallback(async (email: string) => {
     try {
-      const responseChallenge = await axios.post(`${SERVER_URI}/request-register`, {
-        _id: id,
-        email
-      })
+      const responseChallenge = await axios.post(`${SERVER_URI}/request-register`, { email })
       const request = await startRegistration(responseChallenge.data)
       const responseValidation = await axios.post<{ verified: boolean }>(`${SERVER_URI}/register`, {
         data: request,
         email
       })
 
-      return responseValidation.data.verified
+      return responseValidation.data
     } catch (err) {
       console.error(err)
-      return false
+      return { verified: false }
     }
   }, [])
 
   const signUp = useCallback(
     async (email: string) => {
+      setStatus('loading')
+      console.log('SIGN UP')
       try {
         const response = await axios.post('/api/user', { email })
+        console.log({ data: response.data })
         if (response.data.success) {
-          const isVerified = await createCredential(response.data.id, email)
-          if (isVerified) {
+          const credential = await createCredential(email)
+          if (credential.verified) {
             const walletId = localStorage.getItem(response.data.id)
             if (!walletId) {
+              const random = Wallet.createRandom()
+              if (!response.data.id) {
+                throw new Error('missing Id')
+              }
+
+              localStorage.setItem(response.data.id, Buffer.from(random.privateKey).toString('base64'))
+
+              setBaseSigner(random)
+              setStatus('missingKey')
               throw new Error('Missing private key')
             }
             const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
             setBaseSigner(signer)
+            setStatus('success')
           }
         } else {
           await axios.post('/api/user/create', { email })
-          return true
+          setStatus('success')
           // const id = uuidv4()
           // localStorage.setItem('wallet-key', id)
         }
-      } catch (error) {}
+      } catch (err) {
+        console.log('[signUp] Error =>', err)
+        // @ts-ignore
+        setStatus(err.message === 'Missing private key' ? 'missingKey' : 'error')
+      }
       // const localCredentialId = localStorage.getItem('wallet-id')
 
       // if (!localCredentialId) {
@@ -82,33 +96,33 @@ const useAccountSigner = () => {
 
   const signIn = useCallback(
     async (email: string) => {
-      const localCredentialId = localStorage.getItem('wallet-key')
-      if (!localCredentialId) {
-        if (email) {
-          signUp(email)
+      setStatus('loading')
+      try {
+        const responseChallenge = await axios.post(`${SERVER_URI}/login`, { email })
+        const request = await startAuthentication(responseChallenge.data)
+        const responseValidation = await axios.post(`${SERVER_URI}/login-challenge`, {
+          data: request,
+          email
+        })
+
+        const { verified, id } = responseValidation.data
+        if (verified && id) {
+          const walletId = localStorage.getItem(id)
+          if (walletId) {
+            const signer = new Wallet(Buffer.from(id, 'base64').toString())
+            setBaseSigner(signer)
+            setStatus('success')
+            return
+          } else {
+            throw new Error('Missing wallet key')
+          }
         }
-        return
-      }
-
-      const responseChallenge = await axios.post(`${SERVER_URI}/login`, { email })
-      const request = await startAuthentication(responseChallenge.data)
-      const responseValidation = await axios.post(`${SERVER_URI}/login-challenge`, {
-        data: request,
-        email
-      })
-
-      if (responseValidation.data.verified) {
-        const walletId = localStorage.getItem(localCredentialId)
-        if (!walletId) {
-          // At this point user would want to import private key
-          throw new Error('Missing walletId')
-        }
-
-        const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
-        setBaseSigner(signer)
+      } catch (err) {
+        // @ts-ignore
+        setStatus(err?.message === 'Missing wallet key' ? 'missingKey' : 'error')
       }
     },
-    [setBaseSigner, signUp]
+    [setBaseSigner]
   )
 
   const signOut = useCallback(() => {
@@ -122,7 +136,8 @@ const useAccountSigner = () => {
   return {
     signUp,
     signIn,
-    signOut
+    signOut,
+    status
   }
 }
 

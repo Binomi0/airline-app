@@ -6,6 +6,7 @@ type SignOut = Readonly<{ type: 'SIGN_OUT' }>
 
 export type AuthReducerState = {
   user?: User
+  token?: string
 }
 
 export type AuthContextProps = AuthReducerState & {

@@ -1,5 +1,17 @@
-import React, { useCallback, useRef, useState } from 'react'
-import { AppBar, Box, Button, IconButton, Stack, TextField, Toolbar, Typography, useScrollTrigger } from '@mui/material'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  Alert,
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Snackbar,
+  Stack,
+  TextField,
+  Toolbar,
+  Typography,
+  useScrollTrigger
+} from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useMainProviderContext } from 'context/MainProvider'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -9,7 +21,7 @@ import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
 import { useAuthProviderContext } from 'context/AuthProvider'
-import axios from 'axios'
+import axios from 'config/axios'
 
 type CreatingState = 'signIn' | 'signUp' | 'validate' | undefined
 
@@ -23,43 +35,59 @@ const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
   const { toggleSidebar } = useMainProviderContext()
   const trigger = useScrollTrigger()
-  const { signUp, signIn, signOut } = useAccountSigner()
+  const { signUp, signIn, signOut, status } = useAccountSigner()
   const { smartAccountAddress } = useAlchemyProviderContext()
   const [creating, setCreating] = useState<CreatingState>()
   const [email, setEmail] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const codeRef = useRef<HTMLInputElement>(null)
   const { user } = useAuthProviderContext()
+  const [snackOpen, setSnackOpen] = useState(false)
 
   const handleSignUp = useCallback((email: string) => validateEmail(email) && signUp(email), [signUp])
   const handleSignIn = useCallback((email: string) => validateEmail(email) && signIn(email), [signIn])
 
   const handleValidateCode = useCallback(async () => {
     const code = codeRef.current?.value
-    console.log('email: %s, code: %s', email, code)
+
     if (!email || !code) return
+
     try {
       await axios.post('/api/user/validate', { code, email })
       handleSignUp(email)
     } catch (err) {
-      console.log('ERROR =>', err)
+      console.log('[handleValidateCode] ERROR =>', err)
     }
+
     setCreating(undefined)
   }, [email, handleSignUp])
 
   const handleAccess = useCallback(async () => {
-    if (!inputRef.current?.value) return
+    if (!inputRef.current?.value) {
+      throw new Error('Missing email')
+    }
     const email = inputRef.current.value
 
-    if (creating === 'signIn') handleSignIn(email)
-    else if (creating === 'signUp') {
-      const user = await axios.post('/api/user', { email }).then((r) => r.data)
-      console.log({ user })
-      if (user.emailVerified) {
-        handleSignUp(email)
-      } else {
-        setEmail(email)
-        setCreating('validate')
+    if (creating === 'signIn') {
+      console.log('Signing in')
+      handleSignIn(email)
+      setCreating(undefined)
+    } else if (creating === 'signUp') {
+      console.log('Signing up')
+      try {
+        const user = await axios.post('/api/user', { email }).then((r) => r.data)
+        if (user.success) {
+          handleSignUp(email)
+          setCreating(undefined)
+        } else {
+          const response = await axios.post('/api/user/create', { email })
+          if (response.data.success) {
+            setEmail(email)
+            setCreating('validate')
+          }
+        }
+      } catch (err) {
+        console.log('[handleAccess] ERROR =>', err)
       }
     }
   }, [creating, handleSignIn, handleSignUp])
@@ -72,9 +100,25 @@ const CustomAppBar: React.FC = () => {
     if (user?.email) signUp(user?.email)
   }, [signUp, user?.email])
 
-  console.log({ creating })
+  useEffect(() => {
+    setSnackOpen(status === 'missingKey')
+  }, [status])
+
+  console.log({ status })
+  console.log({ snackOpen })
+
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+        open={snackOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackOpen(false)}
+      >
+        <Alert onClose={() => setSnackOpen(false)} severity='success' sx={{ width: '100%' }}>
+          Missing key
+        </Alert>
+      </Snackbar>
       <AppBar position='sticky' color={trigger ? 'primary' : 'transparent'}>
         <Toolbar>
           <IconButton

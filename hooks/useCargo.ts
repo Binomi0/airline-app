@@ -1,5 +1,5 @@
 import { NFT } from '@thirdweb-dev/sdk'
-import axios from 'axios'
+import axios from 'config/axios'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useVaProviderContext } from 'context/VaProvider'
 import { cargos } from 'mocks/cargos'

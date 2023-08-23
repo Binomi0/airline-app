@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'config/axios'
 import BigNumber from 'bignumber.js'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useCallback, useEffect, useState } from 'react'

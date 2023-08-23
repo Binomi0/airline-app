@@ -12,6 +12,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const db = client.db(DB.develop).collection(Collection.webauthn)
     const user = await db.findOne({ email: req.body.email })
 
+    if (!user) {
+      return res.status(404).end()
+    }
+
     const options = generateAuthenticationOptions({
       // Require users to use a previously-registered authenticator
       // @ts-ignore

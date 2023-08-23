@@ -11,8 +11,8 @@ import {
   walletConnect
 } from '@thirdweb-dev/react'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import { useAuthProviderContext } from 'context/AuthProvider'
 import { Wallet } from 'ethers'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   children: ReactNode
@@ -20,24 +20,22 @@ interface Props {
 
 const CustomWeb3Provider = ({ children }: Props) => {
   const localWalletConfig = localWallet()
-  const { user } = useAuthProviderContext()
+  const session = useSession()
   const { setBaseSigner } = useAlchemyProviderContext()
 
   const authUser = useCallback(() => {
-    const id = localStorage.getItem('wallet-key')
-    if (!id) return
-
-    const base64Key = localStorage.getItem(id)
+    // @ts-ignore
+    const base64Key = localStorage.getItem(session.data?.user?.id)
     if (!base64Key) return
 
     const key = Buffer.from(base64Key, 'base64').toString()
     const wallet = new Wallet(key)
     setBaseSigner(wallet)
-  }, [setBaseSigner])
+  }, [setBaseSigner, session])
 
   useEffect(() => {
-    if (user) authUser()
-  }, [authUser, user])
+    if (session.status === 'authenticated') authUser()
+  }, [authUser, session.status])
 
   return (
     <ThirdwebProvider
@@ -46,16 +44,16 @@ const CustomWeb3Provider = ({ children }: Props) => {
       dAppMeta={{
         name: 'Airline App',
         description: 'Decentralized Virtual Airline',
-        logoUrl: 'https://example.com/logo.png',
-        url: 'https://airline-app-binomio.vercel.app',
+        logoUrl: 'https://airline.onrubia.es/logo.png',
+        url: 'https://airline.onrubia.es',
         isDarkMode: true
       }}
       activeChain={Sepolia}
       supportedChains={[Sepolia]}
-      // authConfig={{
-      //   domain: process.env['NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN'] || '',
-      //   authUrl: '/api/auth'
-      // }}
+      authConfig={{
+        domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN as string,
+        authUrl: '/api/auth'
+      }}
       // autoConnect
       // signer={baseSigner}
       supportedWallets={[

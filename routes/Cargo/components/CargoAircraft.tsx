@@ -18,7 +18,7 @@ import {
   useNFT,
   useSetClaimConditions
 } from '@thirdweb-dev/react'
-import axios from 'axios'
+import axios from 'config/axios'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { flightNftAddress, nftLicenseTokenAddress } from 'contracts/address'
 import { useRouter } from 'next/router'

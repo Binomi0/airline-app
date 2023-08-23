@@ -1,21 +1,29 @@
 import { GetServerSidePropsContext } from 'next'
-import { getCookie } from 'cookies-next'
+import { deleteCookie, getCookie } from 'cookies-next'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import { Collection, DB, User } from 'types'
 
-interface User {
-  email: string
-  address: string
+interface Props {
+  props: {
+    token?: string
+    user?: {
+      email?: string
+      address?: string
+    } | null
+  }
 }
 
-const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<{ props: { user?: User } }> => {
-  const token = getCookie('token', { req: ctx.req, res: ctx.res })
+const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<Props> => {
+  const token = getCookie('token', { req: ctx.req, res: ctx.res }) as string
+  console.log({ token })
   if (token) {
     try {
       const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
+      console.log({ decoded })
       const { email } = decoded.data
       if (!email) {
+        deleteCookie('token')
         return {
           props: {}
         }
@@ -26,9 +34,9 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<{
       const user = await db.findOne<User>({ email }, { projection: { _id: 0 } })
 
       if (user) {
-        console.log({ user })
         return {
           props: {
+            token,
             user: {
               email,
               address: ''
@@ -37,38 +45,20 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<{
         }
       }
     } catch (err) {
-      console.log('TOKEN ERROR =>', err)
-      return { props: {} }
+      deleteCookie('token')
+      return {
+        props: {
+          user: null
+        }
+      }
     }
   }
   try {
     return {
       props: {}
     }
-    //   const refreshToken: string = getCookie("refreshToken", ctx) as string;
-
-    //   if (!refreshToken) {
-    //     throw new Error("Missing token");
-    //   }
-    //   const detectedIp = requestIp.getClientIp(ctx.req);
-    //   internalApi.defaults.headers.common["x-forwarded-for"] = detectedIp || "0";
-
-    //   const response = await internalApi.post<ILoginAuth>(
-    //     ApiRoutes.AUTH_LOGIN_REFRESH,
-    //     { refreshToken }
-    //   );
-
-    //   internalApi.defaults.headers.common.Authorization = `Bearer ${response.data.idToken}`;
-    //   return {
-    //     props: {},
-    //   };
   } catch (err) {
     console.log('Error in server =>', err)
-    //   if (ctx.res.writeHead) {
-    //     ctx.res.writeHead(302, { Location: AppRoutes.ACCESS });
-    //     ctx.res.end();
-    //   }
-
     return {
       props: {} as never
     }

@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { generateRegistrationOptions } from '@simplewebauthn/server'
 import clientPromise from 'lib/mongodb'
 import { Collection, DB } from 'types'
+import { v4 as uuidv4 } from 'uuid'
 
 // Human-readable title for your website
 const rpName = 'AIRLINE'
@@ -9,15 +10,15 @@ const rpName = 'AIRLINE'
 const rpID = process.env.DOMAIN as string
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { _id: id, email } = req.body
+  const { email } = req.body
   const client = await clientPromise
   const db = client.db(DB.develop).collection(Collection.webauthn)
   const user = await db.findOne({ email: req.body.email })
-
+  const id = uuidv4()
   const challengeResponse = generateRegistrationOptions({
     rpName,
     rpID,
-    userID: id,
+    userID: user?.id ?? id,
     userName: email,
     // Don't prompt users for additional information about the authenticator
     // (Recommended for smoother UX)

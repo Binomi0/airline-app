@@ -3,7 +3,6 @@ import clientPromise from 'lib/mongodb'
 import { Collection, DB } from 'types'
 import transporter from 'lib/nodemailer'
 import { v4 as uuidv4 } from 'uuid'
-import Email from 'next-auth/providers/email'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!req.body.email) return res.status(400).end()
@@ -33,7 +32,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
           (err, info) => {
             if (err) {
-              console.log('ERROR =>', err)
+              console.log('[sendMail] ERROR =>', err)
               return
             }
             console.log({ info })
@@ -43,7 +42,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
       return res.status(200).send({ success: true })
     } catch (err) {
-      console.log('ERROR =>', err)
+      console.log('[handler] create() ERROR =>', err)
       return res.status(500).send(err)
     }
   }

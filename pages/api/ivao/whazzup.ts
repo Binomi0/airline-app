@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'config/axios'
 import { IVAOClients } from 'context/VaProvider/VaProvider.types'
 import moment, { Moment } from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'

@@ -13,8 +13,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const client = await clientPromise
-  const db = client.db(DB.develop).collection(Collection.webauthn)
-  const user = await db.findOne({ email: req.body.email })
+  const db = client.db(DB.develop)
+  const webauthnCollection = db.collection(Collection.webauthn)
+  const user = await webauthnCollection.findOne({ email: req.body.email })
 
   if (!user) {
     // @ts-ignore
@@ -36,9 +37,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).send({ error: error.message, verified: false })
   }
 
-  const token = jwt.sign({ data: { email: req.body.email } }, process.env.JWT_SECRET, { expiresIn: '1h' })
+  const token = jwt.sign({ data: { email: req.body.email } }, process.env.JWT_SECRET, { expiresIn: '1m' })
   setCookie('token', token, { req, res })
-  res.send(verification)
+  const userCollection = db.collection(Collection.user)
+  const data = await userCollection.findOne({ email: req.body.email })
+  console.log({ data })
+  res.send({ verified: verification.verified, id: data?.id })
 }
 
 export default handler

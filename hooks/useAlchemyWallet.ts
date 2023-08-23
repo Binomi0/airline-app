@@ -6,11 +6,14 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvid
 import { Wallet, ethers } from 'ethers'
 import { coinTokenAddress } from 'contracts/address'
 import AirlineCoin from 'contracts/abi/AirlineCoin.json'
+import axios from 'config/axios'
+import { useSession } from 'next-auth/react'
 
 const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
 
 const useAlchemyWallet = (signer?: Wallet) => {
+  const session = useSession()
   const {
     smartSigner,
     paymasterSigner,
@@ -96,12 +99,24 @@ const useAlchemyWallet = (signer?: Wallet) => {
     if (!smartAccountAddress) {
       const address = await smartSigner.account.getAddress()
       setSmartAccountAddress(address)
+
+      if (session.status === 'authenticated') {
+        await axios.post('/api/wallet', { smartAccountAddress: address, signerAddress: signer.address })
+      }
     }
 
     setBaseSigner(signer)
     setSmartSigner(smartSigner)
     setPaymasterSigner(newPaymasterSigner)
-  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signer, smartAccountAddress])
+  }, [
+    session.status,
+    setBaseSigner,
+    setPaymasterSigner,
+    setSmartAccountAddress,
+    setSmartSigner,
+    signer,
+    smartAccountAddress
+  ])
 
   useEffect(() => {
     if (!signer) return

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import { Button, CircularProgress, Stack, Typography } from '@mui/material'
-import axios from 'axios'
+import axios from 'config/axios'
 import { coinTokenAddress } from 'contracts/address'
 import useTokenBalance from 'hooks/useTokenBalance'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
@@ -25,7 +25,7 @@ const AirBalanceBar = () => {
     } finally {
       setIsRequesting(false)
     }
-  }, [])
+  }, [smartAccountAddress])
 
   return (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>

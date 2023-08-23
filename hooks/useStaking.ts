@@ -1,5 +1,6 @@
 import { Hex } from '@alchemy/aa-core'
 import { SmartContract } from '@thirdweb-dev/sdk'
+import axios from 'config/axios'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { stakingAddress } from 'contracts/address'
 import { BigNumber, ethers } from 'ethers'
@@ -14,18 +15,25 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
       if (!contract || !paymasterSigner) return
       setIsLoading(true)
 
-      const erc20Staking = new ethers.Contract(stakingAddress, contract.abi)
-      const encodedCallData = erc20Staking.interface.encodeFunctionData('stake', [amount])
+      try {
+        const erc20Staking = new ethers.Contract(stakingAddress, contract.abi)
+        const encodedCallData = erc20Staking.interface.encodeFunctionData('stake', [amount])
 
-      const { hash } = await paymasterSigner.sendUserOperation({
-        target: stakingAddress,
-        data: encodedCallData as Hex
-      })
+        const { hash } = await paymasterSigner.sendUserOperation({
+          target: stakingAddress,
+          data: encodedCallData as Hex
+        })
 
-      await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
+        await axios.post('/api/transaction/user', {
+          operation: 'claimRewards',
+          amount: amount.toString(),
+          hash
+        })
+        await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
 
-      setIsLoading(false)
-      return hash
+        setIsLoading(false)
+        return hash
+      } catch (error) {}
     },
     [contract, paymasterSigner]
   )

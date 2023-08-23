@@ -15,6 +15,7 @@ import '../styles/globals.css'
 import { AlchemyProvider } from 'context/AlchemyProvider'
 import { AuthProvider } from 'context/AuthProvider'
 import CustomWeb3Provider from 'components/CustomWeb3Provider'
+import { SessionProvider } from 'next-auth/react'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -40,26 +41,28 @@ export default function MyApp(props: MyAppProps) {
   }, [])
 
   return (
-    <AuthProvider user={props.pageProps.user}>
-      <AlchemyProvider>
-        <CustomWeb3Provider>
-          <CacheProvider value={emotionCache}>
-            <Head>
-              <meta name='viewport' content='initial-scale=1, width=device-width' />
-            </Head>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <ErrorBoundary>
-                <MainProvider>
-                  <AppBar />
-                  <Sidebar />
-                </MainProvider>
-                <Component loading={loading} {...props.pageProps} />
-              </ErrorBoundary>
-            </ThemeProvider>
-          </CacheProvider>
-        </CustomWeb3Provider>
-      </AlchemyProvider>
-    </AuthProvider>
+    <SessionProvider session={props.pageProps.session}>
+      <AuthProvider>
+        <AlchemyProvider>
+          <CustomWeb3Provider>
+            <CacheProvider value={emotionCache}>
+              <Head>
+                <meta name='viewport' content='initial-scale=1, width=device-width' />
+              </Head>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <ErrorBoundary>
+                  <MainProvider>
+                    <AppBar />
+                    <Sidebar />
+                  </MainProvider>
+                  <Component loading={loading} {...props.pageProps} />
+                </ErrorBoundary>
+              </ThemeProvider>
+            </CacheProvider>
+          </CustomWeb3Provider>
+        </AlchemyProvider>
+      </AuthProvider>
+    </SessionProvider>
   )
 }

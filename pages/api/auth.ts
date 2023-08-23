@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import clientPromise from 'lib/mongodb'
 import { Collection, DB } from 'types'
 import jwt, { JwtPayload } from 'jsonwebtoken'
+import withAuth from 'lib/withAuth'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') return res.status(405).end()
@@ -27,4 +28,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   res.status(401).end()
 }
-export default handler
+export default withAuth(handler)
