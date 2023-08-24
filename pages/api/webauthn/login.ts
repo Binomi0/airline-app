@@ -41,11 +41,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const challenge = {
       ...options,
       user: {
-        // @ts-ignore
         id: user.id,
-        // @ts-ignore
         name: user.name || user.email,
-        // @ts-ignore
         displayName: user.displayName || user.email
       },
       rp: {

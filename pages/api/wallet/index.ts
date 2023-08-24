@@ -16,7 +16,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         { upsert: true }
       )
 
-      return res.status(200).end()
+      return res.status(202).end()
     } catch (err) {
       return res.status(500).send(err)
     }

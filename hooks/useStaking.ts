@@ -2,7 +2,7 @@ import { Hex } from '@alchemy/aa-core'
 import { SmartContract } from '@thirdweb-dev/sdk'
 import axios from 'config/axios'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import { stakingAddress } from 'contracts/address'
+import { stakingAddress as target } from 'contracts/address'
 import { BigNumber, ethers } from 'ethers'
 import { useCallback, useState } from 'react'
 
@@ -16,23 +16,16 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
       setIsLoading(true)
 
       try {
-        const erc20Staking = new ethers.Contract(stakingAddress, contract.abi)
-        const encodedCallData = erc20Staking.interface.encodeFunctionData('stake', [amount])
+        const erc20Staking = new ethers.Contract(target, contract.abi)
+        const data = erc20Staking.interface.encodeFunctionData('stake', [amount]) as Hex
 
-        const { hash } = await paymasterSigner.sendUserOperation({
-          target: stakingAddress,
-          data: encodedCallData as Hex
-        })
+        const { hash } = await paymasterSigner.sendUserOperation({ target, data })
 
-        await axios.post('/api/transaction/user', {
-          operation: 'claimRewards',
-          amount: amount.toString(),
-          hash
-        })
+        await axios.post('/api/transaction/user', { operation: 'stake', amount: amount.toString(), hash })
         await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
 
         setIsLoading(false)
-        return hash
+        return await paymasterSigner.getUserOperationReceipt(hash as Hex)
       } catch (error) {}
     },
     [contract, paymasterSigner]
@@ -43,39 +36,37 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
       if (!contract || !paymasterSigner) return
       setIsLoading(true)
 
-      const erc20Staking = new ethers.Contract(stakingAddress, contract.abi)
-      const encodedCallData = erc20Staking.interface.encodeFunctionData('withdraw', [amount])
+      const erc20Staking = new ethers.Contract(target, contract.abi)
+      const data = erc20Staking.interface.encodeFunctionData('withdraw', [amount]) as Hex
 
-      const { hash } = await paymasterSigner.sendUserOperation({
-        target: stakingAddress,
-        data: encodedCallData as Hex
-      })
+      const { hash } = await paymasterSigner.sendUserOperation({ target, data })
 
+      await axios.post('/api/transaction/user', { operation: 'claimRewards', amount: amount.toString(), hash })
       await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
 
       setIsLoading(false)
-      return hash
+      return await paymasterSigner.getUserOperationReceipt(hash as Hex)
     },
     [contract, paymasterSigner]
   )
 
-  const claimRewards = useCallback(async () => {
-    if (!contract || !paymasterSigner) return
-    setIsLoading(true)
+  const claimRewards = useCallback(
+    async (amount: string) => {
+      if (!contract || !paymasterSigner) return
+      setIsLoading(true)
 
-    const erc20Staking = new ethers.Contract(stakingAddress, contract.abi)
-    const encodedCallData = erc20Staking.interface.encodeFunctionData('claimRewards', [])
+      const erc20Staking = new ethers.Contract(target, contract.abi)
+      const data = erc20Staking.interface.encodeFunctionData('claimRewards', []) as Hex
+      const { hash } = await paymasterSigner.sendUserOperation({ target, data })
 
-    const { hash } = await paymasterSigner.sendUserOperation({
-      target: stakingAddress,
-      data: encodedCallData as Hex
-    })
+      await axios.post('/api/transaction/user', { operation: 'claimRewards', amount, hash })
+      await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
 
-    await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
-
-    setIsLoading(false)
-    return hash
-  }, [contract, paymasterSigner])
+      setIsLoading(false)
+      return await paymasterSigner.getUserOperationReceipt(hash as Hex)
+    },
+    [contract, paymasterSigner]
+  )
 
   return { stake, withdraw, claimRewards, isLoading }
 }

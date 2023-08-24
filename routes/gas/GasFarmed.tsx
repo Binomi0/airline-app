@@ -1,5 +1,5 @@
 import { Grid, Card, Box, Typography, Stack, Button } from '@mui/material'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useBalance, useContract, useContractRead } from '@thirdweb-dev/react'
 import { rewardTokenAddress, stakingAddress } from 'contracts/address'
 import { formatNumber } from 'utils'
@@ -12,6 +12,12 @@ const GasFarmed = () => {
   const { data: stakeInfo, refetch: getStakeInfo } = useContractRead(contract, 'getStakeInfo', [address])
   const { claimRewards, isLoading: isClaiming } = useStaking(contract)
   const { refetch } = useBalance(rewardTokenAddress)
+
+  const handleClaimRewards = useCallback(async () => {
+    const receipt = await claimRewards(stakeInfo?._rewards)
+    console.log({receipt})
+    refetch()
+  }, [claimRewards, refetch, stakeInfo?._rewards])
 
   useEffect(() => {
     const timer = setInterval(getStakeInfo, 15000)
@@ -32,16 +38,7 @@ const GasFarmed = () => {
           </Typography>
 
           <Stack>
-            <Button
-              color='info'
-              disabled={isClaiming}
-              size='small'
-              variant='contained'
-              onClick={async () => {
-                await claimRewards()
-                refetch()
-              }}
-            >
+            <Button color='info' disabled={isClaiming} size='small' variant='contained' onClick={handleClaimRewards}>
               Get Gas
             </Button>
           </Stack>

@@ -20,9 +20,9 @@ import GasBalanceBar from './components/GasBalanceBar'
 import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
-import { useAuthProviderContext } from 'context/AuthProvider'
 import axios from 'config/axios'
 import { useSession } from 'next-auth/react'
+import Swal from 'sweetalert2'
 
 type CreatingState = 'signIn' | 'signUp' | 'validate' | undefined
 type AppBarSnackStatus = 'success' | 'error' | 'warning' | 'info'
@@ -44,7 +44,7 @@ const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
   const { toggleSidebar } = useMainProviderContext()
   const trigger = useScrollTrigger()
-  const { signUp, signIn, signOut, status } = useAccountSigner()
+  const { signUp, signIn, signOut, addBackup,  status } = useAccountSigner()
   const { smartAccountAddress } = useAlchemyProviderContext()
   const [creating, setCreating] = useState<CreatingState>()
   const [email, setEmail] = useState('')
@@ -111,15 +111,35 @@ const CustomAppBar: React.FC = () => {
     }
   }, [creating, handleSignIn, handleSignUp])
 
-  const handleSignOut = useCallback(() => {
-    signOut()
-    setSnack({ open: true, message: 'See you soon!', status: 'info' })
+  const handleSignOut = useCallback(async () => {
+    const confirm = await Swal.fire({
+      title: 'Sign Out',
+      text: 'Are you leaving?',
+      showCancelButton: true,
+      showConfirmButton: true,
+    })
+    if (confirm) {
+      signOut()
+      setSnack({ open: true, message: 'See you soon!', status: 'info' })
+    }
   }, [signOut])
 
-  const handleAddBackup = useCallback(() => {
+  const handleAddBackup = useCallback(async () => {
+    if (!session?.user?.email) {
+      throw new Error('Missing user session')
+    }
     console.log('[handleAddBackup] user =>', session?.user?.email)
-    if (session?.user?.email) signUp(session?.user?.email)
-  }, [session?.user?.email, signUp])
+    const confirm = await Swal.fire({
+      title: 'Account Login Backup',
+      text: 'Add another device to log in this site',
+      showCancelButton: true,
+      showConfirmButton: true,
+      icon: 'question'
+    })
+    if (confirm) {
+      addBackup()
+    }
+  }, [session, addBackup])
 
   useEffect(() => {
     setSnack({ open: status === 'missingKey', message: 'Missing Key', status: 'error' })

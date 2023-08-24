@@ -10,7 +10,7 @@ export interface ITransaction extends Document {
   role: string
 }
 
-const transactionSchema: mongoose.Schema = new mongoose.Schema({
+const transactionSchema: mongoose.Schema = new mongoose.Schema<ITransaction>({
   email: {
     type: String,
     required: true,
@@ -38,4 +38,4 @@ const transactionSchema: mongoose.Schema = new mongoose.Schema({
   }
 })
 
-export default mongoose.model<ITransaction>('Transaction', transactionSchema)
+export default mongoose.models.Transaction || mongoose.model<ITransaction>('Transaction', transactionSchema)

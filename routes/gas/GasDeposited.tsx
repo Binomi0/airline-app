@@ -12,14 +12,16 @@ const GasDeposited = () => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract } = useContract(stakingAddress)
   const { withdraw, isLoading } = useStaking(contract)
-  const { data: staking } = useContractRead(contract, 'stakers', [address])
+  const { data: staking, refetch } = useContractRead(contract, 'stakers', [address])
   const maxAmount = (Number(staking?.amountStaked) / 1e18).toString()
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
-      withdraw(ethers.utils.parseEther(unstakeAmount))
+      const receipt = await withdraw(ethers.utils.parseEther(unstakeAmount))
+      console.log({receipt})
+      refetch()
     },
-    [withdraw]
+    [withdraw, refetch]
   )
 
   return (
