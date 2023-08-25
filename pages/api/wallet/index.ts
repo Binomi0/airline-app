@@ -9,8 +9,11 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     if (!req.body.signerAddress) return res.status(400).end()
     try {
       const client = await clientPromise
-      const db = client.db(DB.develop).collection(Collection.wallet)
-      await db.findOneAndUpdate(
+      const db = client.db(DB.develop)
+      const walletCollection = db.collection(Collection.wallet)
+      const userCollection = db.collection(Collection.user)
+      await userCollection.findOneAndUpdate({ email: req.user }, { $set: { address: req.body.smartAccountAddress } })
+      await walletCollection.findOneAndUpdate(
         { email: req.user },
         { $set: { smartAccountAddress: req.body.smartAccountAddress, signerAddress: req.body.signerAddress } },
         { upsert: true }
@@ -18,11 +21,11 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
       return res.status(202).end()
     } catch (err) {
-      return res.status(500).send(err)
+      res.status(500).send(err)
     }
   }
 
-  return res.status(405).end()
+  res.status(405).end()
 }
 
 export default withAuth(handler)

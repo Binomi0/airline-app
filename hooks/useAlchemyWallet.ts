@@ -91,7 +91,6 @@ const useAlchemyWallet = (signer?: Wallet) => {
     )
 
     const newPaymasterSigner = withAlchemyGasManager(smartSigner, {
-      // provider: smartSigner.rpcClient,
       policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA || '',
       entryPoint: ENTRY_POINT
     })
@@ -101,22 +100,23 @@ const useAlchemyWallet = (signer?: Wallet) => {
       setSmartAccountAddress(address)
 
       if (session.status === 'authenticated') {
-        await axios.post('/api/wallet', { smartAccountAddress: address, signerAddress: signer.address })
+        await axios.post('/api/user/update', { address })
+        await axios.post('/api/wallet', {
+          // @ts-ignore
+          id: session.data.id,
+          smartAccountAddress: address,
+          signerAddress: signer.address
+        })
+        console.log('ADDRESS SAVED')
+      } else {
+        console.log('SHOULD BE AUTHENTICATED AND NOT', {session})
       }
     }
 
     setBaseSigner(signer)
     setSmartSigner(smartSigner)
     setPaymasterSigner(newPaymasterSigner)
-  }, [
-    session.status,
-    setBaseSigner,
-    setPaymasterSigner,
-    setSmartAccountAddress,
-    setSmartSigner,
-    signer,
-    smartAccountAddress
-  ])
+  }, [session, setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signer, smartAccountAddress])
 
   useEffect(() => {
     if (!signer) return

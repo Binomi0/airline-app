@@ -6,7 +6,7 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useAlchemyWallet from './useAlchemyWallet'
 import { deleteCookie } from 'cookies-next'
 import Swal from 'sweetalert2'
-import { useSession } from 'next-auth/react'
+import { getSession, useSession } from 'next-auth/react'
 
 const SERVER_URI = '/api/webauthn'
 type AccountSignerStatus = 'loading' | 'error' | 'success' | 'missingKey' | undefined
@@ -60,6 +60,7 @@ const useAccountSigner = () => {
             const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
             setBaseSigner(signer)
             setStatus('success')
+            getSession()
           }
         } else {
           await axios.post('/api/user/create', { email })
@@ -98,9 +99,9 @@ const useAccountSigner = () => {
               text: 'You are now logged in',
               icon: 'success',
             })
+            getSession()
             return
           } else {
-
             throw new Error('Missing wallet key')
           }
         } else {
@@ -123,20 +124,24 @@ const useAccountSigner = () => {
   }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner])
 
   const addBackup = useCallback(async () => {
+    // @ts-ignore
     if (!session?.user?.email || !session?.user?.id) {
       throw new Error('Missing required email')
     }
     try {
         const credential = await createCredential(session.user.email)
         if (credential.verified) {
+          // @ts-ignore
           const walletId = localStorage.getItem(session.user.id)
           if (!walletId) {
             const random = Wallet.createRandom()
+            // @ts-ignore
             if (!session.user.id) {
               setStatus('missingKey')
               throw new Error('missing Id')
             }
 
+            // @ts-ignore
             localStorage.setItem(session.user.id, Buffer.from(random.privateKey).toString('base64'))
 
             setBaseSigner(random)
@@ -154,6 +159,7 @@ const useAccountSigner = () => {
     }
 
   }
+  // @ts-ignore
   , [createCredential, session?.user?.email, session?.user?.id, setBaseSigner])
 
   return {

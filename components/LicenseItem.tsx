@@ -21,23 +21,20 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
   const { balance: airlBalance, refetch: getBalance } = useTokenBalance(coinTokenAddress)
   const { name, description, image } = nft.metadata
 
+  const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
+
   const handleClaimLicense = useCallback(async () => {
     if (!airlBalance || !smartAccountAddress) return
 
-    const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
-    if (!attribute) {
-      throw new Error('missing price in nft')
-    }
-
     const balance = await getBalance()
-    const hasEnough = balance?.isGreaterThan(attribute.value)
+    const hasEnough = balance?.isGreaterThan(attribute?.value || 0)
     if (hasEnough) {
       await claimNFT({ to: smartAccountAddress, nft, quantity: 1 })
       getBalance()
     } else {
-      console.log(`You do not have enough AIRL tokens, ${attribute.value}`)
+      console.log(`You do not have enough AIRL tokens, ${attribute?.value}`)
     }
-  }, [claimNFT, smartAccountAddress, airlBalance, nft, getBalance])
+  }, [airlBalance, smartAccountAddress, attribute, getBalance, claimNFT, nft])
 
   const getNFTPrice = useCallback((nft: NFT) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
@@ -76,7 +73,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
 
         {!owned && (
           <CardActions>
-            <Button disabled={isClaiming || !smartAccountAddress} variant='contained' onClick={handleClaimLicense}>
+            <Button color={airlBalance.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'} disabled={isClaiming || !smartAccountAddress} variant='contained' onClick={handleClaimLicense}>
               {isClaiming ? (
                 <CircularProgress size={25} />
               ) : (

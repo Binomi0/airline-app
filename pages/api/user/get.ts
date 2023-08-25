@@ -11,14 +11,14 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       const user = await db.findOne({ email: req.user })
 
       if (!user) {
-        return res.status(404).end()
+         return res.status(404).end()
       }
 
-      return res.status(200).send({ success: true, id: user.id, emailVerified: user.emailVerified })
+       res.status(200).send({ success: true, id: user.id, emailVerified: user.emailVerified })
     } catch (err) {
-      return res.status(500).send(err)
+       res.status(500).send(err)
     }
   }
-  return res.status(405).end()
+   res.status(405).end()
 }
 export default withAuth(handler)

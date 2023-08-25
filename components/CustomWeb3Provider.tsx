@@ -1,25 +1,17 @@
 import { Sepolia } from '@thirdweb-dev/chains'
 import React, { ReactNode, useCallback, useEffect } from 'react'
-import { factoryAddress } from 'contracts/address'
 import {
   ThirdwebProvider,
-  coinbaseWallet,
-  localWallet,
-  metamaskWallet,
-  safeWallet,
-  smartWallet,
-  walletConnect
 } from '@thirdweb-dev/react'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { Wallet } from 'ethers'
-import { useSession } from 'next-auth/react'
+import { useSession, getSession } from 'next-auth/react'
 
 interface Props {
   children: ReactNode
 }
 
 const CustomWeb3Provider = ({ children }: Props) => {
-  const localWalletConfig = localWallet()
   const session = useSession()
   const { setBaseSigner } = useAlchemyProviderContext()
 
@@ -31,6 +23,7 @@ const CustomWeb3Provider = ({ children }: Props) => {
     const key = Buffer.from(base64Key, 'base64').toString()
     const wallet = new Wallet(key)
     setBaseSigner(wallet)
+    getSession()
   }, [setBaseSigner, session])
 
   useEffect(() => {
@@ -50,24 +43,24 @@ const CustomWeb3Provider = ({ children }: Props) => {
       }}
       activeChain={Sepolia}
       supportedChains={[Sepolia]}
-      authConfig={{
-        domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN as string,
-        authUrl: '/api/auth'
-      }}
+      // authConfig={{
+      //   domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN as string,
+      //   authUrl: '/api/auth'
+      // }}
       // autoConnect
       // signer={baseSigner}
-      supportedWallets={[
-        smartWallet({
-          enableConnectApp: true,
-          factoryAddress,
-          gasless: true,
-          personalWallets: [localWalletConfig]
-        }),
-        metamaskWallet(),
-        coinbaseWallet(),
-        walletConnect(),
-        safeWallet()
-      ]}
+      // supportedWallets={[
+      //   smartWallet({
+      //     enableConnectApp: true,
+      //     factoryAddress,
+      //     gasless: true,
+      //     personalWallets: [localWalletConfig]
+      //   }),
+      //   metamaskWallet(),
+      //   coinbaseWallet(),
+      //   walletConnect(),
+      //   safeWallet()
+      // ]}
     >
       {children}
     </ThirdwebProvider>

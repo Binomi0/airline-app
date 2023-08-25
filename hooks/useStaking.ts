@@ -8,7 +8,11 @@ import { useCallback, useState } from 'react'
 
 const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) => {
   const [isLoading, setIsLoading] = useState(false)
-  const { paymasterSigner } = useAlchemyProviderContext()
+  const { paymasterSigner, smartAccountAddress } = useAlchemyProviderContext()
+
+  const canDoOperation = useCallback(async () => {
+    const response = await axios.post('/api/user/staking', {address: smartAccountAddress})
+  }, [])
 
   const stake = useCallback(
     async (amount: BigNumber) => {

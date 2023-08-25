@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import clientPromise from 'lib/mongodb'
 import { Collection, DB } from 'types'
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import { getCookie } from 'cookies-next'
+import { deleteCookie, getCookie } from 'cookies-next'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await clientPromise
@@ -10,15 +10,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const token = getCookie('token', { req, res })
+    if (!token) res.status(401).end()
     const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
 
     if (decoded.data.email) {
       const user = await db.findOne({ email: decoded.data.email })
 
-      return res.status(200).send({ user, token })
+      res.status(200).send({ user, token })
+    } else {
+      res.status(400).end()
     }
   } catch (err) {
-    return res.status(500).send(err)
+    // @ts-ignore
+    if (err?.message === 'jwt expired') {
+      deleteCookie('token', {req, res})
+      res.status(401).end()
+    }
+    res.status(500).send(err)
   }
 
   try {
@@ -28,11 +36,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (decoded.data.email) {
         const user = await db.findOne({ email: decoded.data.email })
 
-        return res.status(200).send({ user, token })
+        res.status(200).send({ user, token })
       }
     }
   } catch (err) {
-    return res.status(500).send(err)
+    console.log('JWT', err  )
+    res.status(500).send(err)
   }
 
   res.status(401).end()
