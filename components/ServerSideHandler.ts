@@ -23,7 +23,7 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
       if (!email) {
         deleteCookie('token')
         return {
-          props: {}
+          props: {} as never
         }
       }
 
@@ -45,9 +45,7 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
     } catch (err) {
       deleteCookie('token')
       return {
-        props: {
-          user: null
-        }
+        props: {} as never
       }
     }
   }

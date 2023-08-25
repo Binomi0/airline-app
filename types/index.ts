@@ -109,3 +109,12 @@ export interface WebAuthnUser {
   challenge: string
   authenticators: Authenticator[]
 }
+
+export enum WebAuthnUri {
+  REQUEST_REGISTER = '/api/webauthn/request-register',
+  REGISTER = '/api/webauthn/register',
+  LOGIN = '/api/webauthn/login',
+  LOGIN_CHALLENGE = '/api/webauthn/login-challenge'
+}
+
+export type AccountSignerStatus = 'loading' | 'error' | 'success' | 'missingKey' | undefined

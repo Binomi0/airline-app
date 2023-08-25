@@ -23,6 +23,7 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvid
 import axios from 'config/axios'
 import { useSession } from 'next-auth/react'
 import Swal from 'sweetalert2'
+import Close from '@mui/icons-material/Close'
 
 type CreatingState = 'signIn' | 'signUp' | 'validate' | undefined
 type AppBarSnackStatus = 'success' | 'error' | 'warning' | 'info'
@@ -44,7 +45,7 @@ const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
   const { toggleSidebar } = useMainProviderContext()
   const trigger = useScrollTrigger()
-  const { signUp, signIn, signOut, addBackup,  status } = useAccountSigner()
+  const { signUp, signIn, signOut, addBackup, status } = useAccountSigner()
   const { smartAccountAddress } = useAlchemyProviderContext()
   const [creating, setCreating] = useState<CreatingState>()
   const [email, setEmail] = useState('')
@@ -65,12 +66,12 @@ const CustomAppBar: React.FC = () => {
       await axios.post('/api/user/validate', { code, email })
       handleSignUp(email)
       setSnack({ open: true, message: 'Validation code is OK!', status: 'success' })
+      setCreating(undefined)
     } catch (err) {
       setSnack({ open: true, message: 'Validation code wrong :(', status: 'warning' })
       console.error('[handleValidateCode] ERROR =>', err)
+      codeRef.current.value = ''
     }
-
-    setCreating(undefined)
   }, [email, handleSignUp])
 
   const handleAccess = useCallback(async () => {
@@ -116,7 +117,7 @@ const CustomAppBar: React.FC = () => {
       title: 'Sign Out',
       text: 'Are you leaving?',
       showCancelButton: true,
-      showConfirmButton: true,
+      showConfirmButton: true
     })
     if (confirm) {
       signOut()
@@ -136,10 +137,44 @@ const CustomAppBar: React.FC = () => {
       showConfirmButton: true,
       icon: 'question'
     })
-    if (confirm) {
+
+    if (confirm.isConfirmed) {
       addBackup()
     }
   }, [session, addBackup])
+
+  const handleExportKey = useCallback(() => {
+    if (!session?.user?.id || !session?.user?.address) {
+      throw new Error('Missing params')
+    }
+    console.log(session.user.address)
+    const base64Key = localStorage.getItem(session.user.id)
+    if (!base64Key) {
+      return Swal.fire({
+        title: 'Missing local wallet',
+        text: 'There is no local wallet available',
+        icon: 'error'
+      })
+    }
+
+    const key = Buffer.from(base64Key, 'base64').toString()
+    const blob = new Blob([key], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `airline-walley-key-${String(session.user.address).slice(-4)}.pem`
+
+    // Append the <a> element to the document and trigger the click event
+    document.body.appendChild(a)
+    a.click()
+
+    // Clean up the temporary URL object
+    URL.revokeObjectURL(url)
+
+    // Remove the <a> element from the document
+    document.body.removeChild(a)
+  }, [session?.user?.address, session?.user?.id])
 
   useEffect(() => {
     setSnack({ open: status === 'missingKey', message: 'Missing Key', status: 'error' })
@@ -200,6 +235,13 @@ const CustomAppBar: React.FC = () => {
                       label='EMAIL'
                       placeholder='Insert your email'
                       inputRef={inputRef}
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton onClick={() => setCreating(undefined)}>
+                            <Close color='primary' />
+                          </IconButton>
+                        )
+                      }}
                     />
                     <Button disabled={status === 'loading'} variant='contained' onClick={handleAccess}>
                       SEND
@@ -218,6 +260,13 @@ const CustomAppBar: React.FC = () => {
                       label='CODE'
                       placeholder='Insert code'
                       inputRef={codeRef}
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton onClick={() => setCreating(undefined)}>
+                            <Close />
+                          </IconButton>
+                        )
+                      }}
                     />
                     <Button variant='contained' onClick={handleValidateCode}>
                       SEND
@@ -251,7 +300,10 @@ const CustomAppBar: React.FC = () => {
             ) : (
               <>
                 <Button disabled={status === 'loading'} variant='contained' color='success' onClick={handleAddBackup}>
-                  Add Backup
+                  Add Account Backup
+                </Button>
+                <Button disabled={status === 'loading'} variant='contained' color='warning' onClick={handleExportKey}>
+                  Export Wallet
                 </Button>
                 <Button disabled={status === 'loading'} variant='contained' color='error' onClick={handleSignOut}>
                   Log Out
