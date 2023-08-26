@@ -21,7 +21,13 @@ const AircraftActions: React.FC<{
   return (
     <CardActions sx={{ px: 2 }}>
       {isClaiming && <LinearProgress />}
-      <Button color={hasLicense ? 'success' : 'primary'} size='small' disabled={isClaiming} variant='contained' onClick={handleClick}>
+      <Button
+        color={hasLicense ? 'success' : 'primary'}
+        size='small'
+        disabled={isClaiming}
+        variant='contained'
+        onClick={handleClick}
+      >
         {isClaiming ? <CircularProgress size={14} /> : hasLicense ? `Claim ${name}` : 'Require licencia'}
       </Button>
     </CardActions>

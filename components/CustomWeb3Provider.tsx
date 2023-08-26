@@ -1,8 +1,6 @@
 import { Sepolia } from '@thirdweb-dev/chains'
 import React, { ReactNode, useCallback, useEffect } from 'react'
-import {
-  ThirdwebProvider,
-} from '@thirdweb-dev/react'
+import { ThirdwebProvider } from '@thirdweb-dev/react'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { Wallet } from 'ethers'
 import axios from 'config/axios'
@@ -19,70 +17,66 @@ interface Props {
 }
 
 const CustomWeb3Provider = ({ children }: Props) => {
-  const {user} = useAuthProviderContext()
-  const {
-    setSmartAccountAddress,
-    setBaseSigner,
-    setSmartSigner,
-    setPaymasterSigner
-  } = useAlchemyProviderContext()
+  const { user } = useAuthProviderContext()
+  const { setSmartAccountAddress, setBaseSigner, setSmartSigner, setPaymasterSigner } = useAlchemyProviderContext()
 
-  const initialize = useCallback(async (signer: Wallet) => {
-    if (!signer) return
+  const initialize = useCallback(
+    async (signer: Wallet) => {
+      if (!signer) return
 
-    const owner: SimpleSmartAccountOwner = {
-      // @ts-ignore
-      signMessage: async (msg) => signer.signMessage(msg),
-      getAddress: async () => signer.address as Hex,
-      // @ts-ignore
-      signTypedData: signer.signTypedData
-    }
-
-    const smartSigner = new SmartAccountProvider(
-      // the demo key below is public and rate-limited, it's better to create a new one
-      // you can get started with a free account @ https://www.alchemy.com/
-      process.env.NEXT_PUBLIC_ALCHEMY_URL_ETH_SEPOLIA || '', // rpcUrl
-      ENTRY_POINT, // entryPointAddress
-      sepolia // chain
-    ).connect(
-      (rpcClient) =>
-        new SimpleSmartContractAccount({
-          entryPointAddress: ENTRY_POINT,
-          chain: sepolia,
-          factoryAddress: SIMPLE_ACCOUNT_FACTORY_ADDRESS,
-          rpcClient,
-          owner,
-          // optionally if you already know the account's address
-          accountAddress: user?.address ? user.address as Hex : '' as Hex
-        })
-    )
-
-    const newPaymasterSigner = withAlchemyGasManager(smartSigner, {
-      policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA || '',
-      entryPoint: ENTRY_POINT
-    })
-
-    if (!user?.address) {
-      const address = await smartSigner.account.getAddress()
-
-      if (user) {
-        await axios.post('/api/wallet', {
-          id: user.id,
-          smartAccountAddress: address,
-          signerAddress: signer.address
-        })
+      const owner: SimpleSmartAccountOwner = {
+        // @ts-ignore
+        signMessage: async (msg) => signer.signMessage(msg),
+        getAddress: async () => signer.address as Hex,
+        // @ts-ignore
+        signTypedData: signer.signTypedData
       }
-      setSmartAccountAddress(address)
-    } else {
-      setSmartAccountAddress(user.address as Hex)
-    }
 
-    setBaseSigner(signer)
-    setSmartSigner(smartSigner)
-    setPaymasterSigner(newPaymasterSigner)
-  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, user])
+      const smartSigner = new SmartAccountProvider(
+        // the demo key below is public and rate-limited, it's better to create a new one
+        // you can get started with a free account @ https://www.alchemy.com/
+        process.env.NEXT_PUBLIC_ALCHEMY_URL_ETH_SEPOLIA || '', // rpcUrl
+        ENTRY_POINT, // entryPointAddress
+        sepolia // chain
+      ).connect(
+        (rpcClient) =>
+          new SimpleSmartContractAccount({
+            entryPointAddress: ENTRY_POINT,
+            chain: sepolia,
+            factoryAddress: SIMPLE_ACCOUNT_FACTORY_ADDRESS,
+            rpcClient,
+            owner,
+            // optionally if you already know the account's address
+            accountAddress: user?.address ? (user.address as Hex) : ('' as Hex)
+          })
+      )
 
+      const newPaymasterSigner = withAlchemyGasManager(smartSigner, {
+        policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA || '',
+        entryPoint: ENTRY_POINT
+      })
 
+      if (!user?.address) {
+        const address = await smartSigner.account.getAddress()
+
+        if (user) {
+          await axios.post('/api/wallet', {
+            id: user.id,
+            smartAccountAddress: address,
+            signerAddress: signer.address
+          })
+        }
+        setSmartAccountAddress(address)
+      } else {
+        setSmartAccountAddress(user.address as Hex)
+      }
+
+      setBaseSigner(signer)
+      setSmartSigner(smartSigner)
+      setPaymasterSigner(newPaymasterSigner)
+    },
+    [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, user]
+  )
 
   const authUser = useCallback(() => {
     if (!user?.id) return

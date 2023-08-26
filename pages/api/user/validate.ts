@@ -35,6 +35,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           { email: req.body.email },
           { $set: { emailVerified: true, verificationCode: null, verificationDate: null } }
         )
+
         res.status(200).send({ success: true, id: user.id })
         return
       }

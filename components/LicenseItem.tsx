@@ -73,7 +73,12 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
 
         {!owned && (
           <CardActions>
-            <Button color={airlBalance.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'} disabled={isClaiming || !smartAccountAddress} variant='contained' onClick={handleClaimLicense}>
+            <Button
+              color={airlBalance.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'}
+              disabled={isClaiming || !smartAccountAddress}
+              variant='contained'
+              onClick={handleClaimLicense}
+            >
               {isClaiming ? (
                 <CircularProgress size={25} />
               ) : (

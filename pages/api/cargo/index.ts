@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 // import { getUser } from '../auth/[...nextauth]'
-import clientPromise, {db} from 'lib/mongodb'
+import clientPromise, { db } from 'lib/mongodb'
 import { Collection } from 'types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

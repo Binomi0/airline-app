@@ -12,7 +12,15 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       const current = client.db(db)
       const walletCollection = current.collection(Collection.wallet)
       const userCollection = current.collection(Collection.user)
-      await userCollection.findOneAndUpdate({ email: req.user }, { $set: { address: req.body.smartAccountAddress } })
+      const user = await userCollection.findOne({ email: req.user })
+      if (!user?.starterGift) {
+        res.redirect('/api/request-funds')
+        await userCollection.findOneAndUpdate({ email: req.user }, { $set: { starterGift: true } })
+        return
+      } else {
+        await userCollection.findOneAndUpdate({ email: req.user }, { $set: { address: req.body.smartAccountAddress } })
+      }
+
       await walletCollection.findOneAndUpdate(
         { email: req.user },
         { $set: { smartAccountAddress: req.body.smartAccountAddress, signerAddress: req.body.signerAddress } },

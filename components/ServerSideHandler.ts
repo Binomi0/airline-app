@@ -1,7 +1,7 @@
 import { GetServerSidePropsContext } from 'next'
 import { deleteCookie, getCookie } from 'cookies-next'
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import clientPromise, {db} from 'lib/mongodb'
+import clientPromise, { db } from 'lib/mongodb'
 import { Collection, DB, User } from 'types'
 
 interface Props {

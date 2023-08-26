@@ -13,7 +13,7 @@ export const INITIAL_STATE: AuthReducerState = {
 export const AuthProvider: FC<{ children: React.ReactNode; user: User }> = ({ children, user }) => {
   const [state, dispatch] = useReducer(authProviderReducer, {
     ...INITIAL_STATE,
-    ...(user ? {user} : {})
+    ...(user ? { user } : {})
   })
   const { Provider } = AuthProviderContext
   const { update } = useSession()

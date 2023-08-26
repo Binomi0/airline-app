@@ -11,7 +11,7 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
   const { paymasterSigner, smartAccountAddress } = useAlchemyProviderContext()
 
   const canDoOperation = useCallback(async () => {
-    const response = await axios.post('/api/user/staking', {address: smartAccountAddress})
+    const response = await axios.post('/api/user/staking', { address: smartAccountAddress })
   }, [])
 
   const stake = useCallback(

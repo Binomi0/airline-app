@@ -42,7 +42,7 @@ const CustomAppBar: React.FC = () => {
   const { toggleSidebar } = useMainProviderContext()
   const trigger = useScrollTrigger()
   const { addBackup, status, handleSignOut } = useAccountSigner()
-  const { smartAccountAddress } = useAlchemyProviderContext()
+  const { smartAccountAddress, baseSigner } = useAlchemyProviderContext()
   const { user } = useAuthProviderContext()
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
@@ -56,11 +56,18 @@ const CustomAppBar: React.FC = () => {
     if (!user?.id || !user?.address) throw new Error('Missing params')
 
     const base64Key = localStorage.getItem(user.id)
-    if (!base64Key) return missingExportKeySwal()
-
-    const {isConfirmed} = await askExportKeySwal()
-    if (isConfirmed) downloadFile(base64Key, String(user.address))
-  }, [user?.address, user?.id])
+    if (!base64Key) {
+      if (baseSigner?.privateKey) {
+        const { isConfirmed } = await askExportKeySwal()
+        if (isConfirmed) downloadFile(Buffer.from(baseSigner.privateKey).toString(), String(user.address))
+      } else {
+        return missingExportKeySwal()
+      }
+    } else {
+      const { isConfirmed } = await askExportKeySwal()
+      if (isConfirmed) downloadFile(base64Key, String(user.address))
+    }
+  }, [baseSigner?.privateKey, user?.address, user?.id])
 
   const onSignOut = React.useCallback(async () => {
     const confirm = await signedOutSwal()

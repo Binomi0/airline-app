@@ -15,7 +15,7 @@ const GasFarmed = () => {
 
   const handleClaimRewards = useCallback(async () => {
     const receipt = await claimRewards(stakeInfo?._rewards)
-    console.log({receipt})
+    console.log({ receipt })
     refetch()
   }, [claimRewards, refetch, stakeInfo?._rewards])
 

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import clientPromise, {db} from 'lib/mongodb'
+import clientPromise, { db } from 'lib/mongodb'
 import { Collection } from 'types'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { deleteCookie, getCookie } from 'cookies-next'

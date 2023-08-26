@@ -1,5 +1,4 @@
-
-import { useCallback} from 'react'
+import { useCallback } from 'react'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
 import { ethers } from 'ethers'
 import { coinTokenAddress } from 'contracts/address'
@@ -7,11 +6,7 @@ import AirlineCoin from 'contracts/abi/AirlineCoin.json'
 import { Hex } from '@alchemy/aa-core'
 
 const useAlchemyWallet = () => {
-  const {
-    smartSigner,
-    paymasterSigner,
-    smartAccountAddress,
-  } = useAlchemyProviderContext()
+  const { smartSigner, paymasterSigner, smartAccountAddress } = useAlchemyProviderContext()
 
   const sendTransaction = useCallback(
     async (target: string, value: string) => {
@@ -48,7 +43,6 @@ const useAlchemyWallet = () => {
     },
     [paymasterSigner, smartAccountAddress, smartSigner]
   )
-
 
   return { sendTransaction }
 }

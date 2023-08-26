@@ -22,7 +22,7 @@ const GasAvailable = () => {
       setLoading(true)
       if (await setAllowance(stakingAddress, _amount)) {
         const receipt = await stake(_amount)
-        console.log({receipt})
+        console.log({ receipt })
         refetch()
       }
       setLoading(false)

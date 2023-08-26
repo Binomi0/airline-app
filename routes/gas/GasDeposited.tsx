@@ -18,7 +18,7 @@ const GasDeposited = () => {
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
       const receipt = await withdraw(ethers.utils.parseEther(unstakeAmount))
-      console.log({receipt})
+      console.log({ receipt })
       refetch()
     },
     [withdraw, refetch]
