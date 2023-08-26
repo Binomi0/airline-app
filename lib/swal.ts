@@ -50,3 +50,11 @@ export const signedOutSwal = async () =>
     showCancelButton: true,
     showConfirmButton: true
   })
+
+export const askExportKeySwal = async () => Swal.fire({
+  title: 'Export Walley KEY',
+  text: 'Wallet key is going to be download, please keep it safe.',
+  icon: 'warning',
+  showCancelButton: true,
+  showConfirmButton: true
+})

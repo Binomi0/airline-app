@@ -19,7 +19,7 @@ import GasBalanceBar from './components/GasBalanceBar'
 import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
-import { accountBackupSwal, missingExportKeySwal, signedOutSwal } from 'lib/swal'
+import { accountBackupSwal, askExportKeySwal, missingExportKeySwal, signedOutSwal } from 'lib/swal'
 import { downloadFile } from 'utils'
 import SignIn from './components/SignIn'
 import SignUp from './components/SignUp'
@@ -43,7 +43,7 @@ const CustomAppBar: React.FC = () => {
   const trigger = useScrollTrigger()
   const { addBackup, status, handleSignOut } = useAccountSigner()
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const {user} = useAuthProviderContext()
+  const { user } = useAuthProviderContext()
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
 
@@ -52,20 +52,15 @@ const CustomAppBar: React.FC = () => {
     if (confirm.isConfirmed) addBackup()
   }, [addBackup])
 
-  const handleExportKey = useCallback(() => {
-    // @ts-ignore
-    if (!session?.user?.id || !session?.user?.address) {
-      throw new Error('Missing params')
-    }
-    // @ts-ignore
-    const base64Key = localStorage.getItem(session.user.id)
-    if (!base64Key) {
-      return missingExportKeySwal()
-    }
+  const handleExportKey = useCallback(async () => {
+    if (!user?.id || !user?.address) throw new Error('Missing params')
 
-    // @ts-ignore
-    downloadFile(base64Key, String(session.user.address))
-  }, [])
+    const base64Key = localStorage.getItem(user.id)
+    if (!base64Key) return missingExportKeySwal()
+
+    const {isConfirmed} = await askExportKeySwal()
+    if (isConfirmed) downloadFile(base64Key, String(user.address))
+  }, [user?.address, user?.id])
 
   const onSignOut = React.useCallback(async () => {
     const confirm = await signedOutSwal()

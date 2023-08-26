@@ -6,14 +6,14 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { deleteCookie } from 'cookies-next'
 import { logInSwal, missingKeySwal, backupDoneSwal } from 'lib/swal'
 import { AccountSignerStatus, WebAuthnUri } from 'types'
-// import useWallet from './useWallet'
+import useWallet from './useWallet'
 import { useAuthProviderContext } from 'context/AuthProvider'
 
 const useAccountSigner = () => {
   const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner } = useAlchemyProviderContext()
   const { signIn, signOut, user } = useAuthProviderContext()
   const [status, setStatus] = useState<AccountSignerStatus>()
-  // const { initWallet } = useWallet()
+  const { initWallet } = useWallet()
 
   const createCredential = useCallback(async (email: string) => {
     try {
@@ -40,7 +40,6 @@ const useAccountSigner = () => {
       const request = await startAuthentication(responseChallenge.data)
       const responseValidation = await axios.post(WebAuthnUri.LOGIN_CHALLENGE, { data: request, email })
 
-      console.log('RESPONSE VALIDATION =>', responseValidation)
       const { verified } = responseValidation.data
       setStatus(verified ? 'success' : 'error')
 
@@ -64,7 +63,6 @@ const useAccountSigner = () => {
             const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
             setBaseSigner(signer)
             setStatus('success')
-            console.log({ user: data.user })
             signIn(data.user)
             logInSwal()
             return
@@ -111,10 +109,13 @@ const useAccountSigner = () => {
       try {
         const { verified } = await createCredential(email)
         if (verified) {
-          const { data: user } = await axios.get('/api/user/get')
-          // user.id && initWallet(user.id)
+          const { data } = await axios.get('/api/user/get')
+          if (!data.user.id) {
+            throw new Error('Missing user ID while creating wallet')
+          }
+          initWallet(data.user.id)
           setStatus('success')
-          signIn(user)
+          signIn(data.user)
           return true
         }
         return false
@@ -123,7 +124,7 @@ const useAccountSigner = () => {
         setStatus('error')
       }
     },
-    [createCredential, signIn]
+    [createCredential, initWallet, signIn]
   )
 
   const handleSignOut = useCallback(() => {
@@ -167,7 +168,7 @@ const useAccountSigner = () => {
           setStatus('success')
         }
       } catch (err) {
-        console.log('[handleSignUp] Error =>', err)
+        console.error('[handleSignUp] Error =>', err)
         // @ts-ignore
         setStatus(err.message === 'Missing private key' ? 'missingKey' : 'error')
       }

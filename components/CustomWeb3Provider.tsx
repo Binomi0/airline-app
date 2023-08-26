@@ -7,9 +7,9 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { Wallet } from 'ethers'
 import axios from 'config/axios'
 import { useAuthProviderContext } from 'context/AuthProvider'
-import { SimpleSmartContractAccount, SmartAccountProvider, type SimpleSmartAccountOwner, Hex } from '@alchemy/aa-core'
-import { sepolia } from '@wagmi/chains'
 import { withAlchemyGasManager } from '@alchemy/aa-alchemy'
+import { Hex, SimpleSmartAccountOwner, SimpleSmartContractAccount, SmartAccountProvider } from '@alchemy/aa-core'
+import { sepolia } from '@wagmi/chains'
 
 const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -21,7 +21,6 @@ interface Props {
 const CustomWeb3Provider = ({ children }: Props) => {
   const {user} = useAuthProviderContext()
   const {
-    smartAccountAddress,
     setSmartAccountAddress,
     setBaseSigner,
     setSmartSigner,
@@ -54,7 +53,7 @@ const CustomWeb3Provider = ({ children }: Props) => {
           rpcClient,
           owner,
           // optionally if you already know the account's address
-          accountAddress: smartAccountAddress
+          accountAddress: user?.address ? user.address as Hex : '' as Hex
         })
     )
 
@@ -63,7 +62,7 @@ const CustomWeb3Provider = ({ children }: Props) => {
       entryPoint: ENTRY_POINT
     })
 
-    if (!smartAccountAddress) {
+    if (!user?.address) {
       const address = await smartSigner.account.getAddress()
 
       if (user) {
@@ -74,34 +73,36 @@ const CustomWeb3Provider = ({ children }: Props) => {
         })
       }
       setSmartAccountAddress(address)
+    } else {
+      setSmartAccountAddress(user.address as Hex)
     }
 
     setBaseSigner(signer)
     setSmartSigner(smartSigner)
     setPaymasterSigner(newPaymasterSigner)
-  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, smartAccountAddress, user])
+  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, user])
+
 
 
   const authUser = useCallback(() => {
-    if (!user?.id) {
-      throw new Error('Missing user ID')
-    }
+    if (!user?.id) return
+
     const base64Key = localStorage.getItem(user.id)
     if (!base64Key) return
 
     const key = Buffer.from(base64Key, 'base64').toString()
     const wallet = new Wallet(key)
-    setBaseSigner(wallet)
     initialize(wallet)
-  }, [user?.id, setBaseSigner, initialize])
+  }, [initialize, user?.id])
 
   const removeUser = useCallback(() => {
     setBaseSigner(undefined)
   }, [setBaseSigner])
 
   useEffect(() => {
-    if (user) authUser()
-    else if (!user) removeUser()
+    if (user) {
+      if (user.id) authUser()
+    } else removeUser()
   }, [authUser, removeUser, user])
 
   return (

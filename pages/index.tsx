@@ -1,16 +1,12 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import { Box, Container, Grid, Typography } from '@mui/material'
-import { ConnectWallet } from '@thirdweb-dev/react'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import HomeGridItem from 'components/HomeGridItem'
 import image from 'public/img/Cyb3rYoga.png'
 import styles from '../styles/Home.module.css'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
 
 const Home: NextPage = () => {
-  const { smartAccountAddress } = useAlchemyProviderContext()
-
   return (
     <Box position='relative'>
       <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />
@@ -18,7 +14,6 @@ const Home: NextPage = () => {
       <Container>
         <Box my={5} textAlign='center'>
           <Typography variant='h1'>Virtual Airline</Typography>
-          {!smartAccountAddress && <ConnectWallet />}
         </Box>
 
         <Grid container spacing={8}>
