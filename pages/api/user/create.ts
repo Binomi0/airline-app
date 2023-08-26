@@ -28,13 +28,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const client = await clientPromise
       const db = client.db(DB.develop).collection(Collection.user)
-
       const user = await db.findOne({ email: req.body.email })
-      if (user && user.emailVerified) res.status(202).end()
+
+      if (user && user.emailVerified) {
+        res.status(200).send({ success: false })
+        return
+      }
+
       const randomNumber = Math.floor(Math.random() * 9000 + 1000)
 
-      const userId = uuidv4()
       if (!user) {
+        const userId = uuidv4()
+
         await db.insertOne({
           id: userId,
           email: req.body.email,
@@ -44,7 +49,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         })
 
         await sendVerifyEmail(req.body.email, randomNumber.toString())
-        res.status(200).send({ success: true, id: userId })
+        res.status(200).send({ success: true })
         return
       } else if (!user.emailVerified) {
         if (moment().isAfter(moment(user.verificationDate))) {
@@ -54,10 +59,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             { $set: { verificationCode: randomNumber, verificationDate: moment().add('5', 'minutes').unix() } }
           )
         }
-        res.status(200).send({ success: true, id: userId })
+        res.status(200).send({ success: true })
         return
       }
-      res.status(200).send({ success: false })
+      res.status(400).end()
       return
     } catch (err) {
       console.error('[handler] create() ERROR =>', err)

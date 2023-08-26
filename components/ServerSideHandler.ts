@@ -32,15 +32,7 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
       const user = await db.findOne<User>({ email }, { projection: { _id: 0 } })
 
       if (user) {
-        return {
-          props: {
-            token,
-            user: {
-              email,
-              address: ''
-            }
-          }
-        }
+        return { props: { token, user } }
       }
     } catch (err) {
       deleteCookie('token')
@@ -54,7 +46,7 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
       props: {}
     }
   } catch (err) {
-    console.log('Error in server =>', err)
+    console.error('Error in server =>', err)
     return {
       props: {} as never
     }

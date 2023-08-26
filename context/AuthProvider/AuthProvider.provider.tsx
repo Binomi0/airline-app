@@ -3,7 +3,6 @@ import authProviderReducer from './AuthProvider.reducer'
 import { AuthProviderContext } from './AuthProvider.context'
 import { AuthReducerState } from './AuthProvider.types'
 import { User } from 'types'
-import axios from 'config/axios'
 import { useSession } from 'next-auth/react'
 
 export const INITIAL_STATE: AuthReducerState = {
@@ -11,9 +10,10 @@ export const INITIAL_STATE: AuthReducerState = {
   token: undefined
 }
 
-export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: FC<{ children: React.ReactNode; user: User }> = ({ children, user }) => {
   const [state, dispatch] = useReducer(authProviderReducer, {
-    ...INITIAL_STATE
+    ...INITIAL_STATE,
+    ...(user ? {user} : {})
   })
   const { Provider } = AuthProviderContext
   const { update } = useSession()
@@ -36,38 +36,18 @@ export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     return () => window.removeEventListener('visibilitychange', visibilityHandler, false)
   }, [update])
 
-  const signIn = useCallback(
-    (user?: User) => {
-      console.log()
-      dispatch({ type: 'SIGN_IN', payload: user })
-      !state.user && update()
-    },
-    [update, state.user]
-  )
+  const signIn = useCallback((user: User) => {
+    dispatch({ type: 'SIGN_IN', payload: user })
+  }, [])
 
   const signOut = useCallback(() => {
     dispatch({ type: 'SIGN_OUT' })
   }, [])
 
   // useEffect(() => {
-  //   if (status === 'authenticated') {
-  //     console.log('session data =>', session)
-  //   }
-  //   // if (session.data) {
-  //   //   console.log('tengo token %s', token)
-  //   //   axios.defaults.headers.common = {
-  //   //     Authorization: `Bearer ${token}`
-  //   //   }
-  //   // }
-  // }, [session])
-
-  // useEffect(() => {
-  //   if (session.status === 'authenticated') {
-  //     if (!state.token && token && user) {
-  //       signIn(user)
-  //     }
-  //   }
-  // }, [session.status, signIn, state.token, state.user, token, user])
+  //   if (user) signIn(user)
+  //   else if (!user) signOut()
+  // }, [user, signIn, state.user, signOut])
 
   return (
     <Provider

@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { verifyRegistrationResponse } from '@simplewebauthn/server'
 import clientPromise from 'lib/mongodb'
 import { Collection, DB, Authenticator } from 'types'
+import { setCookie } from 'cookies-next'
+import jwt from 'jsonwebtoken'
 
 // A unique identifier for your website
 const rpID = process.env.DOMAIN
@@ -71,6 +73,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return
   }
 
+  const token = jwt.sign({ data: { email: req.body.email } }, process.env.JWT_SECRET, { expiresIn: '1h' })
+  setCookie('token', token, { req, res })
   res.status(200).send({ verified })
 }
 

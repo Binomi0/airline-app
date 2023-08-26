@@ -42,7 +42,7 @@ export default function MyApp(props: MyAppProps) {
 
   return (
     <SessionProvider session={props.pageProps.session}>
-      <AuthProvider>
+      <AuthProvider user={props.pageProps.user}>
         <AlchemyProvider>
           <CustomWeb3Provider>
             <CacheProvider value={emotionCache}>

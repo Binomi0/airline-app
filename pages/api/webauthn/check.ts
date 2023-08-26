@@ -7,15 +7,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!req.body.email) return res.status(400).end()
     try {
       const client = await clientPromise
-      const db = client.db(DB.develop).collection(Collection.user)
+      const db = client.db(DB.develop).collection(Collection.webauthn)
       const user = await db.findOne({ email: req.body.email })
 
-      if (!user) {
+      if (!user || !user.authenticators.length) {
         res.status(200).send({ success: false })
         return
       }
 
-      res.status(200).send({ success: true, emailVerified: user.emailVerified })
+      res.status(200).send({ success: true })
       return
     } catch (err) {
       res.status(500).send(err)

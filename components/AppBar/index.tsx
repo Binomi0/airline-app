@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Alert,
   AppBar,
@@ -7,7 +7,6 @@ import {
   IconButton,
   Snackbar,
   Stack,
-  TextField,
   Toolbar,
   Typography,
   useScrollTrigger
@@ -20,15 +19,13 @@ import GasBalanceBar from './components/GasBalanceBar'
 import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
-import axios from 'config/axios'
-import { useSession } from 'next-auth/react'
-import Swal from 'sweetalert2'
-import Close from '@mui/icons-material/Close'
-import { accountBackupSwal, missingExportKeySwal } from 'lib/swal'
+import { accountBackupSwal, missingExportKeySwal, signedOutSwal } from 'lib/swal'
 import { downloadFile } from 'utils'
-import LogIn from 'components/LogIn'
+import SignIn from './components/SignIn'
+import SignUp from './components/SignUp'
+import { useAuthProviderContext } from 'context/AuthProvider'
 
-type CreatingState = 'signIn' | 'signUp' | 'validate' | undefined
+export type UserActionStatus = 'signIn' | 'signUp' | undefined
 type AppBarSnackStatus = 'success' | 'error' | 'warning' | 'info'
 interface AppBarSnack {
   open: boolean
@@ -44,32 +41,11 @@ const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
   const { toggleSidebar } = useMainProviderContext()
   const trigger = useScrollTrigger()
-  const { signUp, signIn, signOut, addBackup, status } = useAccountSigner()
+  const { addBackup, status, handleSignOut } = useAccountSigner()
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const [creating, setCreating] = useState<CreatingState>()
-  const [email, setEmail] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
-  const codeRef = useRef<HTMLInputElement>(null)
-  const { data: session } = useSession()
+  const {user} = useAuthProviderContext()
+  const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
-
-  const handleSignUp = useCallback(async (email: string) => validateEmail(email) && signUp(email), [signUp])
-
-  const handleAccess = useCallback(async () => {
-    if (!inputRef.current?.value) {
-      throw new Error('Missing email')
-    }
-    const email = inputRef.current.value
-
-    if (creating === 'signIn') {
-      await handleSignIn(email)
-      setCreating(undefined)
-      setSnack({ open: true, message: 'Wellcome back!', status: 'success' })
-    } else if (creating === 'signUp') {
-      setEmail(email)
-      setCreating((await handleSignUp(email)) ? 'validate' : undefined)
-    }
-  }, [creating, handleSignIn, handleSignUp])
 
   const handleAddBackup = useCallback(async () => {
     const confirm = await accountBackupSwal()
@@ -89,13 +65,19 @@ const CustomAppBar: React.FC = () => {
 
     // @ts-ignore
     downloadFile(base64Key, String(session.user.address))
+  }, [])
 
-    // @ts-ignore
-  }, [session?.user?.address, session?.user?.id])
+  const onSignOut = React.useCallback(async () => {
+    const confirm = await signedOutSwal()
+    if (confirm.isConfirmed) handleSignOut()
+  }, [handleSignOut])
 
   useEffect(() => {
     setSnack({ open: status === 'missingKey', message: 'Missing Key', status: 'error' })
     setSnack({ open: status === 'error', message: 'An error has occoured', status: 'error' })
+    if (status === 'error') {
+      setUserActionStarted(undefined)
+    }
   }, [status])
 
   return (
@@ -138,32 +120,13 @@ const CustomAppBar: React.FC = () => {
                 <AirBalanceBar />
               </>
             )}
-            {!smartAccountAddress ? (
+            {!user ? (
               <>
-                <LogIn />
-
-                {!creating && (
-                  <>
-                    <Button
-                      disabled={status === 'loading'}
-                      variant='contained'
-                      color='secondary'
-                      onClick={() => {
-                        setCreating('signIn')
-                      }}
-                    >
-                      Connect
-                    </Button>
-                    <Button
-                      disabled={status === 'loading'}
-                      variant='contained'
-                      onClick={() => {
-                        setCreating('signUp')
-                      }}
-                    >
-                      Create
-                    </Button>
-                  </>
+                {(!userActionStarted || userActionStarted === 'signIn') && (
+                  <SignIn onInteraction={setUserActionStarted} />
+                )}
+                {(!userActionStarted || userActionStarted === 'signUp') && (
+                  <SignUp onInteraction={setUserActionStarted} />
                 )}
               </>
             ) : (
@@ -174,7 +137,7 @@ const CustomAppBar: React.FC = () => {
                 <Button disabled={status === 'loading'} variant='contained' color='warning' onClick={handleExportKey}>
                   Export Wallet
                 </Button>
-                <Button disabled={status === 'loading'} variant='contained' color='error' onClick={handleSignOut}>
+                <Button disabled={status === 'loading'} variant='contained' color='error' onClick={onSignOut}>
                   Log Out
                 </Button>
               </>

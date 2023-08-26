@@ -3,30 +3,17 @@ import { Wallet } from 'ethers'
 import { useCallback, useState } from 'react'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import useAlchemyWallet from './useAlchemyWallet'
 import { deleteCookie } from 'cookies-next'
-import { getSession, useSession } from 'next-auth/react'
 import { logInSwal, missingKeySwal, backupDoneSwal } from 'lib/swal'
 import { AccountSignerStatus, WebAuthnUri } from 'types'
-import useWallet from './useWallet'
-
-const signUpUserCheck = async (email: string): Promise<{ success: boolean; emailVerified?: boolean; id?: string }> => {
-  try {
-    const response = await axios.post('/api/user/check', { email })
-    return response.data
-  } catch (err) {
-    console.error(err)
-    return { success: false }
-  }
-}
+// import useWallet from './useWallet'
+import { useAuthProviderContext } from 'context/AuthProvider'
 
 const useAccountSigner = () => {
-  const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner, baseSigner } =
-    useAlchemyProviderContext()
-  useAlchemyWallet(baseSigner)
+  const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner } = useAlchemyProviderContext()
+  const { signIn, signOut, user } = useAuthProviderContext()
   const [status, setStatus] = useState<AccountSignerStatus>()
-  const { data: session } = useSession()
-  const { initWallet } = useWallet()
+  // const { initWallet } = useWallet()
 
   const createCredential = useCallback(async (email: string) => {
     try {
@@ -65,26 +52,27 @@ const useAccountSigner = () => {
     }
   }, [])
 
-  const signIn = useCallback(
+  const loadAccount = useCallback(
     async (email: string) => {
       setStatus('loading')
       try {
         const { verified } = await verifyCredential(email)
         if (verified) {
-          const { id } = await axios.get('/api/user/get').then((r) => r.data)
-          const walletId = localStorage.getItem(id)
+          const { data } = await axios.get('/api/user/get')
+          const walletId = localStorage.getItem(data.user.id)
           if (walletId) {
             const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
             setBaseSigner(signer)
             setStatus('success')
-            getSession()
+            console.log({ user: data.user })
+            signIn(data.user)
             logInSwal()
             return
           } else {
             const { value: file } = await missingKeySwal()
             if (file) {
               const reader = new FileReader()
-              reader.onload = (e) => {
+              reader.onload = async (e) => {
                 if (!e.target?.result) {
                   throw new Error('Missing file')
                 }
@@ -92,10 +80,10 @@ const useAccountSigner = () => {
                 const dataUrl = e.target.result as string
                 const base64Data = dataUrl.split(',')[1]
                 const signer = new Wallet(Buffer.from(base64Data, 'base64').toString())
-                localStorage.setItem(id, base64Data)
+                localStorage.setItem(data.user.id, base64Data)
                 setBaseSigner(signer)
                 setStatus('success')
-                getSession()
+                signIn(data.user)
                 logInSwal()
                 return
               }
@@ -105,91 +93,70 @@ const useAccountSigner = () => {
             }
           }
         } else {
-          console.log('ERROR WHITE')
+          // User cancelled challeng or timeout
           setStatus('error')
         }
       } catch (err) {
-        console.log('err =>', err)
+        console.error('err =>', err)
         // @ts-ignore
         setStatus(err?.message === 'Missing wallet key' ? 'missingKey' : 'error')
       }
     },
-    [setBaseSigner, verifyCredential]
+    [setBaseSigner, signIn, verifyCredential]
   )
 
-  const createUser = useCallback(
-    async (email: string) => {
-      const { data } = await axios.post('/api/user/create', { email })
-      await createCredential(email)
-      initWallet(data.id)
-      setStatus('success')
-      getSession()
-    },
-    [createCredential, initWallet]
-  )
-
-  const signUp = useCallback(
+  const handleSignUp = useCallback(
     async (email: string) => {
       setStatus('loading')
       try {
-        const data = await signUpUserCheck(email)
-        if (data.emailVerified) {
-          const { verified } = await verifyCredential(email)
-          console.log({ verified })
-          if (verified) {
-            data.id && initWallet(data.id)
-            setStatus('success')
-            getSession()
-            return true
-          }
-          return false
-        } else if (!data.success) {
-          await createUser(email)
+        const { verified } = await createCredential(email)
+        if (verified) {
+          const { data: user } = await axios.get('/api/user/get')
+          // user.id && initWallet(user.id)
           setStatus('success')
-          return true
-        } else if (!data.emailVerified) {
-          await axios.post('/api/user/create', { email })
-          setStatus('success')
+          signIn(user)
           return true
         }
+        return false
       } catch (err) {
-        console.error('[signUp] Error =>', err)
+        console.error('[handleSignUp] Error =>', err)
         setStatus('error')
       }
     },
-    [createUser, initWallet, verifyCredential]
+    [createCredential, signIn]
   )
 
-  const signOut = useCallback(() => {
+  const handleSignOut = useCallback(() => {
     setBaseSigner(undefined)
     setSmartAccountAddress(undefined)
     setPaymasterSigner(undefined)
     setSmartSigner(undefined)
     deleteCookie('token')
-  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner])
+    signOut()
+  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signOut])
 
   const addBackup = useCallback(
     async () => {
       // @ts-ignore
-      if (!session?.user?.email || !session?.user?.id) {
-        throw new Error('Missing required email')
+      if (!user?.email || !user?.id) {
+        throw new Error('Missing required params email or id')
       }
       try {
-        const credential = await createCredential(session.user.email)
+        const credential = await createCredential(user?.email)
         if (credential.verified) {
           // @ts-ignore
-          const walletId = localStorage.getItem(session.user.id)
+          const walletId = localStorage.getItem(user.id)
           if (!walletId) {
             const random = Wallet.createRandom()
             // @ts-ignore
-            if (!session.user.id) {
+            if (!user.id) {
               setStatus('missingKey')
               throw new Error('missing Id')
             }
 
             backupDoneSwal()
             // @ts-ignore
-            localStorage.setItem(session.user.id, Buffer.from(random.privateKey).toString('base64'))
+            localStorage.setItem(user.id, Buffer.from(random.privateKey).toString('base64'))
 
             setBaseSigner(random)
             setStatus('missingKey')
@@ -200,20 +167,21 @@ const useAccountSigner = () => {
           setStatus('success')
         }
       } catch (err) {
-        console.log('[signUp] Error =>', err)
+        console.log('[handleSignUp] Error =>', err)
         // @ts-ignore
         setStatus(err.message === 'Missing private key' ? 'missingKey' : 'error')
       }
     },
     // @ts-ignore
-    [createCredential, session?.user?.email, session?.user?.id, setBaseSigner]
+    [createCredential, setBaseSigner, user?.email, user?.id]
   )
 
   return {
     addBackup,
-    signUp,
-    signIn,
-    signOut,
+    handleSignUp,
+    loadAccount,
+    handleSignOut,
+    verifyCredential,
     status
   }
 }

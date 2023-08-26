@@ -17,9 +17,9 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
       }
     }
   } catch (err) {
-    console.log('Error', err)
+    console.error('Error', err)
   }
-  return res.status(401).end()
+  res.status(401).end()
 }
 
 export default withAuth
