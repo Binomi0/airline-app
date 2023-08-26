@@ -81,7 +81,8 @@ export type AttributeType = {
 }
 
 export enum DB {
-  develop = 'develop'
+  develop = 'develop',
+  production = 'production'
 }
 
 export enum Collection {

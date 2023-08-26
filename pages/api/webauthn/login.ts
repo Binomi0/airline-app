@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { generateAuthenticationOptions } from '@simplewebauthn/server'
-import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import clientPromise, { db } from 'lib/mongodb'
+import { Collection } from 'types'
 
 // Human-readable title for your website
 const rpName = 'ELIXIR'
@@ -9,8 +9,8 @@ const rpName = 'ELIXIR'
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const client = await clientPromise
-    const db = client.db(DB.develop).collection(Collection.webauthn)
-    const user = await db.findOne({ email: req.body.email })
+    const collection = client.db(db).collection(Collection.webauthn)
+    const user = await collection.findOne({ email: req.body.email })
 
     if (!user) {
       res.status(404).end()
@@ -37,7 +37,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       userVerification: 'discouraged'
     })
 
-    await db.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })
+    await collection.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })
 
     const challenge = {
       ...options,

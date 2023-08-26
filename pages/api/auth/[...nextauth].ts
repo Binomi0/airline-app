@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import clientPromise, {db} from 'lib/mongodb'
+import { Collection } from 'types'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { deleteCookie, getCookie } from 'cookies-next'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await clientPromise
-  const db = client.db(DB.develop).collection(Collection.user)
+  const collection = client.db(db).collection(Collection.user)
 
   try {
     const token = getCookie('token', { req, res })
@@ -17,7 +17,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
 
     if (decoded.data.email) {
-      const user = await db.findOne({ email: decoded.data.email })
+      const user = await collection.findOne({ email: decoded.data.email })
 
       res.status(200).send({ user, token })
       return

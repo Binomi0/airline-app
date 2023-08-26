@@ -1,7 +1,7 @@
 import { NextApiHandler } from 'next'
 // import { getUser } from '../auth/[...nextauth]'
-import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import clientPromise, { db } from 'lib/mongodb'
+import { Collection } from 'types'
 
 const handler: NextApiHandler = async (req, res) => {
   if (req.method !== 'POST') {
@@ -24,14 +24,14 @@ const handler: NextApiHandler = async (req, res) => {
 
   try {
     const client = await clientPromise
-    const db = client.db(DB.develop).collection(Collection.live)
-    const current = await db.findOne({ address: 'user.address' })
+    const collection = client.db(db).collection(Collection.live)
+    const current = await collection.findOne({ address: 'user.address' })
 
     if (current) {
       return res.status(202).json(current)
     }
 
-    const newCargo = await db.insertOne(cargo)
+    const newCargo = await collection.insertOne(cargo)
 
     return res.status(201).send(newCargo)
   } catch (error) {

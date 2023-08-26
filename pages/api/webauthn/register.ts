@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { verifyRegistrationResponse } from '@simplewebauthn/server'
-import clientPromise from 'lib/mongodb'
-import { Collection, DB, Authenticator } from 'types'
+import clientPromise, { db } from 'lib/mongodb'
+import { Collection, Authenticator } from 'types'
 import { setCookie } from 'cookies-next'
 import jwt from 'jsonwebtoken'
 
@@ -13,8 +13,8 @@ const origin = process.env.ORIGIN as string
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body } = req
   const client = await clientPromise
-  const db = client.db(DB.develop)
-  const webauthnCollection = db.collection(Collection.webauthn)
+  const current = client.db(db)
+  const webauthnCollection = current.collection(Collection.webauthn)
   const user = await webauthnCollection.findOne({ email: req.body.email })
 
   let verification

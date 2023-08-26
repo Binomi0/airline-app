@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { verifySignature } from 'utils'
-import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import clientPromise, { db } from 'lib/mongodb'
+import { Collection } from 'types'
 import jwt from 'jsonwebtoken'
 import { setCookie } from 'cookies-next'
 
@@ -14,8 +14,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const client = await clientPromise
-  const db = client.db(DB.develop)
-  const webauthnCollection = db.collection(Collection.webauthn)
+  const current = client.db(db)
+  const webauthnCollection = current.collection(Collection.webauthn)
   const user = await webauthnCollection.findOne({ email: req.body.email })
 
   if (!user) {
@@ -41,7 +41,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const token = jwt.sign({ data: { email: req.body.email } }, process.env.JWT_SECRET, { expiresIn: '1h' })
   setCookie('token', token, { req, res })
-  const userCollection = db.collection(Collection.user)
+  const userCollection = current.collection(Collection.user)
   const data = await userCollection.findOne({ email: req.body.email })
   console.info({ data })
   res.send({ verified: verification.verified, id: data?.id, emailVerified: data?.emailVerified })

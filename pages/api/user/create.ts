@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import clientPromise, { db } from 'lib/mongodb'
+import { Collection } from 'types'
 import transporter from 'lib/nodemailer'
 import { v4 as uuidv4 } from 'uuid'
 import moment from 'moment'
@@ -27,8 +27,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     try {
       const client = await clientPromise
-      const db = client.db(DB.develop).collection(Collection.user)
-      const user = await db.findOne({ email: req.body.email })
+      const collection = client.db(db).collection(Collection.user)
+      const user = await collection.findOne({ email: req.body.email })
 
       if (user && user.emailVerified) {
         res.status(200).send({ success: false })
@@ -40,7 +40,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (!user) {
         const userId = uuidv4()
 
-        await db.insertOne({
+        await collection.insertOne({
           id: userId,
           email: req.body.email,
           verificationCode: randomNumber,
@@ -54,7 +54,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       } else if (!user.emailVerified) {
         if (moment().isAfter(moment(user.verificationDate))) {
           await sendVerifyEmail(req.body.email, randomNumber.toString())
-          await db.findOneAndUpdate(
+          await collection.findOneAndUpdate(
             { email: req.body.email },
             { $set: { verificationCode: randomNumber, verificationDate: moment().add('5', 'minutes').unix() } }
           )

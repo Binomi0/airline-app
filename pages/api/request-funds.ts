@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import clientPromise from 'lib/mongodb'
+import clientPromise, { db } from 'lib/mongodb'
 import { ThirdwebSDK } from '@thirdweb-dev/sdk'
 import { Sepolia } from '@thirdweb-dev/chains'
 import { coinTokenAddress } from 'contracts/address'
@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const { address } = req.body
   const client = await clientPromise
-  const collection = client.db(DB.develop).collection(Collection.wallet)
+  const collection = client.db(db).collection(Collection.wallet)
 
   try {
     const requested = await collection.findOne({ address })

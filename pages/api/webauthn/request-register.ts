@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { generateRegistrationOptions } from '@simplewebauthn/server'
-import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import clientPromise, { db } from 'lib/mongodb'
+import { Collection } from 'types'
 import { v4 as uuidv4 } from 'uuid'
 
 // Human-readable title for your website
@@ -12,8 +12,8 @@ const rpID = process.env.DOMAIN as string
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email } = req.body
   const client = await clientPromise
-  const db = client.db(DB.develop).collection(Collection.webauthn)
-  const user = await db.findOne({ email: req.body.email })
+  const collection = client.db(db).collection(Collection.webauthn)
+  const user = await collection.findOne({ email: req.body.email })
   const id = uuidv4()
 
   const challengeResponse = generateRegistrationOptions({
@@ -42,9 +42,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   })
 
   if (!user) {
-    await db.insertOne({ id, email, challenge: challengeResponse.challenge, authenticators: [] })
+    await collection.insertOne({ id, email, challenge: challengeResponse.challenge, authenticators: [] })
   } else {
-    await db.findOneAndUpdate({ email }, { $set: { challenge: challengeResponse.challenge } })
+    await collection.findOneAndUpdate({ email }, { $set: { challenge: challengeResponse.challenge } })
   }
 
   res.send(challengeResponse)

@@ -1,7 +1,7 @@
-import clientPromise from 'lib/mongodb'
+import clientPromise, { db } from 'lib/mongodb'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
-import { Collection, DB } from 'types'
+import { Collection } from 'types'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -9,9 +9,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     if (!req.body.signerAddress) return res.status(400).end()
     try {
       const client = await clientPromise
-      const db = client.db(DB.develop)
-      const walletCollection = db.collection(Collection.wallet)
-      const userCollection = db.collection(Collection.user)
+      const current = client.db(db)
+      const walletCollection = current.collection(Collection.wallet)
+      const userCollection = current.collection(Collection.user)
       await userCollection.findOneAndUpdate({ email: req.user }, { $set: { address: req.body.smartAccountAddress } })
       await walletCollection.findOneAndUpdate(
         { email: req.user },

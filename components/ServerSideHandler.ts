@@ -1,7 +1,7 @@
 import { GetServerSidePropsContext } from 'next'
 import { deleteCookie, getCookie } from 'cookies-next'
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import clientPromise from 'lib/mongodb'
+import clientPromise, {db} from 'lib/mongodb'
 import { Collection, DB, User } from 'types'
 
 interface Props {
@@ -28,8 +28,8 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
       }
 
       const client = await clientPromise
-      const db = client.db(DB.develop).collection(Collection.user)
-      const user = await db.findOne<User>({ email }, { projection: { _id: 0 } })
+      const collection = client.db(db).collection(Collection.user)
+      const user = await collection.findOne<User>({ email }, { projection: { _id: 0 } })
 
       if (user) {
         return { props: { token, user } }
