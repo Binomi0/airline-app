@@ -22,6 +22,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return res.status(202).end()
     } catch (err) {
       res.status(500).send(err)
+      return
     }
   }
 

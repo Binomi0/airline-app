@@ -9,7 +9,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body } = req
 
   if (!body.data.response.signature) {
-    return res.status(500).end()
+    res.status(500).end()
+    return
   }
 
   const client = await clientPromise
@@ -34,7 +35,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (error) {
     console.error(error)
     // @ts-ignore
-    return res.status(400).send({ error: error.message, verified: false })
+    res.status(400).send({ error: error.message, verified: false })
+    return
   }
 
   const token = jwt.sign({ data: { email: req.body.email } }, process.env.JWT_SECRET, { expiresIn: '1h' })

@@ -24,6 +24,9 @@ import axios from 'config/axios'
 import { useSession } from 'next-auth/react'
 import Swal from 'sweetalert2'
 import Close from '@mui/icons-material/Close'
+import { accountBackupSwal, missingExportKeySwal } from 'lib/swal'
+import { downloadFile } from 'utils'
+import LogIn from 'components/LogIn'
 
 type CreatingState = 'signIn' | 'signUp' | 'validate' | undefined
 type AppBarSnackStatus = 'success' | 'error' | 'warning' | 'info'
@@ -34,10 +37,6 @@ interface AppBarSnack {
 }
 
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
-const validateEmail = (email: string) => {
-  const expression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
-  return expression.test(email)
-}
 
 const initialSnackState: AppBarSnack = { open: false, message: '', status: 'success' }
 
@@ -54,25 +53,7 @@ const CustomAppBar: React.FC = () => {
   const { data: session } = useSession()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
 
-  const handleSignUp = useCallback((email: string) => validateEmail(email) && signUp(email), [signUp])
-  const handleSignIn = useCallback((email: string) => validateEmail(email) && signIn(email), [signIn])
-
-  const handleValidateCode = useCallback(async () => {
-    const code = codeRef.current?.value
-
-    if (!email || !code) return
-
-    try {
-      await axios.post('/api/user/validate', { code, email })
-      handleSignUp(email)
-      setSnack({ open: true, message: 'Validation code is OK!', status: 'success' })
-      setCreating(undefined)
-    } catch (err) {
-      setSnack({ open: true, message: 'Validation code wrong :(', status: 'warning' })
-      console.error('[handleValidateCode] ERROR =>', err)
-      codeRef.current.value = ''
-    }
-  }, [email, handleSignUp])
+  const handleSignUp = useCallback(async (email: string) => validateEmail(email) && signUp(email), [signUp])
 
   const handleAccess = useCallback(async () => {
     if (!inputRef.current?.value) {
@@ -81,99 +62,35 @@ const CustomAppBar: React.FC = () => {
     const email = inputRef.current.value
 
     if (creating === 'signIn') {
-      handleSignIn(email)
+      await handleSignIn(email)
       setCreating(undefined)
       setSnack({ open: true, message: 'Wellcome back!', status: 'success' })
     } else if (creating === 'signUp') {
-      try {
-        const user = await axios.post('/api/user', { email }).then((r) => r.data)
-        if (user.success) {
-          handleSignUp(email)
-          setCreating(undefined)
-          setSnack({ open: true, message: 'Account Created!', status: 'success' })
-        } else {
-          const response = await axios.post('/api/user/create', { email })
-          if (response.data.success) {
-            setEmail(email)
-            setCreating('validate')
-            setSnack({
-              open: true,
-              message: 'Review your mail inbox, a validation code has been sent!',
-              status: 'info'
-            })
-          } else {
-            setCreating(undefined)
-          }
-        }
-      } catch (err) {
-        setCreating(undefined)
-        console.error('[handleAccess] ERROR =>', err)
-      }
+      setEmail(email)
+      setCreating((await handleSignUp(email)) ? 'validate' : undefined)
     }
   }, [creating, handleSignIn, handleSignUp])
 
-  const handleSignOut = useCallback(async () => {
-    const confirm = await Swal.fire({
-      title: 'Sign Out',
-      text: 'Are you leaving?',
-      showCancelButton: true,
-      showConfirmButton: true
-    })
-    if (confirm) {
-      signOut()
-      setSnack({ open: true, message: 'See you soon!', status: 'info' })
-    }
-  }, [signOut])
-
   const handleAddBackup = useCallback(async () => {
-    if (!session?.user?.email) {
-      throw new Error('Missing user session')
-    }
-    console.log('[handleAddBackup] user =>', session?.user?.email)
-    const confirm = await Swal.fire({
-      title: 'Account Login Backup',
-      text: 'Add another device to log in this site',
-      showCancelButton: true,
-      showConfirmButton: true,
-      icon: 'question'
-    })
-
-    if (confirm.isConfirmed) {
-      addBackup()
-    }
-  }, [session, addBackup])
+    const confirm = await accountBackupSwal()
+    if (confirm.isConfirmed) addBackup()
+  }, [addBackup])
 
   const handleExportKey = useCallback(() => {
+    // @ts-ignore
     if (!session?.user?.id || !session?.user?.address) {
       throw new Error('Missing params')
     }
-    console.log(session.user.address)
+    // @ts-ignore
     const base64Key = localStorage.getItem(session.user.id)
     if (!base64Key) {
-      return Swal.fire({
-        title: 'Missing local wallet',
-        text: 'There is no local wallet available',
-        icon: 'error'
-      })
+      return missingExportKeySwal()
     }
 
-    const key = Buffer.from(base64Key, 'base64').toString()
-    const blob = new Blob([key], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
+    // @ts-ignore
+    downloadFile(base64Key, String(session.user.address))
 
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `airline-walley-key-${String(session.user.address).slice(-4)}.pem`
-
-    // Append the <a> element to the document and trigger the click event
-    document.body.appendChild(a)
-    a.click()
-
-    // Clean up the temporary URL object
-    URL.revokeObjectURL(url)
-
-    // Remove the <a> element from the document
-    document.body.removeChild(a)
+    // @ts-ignore
   }, [session?.user?.address, session?.user?.id])
 
   useEffect(() => {
@@ -215,7 +132,7 @@ const CustomAppBar: React.FC = () => {
           </Box>
           <Stack direction='row' alignItems='center' height={50} spacing={1}>
             <LicenseBar />
-            {matches && !creating && (
+            {matches && smartAccountAddress && (
               <>
                 <GasBalanceBar />
                 <AirBalanceBar />
@@ -223,56 +140,8 @@ const CustomAppBar: React.FC = () => {
             )}
             {!smartAccountAddress ? (
               <>
-                {(creating === 'signUp' || creating === 'signIn') && (
-                  <Stack direction='row' spacing={2}>
-                    <TextField
-                      inputProps={{
-                        style: { color: 'white' }
-                      }}
-                      autoFocus
-                      variant='outlined'
-                      size='small'
-                      label='EMAIL'
-                      placeholder='Insert your email'
-                      inputRef={inputRef}
-                      InputProps={{
-                        endAdornment: (
-                          <IconButton onClick={() => setCreating(undefined)}>
-                            <Close color='primary' />
-                          </IconButton>
-                        )
-                      }}
-                    />
-                    <Button disabled={status === 'loading'} variant='contained' onClick={handleAccess}>
-                      SEND
-                    </Button>
-                  </Stack>
-                )}
-                {creating === 'validate' && (
-                  <Stack direction='row' spacing={2}>
-                    <TextField
-                      inputProps={{
-                        style: { color: 'white' }
-                      }}
-                      autoFocus
-                      variant='outlined'
-                      size='small'
-                      label='CODE'
-                      placeholder='Insert code'
-                      inputRef={codeRef}
-                      InputProps={{
-                        endAdornment: (
-                          <IconButton onClick={() => setCreating(undefined)}>
-                            <Close />
-                          </IconButton>
-                        )
-                      }}
-                    />
-                    <Button variant='contained' onClick={handleValidateCode}>
-                      SEND
-                    </Button>
-                  </Stack>
-                )}
+                <LogIn />
+
                 {!creating && (
                   <>
                     <Button

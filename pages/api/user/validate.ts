@@ -5,8 +5,10 @@ import transporter from 'lib/nodemailer'
 import BigNumber from 'bignumber.js'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!req.body.code) return res.status(400).end()
-  if (!req.body.email) return res.status(400).end()
+  if (!req.body.code || !req.body.email) {
+    res.status(400).end()
+    return
+  }
   if (req.method === 'POST') {
     try {
       const client = await clientPromise
@@ -33,14 +35,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           { email: req.body.email },
           { $set: { emailVerified: true, verificationCode: null, verificationDate: null } }
         )
-        return res.status(200).send({ success: true, id: user?.id })
+        res.status(200).send({ success: true, id: user?.id })
+        return
       }
-      return res.status(403).end()
+      res.status(403).end()
+      return
     } catch (err) {
       console.error('[handler] validate() ERROR =>', err)
-      return res.status(500).send(err)
+      res.status(500).send(err)
+      return
     }
   }
-  return res.status(405).end()
+  res.status(405).end()
 }
 export default handler

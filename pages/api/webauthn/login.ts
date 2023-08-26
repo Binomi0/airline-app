@@ -13,7 +13,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const user = await db.findOne({ email: req.body.email })
 
     if (!user) {
-      return res.status(404).end()
+      res.status(404).end()
+      return
     }
 
     const options = generateAuthenticationOptions({
@@ -64,10 +65,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       ]
     }
 
-    return res.status(200).json(challenge)
+    res.status(200).json(challenge)
   } catch (err) {
     console.error(err)
-    return res.status(500).send(err)
+    res.status(500).send(err)
   }
 }
 

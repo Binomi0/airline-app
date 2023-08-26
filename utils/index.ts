@@ -132,3 +132,30 @@ export const getLicenseIdFromAttributes = (attributes: AttributeType[]) =>
   attributes.find((attribute) => attribute.trait_type === 'license')?.value || ''
 
 export const filterLEOrigins = (pilot: IvaoPilot) => pilot.flightPlan.departureId?.includes('LE')
+
+export const downloadFile = (base64Key: string, address: string) => {
+  const key = Buffer.from(base64Key, 'base64').toString()
+  const blob = new Blob([key], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+
+  const a = document.createElement('a')
+  a.href = url
+  // @ts-ignore
+  a.download = `airline-walley-key-${address.slice(-4)}.pem`
+
+  // Append the <a> element to the document and trigger the click event
+  document.body.appendChild(a)
+  a.click()
+
+  // Clean up the temporary URL object
+  URL.revokeObjectURL(url)
+
+  // Remove the <a> element from the document
+  document.body.removeChild(a)
+}
+
+export const validateEmail = (email?: string) => {
+  if (!email) return false
+  const expression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+  return expression.test(email)
+}

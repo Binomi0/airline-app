@@ -32,7 +32,7 @@ const AirBalanceBar = () => {
     return () => clearInterval(timer)
   }, [refetch])
 
-  return (
+  return smartAccountAddress ? (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>
       <AirplaneTicketIcon color='inherit' fontSize='medium' />
       <Typography variant='h6'>
@@ -48,7 +48,7 @@ const AirBalanceBar = () => {
         </Button>
       )}
     </Stack>
-  )
+  ) : null
 }
 
 export default AirBalanceBar

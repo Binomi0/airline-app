@@ -1,17 +1,17 @@
-import { NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next'
 import clientPromise from 'lib/mongodb'
 import { Collection, DB } from 'types'
-import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 
-const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
-  if (req.method === 'GET') {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method === 'POST') {
+    if (!req.body.email) return res.status(400).end()
     try {
       const client = await clientPromise
       const db = client.db(DB.develop).collection(Collection.user)
-      const user = await db.findOne({ email: req.user })
+      const user = await db.findOne({ email: req.body.email })
 
       if (!user) {
-        res.status(404).end()
+        res.status(200).send({ success: false })
         return
       }
 
@@ -22,6 +22,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return
     }
   }
+
   res.status(405).end()
 }
-export default withAuth(handler)
+export default handler

@@ -27,7 +27,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (error) {
     console.error(error)
     // @ts-ignore
-    return res.status(400).send({ error: error.message })
+    res.status(400).send({ error: error.message })
+    return
   }
 
   const { verified, registrationInfo } = verification
@@ -51,7 +52,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     )
   } catch (error) {
-    return res.status(500).send({ error: 'Error al actualizar key' })
+    res.status(500).send({ error: 'Error al actualizar key' })
+    return
   }
   try {
     await webauthnCollection.findOneAndUpdate(
@@ -65,10 +67,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     )
   } catch (error) {
     console.error(error)
-    return res.status(500).send({ error: 'Error al actualizar authenticators' })
+    res.status(500).send({ error: 'Error al actualizar authenticators' })
+    return
   }
 
-  return res.status(200).send({ verified })
+  res.status(200).send({ verified })
 }
 
 export default handler

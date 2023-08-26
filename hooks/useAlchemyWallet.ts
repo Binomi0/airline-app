@@ -7,7 +7,7 @@ import { Wallet, ethers } from 'ethers'
 import { coinTokenAddress } from 'contracts/address'
 import AirlineCoin from 'contracts/abi/AirlineCoin.json'
 import axios from 'config/axios'
-import { useSession } from 'next-auth/react'
+import { getSession, useSession } from 'next-auth/react'
 
 const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -97,31 +97,30 @@ const useAlchemyWallet = (signer?: Wallet) => {
 
     if (!smartAccountAddress) {
       const address = await smartSigner.account.getAddress()
-      setSmartAccountAddress(address)
+      const currentSession = await getSession()
 
-      if (session.status === 'authenticated') {
-        await axios.post('/api/user/update', { address })
+      if (currentSession?.user) {
         await axios.post('/api/wallet', {
           // @ts-ignore
-          id: session.data.id,
+          id: currentSession.user.id,
           smartAccountAddress: address,
           signerAddress: signer.address
         })
-        console.log('ADDRESS SAVED')
       } else {
-        console.log('SHOULD BE AUTHENTICATED AND NOT', {session})
+        console.log('SHOULD BE AUTHENTICATED AND NOT', { currentSession })
       }
+      setSmartAccountAddress(address)
     }
 
     setBaseSigner(signer)
     setSmartSigner(smartSigner)
     setPaymasterSigner(newPaymasterSigner)
-  }, [session, setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signer, smartAccountAddress])
+  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signer, smartAccountAddress])
 
   useEffect(() => {
-    if (!signer) return
+    if (!signer && session) return
     initialize()
-  }, [signer, initialize])
+  }, [signer, session, initialize])
 
   return { sendTransaction }
 }

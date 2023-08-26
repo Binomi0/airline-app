@@ -26,3 +26,27 @@ export const backupDoneSwal = async () =>
     text: 'Your wallet has been exported, do not share it, your items will be at risk.',
     icon: 'info'
   })
+
+export const accountBackupSwal = async () =>
+  Swal.fire({
+    title: 'Account Login Backup',
+    text: 'Add another device to log in this site',
+    showCancelButton: true,
+    showConfirmButton: true,
+    icon: 'question'
+  })
+
+export const missingExportKeySwal = async () =>
+  Swal.fire({
+    title: 'Missing local wallet',
+    text: 'There is no local wallet available to export',
+    icon: 'error'
+  })
+
+export const signedOutSwal = async () =>
+  Swal.fire({
+    title: 'Sign Out',
+    text: 'Are you leaving?',
+    showCancelButton: true,
+    showConfirmButton: true
+  })
