@@ -7,6 +7,7 @@ import GasForm from './components/GasForm'
 import { ethers } from 'ethers'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useStaking from 'hooks/useStaking'
+import Swal from 'sweetalert2'
 
 const GasDeposited = () => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
@@ -17,11 +18,32 @@ const GasDeposited = () => {
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
-      const receipt = await withdraw(ethers.utils.parseEther(unstakeAmount))
-      console.log({ receipt })
-      refetch()
+      if (staking.amountStaked.gte(ethers.utils.parseEther(unstakeAmount))) {
+        const { isConfirmed } = await Swal.fire({
+          title: 'Unstaking AIRL token',
+          text: `Are you sure you want to withdraw ${unstakeAmount} tokens?`,
+          icon: 'question',
+          showCancelButton: true,
+          showConfirmButton: true
+        })
+        if (isConfirmed) {
+          await withdraw(ethers.utils.parseEther(unstakeAmount))
+          Swal.fire({
+            title: 'UnStaked!',
+            text: 'Funds already claimed from staking, hope your planes are full!',
+            icon: 'success'
+          })
+          refetch()
+        }
+      } else {
+        Swal.fire({
+          title: 'Maximun exceeded',
+          text: 'Cannot withdraw more than deposited :)',
+          icon: 'info'
+        })
+      }
     },
-    [withdraw, refetch]
+    [staking.amountStaked, withdraw, refetch]
   )
 
   return (

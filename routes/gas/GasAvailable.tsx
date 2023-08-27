@@ -8,26 +8,45 @@ import GasForm from './components/GasForm'
 import useStaking from 'hooks/useStaking'
 import useERC20 from 'hooks/useERC20'
 import useTokenBalance from 'hooks/useTokenBalance'
+import Swal from 'sweetalert2'
 
 const GasAvailable = () => {
   const { balance: airl, refetch } = useTokenBalance(coinTokenAddress)
   const { contract: staking } = useContract(stakingAddress)
   const { stake } = useStaking(staking)
-  const { setAllowance } = useERC20()
+  const { setAllowance } = useERC20(coinTokenAddress)
   const [loading, setLoading] = useState(false)
 
   const handleStake = useCallback(
     async (amount: string) => {
-      const _amount = ethers.utils.parseEther(amount)
-      setLoading(true)
-      if (await setAllowance(stakingAddress, _amount)) {
-        const receipt = await stake(_amount)
-        console.log({ receipt })
-        refetch()
+      if (airl.isGreaterThanOrEqualTo(amount)) {
+        setLoading(true)
+        const { isConfirmed } = await Swal.fire({
+          title: 'Staking AIRL tokens',
+          text: 'Are you sure you want to Stake?',
+          icon: 'question',
+          showCancelButton: true,
+          showConfirmButton: true
+        })
+        if (isConfirmed) {
+          const _amount = ethers.utils.parseEther(amount)
+          await setAllowance(stakingAddress)
+          const receipt = await stake(_amount)
+          console.log('Staking receipt: ', receipt)
+          refetch()
+          setLoading(false)
+        } else {
+          setLoading(false)
+        }
+      } else {
+        Swal.fire({
+          title: 'Amount exceed balance',
+          text: 'Cannot stake more tokens than current balance',
+          icon: 'info'
+        })
       }
-      setLoading(false)
     },
-    [setAllowance, stake, refetch]
+    [airl, setAllowance, stake, refetch]
   )
 
   React.useEffect(() => {
