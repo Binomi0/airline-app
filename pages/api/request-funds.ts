@@ -1,11 +1,12 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiResponse } from 'next'
 import clientPromise, { db } from 'lib/mongodb'
 import { ThirdwebSDK } from '@thirdweb-dev/sdk'
 import { Sepolia } from '@thirdweb-dev/chains'
 import { coinTokenAddress } from 'contracts/address'
 import { Collection } from 'types'
+import { CustomNextApiRequest } from 'lib/withAuth'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') return res.status(405).end()
   if (!req.body.smartAccountAddress) return res.status(400).end()
   if (!process.env.THIRDWEB_AUTH_PRIVATE_KEY) return res.status(403).end()
@@ -30,7 +31,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const amount = 2
 
     await sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
-    await collection.insertOne({ address: smartAccountAddress, amount })
+    await collection.insertOne({
+      email: req.user,
+      smartAccountAddress: req.body.smartAccountAddress,
+      signerAddress: req.body.signerAddress,
+      amount,
+      starterGift: true
+    })
 
     return res.status(201).end()
   } catch (error) {

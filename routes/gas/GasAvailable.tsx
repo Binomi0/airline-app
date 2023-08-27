@@ -10,8 +10,8 @@ import useERC20 from 'hooks/useERC20'
 import useTokenBalance from 'hooks/useTokenBalance'
 
 const GasAvailable = () => {
-  const { balance: airl } = useTokenBalance(coinTokenAddress)
-  const { contract: staking, refetch } = useContract(stakingAddress)
+  const { balance: airl, refetch } = useTokenBalance(coinTokenAddress)
+  const { contract: staking } = useContract(stakingAddress)
   const { stake } = useStaking(staking)
   const { setAllowance } = useERC20()
   const [loading, setLoading] = useState(false)
@@ -29,6 +29,11 @@ const GasAvailable = () => {
     },
     [setAllowance, stake, refetch]
   )
+
+  React.useEffect(() => {
+    const timer = setInterval(refetch, 15000)
+    return () => clearInterval(timer)
+  }, [refetch])
 
   return (
     <Grid item xs={4}>

@@ -5,29 +5,25 @@ import { Collection } from 'types'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    if (!req.body.smartAccountAddress) return res.status(400).end()
-    if (!req.body.signerAddress) return res.status(400).end()
+    if (!req.body.smartAccountAddress || !req.body.signerAddress ) {
+      res.status(400).end()
+      return
+    }
     try {
       const client = await clientPromise
       const current = client.db(db)
       const walletCollection = current.collection(Collection.wallet)
       const userCollection = current.collection(Collection.user)
-      const user = await userCollection.findOne({ email: req.user })
-      if (!user?.starterGift) {
+
+      const wallet = await walletCollection.findOne({ email: req.user })
+      await userCollection.findOneAndUpdate({ email: req.user }, { $set: { address: req.body.smartAccountAddress } })
+      if (!wallet?.starterGift) {
         res.redirect('/api/request-funds')
-        await userCollection.findOneAndUpdate({ email: req.user }, { $set: { starterGift: true } })
         return
-      } else {
-        await userCollection.findOneAndUpdate({ email: req.user }, { $set: { address: req.body.smartAccountAddress } })
       }
 
-      await walletCollection.findOneAndUpdate(
-        { email: req.user },
-        { $set: { smartAccountAddress: req.body.smartAccountAddress, signerAddress: req.body.signerAddress } },
-        { upsert: true }
-      )
-
-      return res.status(202).end()
+      res.status(202).end()
+      return
     } catch (err) {
       res.status(500).send(err)
       return
