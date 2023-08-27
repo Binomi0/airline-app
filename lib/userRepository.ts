@@ -43,7 +43,7 @@ export const addKeyToUser = (user: User, key: string) => {
   fs.writeFileSync('./challenge.json', JSON.stringify(userByChallenge), 'utf-8')
 }
 
-export const addAuthenticator = (user: User, authenticator: any) => {
+export const addAuthenticator = (user: User, authenticator: Authenticator) => {
   userByChallenge[user.challenge] = {
     ...user,
     authenticators: user.authenticators ? [...user.authenticators, authenticator] : [authenticator]

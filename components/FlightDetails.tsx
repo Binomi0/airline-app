@@ -49,7 +49,7 @@ const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
 
   const flightValue = React.useMemo(() => {
     if (!session?.lastTrack) return 0
-    const { arrivalDistance, departureDistance } = session?.lastTrack
+    const { arrivalDistance, departureDistance } = session.lastTrack
 
     const totalDistance = departureDistance + arrivalDistance
     const completed = totalDistance - arrivalDistance
