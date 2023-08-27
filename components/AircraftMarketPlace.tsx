@@ -8,6 +8,7 @@ import AircraftItem from './AircraftItem'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useClaimNFT from 'hooks/useClaimNFT'
+import Swal from 'sweetalert2'
 
 const mapLicenseFromAircraft = (license: string) => {
   switch (license) {
@@ -37,11 +38,18 @@ const AircraftMarketPlace: React.FC = () => {
   )
 
   const handleClaim = useCallback(
-    (aircraftNFT: NFT) => {
+    async (aircraftNFT: NFT) => {
       if (!smartAccountAddress) {
         throw new Error('Missing account address')
       }
-      claimAircraftNFT({ to: smartAccountAddress, quantity: 1, nft: aircraftNFT })
+      const { isConfirmed } = await Swal.fire({
+        title: aircraftNFT.metadata.name as string,
+        text: `Do you want to get this aircraft?`,
+        icon: 'question'
+      })
+      if (isConfirmed) {
+        claimAircraftNFT({ to: smartAccountAddress, quantity: 1, nft: aircraftNFT })
+      }
     },
     [claimAircraftNFT, smartAccountAddress]
   )

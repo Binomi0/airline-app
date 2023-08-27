@@ -84,8 +84,6 @@ const CustomAppBar: React.FC = () => {
     }
   }, [status])
 
-  console.log({ userActionStarted })
-
   return (
     <>
       <Snackbar

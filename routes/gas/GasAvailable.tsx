@@ -31,8 +31,7 @@ const GasAvailable = () => {
         if (isConfirmed) {
           const _amount = ethers.utils.parseEther(amount)
           await setAllowance(stakingAddress)
-          const receipt = await stake(_amount)
-          console.log('Staking receipt: ', receipt)
+          await stake(_amount)
           refetch()
           setLoading(false)
         } else {

@@ -3,14 +3,17 @@ import BigNumber from 'bignumber.js'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useCallback, useEffect, useState } from 'react'
 
+const ZERO = new BigNumber(0)
 const useTokenBalance = (token?: string) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const [balance, setBalance] = useState<BigNumber>(new BigNumber(0))
+  const [balance, setBalance] = useState<BigNumber>(ZERO)
 
   const getBalance = useCallback(async () => {
     if (!smartAccountAddress) {
-      return setBalance(new BigNumber(0))
+      setBalance(ZERO)
+      return ZERO
     }
+
     try {
       const response = await axios.post('/api/token/balance', { address: smartAccountAddress, token })
       const [balance] = response.data.tokenBalances
@@ -20,7 +23,8 @@ const useTokenBalance = (token?: string) => {
       return balanceBigNumber
     } catch (error) {
       console.error(error)
-      setBalance(new BigNumber(0))
+      setBalance(ZERO)
+      return ZERO
     }
   }, [smartAccountAddress, token])
 

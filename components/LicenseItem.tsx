@@ -7,6 +7,7 @@ import LicenseItemHeader from './License/LicenseItemHeader'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useTokenBalance from 'hooks/useTokenBalance'
 import { Hex } from '@alchemy/aa-core'
+import Swal from 'sweetalert2'
 
 interface Props {
   nft: NFT
@@ -27,14 +28,32 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
     if (!airlBalance || !smartAccountAddress) return
 
     const balance = await getBalance()
-    const hasEnough = balance?.isGreaterThan(attribute?.value || 0)
+    const hasEnough = balance.isGreaterThanOrEqualTo(attribute?.value || 0)
     if (hasEnough) {
-      await claimNFT({ to: smartAccountAddress, nft, quantity: 1 })
-      getBalance()
+      const { isConfirmed } = await Swal.fire({
+        title: name as string,
+        text: `Do you want to get this license for ${attribute?.value}?`,
+        icon: 'question',
+        showCancelButton: true,
+        showConfirmButton: true
+      })
+      if (isConfirmed) {
+        await claimNFT({ to: smartAccountAddress, nft, quantity: 1 })
+        Swal.fire({
+          title: name as string,
+          text: 'Claimed License! New aircrafts unlocked with this license, enjoy!',
+          icon: 'success'
+        })
+        getBalance()
+      }
     } else {
-      console.log(`You do not have enough AIRL tokens, ${attribute?.value}`)
+      Swal.fire({
+        title: 'Not enough tokens',
+        text: `You need at least ${attribute?.value} AIRL token to claim`,
+        icon: 'question'
+      })
     }
-  }, [airlBalance, smartAccountAddress, attribute, getBalance, claimNFT, nft])
+  }, [airlBalance, smartAccountAddress, getBalance, attribute?.value, claimNFT, nft, name])
 
   const getNFTPrice = useCallback((nft: NFT) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')

@@ -9,7 +9,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       await connectDB()
       const user = await User.findOne({ email: req.user }, { projection: { _id: 0 } })
 
-      console.log('get user', user)
       if (!user) {
         res.status(404).end()
         return
