@@ -43,7 +43,7 @@ const GasDeposited = () => {
         })
       }
     },
-    [staking.amountStaked, withdraw, refetch]
+    [staking?.amountStaked, withdraw, refetch]
   )
 
   return (

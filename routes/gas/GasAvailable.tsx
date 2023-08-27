@@ -22,8 +22,8 @@ const GasAvailable = () => {
       if (airl.isGreaterThanOrEqualTo(amount)) {
         setLoading(true)
         const { isConfirmed } = await Swal.fire({
-          title: 'Staking AIRL tokens',
-          text: 'Are you sure you want to Stake?',
+          title: `Stake ${amount} AIRL`,
+          text: `Are you sure you want to stake ${amount} tokens?`,
           icon: 'question',
           showCancelButton: true,
           showConfirmButton: true

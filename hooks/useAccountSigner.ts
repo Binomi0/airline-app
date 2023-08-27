@@ -8,12 +8,14 @@ import { logInSwal, missingKeySwal, backupDoneSwal } from 'lib/swal'
 import { AccountSignerStatus, WebAuthnUri } from 'types'
 import useWallet from './useWallet'
 import { useAuthProviderContext } from 'context/AuthProvider'
+import { useRouter } from 'next/router'
 
 const useAccountSigner = () => {
   const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner } = useAlchemyProviderContext()
   const { signIn, signOut, user } = useAuthProviderContext()
   const [status, setStatus] = useState<AccountSignerStatus>()
   const { initWallet } = useWallet()
+  const router = useRouter()
 
   const createCredential = useCallback(async (email: string) => {
     try {
@@ -126,7 +128,8 @@ const useAccountSigner = () => {
     setSmartSigner(undefined)
     deleteCookie('token')
     signOut()
-  }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signOut])
+    router.asPath !== '/' && router.push('/')
+  }, [router, setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signOut])
 
   const addBackup = useCallback(async () => {
     if (!user?.email || !user?.id) {
