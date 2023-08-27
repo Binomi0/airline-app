@@ -26,7 +26,7 @@ const useCargo = (): UseCargo => {
       const response = await axios.get<Cargo>('/api/cargo')
       setCargo(response.data)
     } catch (error) {
-      console.log('error =>', error)
+      console.error('error =>', error)
     } finally {
       setIsLoading(false)
     }

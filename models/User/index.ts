@@ -1,23 +1,23 @@
 import { mongoose } from 'lib/mongoose'
-
-enum Role {
-  user = 'user',
-  admin = 'admin'
-}
+import { ObjectId } from 'mongodb'
 
 export interface IUser extends Document {
+  id: string
+  userId: string
   email: string
   address?: string
   lastLogin?: number
-  role: Role
-  id: string
+  role: 'user' | 'admin'
   verificationCode?: number
   verificationDate?: number
   emailVerified: boolean
+  aircrafts?: ObjectId[]
 }
 
 const userSchema: mongoose.Schema = new mongoose.Schema<IUser>(
   {
+    id: { type: String, required: true, index: true },
+    userId: { type: String, required: true, index: true },
     email: {
       type: String,
       required: true,
@@ -31,8 +31,8 @@ const userSchema: mongoose.Schema = new mongoose.Schema<IUser>(
     },
     role: {
       type: String,
-      enum: Object.values(Role),
-      default: Role.user
+      enum: ['user', 'admin'],
+      default: 'user'
     },
     verificationCode: {
       type: Number
@@ -42,7 +42,13 @@ const userSchema: mongoose.Schema = new mongoose.Schema<IUser>(
     },
     emailVerified: {
       type: Boolean
-    }
+    },
+    aircrafts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Aircraft'
+      }
+    ]
   },
   {
     timestamps: true

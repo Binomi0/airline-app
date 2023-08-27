@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { generateRegistrationOptions } from '@simplewebauthn/server'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection } from 'types'
 import { v4 as uuidv4 } from 'uuid'
+import { Authenticator } from 'types'
+import { connectDB } from 'lib/mongoose'
+import Webauthn from 'models/Webauthn'
 
 // Human-readable title for your website
 const rpName = 'AIRLINE'
@@ -11,9 +12,8 @@ const rpID = process.env.DOMAIN as string
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email } = req.body
-  const client = await clientPromise
-  const collection = client.db(db).collection(Collection.webauthn)
-  const user = await collection.findOne({ email: req.body.email })
+  await connectDB()
+  const user = await Webauthn.findOne({ email: req.body.email })
   const id = uuidv4()
 
   const challengeResponse = generateRegistrationOptions({
@@ -27,8 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // Prevent users from re-registering existing authenticators
     excludeCredentials:
       user && user.authenticators
-        ? // @ts-ignore
-          user.authenticators.map((authenticator) => ({
+        ? user.authenticators.map((authenticator: Authenticator) => ({
             id: authenticator.credentialID,
             type: 'public-key',
             // Optional
@@ -42,9 +41,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   })
 
   if (!user) {
-    await collection.insertOne({ id, email, challenge: challengeResponse.challenge, authenticators: [] })
+    await Webauthn.create({ id, email, challenge: challengeResponse.challenge, authenticators: [] })
   } else {
-    await collection.findOneAndUpdate({ email }, { $set: { challenge: challengeResponse.challenge } })
+    await Webauthn.findOneAndUpdate({ email }, { $set: { challenge: challengeResponse.challenge } })
   }
 
   res.send(challengeResponse)

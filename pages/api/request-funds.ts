@@ -1,16 +1,16 @@
 import { NextApiResponse } from 'next'
-import clientPromise, { db } from 'lib/mongodb'
 import { coinTokenAddress } from 'contracts/address'
-import { Collection } from 'types'
-import { CustomNextApiRequest } from 'lib/withAuth'
+import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import sdk from 'lib/twSdk'
+import { connectDB } from 'lib/mongoose'
+import Wallet from 'models/Wallet'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     res.status(405).end()
     return
   }
-  if (!req.body.smartAccountAddress || !req.body.smartAccountAddress) {
+  if (!req.body.smartAccountAddress || !req.body.smartAccountAddress || !req.body.id) {
     res.status(400).end()
     return
   }
@@ -20,11 +20,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   const { smartAccountAddress } = req.body
-  const client = await clientPromise
-  const collection = client.db(db).collection(Collection.wallet)
-
+  await connectDB()
   try {
-    const requested = await collection.findOne({ smartAccountAddress })
+    const requested = await Wallet.findOne({ smartAccountAddress })
     if (requested) {
       res.status(202).end()
       return
@@ -34,7 +32,8 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     const amount = 2
 
     sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
-    await collection.insertOne({
+    await Wallet.create({
+      id: req.body.id,
       email: req.user,
       smartAccountAddress: req.body.smartAccountAddress,
       signerAddress: req.body.signerAddress,
@@ -49,4 +48,4 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default handler
+export default withAuth(handler)

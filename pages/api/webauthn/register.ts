@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { verifyRegistrationResponse } from '@simplewebauthn/server'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection, Authenticator } from 'types'
+import { Authenticator } from 'types'
 import { setCookie } from 'cookies-next'
 import jwt from 'jsonwebtoken'
+import { connectDB } from 'lib/mongoose'
+import Webauthn from 'models/Webauthn'
 
 // A unique identifier for your website
 const rpID = process.env.DOMAIN
@@ -12,29 +13,26 @@ const origin = process.env.ORIGIN as string
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body } = req
-  const client = await clientPromise
-  const current = client.db(db)
-  const webauthnCollection = current.collection(Collection.webauthn)
-  const user = await webauthnCollection.findOne({ email: req.body.email })
+  await connectDB()
+  const user = await Webauthn.findOne({ email: req.body.email })
 
   let verification
   try {
     verification = await verifyRegistrationResponse({
       response: body.data,
-      // @ts-ignore
       expectedChallenge: user.challenge,
       expectedOrigin: origin,
       expectedRPID: rpID
     })
-  } catch (error) {
+  } catch (err) {
+    const error = err as Error
     console.error(error)
-    // @ts-ignore
     res.status(400).send({ error: error.message })
     return
   }
 
   const { verified, registrationInfo } = verification
-  // @ts-ignore
+  // @ts-expect-error Registration info comes from webAuthn
   const { credentialPublicKey, credentialID, counter } = registrationInfo
 
   const newAuthenticator: Authenticator = {
@@ -44,7 +42,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    await webauthnCollection.findOneAndUpdate(
+    await Webauthn.findOneAndUpdate(
       { email: req.body.email },
       {
         $set: {
@@ -58,10 +56,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return
   }
   try {
-    await webauthnCollection.findOneAndUpdate(
+    await Webauthn.findOneAndUpdate(
       { email: req.body.email },
       {
-        // @ts-ignore
         $push: {
           authenticators: newAuthenticator
         }

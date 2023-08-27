@@ -1,11 +1,11 @@
+import { connectDB } from 'lib/mongoose'
+import Live from 'models/Live'
 import { NextApiHandler } from 'next'
-// import { getUser } from '../auth/[...nextauth]'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection } from 'types'
 
 const handler: NextApiHandler = async (req, res) => {
   if (req.method !== 'POST') {
-    return res.status(405).end()
+    res.status(405).end()
+    return
   }
 
   // const user = await getUser(req)
@@ -23,20 +23,20 @@ const handler: NextApiHandler = async (req, res) => {
   // }
 
   try {
-    const client = await clientPromise
-    const collection = client.db(db).collection(Collection.live)
-    const current = await collection.findOne({ address: 'user.address' })
+    await connectDB()
+    const current = await Live.findOne({ address: 'user.address' })
 
     if (current) {
-      return res.status(202).json(current)
+      res.status(202).json(current)
+      return
     }
 
-    const newCargo = await collection.insertOne(cargo)
+    const newCargo = await Live.create(cargo)
 
-    return res.status(201).send(newCargo)
+    res.status(201).send(newCargo)
   } catch (error) {
     console.error('New Cargo ERROR =>', error)
-    return res.status(500).end()
+    res.status(500).end()
   }
 }
 

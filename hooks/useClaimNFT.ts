@@ -131,7 +131,6 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         data: encodedCallData as Hex
       })
 
-      console.log({ claimHash })
       setIsClaiming(false)
       return claimHash
     },

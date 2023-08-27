@@ -1,14 +1,13 @@
+import { connectDB } from 'lib/mongoose'
+import Webauthn from 'models/Webauthn'
 import { NextApiRequest, NextApiResponse } from 'next'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection } from 'types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     if (!req.body.email) return res.status(400).end()
     try {
-      const client = await clientPromise
-      const collection = client.db(db).collection(Collection.webauthn)
-      const user = await collection.findOne({ email: req.body.email })
+      await connectDB()
+      const user = await Webauthn.findOne({ email: req.body.email })
 
       if (!user || !user.authenticators.length) {
         res.status(200).send({ success: false })

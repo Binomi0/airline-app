@@ -1,14 +1,14 @@
+import { connectDB } from 'lib/mongoose'
+import User from 'models/User'
 import { NextApiRequest, NextApiResponse } from 'next'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection } from 'types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     if (!req.body.email) return res.status(400).end()
     try {
-      const client = await clientPromise
-      const collection = client.db(db).collection(Collection.user)
-      const user = await collection.findOne({ email: req.body.email })
+      await connectDB()
+
+      const user = await User.findOne({ email: req.body.email })
 
       if (!user) {
         res.status(200).send({ success: false })

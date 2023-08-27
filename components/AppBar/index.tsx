@@ -53,21 +53,23 @@ const CustomAppBar: React.FC = () => {
   }, [addBackup])
 
   const handleExportKey = useCallback(async () => {
-    if (!user?.id || !user?.address) throw new Error('Missing params')
+    if (!user?.id) throw new Error('Missing userId')
 
     const base64Key = localStorage.getItem(user.id)
     if (!base64Key) {
       if (baseSigner?.privateKey) {
         const { isConfirmed } = await askExportKeySwal()
-        if (isConfirmed) downloadFile(Buffer.from(baseSigner.privateKey).toString(), String(user.address))
+        if (isConfirmed) downloadFile(Buffer.from(baseSigner.privateKey).toString(), baseSigner.address)
       } else {
         return missingExportKeySwal()
       }
     } else {
-      const { isConfirmed } = await askExportKeySwal()
-      if (isConfirmed) downloadFile(base64Key, String(user.address))
+      if (smartAccountAddress) {
+        const { isConfirmed } = await askExportKeySwal()
+        if (isConfirmed) downloadFile(base64Key, smartAccountAddress)
+      }
     }
-  }, [baseSigner?.privateKey, user?.address, user?.id])
+  }, [baseSigner, smartAccountAddress, user])
 
   const onSignOut = React.useCallback(async () => {
     const confirm = await signedOutSwal()

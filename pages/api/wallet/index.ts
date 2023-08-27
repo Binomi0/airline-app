@@ -1,22 +1,19 @@
-import clientPromise, { db } from 'lib/mongodb'
+import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import User from 'models/User'
+import Wallet from 'models/Wallet'
 import { NextApiResponse } from 'next'
-import { Collection } from 'types'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    if (!req.body.smartAccountAddress || !req.body.signerAddress ) {
+    if (!req.body.smartAccountAddress || !req.body.signerAddress) {
       res.status(400).end()
       return
     }
     try {
-      const client = await clientPromise
-      const current = client.db(db)
-      const walletCollection = current.collection(Collection.wallet)
-      const userCollection = current.collection(Collection.user)
-
-      const wallet = await walletCollection.findOne({ email: req.user })
-      await userCollection.findOneAndUpdate({ email: req.user }, { $set: { address: req.body.smartAccountAddress } })
+      connectDB()
+      const wallet = await Wallet.findOne({ email: req.user })
+      await User.findOneAndUpdate({ email: req.user }, { address: req.body.smartAccountAddress })
       if (!wallet?.starterGift) {
         res.redirect('/api/request-funds')
         return
@@ -28,6 +25,15 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       res.status(500).send(err)
       return
     }
+  } else if (req.method === 'GET') {
+    connectDB()
+    const wallet = await Wallet.findOne({ email: req.user })
+    if (!wallet) {
+      res.status(404).end()
+      return
+    }
+    res.status(200).send(wallet)
+    return
   }
 
   res.status(405).end()

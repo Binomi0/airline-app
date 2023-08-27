@@ -60,10 +60,9 @@ const useAccountSigner = () => {
           const { data } = await axios.get('/api/user/get')
           const walletId = localStorage.getItem(data.user.id)
           if (walletId) {
-            const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
-            setBaseSigner(signer)
-            setStatus('success')
+            initWallet(data.user.id)
             signIn(data.user)
+            setStatus('success')
             logInSwal()
             return
           } else {
@@ -75,13 +74,9 @@ const useAccountSigner = () => {
                   throw new Error('Missing file')
                 }
 
-                const dataUrl = e.target.result as string
-                const base64Data = dataUrl.split(',')[1]
-                const signer = new Wallet(Buffer.from(base64Data, 'base64').toString())
-                localStorage.setItem(data.user.id, base64Data)
-                setBaseSigner(signer)
-                setStatus('success')
+                initWallet(data.user.id)
                 signIn(data.user)
+                setStatus('success')
                 logInSwal()
                 return
               }
@@ -95,12 +90,12 @@ const useAccountSigner = () => {
           setStatus('error')
         }
       } catch (err) {
-        console.error('err =>', err)
-        // @ts-ignore
-        setStatus(err?.message === 'Missing wallet key' ? 'missingKey' : 'error')
+        const error = err as Error
+        console.error('err =>', error)
+        setStatus(error.message === 'Missing wallet key' ? 'missingKey' : 'error')
       }
     },
-    [setBaseSigner, signIn, verifyCredential]
+    [initWallet, signIn, verifyCredential]
   )
 
   const handleSignUp = useCallback(
@@ -110,12 +105,9 @@ const useAccountSigner = () => {
         const { verified } = await createCredential(email)
         if (verified) {
           const { data } = await axios.get('/api/user/get')
-          if (!data.user.id) {
-            throw new Error('Missing user ID while creating wallet')
-          }
           initWallet(data.user.id)
-          setStatus('success')
           signIn(data.user)
+          setStatus('success')
           return true
         }
         return false
@@ -136,46 +128,38 @@ const useAccountSigner = () => {
     signOut()
   }, [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signOut])
 
-  const addBackup = useCallback(
-    async () => {
-      // @ts-ignore
-      if (!user?.email || !user?.id) {
-        throw new Error('Missing required params email or id')
-      }
-      try {
-        const credential = await createCredential(user?.email)
-        if (credential.verified) {
-          // @ts-ignore
-          const walletId = localStorage.getItem(user.id)
-          if (!walletId) {
-            const random = Wallet.createRandom()
-            // @ts-ignore
-            if (!user.id) {
-              setStatus('missingKey')
-              throw new Error('missing Id')
-            }
-
-            backupDoneSwal()
-            // @ts-ignore
-            localStorage.setItem(user.id, Buffer.from(random.privateKey).toString('base64'))
-
-            setBaseSigner(random)
+  const addBackup = useCallback(async () => {
+    if (!user?.email || !user?.id) {
+      throw new Error('Missing required params email or id')
+    }
+    try {
+      const credential = await createCredential(user?.email)
+      if (credential.verified) {
+        const walletId = localStorage.getItem(user.id)
+        if (!walletId) {
+          const random = Wallet.createRandom()
+          if (!user.id) {
             setStatus('missingKey')
-            return
+            throw new Error('missing Id')
           }
-          const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
-          setBaseSigner(signer)
-          setStatus('success')
+
+          backupDoneSwal()
+          localStorage.setItem(user.id, Buffer.from(random.privateKey).toString('base64'))
+
+          setBaseSigner(random)
+          setStatus('missingKey')
+          return
         }
-      } catch (err) {
-        console.error('[handleSignUp] Error =>', err)
-        // @ts-ignore
-        setStatus(err.message === 'Missing private key' ? 'missingKey' : 'error')
+        const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
+        setBaseSigner(signer)
+        setStatus('success')
       }
-    },
-    // @ts-ignore
-    [createCredential, setBaseSigner, user?.email, user?.id]
-  )
+    } catch (err) {
+      const error = err as Error
+      console.error('[handleSignUp] Error =>', err)
+      setStatus(error.message === 'Missing private key' ? 'missingKey' : 'error')
+    }
+  }, [createCredential, setBaseSigner, user?.email, user?.id])
 
   return {
     addBackup,

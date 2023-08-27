@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection } from 'types'
 import transporter from 'lib/nodemailer'
 import BigNumber from 'bignumber.js'
+import { connectDB } from 'lib/mongoose'
+import User from 'models/User'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!req.body.code || !req.body.email) {
@@ -11,9 +11,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   if (req.method === 'POST') {
     try {
-      const client = await clientPromise
-      const collection = client.db(db).collection(Collection.user)
-      const user = await collection.findOne({ email: req.body.email })
+      connectDB()
+      const user = await User.findOne({ email: req.body.email })
 
       if (!user) {
         throw new Error('User not found')
@@ -31,7 +30,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           html: '<p>¡Bienvenido! Register process already finished, thanks!</p>'
         })
 
-        await collection.findOneAndUpdate(
+        await User.findOneAndUpdate(
           { email: req.body.email },
           { $set: { emailVerified: true, verificationCode: null, verificationDate: null } }
         )

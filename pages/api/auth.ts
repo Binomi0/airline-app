@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection } from 'types'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import withAuth from 'lib/withAuth'
+import { connectDB } from 'lib/mongoose'
+import User from 'models/User'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') return res.status(405).end()
@@ -16,9 +16,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     try {
-      const client = await clientPromise
-      const collection = client.db(db).collection(Collection.user)
-      const user = await collection.findOne({ email })
+      await connectDB()
+      const user = await User.findOne({ email })
 
       return res.status(200).send(user)
     } catch (err) {

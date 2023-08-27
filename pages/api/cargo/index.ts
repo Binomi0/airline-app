@@ -1,7 +1,6 @@
+import { connectDB } from 'lib/mongoose'
+import Live from 'models/Live'
 import { NextApiRequest, NextApiResponse } from 'next'
-// import { getUser } from '../auth/[...nextauth]'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection } from 'types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') return res.status(405).end()
@@ -13,9 +12,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   //   })
   // }
   try {
-    const client = await clientPromise
-    const collection = client.db(db).collection(Collection.live)
-    const cargo = await collection.findOne({ address: 'user.address' })
+    await connectDB()
+    const cargo = await Live.findOne({ address: 'user.address' })
 
     return res.json(cargo)
   } catch (e) {

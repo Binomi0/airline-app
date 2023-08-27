@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { DB } from 'types'
 
 // MongoDB connection URL
 const mongoURI = process.env.MONGODB_URI
@@ -6,9 +7,7 @@ const mongoURI = process.env.MONGODB_URI
 const connectDB = async () => {
   try {
     await mongoose.connect(mongoURI, {
-      // @ts-ignore
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      dbName: process.env.NODE_ENV === 'development' ? DB.develop : DB.production
     })
     console.log('MongoDB Connected')
   } catch (error) {

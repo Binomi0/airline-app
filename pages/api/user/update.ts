@@ -1,19 +1,17 @@
-import clientPromise, { db } from 'lib/mongodb'
+import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import User from 'models/User'
 import { NextApiResponse } from 'next'
-import { Collection } from 'types'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     if (!req.body.address) return res.status(400).end()
 
     const { address } = req.body
-    const client = await clientPromise
-    const collection = client.db(db).collection(Collection.user)
+    await connectDB()
+    const user = await User.findOneAndUpdate({ email: req.user }, { address })
 
-    await collection.findOneAndUpdate({ email: req.user }, { $set: { address } })
-
-    res.status(202).end()
+    res.status(200).send(user)
   }
 
   res.status(405).end()

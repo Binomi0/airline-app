@@ -1,16 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { generateAuthenticationOptions } from '@simplewebauthn/server'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection } from 'types'
+import { Authenticator } from 'types'
+import { connectDB } from 'lib/mongoose'
+import Webauthn from 'models/Webauthn'
 
 // Human-readable title for your website
 const rpName = 'ELIXIR'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    const client = await clientPromise
-    const collection = client.db(db).collection(Collection.webauthn)
-    const user = await collection.findOne({ email: req.body.email })
+    await connectDB()
+    const user = await Webauthn.findOne({ email: req.body.email })
 
     if (!user) {
       res.status(404).end()
@@ -19,8 +19,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const options = generateAuthenticationOptions({
       // Require users to use a previously-registered authenticator
-      // @ts-ignore
-      allowCredentials: user.authenticators.map((authenticator) => {
+      allowCredentials: user.authenticators.map((authenticator: Authenticator) => {
         const bufferFromBase64 = Buffer.from(authenticator.credentialID, 'base64')
 
         return {
@@ -37,7 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       userVerification: 'discouraged'
     })
 
-    await collection.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })
+    await Webauthn.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })
 
     const challenge = {
       ...options,

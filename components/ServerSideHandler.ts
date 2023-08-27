@@ -1,16 +1,13 @@
 import { GetServerSidePropsContext } from 'next'
 import { deleteCookie, getCookie } from 'cookies-next'
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection, DB, User } from 'types'
+import { connectDB } from 'lib/mongoose'
+import User, { IUser } from 'models/User'
 
 interface Props {
   props: {
     token?: string
-    user?: {
-      email?: string
-      address?: string
-    } | null
+    user?: Partial<IUser>
   }
 }
 
@@ -27,12 +24,23 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
         }
       }
 
-      const client = await clientPromise
-      const collection = client.db(db).collection(Collection.user)
-      const user = await collection.findOne<User>({ email }, { projection: { _id: 0 } })
+      await connectDB()
+      const user = await User.findOne({ email })
 
       if (user) {
-        return { props: { token, user } }
+        return {
+          props: {
+            token,
+            user: {
+              id: user.id,
+              userId: user.userId,
+              email: user.email,
+              emailVerified: user.emailVerified,
+              address: user.address.toString(),
+              role: user.role
+            }
+          }
+        }
       }
     } catch (err) {
       deleteCookie('token')

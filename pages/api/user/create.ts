@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import clientPromise, { db } from 'lib/mongodb'
-import { Collection } from 'types'
 import transporter from 'lib/nodemailer'
 import { v4 as uuidv4 } from 'uuid'
 import moment from 'moment'
+import { connectDB } from 'lib/mongoose'
+import User from 'models/User'
 
 const sendVerifyEmail = async (email: string, code: string) => {
   try {
@@ -26,9 +26,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   if (req.method === 'POST') {
     try {
-      const client = await clientPromise
-      const collection = client.db(db).collection(Collection.user)
-      const user = await collection.findOne({ email: req.body.email })
+      await connectDB()
+
+      const user = await User.findOne({ email: req.body.email })
 
       if (user && user.emailVerified) {
         res.status(200).send({ success: false })
@@ -40,24 +40,29 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (!user) {
         const userId = uuidv4()
 
-        await collection.insertOne({
+        const createUser = User.create({
           id: userId,
+          userId,
           email: req.body.email,
           verificationCode: randomNumber,
           verificationDate: moment().add('5', 'minutes').unix(),
           emailVerified: false
         })
+        const sendEmail = sendVerifyEmail(req.body.email, randomNumber.toString())
 
-        await sendVerifyEmail(req.body.email, randomNumber.toString())
+        await Promise.all([createUser, sendEmail])
+
         res.status(200).send({ success: true })
         return
       } else if (!user.emailVerified) {
         if (moment().isAfter(moment(user.verificationDate))) {
-          await sendVerifyEmail(req.body.email, randomNumber.toString())
-          await collection.findOneAndUpdate(
+          const sendEmail = sendVerifyEmail(req.body.email, randomNumber.toString())
+          const updateUser = User.findOneAndUpdate(
             { email: req.body.email },
             { $set: { verificationCode: randomNumber, verificationDate: moment().add('5', 'minutes').unix() } }
           )
+
+          await Promise.all([sendEmail, updateUser])
         }
         res.status(200).send({ success: true })
         return
