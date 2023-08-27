@@ -30,7 +30,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     // amount to fill to each connected smartAccountAddress
     const amount = 2
 
-    await sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
+    sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
     await collection.insertOne({
       email: req.user,
       smartAccountAddress: req.body.smartAccountAddress,

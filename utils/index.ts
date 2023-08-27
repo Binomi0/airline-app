@@ -140,7 +140,6 @@ export const downloadFile = (base64Key: string, address: string) => {
 
   const a = document.createElement('a')
   a.href = url
-  // @ts-ignore
   a.download = `airline-walley-key-${address.slice(-4)}.pem`
 
   // Append the <a> element to the document and trigger the click event
