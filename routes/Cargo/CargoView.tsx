@@ -7,7 +7,7 @@ import image from 'public/img/airplanes9.png'
 import { useVaProviderContext } from 'context/VaProvider'
 import { FRoute, Flight } from 'types'
 import useCargo from 'hooks/useCargo'
-import { ConnectWallet, NFT } from '@thirdweb-dev/react'
+import { NFT } from '@thirdweb-dev/react'
 import NoAddress from 'routes/Cargo/components/NoAddress'
 import CargoReady from 'routes/Cargo/components/CargoReady'
 import CargoList from 'routes/Cargo/components/CargoList'
@@ -33,10 +33,6 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} src={image} alt='banner' fill />
       <Container>
-        <Box my={6} textAlign='center'>
-          {!address && <ConnectWallet />}
-        </Box>
-
         <NoAddress />
 
         <Fade in={!!address && !!selected.origin} unmountOnExit>
@@ -76,7 +72,6 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
                   estás intentando conectar.
                 </Typography>
               )}
-              <ConnectWallet />
             </Alert>
           </Box>
         </Fade>

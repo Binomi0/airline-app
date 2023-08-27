@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect, useReducer } from 'react'
 import vaProviderReducer from './VaProvider.reducer'
-import { IVAOClients, VaReducerState } from './VaProvider.types'
+import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
 import axios from 'config/axios'
 import type { Atc, FRoute, Flight, IvaoPilot } from 'types'

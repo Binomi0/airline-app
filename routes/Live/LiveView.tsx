@@ -4,7 +4,6 @@ import { Fade, Box, Typography, Button } from '@mui/material'
 import { useVaProviderContext } from 'context/VaProvider'
 import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
-import { ConnectWallet } from '@thirdweb-dev/react'
 import GppGoodIcon from '@mui/icons-material/GppGood'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
@@ -36,7 +35,6 @@ const LiveView: FC = () => {
         <Typography variant='h4' paragraph>
           Sign in with your wallet to start tracking.
         </Typography>
-        <ConnectWallet />
       </Box>
     )
   }

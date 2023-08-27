@@ -1,4 +1,3 @@
-import { ConnectWallet } from '@thirdweb-dev/react'
 import type { NextPage } from 'next'
 import { Box, Container, LinearProgress, Stack, Typography } from '@mui/material'
 import GasStationView from 'routes/gas/GasStationView'
@@ -35,7 +34,6 @@ const Gas: NextPage<Props> = ({ loading }) => {
         <Typography variant='h4' paragraph>
           Sign in with your wallet to checkout gas station.
         </Typography>
-        <ConnectWallet />
       </Box>
     )
   }

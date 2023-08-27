@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NextPage } from 'next'
-import { ConnectWallet, NFT, useContract, useOwnedNFTs } from '@thirdweb-dev/react'
+import { NFT, useContract, useOwnedNFTs } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import CargoView from 'routes/Cargo/CargoView'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
@@ -30,7 +30,6 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
         <Typography variant='h4' paragraph>
           Sign in with your wallet to checkout available flights.
         </Typography>
-        <ConnectWallet />
       </Box>
     )
   }

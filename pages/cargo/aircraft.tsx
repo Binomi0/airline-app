@@ -4,7 +4,7 @@ import { Alert, AlertTitle, Box, Link as MuiLink, Container, Typography, Button 
 import Image from 'next/image'
 import image from 'public/img/real_replica_cessna_172.png'
 import styles from 'styles/Home.module.css'
-import { ConnectWallet, useContract, useNFTBalance } from '@thirdweb-dev/react'
+import {  useContract, useNFTBalance } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import Link from 'next/link'
 import axios from 'config/axios'
@@ -21,9 +21,7 @@ const CargoItem = () => {
     axios.post('/api/flight/new', { cargoId: router.query.id })
   }, [router.query.id])
 
-  return !address ? (
-    <ConnectWallet />
-  ) : (
+  return address ? (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} style={{ opacity: 0.4 }} src={image} alt='banner' fill />
       <Container>
@@ -64,7 +62,7 @@ const CargoItem = () => {
         )}
       </Container>
     </Box>
-  )
+  ) : null
 }
 
 export default CargoItem
