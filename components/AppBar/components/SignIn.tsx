@@ -1,67 +1,68 @@
 import { Button } from '@mui/material'
 import useAccountSigner from 'hooks/useAccountSigner'
-import { signedOutSwal } from 'lib/swal'
 import React from 'react'
 import { validateEmail } from 'utils'
 import EmailInput from './EmailInput'
 import axios from 'config/axios'
 import { UserActionStatus } from '..'
-import { useAuthProviderContext } from 'context/AuthProvider'
 
 interface Props {
+  // eslint-disable-next-line no-unused-vars
   onInteraction: (value?: UserActionStatus) => void
 }
 
 const SignIn = ({ onInteraction }: Props) => {
-  const { loadAccount, status, handleSignOut } = useAccountSigner()
+  const { loadAccount, status } = useAccountSigner()
   const [requestEmail, setRequestEmail] = React.useState(false)
-  const { user } = useAuthProviderContext()
+  const [loading, setLoading] = React.useState(false)
 
   const handleSignIn = React.useCallback(
     async (email: string) => validateEmail(email) && loadAccount(email),
     [loadAccount]
   )
 
-  const onSignOut = React.useCallback(async () => {
-    const { isConfirmed } = await signedOutSwal()
-    if (isConfirmed) handleSignOut()
-  }, [handleSignOut])
-
   const handleAccess = React.useCallback(
     async (value: string) => {
-      const { data: auth } = await axios.post('/api/webauthn/check', { email: value })
-      if (auth.success) {
-        handleSignIn(value)
+      setLoading(true)
+      try {
+        const { data: auth } = await axios.post('/api/webauthn/check', { email: value })
+        if (auth.success) {
+          await handleSignIn(value)
+        }
+        setRequestEmail(false)
+        onInteraction()
+        setLoading(false)
+      } catch (error) {
+        console.error(error)
       }
-      setRequestEmail(false)
-      onInteraction()
     },
     [handleSignIn, onInteraction]
   )
 
   return (
     <>
-      {user ? (
-        <Button disabled={status === 'loading'} variant='contained' color='error' onClick={onSignOut}>
-          Log Out
+      {!requestEmail && (
+        <Button
+          disabled={status === 'loading' || loading}
+          variant='contained'
+          color='secondary'
+          onClick={() => {
+            setRequestEmail(true)
+            onInteraction('signIn')
+          }}
+        >
+          Connect
         </Button>
-      ) : (
-        <>
-          {!requestEmail && (
-            <Button
-              disabled={status === 'loading'}
-              variant='contained'
-              color='secondary'
-              onClick={() => {
-                setRequestEmail(true)
-                onInteraction('signIn')
-              }}
-            >
-              Connect
-            </Button>
-          )}
-          {requestEmail && <EmailInput onCancel={() => setRequestEmail(false)} onSubmit={handleAccess} />}
-        </>
+      )}
+      {requestEmail && (
+        <EmailInput
+          onCancel={() => {
+            setRequestEmail(false)
+            onInteraction()
+          }}
+          onSubmit={handleAccess}
+          loading={loading}
+        />
       )}
     </>
   )

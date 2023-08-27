@@ -84,6 +84,8 @@ const CustomAppBar: React.FC = () => {
     }
   }, [status])
 
+  console.log({ userActionStarted })
+
   return (
     <>
       <Snackbar
@@ -126,12 +128,8 @@ const CustomAppBar: React.FC = () => {
             )}
             {!user ? (
               <>
-                {(!userActionStarted || userActionStarted === 'signIn') && (
-                  <SignIn onInteraction={setUserActionStarted} />
-                )}
-                {(!userActionStarted || userActionStarted === 'signUp') && (
-                  <SignUp onInteraction={setUserActionStarted} />
-                )}
+                {userActionStarted !== 'signUp' && <SignIn onInteraction={setUserActionStarted} />}
+                {userActionStarted !== 'signIn' && <SignUp onInteraction={setUserActionStarted} />}
               </>
             ) : (
               <>

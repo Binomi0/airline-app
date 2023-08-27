@@ -5,9 +5,10 @@ import React from 'react'
 interface Props {
   onCancel: () => void
   onSubmit: (value: string) => void
+  loading: boolean
 }
 
-const CodeInput = ({ onCancel, onSubmit }: Props) => {
+const CodeInput = ({ onCancel, onSubmit, loading }: Props) => {
   const codeRef = React.useRef<HTMLInputElement>(null)
   const [error, setError] = React.useState('')
 
@@ -27,6 +28,7 @@ const CodeInput = ({ onCancel, onSubmit }: Props) => {
           style: { color: 'white' }
         }}
         autoFocus
+        disabled={loading}
         variant='outlined'
         size='small'
         label='CODE'
@@ -42,7 +44,7 @@ const CodeInput = ({ onCancel, onSubmit }: Props) => {
           )
         }}
       />
-      <Button variant='contained' onClick={handleValidateCode}>
+      <Button disabled={loading} variant='contained' onClick={handleValidateCode}>
         SEND CODE
       </Button>
     </Stack>

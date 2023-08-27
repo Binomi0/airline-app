@@ -1,14 +1,16 @@
 import { Close } from '@mui/icons-material'
-import { Stack, TextField, IconButton, Button } from '@mui/material'
+import { Stack, TextField, IconButton, Button, CircularProgress } from '@mui/material'
 import React, { ChangeEvent } from 'react'
 import { validateEmail } from 'utils'
 
 interface Props {
+  // eslint-disable-next-line no-unused-vars
   onSubmit: (email: string) => void
   onCancel: () => void
+  loading: boolean
 }
 
-const EmailInput = ({ onSubmit, onCancel }: Props) => {
+const EmailInput = ({ onSubmit, onCancel, loading }: Props) => {
   const [email, setEmail] = React.useState('')
   const [error, setError] = React.useState('')
   const emailRef = React.useRef<HTMLInputElement>(null)
@@ -29,9 +31,12 @@ const EmailInput = ({ onSubmit, onCancel }: Props) => {
     setEmail(event.target.value)
   }, [])
 
-  return (
+  return loading ? (
+    <CircularProgress color='primary' />
+  ) : (
     <Stack direction='row' spacing={2}>
       <TextField
+        disabled={loading}
         inputProps={{
           style: { color: 'white' }
         }}
@@ -52,7 +57,7 @@ const EmailInput = ({ onSubmit, onCancel }: Props) => {
           )
         }}
       />
-      <Button disabled={status === 'loading'} variant='contained' onClick={handleAccess}>
+      <Button disabled={loading} variant='contained' onClick={handleAccess}>
         ENTER
       </Button>
     </Stack>
