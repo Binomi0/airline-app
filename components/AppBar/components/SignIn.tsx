@@ -23,10 +23,8 @@ const SignIn = ({ onInteraction }: Props) => {
   )
 
   const onSignOut = React.useCallback(async () => {
-    const confirm = await signedOutSwal()
-    if (confirm) {
-      handleSignOut()
-    }
+    const { isConfirmed } = await signedOutSwal()
+    if (isConfirmed) handleSignOut()
   }, [handleSignOut])
 
   const handleAccess = React.useCallback(
@@ -34,9 +32,9 @@ const SignIn = ({ onInteraction }: Props) => {
       const { data: auth } = await axios.post('/api/webauthn/check', { email: value })
       if (auth.success) {
         handleSignIn(value)
-        setRequestEmail(false)
-        onInteraction()
       }
+      setRequestEmail(false)
+      onInteraction()
     },
     [handleSignIn, onInteraction]
   )

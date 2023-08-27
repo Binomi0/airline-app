@@ -10,32 +10,37 @@ export interface ITransaction extends Document {
   role: string
 }
 
-const transactionSchema: mongoose.Schema = new mongoose.Schema<ITransaction>({
-  email: {
-    type: String,
-    required: true,
-    index: true
+const transactionSchema: mongoose.Schema = new mongoose.Schema<ITransaction>(
+  {
+    email: {
+      type: String,
+      required: true,
+      index: true
+    },
+    operation: {
+      type: String,
+      required: true
+    },
+    amount: {
+      type: Number,
+      required: true
+    },
+    transactionDate: {
+      type: Date,
+      default: Date.now
+    },
+    hash: {
+      type: String,
+      required: true
+    },
+    isCompleted: {
+      type: Boolean,
+      default: false
+    }
   },
-  operation: {
-    type: String,
-    required: true
-  },
-  amount: {
-    type: Number,
-    required: true
-  },
-  transactionDate: {
-    type: Date,
-    default: Date.now
-  },
-  hash: {
-    type: String,
-    required: true
-  },
-  isCompleted: {
-    type: Boolean,
-    default: false
-  }
-})
+  { timestamps: true }
+)
+
+transactionSchema.statics
 
 export default mongoose.models.Transaction || mongoose.model<ITransaction>('Transaction', transactionSchema)
