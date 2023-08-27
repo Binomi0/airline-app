@@ -8,7 +8,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       await connectDB()
 
-      const user = await User.findOne({ email: req.body.email })
+      const user = await User.findOne({ email: req.body.email }, { id: 1 })
 
       if (!user) {
         res.status(200).send({ success: false })

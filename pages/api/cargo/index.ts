@@ -1,4 +1,5 @@
 import { connectDB } from 'lib/mongoose'
+import withAuth from 'lib/withAuth'
 import Live from 'models/Live'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -22,4 +23,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default handler
+export default withAuth(handler)

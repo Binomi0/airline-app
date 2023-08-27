@@ -1,5 +1,6 @@
 import { NextApiHandler } from 'next'
 import fs from 'fs'
+import withAuth from 'lib/withAuth'
 
 interface Flight {
   cargoId: number
@@ -38,4 +39,4 @@ const handler: NextApiHandler = (req, res) => {
   }
 }
 
-export default handler
+export default withAuth(handler)

@@ -1,5 +1,5 @@
 import { Button } from '@mui/material'
-import axios from 'axios'
+import axios from 'config/axios'
 import useAccountSigner from 'hooks/useAccountSigner'
 import React, { useCallback } from 'react'
 import { validateEmail } from 'utils'

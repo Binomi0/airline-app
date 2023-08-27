@@ -1,5 +1,6 @@
 import axios from 'config/axios'
 import { IVAOClients } from 'context/VaProvider/VaProvider.types'
+import withAuth from 'lib/withAuth'
 import moment, { Moment } from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -31,4 +32,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   return res.status(202).send(clients)
 }
 
-export default handler
+export default withAuth(handler)

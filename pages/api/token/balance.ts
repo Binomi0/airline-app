@@ -1,4 +1,5 @@
 import { Network, Alchemy } from 'alchemy-sdk'
+import withAuth from 'lib/withAuth'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 // Optional Config object, but defaults to demo api-key and eth-mainnet.
@@ -21,4 +22,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default handler
+export default withAuth(handler)
