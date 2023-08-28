@@ -14,11 +14,11 @@ const CargoItem = () => {
   const router = useRouter()
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract } = useContract(nftAircraftTokenAddress)
-
   const { data } = useNFTBalance(contract, address, 1)
 
   const handleClick = useCallback(() => {
-    axios.post('/api/flight/new', { cargoId: router.query.id })
+    console.log('HANDLE CLICK ADD CARGO?')
+    // axios.post('/api/flight/new', { cargoId: router.query.id })
   }, [router.query.id])
 
   return address ? (

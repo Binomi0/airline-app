@@ -33,10 +33,11 @@ const useCargo = (): UseCargo => {
   }, [])
 
   const newCargo = useCallback(
-    (route: FRoute, aircraft: NFT) => {
+    async (route: FRoute, aircraft: NFT) => {
       const distance = getDistanceByCoords(atcs, route)
       const details = cargos[getRandomInt(8)]
       const weight = getCargoWeight(aircraft)
+      // FIXME: get current callsign
       const callsign = getCallsign()
       const prize = getCargoPrize(distance, aircraft)
       const cargo = {
@@ -52,7 +53,14 @@ const useCargo = (): UseCargo => {
         prize
       }
 
-      setCargo(cargo)
+      try {
+        await axios.post('/api/cargo/new', cargo)
+        setCargo(cargo)
+      }
+      catch(error) {
+        console.error(error)
+      }
+
     },
     [atcs, address]
   )

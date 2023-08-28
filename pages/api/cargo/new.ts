@@ -1,4 +1,5 @@
 import { connectDB } from 'lib/mongoose'
+import withAuth from 'lib/withAuth'
 import Live from 'models/Live'
 import { NextApiHandler } from 'next'
 
@@ -8,19 +9,7 @@ const handler: NextApiHandler = async (req, res) => {
     return
   }
 
-  // const user = await getUser(req)
-
-  // if (!user) {
-  //   return res.status(401).json({
-  //     message: 'Not authorized.'
-  //   })
-  // }
-
   const cargo = req.body
-
-  // if (cargo.address !== user.address) {
-  //   return res.status(400).end()
-  // }
 
   try {
     await connectDB()
@@ -40,4 +29,4 @@ const handler: NextApiHandler = async (req, res) => {
   }
 }
 
-export default handler
+export default withAuth(handler)
