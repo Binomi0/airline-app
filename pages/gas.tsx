@@ -8,9 +8,9 @@ import Image from 'next/image'
 import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import serverSidePropsHandler from 'components/ServerSideHandler'
-import GppGoodIcon from '@mui/icons-material/GppGood'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useTokenBalance from 'hooks/useTokenBalance'
+import Disconnected from 'components/Disconnected'
 
 interface Props {
   loading: boolean
@@ -25,17 +25,7 @@ const Gas: NextPage<Props> = ({ loading }) => {
   }
 
   if (!address) {
-    return (
-      <Box mt={10} textAlign='center'>
-        <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />
-        <Typography variant='h2' paragraph>
-          Sign in
-        </Typography>
-        <Typography variant='h4' paragraph>
-          Sign in with your wallet to checkout gas station.
-        </Typography>
-      </Box>
-    )
+    return <Disconnected />
   }
 
   if (!balance) return null

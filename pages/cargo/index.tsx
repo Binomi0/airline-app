@@ -6,9 +6,9 @@ import CargoView from 'routes/Cargo/CargoView'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
 import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector'
 import serverSidePropsHandler from 'components/ServerSideHandler'
-import GppGoodIcon from '@mui/icons-material/GppGood'
 import { VaProvider } from 'context/VaProvider'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import Disconnected from 'components/Disconnected'
 
 const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
@@ -23,17 +23,7 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
   }
 
   if (!address) {
-    return (
-      <Box mt={10} textAlign='center'>
-        <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />
-        <Typography variant='h2' paragraph>
-          Sign in
-        </Typography>
-        <Typography variant='h4' paragraph>
-          Sign in with your wallet to checkout available flights.
-        </Typography>
-      </Box>
-    )
+    return <Disconnected />
   }
 
   if (owned.length === 0) {

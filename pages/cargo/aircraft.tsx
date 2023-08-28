@@ -7,9 +7,8 @@ import styles from 'styles/Home.module.css'
 import { useContract, useNFTBalance } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import Link from 'next/link'
-import axios from 'config/axios'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import GppGoodIcon from '@mui/icons-material/GppGood'
+import Disconnected from 'components/Disconnected'
 
 const CargoItem = () => {
   const router = useRouter()
@@ -19,21 +18,10 @@ const CargoItem = () => {
 
   const handleClick = useCallback(() => {
     console.log('HANDLE CLICK ADD CARGO?')
-    // axios.post('/api/flight/new', { cargoId: router.query.id })
-  }, [router.query.id])
+  }, [])
 
   if (!address) {
-    return (
-      <Box mt={10} textAlign='center'>
-        <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />
-        <Typography variant='h2' paragraph>
-          Sign in
-        </Typography>
-        <Typography variant='h4' paragraph>
-          Sign in with your wallet to checkout available flights.
-        </Typography>
-      </Box>
-    )
+    return <Disconnected />
   }
 
   return (
