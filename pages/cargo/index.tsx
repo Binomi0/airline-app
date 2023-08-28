@@ -14,8 +14,10 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const [aircraft, setAircraft] = useState<NFT>()
   const { contract } = useContract(nftAircraftTokenAddress)
-  const { data: owned = [], isLoading: isLoadingNFTs } = useOwnedNFTs(contract, address)
+  const { data: owned = [], isLoading: isLoadingNFTs, isFetched } = useOwnedNFTs(contract, address)
 
+  console.log({ isLoadingNFTs })
+  console.log({ isFetched })
   if (isLoadingNFTs) {
     return <LinearProgress />
   }
@@ -45,6 +47,7 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
       </Box>
     )
   }
+
   return (
     <VaProvider>
       {aircraft ? (

@@ -18,7 +18,7 @@ const LicenseMarketPlace: React.FC = () => {
   }
 
   if (error) {
-    console.log('error', error)
+    console.error('error', error)
     return (
       <Alert severity='error'>
         <AlertTitle>Ha ocurrido un error</AlertTitle>

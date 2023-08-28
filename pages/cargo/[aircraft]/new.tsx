@@ -1,4 +1,4 @@
-import { Box, Fade, LinearProgress } from '@mui/material'
+import { Box, Fade, LinearProgress, Typography } from '@mui/material'
 import { useContract, useNFT, useOwnedNFTs } from '@thirdweb-dev/react'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
@@ -8,6 +8,7 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import React, { useEffect, useMemo } from 'react'
 import CargoView from 'routes/Cargo/CargoView'
+import GppGoodIcon from '@mui/icons-material/GppGood'
 
 const CargoAircraft: NextPage<{ loading: boolean }> = ({ loading }) => {
   const router = useRouter()
@@ -32,6 +33,20 @@ const CargoAircraft: NextPage<{ loading: boolean }> = ({ loading }) => {
       router.push('/hangar')
     }
   }, [owned, data, isLoading, isLoadingOwn, router, hasAircraft])
+
+  if (!address) {
+    return (
+      <Box mt={10} textAlign='center'>
+        <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />
+        <Typography variant='h2' paragraph>
+          Sign in
+        </Typography>
+        <Typography variant='h4' paragraph>
+          Sign in with your wallet to checkout available flights.
+        </Typography>
+      </Box>
+    )
+  }
 
   return (
     <VaProvider>

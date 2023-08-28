@@ -14,9 +14,9 @@ const transporter = createTransport({
 // eslint-disable-next-line
 transporter.verify(function (error, success) {
   if (error) {
-    console.log(error)
+    console.error(error)
   } else {
-    console.log('Server is ready to take our messages')
+    console.info('Server is ready to take our messages')
   }
 })
 
