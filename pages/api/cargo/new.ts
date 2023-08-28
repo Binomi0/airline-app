@@ -1,9 +1,12 @@
 import { connectDB } from 'lib/mongoose'
-import withAuth from 'lib/withAuth'
+import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import Cargo from 'models/Cargo'
+import CargoDetails from 'models/Cargo/CargoDetails'
 import Live from 'models/Live'
-import { NextApiHandler } from 'next'
+// import Live from 'models/Live'
+import { NextApiResponse } from 'next'
 
-const handler: NextApiHandler = async (req, res) => {
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     res.status(405).end()
     return
@@ -13,16 +16,32 @@ const handler: NextApiHandler = async (req, res) => {
 
   try {
     await connectDB()
-    const current = await Live.findOne({ address: 'user.address' })
+    const current = await Cargo.findOne({ userId: req.id })
 
     if (current) {
-      res.status(202).json(current)
+      res.status(202).send(current)
       return
     }
 
-    const newCargo = await Live.create(cargo)
+    // TODO: Remove when al cargo details are inserted in db
+    let details = await CargoDetails.findOne({ name: cargo.details.name })
+    if (!details) {
+      details = await CargoDetails.create(cargo.details)
+    }
 
-    res.status(201).send(newCargo)
+    const currentCargo = await Cargo.findOne({ userId: req.id })
+    if (!currentCargo) {
+      const newCargo = await Cargo.create({
+        ...cargo,
+        userId: req.id,
+        details: details._id
+      })
+
+      res.status(201).send(newCargo)
+      return
+    }
+
+    res.status(202).send(currentCargo)
   } catch (error) {
     console.error('New Cargo ERROR =>', error)
     res.status(500).end()

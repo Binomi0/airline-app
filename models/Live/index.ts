@@ -1,57 +1,60 @@
 import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
 
+enum LastTrackState {
+  En_Route = 'En_Route',
+  Boarding = 'Boarding',
+  Approach = 'Approach',
+  Departing = 'Departing',
+  On_Blocks = 'On_Blocks',
+  Initial_Climb = 'Initial_Climb',
+  Landed = 'Landed'
+}
+
+interface FlightState {
+  name: string
+  value: string
+}
+
 export interface ILive extends Document {
-  email: string
-  address?: string
-  origin?: string
-  destination?: string
-  distance?: number
-  details?: {
-    name?: string
-    description?: string
-  }
-  aircraftId?: string
-  aircraft?: ObjectId
-  weight: number
   callsign: string
-  prize: number
+  aircraftId: string
+  cargoId: ObjectId
+  userId: ObjectId
+  status: LastTrackState
+  track: FlightState[]
 }
 
 const liveSchema: mongoose.Schema = new mongoose.Schema<ILive>(
   {
-    email: {
-      type: String,
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
       index: true
     },
-    address: {
-      type: String
-    },
-    origin: {
-      type: String
-    },
-    destination: {
-      type: String
-    },
-    distance: {
-      type: Number
-    },
-    details: {
-      name: {
-        type: String
-      },
-      description: {
-        type: String
-      }
+    cargoId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Cargo',
+      required: true
     },
     aircraftId: {
-      type: String
+      type: String,
+      required: true
     },
-    aircraft: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Aircraft'
-    }
+    callsign: { type: String, required: true },
+    status: {
+      type: String,
+      enum: ['Boarding', 'Departing', 'Initial_Climb', 'En_Route', 'Approach', 'Landed', 'On_Blocks'],
+      default: LastTrackState.Boarding
+    },
+    track: [
+      {
+        name: { type: LastTrackState },
+        value: { type: Date },
+        unique: true
+      }
+    ]
   },
   {
     timestamps: true

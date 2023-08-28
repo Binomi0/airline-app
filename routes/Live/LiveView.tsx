@@ -1,17 +1,21 @@
-import { useMemo, useEffect, useCallback } from 'react'
+import { useMemo, useEffect, useCallback, useState } from 'react'
 import type { FC } from 'react'
-import { Fade, Box, Typography, Button } from '@mui/material'
+import { Fade, Box, Typography, Button, CircularProgress, Stack } from '@mui/material'
 import { useVaProviderContext } from 'context/VaProvider'
 import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
 import GppGoodIcon from '@mui/icons-material/GppGood'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import axios from 'config/axios'
+import { LastTrackState } from 'types'
 
 const LiveView: FC = () => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { cargo, getCargo, isLoading } = useCargo()
   const { pilots, setCurrentPilot, active } = useVaProviderContext()
-  const pilot = useMemo(() => pilots.find((pilot) => pilot.callsign === cargo?.callsign), [pilots, cargo])
+  const [flightState, setFlightState] = useState<LastTrackState>('Boarding')
+  // const pilot = useMemo(() => pilots.find((pilot) => pilot.callsign === cargo?.callsign), [pilots, cargo])
+  const pilot = useMemo(() => pilots[0], [pilots])
 
   const handleDisconnect = useCallback(() => {
     setCurrentPilot()
@@ -25,6 +29,14 @@ const LiveView: FC = () => {
     setCurrentPilot(pilot)
   }, [pilot, setCurrentPilot])
 
+  useEffect(() => {
+    if (!pilot || pilot?.lastTrack.state === flightState) return
+    console.log({ pilot: pilot.lastTrack.state })
+    axios.post('/api/live/state', { state: pilot.lastTrack.state })
+    setFlightState(pilot.lastTrack.state as LastTrackState)
+  }, [flightState, pilot])
+
+  console.log({ flightState })
   if (!address) {
     return (
       <Box mt={10} textAlign='center'>
@@ -42,11 +54,18 @@ const LiveView: FC = () => {
   return (
     <>
       <Fade in={!active && !pilot} unmountOnExit timeout={{ exit: 0 }}>
-        <Box mt={10} textAlign='center'>
+        <Stack mt={10} spacing={10} alignItems='center'>
           <Typography variant='h1'>Esperando conexión...</Typography>
-          <Typography variant='h2'>{cargo?.callsign}</Typography>
-          <Typography variant='h3'>Conéctate a IVAO para continuar.</Typography>
-        </Box>
+          <Box bgcolor='primary.light' px={5} borderRadius={10}>
+            <Typography variant='h2'>{cargo?.callsign}</Typography>
+          </Box>
+          <Typography variant='h3' paragraph>
+            Conéctate a IVAO para continuar.
+          </Typography>
+          <Box textAlign='center'>
+            <CircularProgress size={100} />
+          </Box>
+        </Stack>
       </Fade>
       <Fade in={!!active && !!pilot} unmountOnExit>
         <Box mt={10}>

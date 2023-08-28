@@ -8,6 +8,7 @@ import { Cargo, FRoute } from 'types'
 import { getCallsign, getCargoWeight, getDistanceByCoords, getRandomInt, getCargoPrize } from 'utils'
 
 interface UseCargo {
+  // eslint-disable-next-line no-unused-vars
   newCargo: (route: FRoute, owned: NFT) => void
   getCargo: () => Promise<void>
   cargo?: Cargo
@@ -46,21 +47,18 @@ const useCargo = (): UseCargo => {
         destination: route.destination,
         distance,
         details,
-        aircraftId: aircraft.metadata.id,
         aircraft,
+        aircraftId: aircraft.metadata.id,
         weight,
         callsign,
         prize
       }
 
       try {
-        await axios.post('/api/cargo/new', cargo)
         setCargo(cargo)
-      }
-      catch(error) {
+      } catch (error) {
         console.error(error)
       }
-
     },
     [atcs, address]
   )

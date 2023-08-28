@@ -92,8 +92,6 @@ export function getRandomInt(max: number) {
 }
 
 export function getCallsign() {
-  // TODO: hardcoded value
-  return 'TAP1122'
   const ident = Math.round(Math.floor(Math.random() * (10000 - 1000 + 1) + 1000))
   return `${process.env.NEXT_PUBLIC_CALLSIGN}${ident}`
 }

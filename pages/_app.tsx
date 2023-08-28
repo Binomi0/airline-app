@@ -41,11 +41,11 @@ export default function MyApp(props: MyAppProps) {
   }, [])
 
   return (
-    <SessionProvider session={props.pageProps.session}>
-      <AuthProvider user={props.pageProps.user}>
-        <AlchemyProvider>
-          <CustomWeb3Provider>
-            <CacheProvider value={emotionCache}>
+    <CacheProvider value={emotionCache}>
+      <SessionProvider session={props.pageProps.session}>
+        <AuthProvider user={props.pageProps.user}>
+          <AlchemyProvider>
+            <CustomWeb3Provider>
               <Head>
                 <meta name='viewport' content='initial-scale=1, width=device-width' />
               </Head>
@@ -59,10 +59,10 @@ export default function MyApp(props: MyAppProps) {
                   <Component loading={loading} {...props.pageProps} />
                 </ErrorBoundary>
               </ThemeProvider>
-            </CacheProvider>
-          </CustomWeb3Provider>
-        </AlchemyProvider>
-      </AuthProvider>
-    </SessionProvider>
+            </CustomWeb3Provider>
+          </AlchemyProvider>
+        </AuthProvider>
+      </SessionProvider>
+    </CacheProvider>
   )
 }

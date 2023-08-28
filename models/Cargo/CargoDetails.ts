@@ -1,29 +1,23 @@
 import { mongoose } from 'lib/mongoose'
-import { ObjectId } from 'mongodb'
-import { CargoDetails } from 'types'
+import { CargoDetail } from 'types'
 
-export interface ICargoDetails extends  Document, CargoDetails {
-  cargo: ObjectId
-}
+export type CargoDetailSchema = Document & CargoDetail
 
-const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargoDetails>(
+const cargoSchema: mongoose.Schema = new mongoose.Schema<CargoDetailSchema>(
   {
-    cargo: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true
-    },
     name: {
       type: String,
       required: true,
+      index: true
     },
     description: {
       type: String,
       required: true
-    },
+    }
   },
   {
     timestamps: true
   }
 )
 
-export default mongoose.models.CargoDetails || mongoose.model<ICargoDetails>('CargoDetails', cargoSchema)
+export default mongoose.models.CargoDetails || mongoose.model<CargoDetailSchema>('CargoDetails', cargoSchema)

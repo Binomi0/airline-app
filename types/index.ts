@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { NFT } from '@thirdweb-dev/sdk'
 import { atc } from 'mocks'
 import ivaoPilot from 'mocks/ivaoPilot'
+import { ObjectId } from 'mongodb'
 
 export interface AircraftAttributes {
   deposit: number
@@ -18,12 +20,12 @@ export interface AirlineNFT {
 }
 
 export type LastTrackState =
-  | 'En Route'
+  | 'En_Route'
   | 'Boarding'
   | 'Approach'
   | 'Departing'
-  | 'On Blocks'
-  | 'Initial Climb'
+  | 'On_Blocks'
+  | 'Initial_Climb'
   | 'Landed'
 
 export type IvaoPilot = typeof ivaoPilot
@@ -39,15 +41,15 @@ export interface Cargo {
   origin: string
   destination: string
   distance: number
-  details: CargoDetails
+  details: CargoDetail
   aircraft: NFT
   aircraftId: string
-  weight: number
   callsign: string
+  weight: number
   prize: number
 }
 
-export interface CargoDetails {
+export interface CargoDetail {
   name: string
   description: string
 }
@@ -60,10 +62,10 @@ export enum Aircraft {
 }
 
 export enum AircraftName {
-  'C700',
-  'B737',
-  'C172',
-  'AN225'
+  C700 = 'C700',
+  B737 = 'B737',
+  C172 = 'C172',
+  AN225 = 'AN225'
 }
 
 export enum License {

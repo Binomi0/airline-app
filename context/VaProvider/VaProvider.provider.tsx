@@ -80,9 +80,9 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [setClients, setFlights])
 
   // useEffect(() => {
-  //   const timer = setInterval(getClients, 15000);
-  //   return () => clearInterval(timer);
-  // }, [getClients]);
+  //   const timer = setInterval(getClients, 15000)
+  //   return () => clearInterval(timer)
+  // }, [getClients])
 
   useEffect(() => {
     getClients()

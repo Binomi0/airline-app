@@ -77,7 +77,7 @@ const CargoItem = () => {
         )}
       </Container>
     </Box>
-  ) : null
+  )
 }
 
 export default CargoItem

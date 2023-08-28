@@ -1,13 +1,18 @@
 import { mongoose } from 'lib/mongoose'
+import { ObjectId } from 'mongodb'
 import { Cargo } from 'types'
 
-export type ICargo =  Document & Cargo
+export type ICargo = Document & Cargo & { userId: ObjectId }
 
 const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
     origin: {
       type: String,
-      required: true,
+      required: true
     },
     destination: {
       type: String,
@@ -20,18 +25,18 @@ const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
     details: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'CargoDetails',
-      required: true,
+      required: true
     },
     aircraftId: {
       type: String,
       required: true
     },
-    weight: {
-      type: Number,
-      required: true
-    },
     callsign: {
       type: String,
+      required: true
+    },
+    weight: {
+      type: Number,
       required: true
     },
     prize: {
