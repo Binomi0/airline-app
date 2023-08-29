@@ -4,10 +4,10 @@ import { Fade, Box, Typography, Button, CircularProgress, Stack } from '@mui/mat
 import { useVaProviderContext } from 'context/VaProvider'
 import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
-import GppGoodIcon from '@mui/icons-material/GppGood'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import axios from 'config/axios'
 import { LastTrackState } from 'types'
+import Disconnected from 'components/Disconnected'
 
 const LiveView: FC = () => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
@@ -38,17 +38,7 @@ const LiveView: FC = () => {
 
   console.log({ flightState })
   if (!address) {
-    return (
-      <Box mt={10} textAlign='center'>
-        <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />
-        <Typography variant='h2' paragraph>
-          Sign in
-        </Typography>
-        <Typography variant='h4' paragraph>
-          Sign in with your wallet to start tracking.
-        </Typography>
-      </Box>
-    )
+    return <Disconnected />
   }
 
   return (
