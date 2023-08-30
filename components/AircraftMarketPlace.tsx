@@ -45,7 +45,8 @@ const AircraftMarketPlace: React.FC = () => {
       const { isConfirmed } = await Swal.fire({
         title: aircraftNFT.metadata.name as string,
         text: `Do you want to get this aircraft?`,
-        icon: 'question'
+        icon: 'question',
+        showCancelButton: true
       })
       if (isConfirmed) {
         claimAircraftNFT({ to: smartAccountAddress, quantity: 1, nft: aircraftNFT })

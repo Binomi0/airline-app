@@ -15,6 +15,7 @@ const IvaoView = () => {
     <Grid container spacing={2}>
       {pilots
         .filter(filterLEOrigins)
+        .filter((pilot) => pilot.lastTrack.state === 'Boarding')
         .slice(0, 10)
         .map((session) => (
           <FlightDetails session={session} key={session.id} />

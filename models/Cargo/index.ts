@@ -47,6 +47,14 @@ const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
       type: String,
       enum: Object.values(CargoStatus),
       default: CargoStatus.STARTED
+    },
+    remote: {
+      type: Boolean,
+      require: true
+    },
+    rewarded: {
+      type: Boolean,
+      default: false
     }
   },
   {

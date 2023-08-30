@@ -3,6 +3,7 @@ import axios from 'config/axios'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useVaProviderContext } from 'context/VaProvider'
 import { cargos } from 'mocks/cargos'
+import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import { Cargo, CargoStatus, FRoute } from 'types'
 import { getCallsign, getCargoWeight, getDistanceByCoords, getRandomInt, getCargoPrize } from 'utils'
@@ -16,6 +17,7 @@ interface UseCargo {
 }
 
 const useCargo = (): UseCargo => {
+  const router = useRouter()
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { atcs } = useVaProviderContext()
   const [cargo, setCargo] = useState<Cargo>()
@@ -50,9 +52,10 @@ const useCargo = (): UseCargo => {
         aircraft,
         aircraftId: aircraft.metadata.id,
         weight,
-        callsign,
+        callsign: router.query.pilot ? (router.query.pilot as string) : callsign,
         prize,
-        status: CargoStatus.STARTED
+        status: CargoStatus.STARTED,
+        remote: !!router.query.pilot
       }
 
       try {
@@ -61,7 +64,7 @@ const useCargo = (): UseCargo => {
         console.error(error)
       }
     },
-    [atcs, address]
+    [atcs, address, router.query.pilot]
   )
 
   return { newCargo, cargo, getCargo, isLoading }

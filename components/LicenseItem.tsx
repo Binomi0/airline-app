@@ -32,7 +32,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
     if (hasEnough) {
       const { isConfirmed } = await Swal.fire({
         title: name as string,
-        text: `Do you want to get this license for ${attribute?.value}?`,
+        text: `Do you want to get this license for ${attribute?.value} AIRL?`,
         icon: 'question',
         showCancelButton: true,
         showConfirmButton: true

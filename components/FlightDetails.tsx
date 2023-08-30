@@ -20,6 +20,7 @@ import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports'
 import AirlinesIcon from '@mui/icons-material/Airlines'
 import type { LastTrackState, IvaoPilot } from 'types'
+import { useRouter } from 'next/router'
 
 const stateIcons: Record<LastTrackState, ReactNode> = {
   En_Route: <ConnectingAirportsIcon color='primary' fontSize='large' />,
@@ -45,6 +46,7 @@ const stateColors: Record<
 }
 
 const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
+  const router = useRouter()
   const [size, setSize] = React.useState(6)
 
   const flightValue = React.useMemo(() => {
@@ -57,13 +59,23 @@ const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
     return (completed / totalDistance) * 100
   }, [session?.lastTrack])
 
+  const handleSelectPilot = React.useCallback(() => {
+    localStorage.setItem('selected-pilot', session.callsign)
+    router.push(`/cargo?pilot=${session.callsign}`)
+  }, [router, session.callsign])
+
   return (
     <Grid item xs={size} key={session.id}>
       <Card onClick={() => setSize((s) => (s === 12 ? 6 : 12))}>
         <CardHeader
           sx={{}}
           action={
-            <Button size='small' variant='contained' color={stateColors[session.lastTrack.state as LastTrackState]}>
+            <Button
+              disabled
+              size='small'
+              variant='contained'
+              color={stateColors[session.lastTrack.state as LastTrackState]}
+            >
               {session.lastTrack.state}
             </Button>
           }
@@ -115,11 +127,8 @@ const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
         </CardContent>
         {size === 12 && (
           <CardActions sx={{ justifyContent: 'flex-end' }}>
-            <Button size='large' variant='contained'>
-              BOTON 1
-            </Button>
-            <Button size='large' variant='contained'>
-              BOTON 2
+            <Button size='large' variant='contained' onClick={handleSelectPilot}>
+              Select
             </Button>
           </CardActions>
         )}

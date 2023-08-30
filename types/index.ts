@@ -53,11 +53,18 @@ export interface Cargo {
   weight: number
   prize: number
   status: CargoStatus
+  remote: boolean
+  rewarded: boolean
 }
 
 export interface CargoDetail {
   name: string
   description: string
+}
+
+export interface CargoStep {
+  name: string
+  value: string
 }
 
 export enum Aircraft {

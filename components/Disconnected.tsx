@@ -1,16 +1,16 @@
-import { Box, Typography } from '@mui/material'
-import GppGoodIcon from '@mui/icons-material/GppGood'
+import { Stack, Typography } from '@mui/material'
+import GppBadIcon from '@mui/icons-material/GppBad'
 
 const Disconnected = () => (
-  <Box mt={10} textAlign='center'>
-    <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />
-    <Typography variant='h2' paragraph>
+  <Stack mt={10} justifyContent='center' spacing={10} alignItems='center'>
+    <GppBadIcon sx={{ fontSize: 120 }} color='error' />
+    <Typography fontWeight={600} variant='h2' paragraph fontFamily='B612 Mono' textTransform='uppercase'>
       Restricted Area
     </Typography>
-    <Typography variant='h4' paragraph>
+    <Typography variant='h4' paragraph fontFamily='B612 Mono'>
       You need clearance to enter here
     </Typography>
-  </Box>
+  </Stack>
 )
 
 export default Disconnected

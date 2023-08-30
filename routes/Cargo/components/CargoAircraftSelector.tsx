@@ -20,6 +20,16 @@ const CargoAircraftSelector: React.FC<{
 }> = ({ setAircraft, owned }) => {
   const router = useRouter()
 
+  const handleSelectAircraft = React.useCallback(
+    (nft: NFT) => () => {
+      if (router.query.pilot) {
+        const url = `cargo/${nft.metadata.id}/new?pilot=${router.query.pilot}`
+        router.push(url)
+      }
+    },
+    [router]
+  )
+
   return (
     <Container>
       <Stack direction='row' justifyContent='center'>
@@ -36,7 +46,7 @@ const CargoAircraftSelector: React.FC<{
             }
           >
             {owned.map((nft) => (
-              <ListItemButton key={nft.metadata.id} onClick={() => router.push(`cargo/${nft.metadata.id}/new`)}>
+              <ListItemButton key={nft.metadata.id} onClick={handleSelectAircraft(nft)}>
                 <ListItemIcon>
                   <Avatar variant='square'>
                     <MediaRenderer width='50px' height='50px' src={nft?.metadata.image} />
