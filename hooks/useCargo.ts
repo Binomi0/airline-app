@@ -4,7 +4,7 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useVaProviderContext } from 'context/VaProvider'
 import { cargos } from 'mocks/cargos'
 import { useCallback, useState } from 'react'
-import { Cargo, FRoute } from 'types'
+import { Cargo, CargoStatus, FRoute } from 'types'
 import { getCallsign, getCargoWeight, getDistanceByCoords, getRandomInt, getCargoPrize } from 'utils'
 
 interface UseCargo {
@@ -51,7 +51,8 @@ const useCargo = (): UseCargo => {
         aircraftId: aircraft.metadata.id,
         weight,
         callsign,
-        prize
+        prize,
+        status: CargoStatus.STARTED
       }
 
       try {

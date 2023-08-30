@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { NextPage } from 'next'
 import { NFT, useContract, useOwnedNFTs } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
@@ -9,21 +9,27 @@ import serverSidePropsHandler from 'components/ServerSideHandler'
 import { VaProvider } from 'context/VaProvider'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import Disconnected from 'components/Disconnected'
+import useLive from 'hooks/useLive'
+import { useRouter } from 'next/router'
 
 const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
+  const router = useRouter()
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const [aircraft, setAircraft] = useState<NFT>()
   const { contract } = useContract(nftAircraftTokenAddress)
-  const { data: owned = [], isLoading: isLoadingNFTs, isFetched } = useOwnedNFTs(contract, address)
+  const { data: owned = [], isLoading: isLoadingNFTs } = useOwnedNFTs(contract, address)
+  const { live } = useLive()
 
-  console.log({ isLoadingNFTs })
-  console.log({ isFetched })
-  if (isLoadingNFTs) {
-    return <LinearProgress />
-  }
+  React.useEffect(() => {
+    if (live) router.push('/live')
+  }, [live, router])
 
   if (!address) {
     return <Disconnected />
+  }
+
+  if (isLoadingNFTs) {
+    return <LinearProgress />
   }
 
   if (owned.length === 0) {

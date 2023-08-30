@@ -1,8 +1,7 @@
 import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
-import Live from 'models/Live'
+import Live, { LastTrackStateEnum } from 'models/Live'
 import { NextApiResponse } from 'next'
-import { LastTrackState } from 'types'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -13,7 +12,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     return
   }
 
-  const lastTrackState = req.body.state as LastTrackState
+  const lastTrackState = req.body.state as LastTrackStateEnum
 
   console.log({ lastTrackState })
   try {

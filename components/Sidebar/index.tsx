@@ -9,10 +9,12 @@ import LocalAirportIcon from '@mui/icons-material/LocalAirport'
 import { useMainProviderContext } from 'context/MainProvider'
 import SidebarItem from './SidebarItem'
 import { useRouter } from 'next/router'
+import useLive from 'hooks/useLive'
 
 const Sidebar: React.FC = () => {
   const router = useRouter()
   const { sidebarOpen: open, toggleSidebar } = useMainProviderContext()
+  const { live } = useLive()
 
   const handleClick = useCallback(
     (route: string) => () => {
@@ -62,6 +64,14 @@ const Sidebar: React.FC = () => {
           Icon={LocalAirportIcon}
           selected={router.pathname === '/ivao'}
         />
+        {live && (
+          <SidebarItem
+            onLink={handleClick('/live')}
+            text='LIVE FLIGHT'
+            Icon={LocalAirportIcon}
+            selected={router.pathname === '/live'}
+          />
+        )}
       </List>
     </Drawer>
   )

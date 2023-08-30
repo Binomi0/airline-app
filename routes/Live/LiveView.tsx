@@ -8,18 +8,33 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import axios from 'config/axios'
 import { LastTrackState } from 'types'
 import Disconnected from 'components/Disconnected'
+import MCDUView from './components/MCDUView'
+import Swal from 'sweetalert2'
+import { useRouter } from 'next/router'
 
 const LiveView: FC = () => {
+  const router = useRouter()
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { cargo, getCargo, isLoading } = useCargo()
   const { pilots, setCurrentPilot, active } = useVaProviderContext()
   const [flightState, setFlightState] = useState<LastTrackState>('Boarding')
   // const pilot = useMemo(() => pilots.find((pilot) => pilot.callsign === cargo?.callsign), [pilots, cargo])
+  // const pilot = useMemo(() => pilots.find((pilot) => pilot.lastTrack.state === 'Boarding'), [pilots])
   const pilot = useMemo(() => pilots[0], [pilots])
 
-  const handleDisconnect = useCallback(() => {
-    setCurrentPilot()
-  }, [setCurrentPilot])
+  const handleDisconnect = useCallback(async () => {
+    const { isConfirmed } = await Swal.fire({
+      title: 'Abort Flight?',
+      text: 'Current flight progress will be lost',
+      icon: 'warning',
+      showCancelButton: true
+    })
+    if (isConfirmed) {
+      setCurrentPilot()
+      await Promise.all([axios.delete('/api/live'), axios.delete('/api/cargo')])
+      router.push('/')
+    }
+  }, [router, setCurrentPilot])
 
   useEffect(() => {
     getCargo()
@@ -36,11 +51,11 @@ const LiveView: FC = () => {
     setFlightState(pilot.lastTrack.state as LastTrackState)
   }, [flightState, pilot])
 
-  console.log({ flightState })
   if (!address) {
     return <Disconnected />
   }
 
+  console.log({ pilot })
   return (
     <>
       <Fade in={!active && !pilot} unmountOnExit timeout={{ exit: 0 }}>
@@ -59,12 +74,7 @@ const LiveView: FC = () => {
       </Fade>
       <Fade in={!!active && !!pilot} unmountOnExit>
         <Box mt={10}>
-          <Typography paragraph>Already connected, tracking...</Typography>
-          <Typography>{pilot?.lastTrack.onGround ? 'En tierra' : 'En el aire'}</Typography>
-          <Typography>Estado ({pilot?.lastTrack.state})</Typography>
-          <Button variant='contained' color='secondary' onClick={handleDisconnect}>
-            Disconnect
-          </Button>
+          <MCDUView pilot={pilot} onDisconnect={handleDisconnect} />
         </Box>
       </Fade>
       <Fade in={!cargo && !isLoading}>

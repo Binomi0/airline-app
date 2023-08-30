@@ -35,6 +35,11 @@ export interface FRoute {
   destination: string
 }
 
+export enum CargoStatus {
+  STARTED = 'STARTED',
+  COMPLETED = 'COMPLETED',
+  ABORTED = 'ABORTED'
+}
 export type Flight = Record<string, FRoute[]>
 export type Atc = typeof atc
 export interface Cargo {
@@ -47,6 +52,7 @@ export interface Cargo {
   callsign: string
   weight: number
   prize: number
+  status: CargoStatus
 }
 
 export interface CargoDetail {

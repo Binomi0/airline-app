@@ -1,7 +1,7 @@
 import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
 
-enum LastTrackState {
+export enum LastTrackStateEnum {
   En_Route = 'En_Route',
   Boarding = 'Boarding',
   Approach = 'Approach',
@@ -12,8 +12,8 @@ enum LastTrackState {
 }
 
 interface FlightState {
-  name: string
-  value: string
+  name: LastTrackStateEnum
+  value: Date
 }
 
 export interface ILive extends Document {
@@ -21,9 +21,11 @@ export interface ILive extends Document {
   aircraftId: string
   cargoId: ObjectId
   userId: ObjectId
-  status: LastTrackState
+  status: LastTrackStateEnum
   track: FlightState[]
 }
+
+const schema = 'Live'
 
 const liveSchema: mongoose.Schema = new mongoose.Schema<ILive>(
   {
@@ -43,16 +45,11 @@ const liveSchema: mongoose.Schema = new mongoose.Schema<ILive>(
       required: true
     },
     callsign: { type: String, required: true },
-    status: {
-      type: String,
-      enum: ['Boarding', 'Departing', 'Initial_Climb', 'En_Route', 'Approach', 'Landed', 'On_Blocks'],
-      default: LastTrackState.Boarding
-    },
+    status: { type: String, enum: Object.values(LastTrackStateEnum), default: LastTrackStateEnum.Boarding },
     track: [
       {
-        name: { type: LastTrackState },
-        value: { type: Date },
-        unique: true
+        name: { type: String, enum: Object.values(LastTrackStateEnum), default: LastTrackStateEnum.Boarding },
+        value: { type: Date, default: new Date() }
       }
     ]
   },
@@ -61,4 +58,4 @@ const liveSchema: mongoose.Schema = new mongoose.Schema<ILive>(
   }
 )
 
-export default mongoose.models.Live || mongoose.model<ILive>('Live', liveSchema)
+export default mongoose.models.Live || mongoose.model<ILive>(schema, liveSchema)

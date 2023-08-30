@@ -1,6 +1,6 @@
 import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
-import { Cargo } from 'types'
+import { Cargo, CargoStatus } from 'types'
 
 export type ICargo = Document & Cargo & { userId: ObjectId }
 
@@ -42,6 +42,11 @@ const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
     prize: {
       type: Number,
       required: true
+    },
+    status: {
+      type: String,
+      enum: Object.values(CargoStatus),
+      default: CargoStatus.STARTED
     }
   },
   {
