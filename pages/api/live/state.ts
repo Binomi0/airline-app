@@ -8,8 +8,9 @@ import sdk from 'lib/twSdk'
 import User from 'models/User'
 import { coinTokenAddress } from 'contracts/address'
 
-const validateFullFlight = (steps: CargoStep[]) => {
+const validateFullFlight = (steps: CargoStep[]): number => {
   let counter = 0
+  let result = 0
 
   steps.forEach((step) => {
     if (step.name === LastTrackStateEnum.Boarding) {
@@ -29,17 +30,17 @@ const validateFullFlight = (steps: CargoStep[]) => {
     }
 
     if (counter === 7) {
-      return 3
-    } else if (counter > 5) {
-      return 2
-    } else if (counter > 4) {
-      return 1
+      result = 30
+    } else if (counter > 6) {
+      result = 15
     }
-    return 0
   })
+
+  return result
 }
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
+  console.log('user =>', req.id)
   if (req.method !== 'POST') {
     res.status(405).end()
     return
@@ -59,32 +60,42 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
 
     if (live.track.some((step: CargoDetail) => step.name === LastTrackStateEnum.On_Blocks)) {
-      const isValid = validateFullFlight(live.track)
-      const cargo = await Cargo.findOneAndUpdate<ICargo>(
-        { userId: req.id },
-        { status: CargoStatus.COMPLETED, rewarded: false }
-      )
-      if (!cargo) {
-        throw new Error('Missing cargo after finish flight')
+      const score = validateFullFlight(live.track)
+
+      if (score) {
+        const cargo = await Cargo.findById<ICargo>(live.cargoId)
+        const user = await User.findById(req.id)
+        if (!cargo || !user) {
+          throw new Error('Missing cargo or user after finish flight')
+        }
+
+        if (!cargo.isRewarded && cargo.status === CargoStatus.COMPLETED) {
+          const remote = cargo.remote ? 3 : 1
+          const prize = (cargo.prize / remote) * (1 + score / 100)
+          await sdk.wallet.transfer(user.address, prize, coinTokenAddress)
+          await Cargo.findOneAndUpdate<ICargo>(
+            { userId: req.id },
+            { isRewarded: true, status: CargoStatus.COMPLETED, score, rewards: prize }
+          )
+        }
+
+        res.status(200).end()
+        return
       }
-
-      const user = await User.findOne({ userId: req.id })
-      if (!user) {
-        throw new Error('Missing using after finish flight')
-      }
-
-      await sdk.wallet.transfer(user.address, cargo.prize, coinTokenAddress)
-      await Cargo.findOneAndUpdate<ICargo>({ userId: req.id }, { rewarded: true })
-
-      res.status(200).end()
-      return
     }
 
     if (live.track.some((step: CargoDetail) => step.name === lastTrackState)) {
       await Live.findOneAndUpdate(
         { _id: live._id, 'track.name': lastTrackState },
-        { $addToSet: { track: { value: new Date() } } },
-        { new: true }
+        {
+          $set: {
+            'track.$[element].value': new Date()
+          }
+        },
+        {
+          arrayFilters: [{ 'element.name': lastTrackState }],
+          new: true
+        }
       )
 
       res.status(202).end

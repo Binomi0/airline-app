@@ -16,18 +16,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   await connectDB()
-  const user = await Webauthn.findOne({ email: req.body.email })
+  const auth = await Webauthn.findOne({ email: req.body.email })
 
-  if (!user) {
-    throw new Error(`Could not find authenticator ${body.data.id} for user ${user?._id}`)
+  if (!auth) {
+    throw new Error(`Could not find authenticator ${body.data.id} for auth ${auth?._id}`)
   }
 
   let verification
 
   try {
     verification = {
-      verified: user.authenticators.some(
-        async (authenticator: Authenticator) => await verifySignature(authenticator, body.data, user.challenge)
+      verified: auth.authenticators.some(
+        async (authenticator: Authenticator) => await verifySignature(authenticator, body.data, auth.challenge)
       )
     }
   } catch (err) {
@@ -37,11 +37,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return
   }
 
-  const token = jwt.sign({ data: { email: req.body.email } }, process.env.JWT_SECRET, { expiresIn: '1h' })
-  setCookie('token', token, { req, res })
-  const data = await User.findOne({ email: req.body.email })
-  console.info({ data })
-  res.send({ verified: verification.verified, id: data?.id, emailVerified: data?.emailVerified })
+  try {
+    const user = await User.findOne({ email: req.body.email })
+    const token = jwt.sign({ data: { email: req.body.email, id: user?.id } }, process.env.JWT_SECRET, {
+      expiresIn: '1h'
+    })
+    setCookie('token', token, { req, res })
+    res.send({ verified: verification.verified, id: user?.id, emailVerified: user?.emailVerified })
+    return
+  } catch (err) {
+    console.error('login-response error =>', err)
+    res.status(500).send(err)
+  }
 }
 
 export default handler

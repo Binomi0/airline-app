@@ -43,6 +43,9 @@ const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
       type: Number,
       required: true
     },
+    score: {
+      type: Number
+    },
     status: {
       type: String,
       enum: Object.values(CargoStatus),
@@ -52,7 +55,10 @@ const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
       type: Boolean,
       require: true
     },
-    rewarded: {
+    rewards: {
+      type: Number
+    },
+    isRewarded: {
       type: Boolean,
       default: false
     }

@@ -18,8 +18,8 @@ const LiveView: FC = () => {
   const { cargo, getCargo, isLoading } = useCargo()
   const { pilots, setCurrentPilot, active } = useVaProviderContext()
   const [flightState, setFlightState] = useState<LastTrackState>('Boarding')
-  // const pilot = useMemo(() => pilots.find((pilot) => pilot.callsign === cargo?.callsign), [pilots, cargo])
-  const pilot = pilots && pilots[0]
+  const pilot = useMemo(() => pilots.find((pilot) => pilot.callsign === cargo?.callsign), [pilots, cargo])
+  // const pilot = pilots && pilots[0]
 
   const handleDisconnect = useCallback(async () => {
     const { isConfirmed } = await Swal.fire({

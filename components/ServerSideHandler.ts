@@ -16,8 +16,8 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
   if (token) {
     try {
       const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
-      const { email } = decoded.data
-      if (!email) {
+      const { email, id } = decoded.data
+      if (!email || !id) {
         deleteCookie('token')
         return {
           props: {} as never
@@ -25,7 +25,7 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
       }
 
       await connectDB()
-      const user = await User.findOne({ email })
+      const user = await User.findById(id)
 
       if (user) {
         return {
@@ -49,15 +49,9 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
       }
     }
   }
-  try {
-    return {
-      props: {}
-    }
-  } catch (err) {
-    console.error('Error in server =>', err)
-    return {
-      props: {} as never
-    }
+
+  return {
+    props: {}
   }
 }
 

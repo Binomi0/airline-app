@@ -5,7 +5,7 @@ import image from '../../../public/img/cockpit_view.jpg'
 import Image from 'next/image'
 
 interface Props {
-  pilot: IvaoPilot
+  pilot?: IvaoPilot
   onDisconnect: () => void
 }
 const MCDUView = ({ pilot, onDisconnect }: Props) => {
@@ -20,7 +20,7 @@ const MCDUView = ({ pilot, onDisconnect }: Props) => {
                 Already connected, tracking...
               </Typography>
               <Typography fontSize={28} paragraph sx={{ fontFamily: 'B612 Mono', fontWeight: 500 }}>
-                {pilot.flightPlan.departureId}/{pilot.flightPlan.arrivalId}
+                {pilot?.flightPlan.departureId}/{pilot?.flightPlan.arrivalId}
               </Typography>
             </Stack>
             <Typography sx={{ fontFamily: 'B612 Mono' }}>

@@ -9,7 +9,8 @@ import {
   Typography,
   LinearProgress,
   Box,
-  CardActions
+  CardActions,
+  useTheme
 } from '@mui/material'
 import moment from 'moment'
 import React, { ReactNode } from 'react'
@@ -45,8 +46,14 @@ const stateColors: Record<
   Landed: 'success'
 }
 
-const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
+// eslint-disable-next-line no-unused-vars
+const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string) => void; index: number }> = ({
+  session,
+  onSelect,
+  index
+}) => {
   const router = useRouter()
+  const { palette } = useTheme()
   const [size, setSize] = React.useState(6)
 
   const flightValue = React.useMemo(() => {
@@ -64,9 +71,23 @@ const FlightDetails: React.FC<{ session: IvaoPilot }> = ({ session }) => {
     router.push(`/cargo?pilot=${session.callsign}`)
   }, [router, session.callsign])
 
+  const handleClickPilot = React.useCallback(() => {
+    onSelect(session.callsign)
+    setSize((s) => (s === 12 ? 6 : 12))
+  }, [onSelect, session.callsign])
+
+  console.log({ index })
+
   return (
     <Grid item xs={size} key={session.id}>
-      <Card onClick={() => setSize((s) => (s === 12 ? 6 : 12))}>
+      <Card
+        onClick={handleClickPilot}
+        sx={{
+          boxSizing: 'border-box',
+          backgroundColor: index === 0 && size === 12 ? palette.secondary.light : palette.common.white,
+          boxShadow: index === 0 && size === 12 ? `0 0 50px ${palette.primary.dark}` : 'none'
+        }}
+      >
         <CardHeader
           sx={{}}
           action={

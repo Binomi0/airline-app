@@ -54,7 +54,9 @@ export interface Cargo {
   prize: number
   status: CargoStatus
   remote: boolean
-  rewarded: boolean
+  rewards?: number
+  isRewarded: boolean
+  score?: number
 }
 
 export interface CargoDetail {
