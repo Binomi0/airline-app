@@ -10,15 +10,18 @@ const settings = {
 const alchemy = new Alchemy(settings)
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method !== 'POST') return res.status(405).end()
+  if (req.method !== 'POST') {
+    res.status(405).end()
+    return
+  }
 
   try {
     const response = await alchemy.core.getTokenBalances(req.body.address, [req.body.token])
 
-    return res.status(200).send(response)
+    res.status(200).send(response)
   } catch (error) {
     console.error('error =>', error)
-    return res.status(500).send(error)
+    res.status(500).send(error)
   }
 }
 

@@ -5,7 +5,10 @@ import { NextApiResponse } from 'next'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    if (!req.body.address) return res.status(400).end()
+    if (!req.body.address) {
+      res.status(400).end()
+      return
+    }
 
     const { address } = req.body
     await connectDB()

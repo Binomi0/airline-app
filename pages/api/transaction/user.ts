@@ -5,9 +5,10 @@ import TransactionModel from 'models/Transaction'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    if (!req.body.operation) return res.status(400).end()
-    if (!req.body.amount) return res.status(400).end()
-    if (!req.body.hash) return res.status(400).end()
+    if (!req.body.operation || !req.body.amount || !req.body.hash) {
+      res.status(400).end()
+      return
+    }
 
     try {
       await connectDB()
@@ -33,9 +34,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       //   isCompleted: false,
       // })
 
-      return res.status(202).end()
+      res.status(202).end()
     } catch (err) {
-      return res.status(500).send(err)
+      res.status(500).send(err)
     }
   }
 

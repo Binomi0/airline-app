@@ -23,6 +23,7 @@ export interface ILive extends Document {
   userId: ObjectId
   status: LastTrackStateEnum
   track: FlightState[]
+  isCompleted: boolean
 }
 
 const schema = 'Live'
@@ -51,7 +52,8 @@ const liveSchema: mongoose.Schema = new mongoose.Schema<ILive>(
         name: { type: String, enum: Object.values(LastTrackStateEnum), default: LastTrackStateEnum.Boarding },
         value: { type: Date, default: new Date() }
       }
-    ]
+    ],
+    isCompleted: Boolean
   },
   {
     timestamps: true

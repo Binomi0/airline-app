@@ -11,10 +11,12 @@ axios.interceptors.request.use(
 )
 
 axios.interceptors.response.use(
-  function (response) {
+  async function (response) {
     if (response.status === 401) {
+      console.log('BORRANDO SESSION POR CADUCIDAD')
       deleteCookie('token')
-      window.location.reload()
+      // window.location.reload()
+      // await window.Notification.requestPermission()
     }
     return response
   },

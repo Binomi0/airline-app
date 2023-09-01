@@ -8,7 +8,10 @@ let nextCall: Moment
 let clients: { pilots: IVAOClients[]; atcs: IVAOClients[] }[]
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method !== 'GET') return res.status(405).end()
+  if (req.method !== 'GET') {
+    res.status(405).end()
+    return
+  }
   const now = moment()
 
   if (!nextCall || nextCall.isBefore(now)) {
@@ -19,17 +22,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const response = await axios.get('https://api.ivao.aero/v2/tracker/whazzup')
 
       if (!response.data.clients.pilots) {
-        return res.status(202).send(clients)
+        res.status(202).send(clients)
+        return
       }
       clients = response.data.clients
 
-      return res.status(200).send(response.data.clients)
+      res.status(200).send(response.data.clients)
+      return
     } catch (error) {
       console.error('error =>', error)
-      return res.status(500).send([])
+      res.status(500).send([])
+      return
     }
   }
-  return res.status(202).send(clients)
+  res.status(202).send(clients)
 }
 
 export default withAuth(handler)

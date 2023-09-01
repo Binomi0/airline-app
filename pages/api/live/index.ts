@@ -7,7 +7,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     try {
       await connectDB()
-      const live = await Live.findOne({ userId: req.id })
+      const live = await Live.findOne({ userId: req.id, isCompleted: false })
       if (!live) {
         res.status(204).end()
         return

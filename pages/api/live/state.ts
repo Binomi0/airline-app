@@ -73,10 +73,13 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           const remote = cargo.remote ? 3 : 1
           const prize = (cargo.prize / remote) * (1 + score / 100)
           await sdk.wallet.transfer(user.address, prize, coinTokenAddress)
-          await Cargo.findOneAndUpdate<ICargo>(
-            { userId: req.id },
-            { isRewarded: true, status: CargoStatus.COMPLETED, score, rewards: prize }
-          )
+          await Promise.all([
+            Cargo.findOneAndUpdate<ICargo>(
+              { userId: req.id },
+              { isRewarded: true, status: CargoStatus.COMPLETED, score, rewards: prize }
+            ),
+            Live.findOneAndDelete({ email: req.user })
+          ])
         }
 
         res.status(200).end()

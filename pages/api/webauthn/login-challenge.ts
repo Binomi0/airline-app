@@ -40,7 +40,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const user = await User.findOne({ email: req.body.email })
     const token = jwt.sign({ data: { email: req.body.email, id: user?.id } }, process.env.JWT_SECRET, {
-      expiresIn: '1h'
+      expiresIn: '1m'
     })
     setCookie('token', token, { req, res })
     res.send({ verified: verification.verified, id: user?.id, emailVerified: user?.emailVerified })
