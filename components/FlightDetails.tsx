@@ -89,7 +89,6 @@ const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string)
         }}
       >
         <CardHeader
-          sx={{}}
           action={
             <Button
               disabled

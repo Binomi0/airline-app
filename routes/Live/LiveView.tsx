@@ -54,7 +54,6 @@ const LiveView: FC = () => {
     return <Disconnected />
   }
 
-  console.log({ pilot })
   return (
     <>
       <Fade in={!active && !pilot} unmountOnExit timeout={{ exit: 0 }}>
