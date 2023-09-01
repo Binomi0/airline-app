@@ -6,8 +6,8 @@ import User, { IUser } from 'models/User'
 
 interface Props {
   props: {
-    token?: string
-    user?: Partial<IUser>
+    token?: string | null
+    user?: Partial<IUser> | null
   }
 }
 
@@ -16,16 +16,20 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
   if (token) {
     try {
       const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
-      const { email, id } = decoded.data
-      if (!email || !id) {
+
+      const { email } = decoded.data
+      if (!email) {
         deleteCookie('token')
         return {
-          props: {} as never
+          props: {
+            token: null,
+            user: null
+          }
         }
       }
 
       await connectDB()
-      const user = await User.findById(id)
+      const user = await User.findOne({ email })
 
       if (user) {
         return {
@@ -43,15 +47,21 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
         }
       }
     } catch (err) {
-      deleteCookie('token')
+      deleteCookie('token', { req: ctx.req, res: ctx.res })
       return {
-        props: {} as never
+        props: {
+          token: null,
+          user: null
+        }
       }
     }
   }
 
   return {
-    props: {}
+    props: {
+      user: null,
+      token: null
+    }
   }
 }
 

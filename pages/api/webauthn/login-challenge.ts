@@ -32,15 +32,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   } catch (err) {
     const error = err as Error
-    console.error(error)
+    console.error('Login verification error:', error)
     res.status(400).send({ error: error.message, verified: false })
     return
   }
 
   try {
     const user = await User.findOne({ email: req.body.email })
-    const token = jwt.sign({ data: { email: req.body.email, id: user?.id } }, process.env.JWT_SECRET, {
-      expiresIn: '1m'
+    if (!user) {
+      throw new Error(`Missing user ${user.email}`)
+    }
+    console.log('userid =>', user.id)
+    const token = jwt.sign({ data: { email: req.body.email, id: user.id } }, process.env.JWT_SECRET, {
+      expiresIn: '7d'
     })
     setCookie('token', token, { req, res })
     res.send({ verified: verification.verified, id: user?.id, emailVerified: user?.emailVerified })

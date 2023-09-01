@@ -111,19 +111,14 @@ const CustomAppBar: React.FC = () => {
           <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
             {matches ? 'Decentralized Virtual Airline' : 'DVA'}
           </Typography>
-          <Box mr={2} bgcolor='secondary.main' borderRadius={5} px={2}>
-            <Typography fontWeight={600} variant='caption'>
-              {maskAddress(smartAccountAddress)}
-            </Typography>
-          </Box>
+          {user && smartAccountAddress && (
+            <Box mr={2} bgcolor='secondary.main' borderRadius={5} px={2}>
+              <Typography fontWeight={600} variant='caption'>
+                {maskAddress(smartAccountAddress)}
+              </Typography>
+            </Box>
+          )}
           <Stack direction='row' alignItems='center' height={50} spacing={1}>
-            <LicenseBar />
-            {matches && smartAccountAddress && (
-              <>
-                <GasBalanceBar />
-                <AirBalanceBar />
-              </>
-            )}
             {!user ? (
               <>
                 {userActionStarted !== 'signUp' && <SignIn onInteraction={setUserActionStarted} />}
@@ -131,6 +126,13 @@ const CustomAppBar: React.FC = () => {
               </>
             ) : (
               <>
+                <LicenseBar />
+                {matches && smartAccountAddress && (
+                  <>
+                    <GasBalanceBar />
+                    <AirBalanceBar />
+                  </>
+                )}
                 <Button disabled={status === 'loading'} variant='contained' color='success' onClick={handleAddBackup}>
                   Add Account Backup
                 </Button>

@@ -26,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     })
   } catch (err) {
     const error = err as Error
-    console.error(error)
+    console.error('Register', error)
     res.status(400).send({ error: error.message })
     return
   }
@@ -39,6 +39,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     credentialID: Buffer.from(credentialID).toString('base64'),
     credentialPublicKey: Buffer.from(credentialPublicKey).toString('base64'),
     counter
+  }
+
+  if (!verified) {
+    res.status(403).end()
+    return
   }
 
   try {
@@ -65,7 +70,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     )
   } catch (error) {
-    console.error(error)
+    console.error('Register', error)
     res.status(500).send({ error: 'Error al actualizar authenticators' })
     return
   }

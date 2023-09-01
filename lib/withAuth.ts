@@ -29,21 +29,3 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
 }
 
 export default withAuth
-
-// export default function withAuth(handler) {
-//   return async (req, res) => {
-//     const token = req.headers.authorization?.split(' ')[1]
-
-//     if (!token) {
-//       return res.status(401).json({ message: 'Unauthorized' })
-//     }
-
-//     try {
-//       const decoded = jwt.verify(token, 'your-secret-key') // Replace with your actual secret key
-//       req.user = decoded
-//       return handler(req, res)
-//     } catch (error) {
-//       return res.status(401).json({ message: 'Unauthorized' })
-//     }
-//   }
-// }

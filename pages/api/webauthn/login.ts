@@ -66,7 +66,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     res.status(200).json(challenge)
   } catch (err) {
-    console.error(err)
+    console.error('Login Error', err)
     res.status(500).send(err)
   }
 }

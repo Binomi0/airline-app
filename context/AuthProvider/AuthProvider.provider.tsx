@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useReducer } from 'react'
+import React, { useCallback, useReducer } from 'react'
 import authProviderReducer from './AuthProvider.reducer'
 import { AuthProviderContext } from './AuthProvider.context'
 import { AuthReducerState } from './AuthProvider.types'
@@ -9,7 +9,12 @@ export const INITIAL_STATE: AuthReducerState = {
   token: undefined
 }
 
-export const AuthProvider: FC<{ children: React.ReactNode; user: User }> = ({ children, user }) => {
+interface Props {
+  children: React.ReactNode
+  user?: User
+}
+
+export const AuthProvider = ({ children, user }: Props) => {
   const [state, dispatch] = useReducer(authProviderReducer, {
     ...INITIAL_STATE,
     ...(user ? { user } : {})

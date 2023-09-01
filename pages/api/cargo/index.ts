@@ -17,8 +17,8 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
       res.status(200).send(cargo)
     } catch (err) {
-      console.error(err)
-      res.status(500).send(err)
+      console.error('GET /api/cargp error =>', err)
+      res.status(400).send(err)
     }
   } else if (req.method === 'DELETE') {
     try {
@@ -31,7 +31,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       res.status(204).end()
       return
     } catch (err) {
-      console.error(err)
+      console.error('post /api/cargp error =>', err)
+      res.status(400).send(err)
+      return
     }
   }
 
