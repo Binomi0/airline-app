@@ -13,7 +13,7 @@ interface Props {
 
 const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<Props> => {
   const token = getCookie('token', { req: ctx.req, res: ctx.res }) as string
-
+  // mongoose.deleteModel('Live')
   if (token) {
     try {
       const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload

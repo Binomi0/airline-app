@@ -1,7 +1,7 @@
 import axios from 'config/axios'
 import { IVAOClients } from 'context/VaProvider/VaProvider.types'
 import withAuth from 'lib/withAuth'
-import Atcs from 'models/Atcs'
+import Atcs from 'models/Atc'
 import moment, { Moment } from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Atc } from 'types'

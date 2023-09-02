@@ -25,6 +25,8 @@ const CargoAircraftSelector: React.FC<{
       if (router.query.pilot) {
         const url = `cargo/${nft.metadata.id}/new?pilot=${router.query.pilot}&origin=${router.query.origin}&destination=${router.query.destination}`
         router.push(url)
+      } else {
+        router.push(`cargo/${nft.metadata.id}/new`)
       }
     },
     [router]

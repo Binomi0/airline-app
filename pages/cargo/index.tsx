@@ -11,10 +11,12 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import Disconnected from 'components/Disconnected'
 import useLive from 'hooks/useLive'
 import { useRouter } from 'next/router'
+import useAuth from 'hooks/useAuth'
 
 const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
   const router = useRouter()
   const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const { user } = useAuth()
   const [aircraft, setAircraft] = useState<NFT>()
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data: owned = [], isLoading: isLoadingNFTs } = useOwnedNFTs(contract, address)
@@ -24,7 +26,7 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
     if (live) router.push('/live')
   }, [live, router])
 
-  if (!address) {
+  if (!user) {
     return <Disconnected />
   }
 

@@ -80,6 +80,10 @@ const useCargo = (): UseCargo => {
     getCompletedCount()
   }, [getCompletedCount])
 
+  useEffect(() => {
+    getCargo()
+  }, [getCargo])
+
   return { newCargo, cargo, getCargo, isLoading, completed }
 }
 

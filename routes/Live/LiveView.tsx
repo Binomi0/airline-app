@@ -6,12 +6,11 @@ import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import axios from 'config/axios'
-import { LastTrackState } from 'types'
+import { LastTrackState, LastTrackStateEnum } from 'types'
 import Disconnected from 'components/Disconnected'
 import MCDUView from './components/MCDUView'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
-import { LastTrackStateEnum } from 'models/Live'
 
 const LiveView: FC = () => {
   const router = useRouter()

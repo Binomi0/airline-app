@@ -75,12 +75,12 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const getClients = useCallback(async () => {
     const response = await axios.get('/api/ivao/whazzup')
 
-    setClients(response.data)
+    setClients(response.data as Readonly<IVAOClients>)
     setFlights(response.data.atcs as Readonly<Atc[]>)
   }, [setClients, setFlights])
 
   useEffect(() => {
-    const timer = setInterval(getClients, 15000)
+    const timer = setInterval(getClients, 20000)
     return () => clearInterval(timer)
   }, [getClients])
 

@@ -1,20 +1,6 @@
 import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
-
-export enum LastTrackStateEnum {
-  En_Route = 'En Route',
-  Boarding = 'Boarding',
-  Approach = 'Approach',
-  Departing = 'Departing',
-  On_Blocks = 'On Blocks',
-  Initial_Climb = 'Initial Climb',
-  Landed = 'Landed'
-}
-
-interface FlightState {
-  name: LastTrackStateEnum
-  value: Date
-}
+import { FlightState, LastTrackStateEnum } from 'types'
 
 export interface ILive extends Document {
   callsign: string

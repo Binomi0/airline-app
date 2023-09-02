@@ -20,9 +20,8 @@ import FlightIcon from '@mui/icons-material/Flight'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports'
 import AirlinesIcon from '@mui/icons-material/Airlines'
-import type { IvaoPilot } from 'types'
+import type { IvaoPilot, LastTrackStateEnum } from 'types'
 import { useRouter } from 'next/router'
-import { LastTrackStateEnum } from 'models/Live'
 
 const stateIcons: Record<LastTrackStateEnum, ReactNode> = {
   'En Route': <ConnectingAirportsIcon color='primary' fontSize='large' />,

@@ -10,6 +10,7 @@ import React, { ReactNode, useEffect, useMemo } from 'react'
 import CargoView from 'routes/Cargo/CargoView'
 import Disconnected from 'components/Disconnected'
 import useAuth from 'hooks/useAuth'
+import useLive from 'hooks/useLive'
 
 const CargoAircraft: NextPage<{ loading: boolean; NoAddress: ReactNode }> = ({ loading }) => {
   const router = useRouter()
@@ -18,11 +19,16 @@ const CargoAircraft: NextPage<{ loading: boolean; NoAddress: ReactNode }> = ({ l
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data, isLoading } = useNFT(contract, router.query.aircraft as string)
   const { data: owned, isLoading: isLoadingOwn } = useOwnedNFTs(contract, address)
+  const { live } = useLive()
 
   const hasAircraft = useMemo(() => {
     if (!owned || !data) return false
     return owned.some((nft) => nft.metadata.id === data.metadata.id)
   }, [owned, data])
+
+  React.useEffect(() => {
+    if (live) router.push('/live')
+  }, [live, router])
 
   useEffect(() => {
     if (!user) {

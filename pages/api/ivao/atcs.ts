@@ -1,5 +1,5 @@
 import withAuth from 'lib/withAuth'
-import Atcs from 'models/Atcs'
+import Atcs from 'models/Atc'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

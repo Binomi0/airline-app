@@ -1,7 +1,8 @@
 import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
-import Live, { LastTrackStateEnum } from 'models/Live'
+import { LiveModel as Live } from 'models'
 import { NextApiResponse } from 'next'
+import { LastTrackStateEnum } from 'types'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -23,6 +24,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         userId: req.id,
         aircraftId: cargo.aircraftId,
         callsign: cargo.callsign,
+        isCompleted: false,
         track: { name: LastTrackStateEnum.Boarding, value: new Date() }
       })
       res.status(201).send(current)

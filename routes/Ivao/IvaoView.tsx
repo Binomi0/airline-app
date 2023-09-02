@@ -3,7 +3,7 @@ import FlightDetails from 'components/FlightDetails'
 import { useVaProviderContext } from 'context/VaProvider'
 import React from 'react'
 import { IvaoPilot } from 'types'
-import { filterLEOrigins } from 'utils'
+// import { filterLEOrigins } from 'utils'
 
 const IvaoView = () => {
   const { pilots } = useVaProviderContext()
@@ -37,7 +37,7 @@ const IvaoView = () => {
       <Grid container spacing={2}>
         {current
           // .filter(filterLEOrigins)
-          .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
+          // .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
           .slice(0, 20)
           .map((session, index) => (
             <FlightDetails session={session} key={session.id} index={index} onSelect={handleSelect} />
