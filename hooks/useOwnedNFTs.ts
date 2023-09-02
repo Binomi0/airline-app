@@ -10,13 +10,12 @@ const useOwnedNfts = (token?: Hex) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState('')
 
-  const load = React.useCallback(async () => {
-    if (!smartAccountAddress) return
-
+  const getNftsForOwner = React.useCallback(async () => {
+    if (!smartAccountAddress || !token) return
     try {
       setIsLoading(true)
       const nfts = await alchemy.nft.getNftsForOwner(smartAccountAddress)
-      const ownedNfts = nfts.ownedNfts.filter((nft) => nft?.contract?.address.toLowerCase() === token?.toLowerCase())
+      const ownedNfts = nfts.ownedNfts.filter((nft) => nft.contract?.address.toLowerCase() === token.toLowerCase())
       setData(ownedNfts)
     } catch (error) {
       console.error('useOwnedNFTs', error)
@@ -27,9 +26,8 @@ const useOwnedNfts = (token?: Hex) => {
   }, [smartAccountAddress, token])
 
   React.useEffect(() => {
-    if (!token) return
-    load()
-  }, [load, token])
+    getNftsForOwner()
+  }, [getNftsForOwner])
 
   return {
     data,

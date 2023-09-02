@@ -29,7 +29,6 @@ const validateFullFlight = (steps: CargoStep[]): number => {
       counter++
     }
 
-    console.log({ counter })
     if (counter === 7) {
       result = 30
     } else if (counter > 6) {
@@ -74,7 +73,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       )
 
       const score = validateFullFlight(updatedLive.track)
-      console.log({ score })
       if (score) {
         const cargo = await Cargo.findById<ICargo>(live.cargoId)
         const user = await User.findOne({ _id: req.id })

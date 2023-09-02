@@ -49,7 +49,6 @@ const LiveView: FC = () => {
 
   useEffect(() => {
     if (!pilot || pilot?.lastTrack.state === flightState) return
-    console.log({ pilot: pilot.lastTrack.state })
     axios.post('/api/live/state', { state: pilot.lastTrack.state })
     setFlightState(pilot.lastTrack.state as LastTrackState)
   }, [flightState, pilot])

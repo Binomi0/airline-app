@@ -67,11 +67,10 @@ export const getDistanceByCoords = async (atcs: Atc[], cargo: Pick<Cargo, 'origi
   if (!originTower) {
     try {
       const response = await axios.get<Atc[]>(`/api/ivao/atcs?callsign=${cargo.origin}`)
-      console.log(response.data)
       if (!response.data.length) return 100
       originTower = response.data[0]
     } catch (err) {
-      console.log('ERROR GETTING ATC', err)
+      console.error('ERROR GETTING ATC', err)
       return 100
     }
   }
@@ -80,11 +79,10 @@ export const getDistanceByCoords = async (atcs: Atc[], cargo: Pick<Cargo, 'origi
   if (!arrivalTower) {
     try {
       const response = await axios.get<Atc[]>(`/api/ivao/atcs?callsign=${cargo.destination}`)
-      console.log(response.data)
       if (!response.data.length) return 100
       arrivalTower = response.data[0]
     } catch (err) {
-      console.log('ERROR GETTING ATC', err)
+      console.error('ERROR GETTING ATC', err)
       return 100
     }
   }

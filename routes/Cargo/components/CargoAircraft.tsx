@@ -95,8 +95,6 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
     try {
       const { aircraft: _, ...newCargo } = cargo
 
-      console.log({ newCargo })
-
       const { isConfirmed } = await Swal.fire({
         title: `Callsign ${newCargo.callsign}`,
         text: 'Are you ready for this flight? Remember to set required callsign before start',
@@ -116,8 +114,6 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
   if (!cargo) {
     return <LinearProgress />
   }
-
-  console.log({ cargo })
 
   return (
     <Grid container spacing={2}>

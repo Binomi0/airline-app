@@ -13,12 +13,10 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   const { cargo } = req.body
-  console.log({ cargo })
 
   try {
     await connectDB()
     const live = await Live.findOne({ userId: req.id })
-    console.log({ live })
     if (!live) {
       const current = await Live.create({
         cargoId: cargo._id,

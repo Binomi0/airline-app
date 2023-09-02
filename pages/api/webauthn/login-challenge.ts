@@ -42,7 +42,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!user) {
       throw new Error(`Missing user ${user.email}`)
     }
-    console.log('userid =>', user.id)
     const token = jwt.sign({ data: { email: req.body.email, id: user.id } }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     })
