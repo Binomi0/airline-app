@@ -8,7 +8,6 @@ import Image from 'next/image'
 import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import serverSidePropsHandler from 'components/ServerSideHandler'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useTokenBalance from 'hooks/useTokenBalance'
 import Disconnected from 'components/Disconnected'
 import { useAuthProviderContext } from 'context/AuthProvider'
@@ -19,14 +18,13 @@ interface Props {
 
 const Gas: NextPage<Props> = ({ loading }) => {
   const { balance } = useTokenBalance(rewardTokenAddress)
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { user } = useAuthProviderContext()
 
   if (loading) {
     return <LinearProgress />
   }
 
-  if (!address || user) {
+  if (!user) {
     return <Disconnected />
   }
 

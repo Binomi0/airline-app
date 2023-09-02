@@ -36,7 +36,7 @@ const IvaoView = () => {
       </Box>
       <Grid container spacing={2}>
         {current
-          .filter(filterLEOrigins)
+          // .filter(filterLEOrigins)
           .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
           .slice(0, 20)
           .map((session, index) => (

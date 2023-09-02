@@ -20,10 +20,11 @@ import FlightIcon from '@mui/icons-material/Flight'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports'
 import AirlinesIcon from '@mui/icons-material/Airlines'
-import type { LastTrackState, IvaoPilot } from 'types'
+import type { IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
+import { LastTrackStateEnum } from 'models/Live'
 
-const stateIcons: Record<LastTrackState, ReactNode> = {
+const stateIcons: Record<LastTrackStateEnum, ReactNode> = {
   'En Route': <ConnectingAirportsIcon color='primary' fontSize='large' />,
   Boarding: <FlightIcon color='info' fontSize='large' />,
   Approach: <FlightLandIcon color='secondary' fontSize='large' />,
@@ -34,7 +35,7 @@ const stateIcons: Record<LastTrackState, ReactNode> = {
 }
 
 const stateColors: Record<
-  LastTrackState,
+  LastTrackStateEnum,
   'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
 > = {
   'En Route': 'primary',
@@ -94,7 +95,7 @@ const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string)
               disabled
               size='small'
               variant='contained'
-              color={stateColors[session.lastTrack.state as LastTrackState]}
+              color={stateColors[session.lastTrack.state as LastTrackStateEnum]}
             >
               {session.lastTrack.state}
             </Button>
@@ -105,7 +106,7 @@ const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string)
                 backgroundColor: 'white'
               }}
             >
-              {session ? stateIcons[session.lastTrack.state as LastTrackState] : '?'}
+              {session ? stateIcons[session.lastTrack.state as LastTrackStateEnum] : '?'}
             </Avatar>
           }
           title={`FLIGHT DETECTED (${session.flightPlan.aircraftId}) - [${session.callsign}]`}
@@ -122,7 +123,7 @@ const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string)
             </Typography>
             <Stack width='75%'>
               <LinearProgress
-                color={stateColors[session.lastTrack.state as LastTrackState]}
+                color={stateColors[session.lastTrack.state as LastTrackStateEnum]}
                 variant='determinate'
                 value={flightValue}
               />
