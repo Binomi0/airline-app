@@ -1,38 +1,26 @@
-import axios from 'config/axios'
 import BigNumber from 'bignumber.js'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useCallback, useEffect, useState } from 'react'
+import alchemy from 'lib/alchemy'
+import { Hex } from '@alchemy/aa-core'
 
 const ZERO = new BigNumber(0)
-const useTokenBalance = (token?: string) => {
+const useTokenBalance = (contract?: Hex) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const [balance, setBalance] = useState<BigNumber>(ZERO)
 
   const getBalance = useCallback(async () => {
-    if (!smartAccountAddress) {
-      setBalance(ZERO)
-      return ZERO
-    }
+    if (!contract || !smartAccountAddress) return new BigNumber(0)
+    const { tokenBalances } = await alchemy.core.getTokenBalances(smartAccountAddress, [contract])
 
-    try {
-      const response = await axios.post('/api/token/balance', { address: smartAccountAddress, token })
-      const [balance] = response.data.tokenBalances
-      const balanceBigNumber = new BigNumber(balance.tokenBalance).div(1e18)
-
-      setBalance(balanceBigNumber)
-      return balanceBigNumber
-    } catch (error) {
-      console.error(error)
-      setBalance(ZERO)
-      return ZERO
-    }
-  }, [smartAccountAddress, token])
+    const result = new BigNumber(tokenBalances[0].tokenBalance || '0').div(1e18)
+    setBalance(result)
+    return result
+  }, [contract, smartAccountAddress])
 
   useEffect(() => {
-    if (!token || !smartAccountAddress) return
-
     getBalance()
-  }, [smartAccountAddress, getBalance, token])
+  }, [getBalance])
 
   return { balance, refetch: getBalance }
 }

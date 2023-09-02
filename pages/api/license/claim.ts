@@ -7,6 +7,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).end()
     return
   }
+  if (!req.body.address || !req.body.token) {
+    res.status(400).send
+    return
+  }
 
   try {
     const response = await alchemy.core.getTokenBalances(req.body.address, [req.body.token])

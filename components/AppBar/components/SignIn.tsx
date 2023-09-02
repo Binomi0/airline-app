@@ -4,7 +4,7 @@ import React from 'react'
 import { validateEmail } from 'utils'
 import EmailInput from './EmailInput'
 import axios from 'config/axios'
-import { UserActionStatus } from '..'
+import { UserActionStatus } from 'components/AppBar'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars

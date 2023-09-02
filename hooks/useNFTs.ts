@@ -1,12 +1,7 @@
 import React from 'react'
-import { Alchemy, Network, Nft } from 'alchemy-sdk'
+import { Nft } from 'alchemy-sdk'
 import { Hex } from '@alchemy/aa-core'
-
-const config = {
-  apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY_ETH_SEPOLIA,
-  network: Network.ETH_SEPOLIA
-}
-const alchemy = new Alchemy(config)
+import alchemy from 'lib/alchemy'
 
 const useNFTs = (contract: Hex) => {
   const [data, setData] = React.useState<Nft[]>()
@@ -18,7 +13,6 @@ const useNFTs = (contract: Hex) => {
 
     try {
       const { nfts } = await alchemy.nft.getNftsForContract(contract)
-      console.log({ nfts })
       setData(nfts)
     } catch (error) {
       console.error(error)

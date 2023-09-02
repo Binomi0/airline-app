@@ -4,6 +4,7 @@ import React from 'react'
 
 interface Props {
   onCancel: () => void
+  // eslint-disable-next-line no-unused-vars
   onSubmit: (value: string) => void
   loading: boolean
 }

@@ -13,7 +13,7 @@ interface Props {
   nft: NFT
   owned: boolean
   isClaiming: boolean
-  // eslint-disable-next-line
+  // eslint-disable-next-line no-unused-vars
   claimNFT: ({ to, nft, quantity }: { to: Hex; nft: NFT; quantity: number }) => Promise<string | undefined>
 }
 

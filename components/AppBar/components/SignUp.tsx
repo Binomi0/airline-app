@@ -5,8 +5,8 @@ import React, { useCallback } from 'react'
 import { validateEmail } from 'utils'
 import EmailInput from './EmailInput'
 import CodeInput from './CodeInput'
-import { UserActionStatus } from '..'
 import { useAuthProviderContext } from 'context/AuthProvider'
+import { UserActionStatus } from 'components/AppBar'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars

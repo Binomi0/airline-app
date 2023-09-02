@@ -24,14 +24,7 @@ import { downloadFile } from 'utils'
 import SignIn from './components/SignIn'
 import SignUp from './components/SignUp'
 import { useAuthProviderContext } from 'context/AuthProvider'
-
-export type UserActionStatus = 'signIn' | 'signUp' | undefined
-type AppBarSnackStatus = 'success' | 'error' | 'warning' | 'info'
-interface AppBarSnack {
-  open: boolean
-  message: string
-  status: AppBarSnackStatus
-}
+import { AppBarSnack, UserActionStatus } from 'components/AppBar'
 
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
 
