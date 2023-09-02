@@ -51,10 +51,19 @@ export const signedOutSwal = async () =>
     showConfirmButton: true
   })
 
-export const askExportKeySwal = async () => Swal.fire({
-  title: 'Export Walley KEY',
-  text: 'Wallet key is going to be download, please keep it safe.',
-  icon: 'warning',
-  showCancelButton: true,
-  showConfirmButton: true
-})
+export const askExportKeySwal = async (qrcode: string) =>
+  Swal.fire({
+    // title: 'Export Walley KEY',
+    // text: 'Wallet key is going to be download, please keep it safe.',
+    // icon: 'warning',
+    // showCancelButton: true,
+    // showConfirmButton: true,
+    title: 'Export Walley KEY',
+    imageUrl: 'https://api.qrserver.com/v1/create-qr-code/?data=' + qrcode + '&amp;size=150x150',
+    imageWidth: 200,
+    imageHeight: 200,
+    imageAlt: 'QR Code',
+    showCancelButton: true,
+    confirmButtonText: 'Download Walley KEY',
+    showLoaderOnConfirm: true
+  })

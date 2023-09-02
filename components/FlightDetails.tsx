@@ -24,12 +24,12 @@ import type { LastTrackState, IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
 
 const stateIcons: Record<LastTrackState, ReactNode> = {
-  En_Route: <ConnectingAirportsIcon color='primary' fontSize='large' />,
+  'En Route': <ConnectingAirportsIcon color='primary' fontSize='large' />,
   Boarding: <FlightIcon color='info' fontSize='large' />,
   Approach: <FlightLandIcon color='secondary' fontSize='large' />,
   Departing: <FlightTakeoffIcon color='warning' fontSize='large' />,
-  On_Blocks: <AirplaneTicketIcon color='info' fontSize='large' />,
-  Initial_Climb: <FlightTakeoffIcon color='warning' fontSize='large' />,
+  'On Blocks': <AirplaneTicketIcon color='info' fontSize='large' />,
+  'Initial Climb': <FlightTakeoffIcon color='warning' fontSize='large' />,
   Landed: <AirlinesIcon color='success' fontSize='large' />
 }
 
@@ -37,12 +37,12 @@ const stateColors: Record<
   LastTrackState,
   'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
 > = {
-  En_Route: 'primary',
+  'En Route': 'primary',
   Boarding: 'info',
   Approach: 'secondary',
   Departing: 'warning',
-  On_Blocks: 'info',
-  Initial_Climb: 'warning',
+  'On Blocks': 'info',
+  'Initial Climb': 'warning',
   Landed: 'success'
 }
 

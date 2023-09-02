@@ -51,15 +51,17 @@ const CustomAppBar: React.FC = () => {
     const base64Key = localStorage.getItem(user.id)
     if (!base64Key) {
       if (baseSigner?.privateKey) {
-        const { isConfirmed } = await askExportKeySwal()
+        const { isConfirmed } = await askExportKeySwal(baseSigner.privateKey)
         if (isConfirmed) downloadFile(Buffer.from(baseSigner.privateKey).toString(), baseSigner.address)
       } else {
         return missingExportKeySwal()
       }
     } else {
       if (smartAccountAddress) {
-        const { isConfirmed } = await askExportKeySwal()
-        if (isConfirmed) downloadFile(base64Key, smartAccountAddress)
+        if (baseSigner?.privateKey) {
+          const { isConfirmed } = await askExportKeySwal(baseSigner.privateKey)
+          if (isConfirmed) downloadFile(base64Key, smartAccountAddress)
+        }
       }
     }
   }, [baseSigner, smartAccountAddress, user])

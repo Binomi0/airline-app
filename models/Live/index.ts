@@ -2,12 +2,12 @@ import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
 
 export enum LastTrackStateEnum {
-  En_Route = 'En_Route',
+  En_Route = 'En Route',
   Boarding = 'Boarding',
   Approach = 'Approach',
   Departing = 'Departing',
-  On_Blocks = 'On_Blocks',
-  Initial_Climb = 'Initial_Climb',
+  On_Blocks = 'On Blocks',
+  Initial_Climb = 'Initial Climb',
   Landed = 'Landed'
 }
 

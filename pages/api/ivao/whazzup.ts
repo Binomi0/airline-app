@@ -27,7 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const { atcs } = response.data.clients
         try {
           atcs.forEach(async (atc: Atc) => {
-            await Atcs.findOneAndUpdate({ id: atc.id }, atc, { upsert: true })
+            await Atcs.findOneAndUpdate({ callsign: atc.callsign }, atc, { upsert: true })
           })
         } catch (error) {
           console.error('ERROR =>', error)

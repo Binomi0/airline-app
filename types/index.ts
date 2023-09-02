@@ -2,6 +2,7 @@
 import { NFT } from '@thirdweb-dev/sdk'
 import { atc } from 'mocks'
 import ivaoPilot from 'mocks/ivaoPilot'
+import { LastTrackStateEnum } from 'models/Live'
 import { ObjectId } from 'mongodb'
 
 export interface AircraftAttributes {
@@ -19,14 +20,15 @@ export interface AirlineNFT {
   }
 }
 
-export type LastTrackState =
-  | 'En_Route'
-  | 'Boarding'
-  | 'Approach'
-  | 'Departing'
-  | 'On_Blocks'
-  | 'Initial_Climb'
-  | 'Landed'
+export type LastTrackState = keyof typeof LastTrackStateEnum
+
+// | 'En Route'
+// | 'Boarding'
+// | 'Approach'
+// | 'Departing'
+// | 'On Blocks'
+// | 'Initial Climb'
+// | 'Landed'
 
 export type IvaoPilot = typeof ivaoPilot
 

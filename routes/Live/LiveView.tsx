@@ -6,18 +6,19 @@ import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import axios from 'config/axios'
-import { CargoStatus, LastTrackState } from 'types'
+import { LastTrackState } from 'types'
 import Disconnected from 'components/Disconnected'
 import MCDUView from './components/MCDUView'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
+import { LastTrackStateEnum } from 'models/Live'
 
 const LiveView: FC = () => {
   const router = useRouter()
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { cargo, getCargo, isLoading } = useCargo()
   const { pilots, setCurrentPilot, active } = useVaProviderContext()
-  const [flightState, setFlightState] = useState<LastTrackState>('Boarding')
+  const [flightState, setFlightState] = useState<LastTrackState>(LastTrackStateEnum.Boarding)
   const pilot = useMemo(() => pilots.find((pilot) => pilot.callsign === cargo?.callsign), [pilots, cargo])
   // const pilot = pilots && pilots[0]
 
@@ -36,7 +37,7 @@ const LiveView: FC = () => {
   }, [router, setCurrentPilot])
 
   const handleClaim = useCallback(() => {
-    axios.post('/api/live/state', { state: 'On_Blocks' })
+    axios.post('/api/live/state', { state: LastTrackStateEnum.On_Blocks })
   }, [])
 
   useEffect(() => {
@@ -75,11 +76,13 @@ const LiveView: FC = () => {
       </Fade>
       <Fade in={!!active && !!pilot} unmountOnExit>
         <Box mt={10}>
-          <Box textAlign='center' my={2}>
-            <Button sx={{ zIndex: 1 }} onClick={handleClaim} size='large' variant='contained'>
-              CLAIM PRIZE!
-            </Button>
-          </Box>
+          {pilot?.lastTrack.state === 'On Blocks' && (
+            <Box textAlign='center' my={2}>
+              <Button sx={{ zIndex: 1 }} onClick={handleClaim} size='large' variant='contained'>
+                CLAIM PRIZE!
+              </Button>
+            </Box>
+          )}
           <MCDUView pilot={pilot} onDisconnect={handleDisconnect} />
         </Box>
       </Fade>

@@ -118,13 +118,13 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return
     }
 
-    // const updated = await Live.findOneAndUpdate(
-    //   { userId: req.id },
-    //   { status: lastTrackState, $addToSet: { track: { name: lastTrackState, value: new Date() } } },
-    //   { new: true }
-    // )
-    // res.status(201).send(updated)
-    // return
+    const updated = await Live.findOneAndUpdate(
+      { userId: req.id },
+      { status: lastTrackState, $addToSet: { track: { name: lastTrackState, value: new Date() } } },
+      { new: true }
+    )
+    res.status(201).send(updated)
+    return
   } catch (error) {
     console.error('Live state update error =>', error)
     res.status(500).end()
