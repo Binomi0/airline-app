@@ -6,7 +6,7 @@ import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import axios from 'config/axios'
-import { LastTrackState } from 'types'
+import { CargoStatus, LastTrackState } from 'types'
 import Disconnected from 'components/Disconnected'
 import MCDUView from './components/MCDUView'
 import Swal from 'sweetalert2'
@@ -34,6 +34,10 @@ const LiveView: FC = () => {
       router.push('/')
     }
   }, [router, setCurrentPilot])
+
+  const handleClaim = useCallback(() => {
+    axios.post('/api/live/state', { state: 'On_Blocks' })
+  }, [])
 
   useEffect(() => {
     getCargo()
@@ -72,6 +76,11 @@ const LiveView: FC = () => {
       </Fade>
       <Fade in={!!active && !!pilot} unmountOnExit>
         <Box mt={10}>
+          <Box textAlign='center' my={2}>
+            <Button sx={{ zIndex: 1 }} onClick={handleClaim} size='large' variant='contained'>
+              CLAIM PRIZE!
+            </Button>
+          </Box>
           <MCDUView pilot={pilot} onDisconnect={handleDisconnect} />
         </Box>
       </Fade>

@@ -17,18 +17,19 @@ const validateFullFlight = (steps: CargoStep[]): number => {
       counter++
     } else if (step.name === LastTrackStateEnum.Departing) {
       counter++
-    } else if (step.name === LastTrackStateEnum.Initial_Climb) {
+    } else if (step.name === 'Initial Climb') {
       counter++
-    } else if (step.name === LastTrackStateEnum.En_Route) {
+    } else if (step.name === 'En Route') {
       counter++
     } else if (step.name === LastTrackStateEnum.Approach) {
       counter++
     } else if (step.name === LastTrackStateEnum.Landed) {
       counter++
-    } else if (step.name === LastTrackStateEnum.On_Blocks) {
+    } else if (step.name === 'On Blocks') {
       counter++
     }
 
+    console.log({ counter })
     if (counter === 7) {
       result = 30
     } else if (counter > 6) {
@@ -40,7 +41,6 @@ const validateFullFlight = (steps: CargoStep[]): number => {
 }
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
-  console.log('user =>', req.id)
   if (req.method !== 'POST') {
     res.status(405).end()
     return
@@ -59,35 +59,50 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return
     }
 
-    if (live.track.some((step: CargoDetail) => step.name === LastTrackStateEnum.On_Blocks)) {
-      const score = validateFullFlight(live.track)
+    if (lastTrackState === LastTrackStateEnum.On_Blocks) {
+      const updatedLive = await Live.findOneAndUpdate(
+        { _id: live._id, 'track.name': lastTrackState },
+        {
+          $set: {
+            'track.$[element].value': new Date()
+          }
+        },
+        {
+          arrayFilters: [{ 'element.name': lastTrackState }],
+          new: true
+        }
+      )
 
+      const score = validateFullFlight(updatedLive.track)
+      console.log({ score })
       if (score) {
         const cargo = await Cargo.findById<ICargo>(live.cargoId)
-        const user = await User.findById(req.id)
+        const user = await User.findOne({ _id: req.id })
         if (!cargo || !user) {
           throw new Error('Missing cargo or user after finish flight')
         }
 
-        if (!cargo.isRewarded && cargo.status === CargoStatus.COMPLETED) {
+        if (!cargo.isRewarded && cargo.status === CargoStatus.STARTED) {
           const remote = cargo.remote ? 3 : 1
           const prize = (cargo.prize / remote) * (1 + score / 100)
           await sdk.wallet.transfer(user.address, prize, coinTokenAddress)
           await Promise.all([
-            Cargo.findOneAndUpdate<ICargo>(
-              { userId: req.id },
-              { isRewarded: true, status: CargoStatus.COMPLETED, score, rewards: prize }
-            ),
-            Live.findOneAndDelete({ email: req.user })
+            Cargo.findByIdAndUpdate<ICargo>(live.cargoId, {
+              isRewarded: true,
+              status: CargoStatus.COMPLETED,
+              score,
+              rewards: prize
+            }),
+            Live.findOneAndDelete({ userId: req.id })
           ])
         }
-
-        res.status(200).end()
-        return
+      } else {
+        // Flight is finished incomplete
       }
-    }
 
-    if (live.track.some((step: CargoDetail) => step.name === lastTrackState)) {
+      res.status(200).end()
+      return
+    } else if (live.track.some((step: CargoDetail) => step.name === lastTrackState)) {
       await Live.findOneAndUpdate(
         { _id: live._id, 'track.name': lastTrackState },
         {
@@ -105,13 +120,13 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return
     }
 
-    const updated = await Live.findOneAndUpdate(
-      { userId: req.id },
-      { status: lastTrackState, $addToSet: { track: { name: lastTrackState, value: new Date() } } },
-      { new: true }
-    )
-    res.status(201).send(updated)
-    return
+    // const updated = await Live.findOneAndUpdate(
+    //   { userId: req.id },
+    //   { status: lastTrackState, $addToSet: { track: { name: lastTrackState, value: new Date() } } },
+    //   { new: true }
+    // )
+    // res.status(201).send(updated)
+    // return
   } catch (error) {
     console.error('Live state update error =>', error)
     res.status(500).end()
