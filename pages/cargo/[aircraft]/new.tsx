@@ -9,9 +9,11 @@ import { useRouter } from 'next/router'
 import React, { ReactNode, useEffect, useMemo } from 'react'
 import CargoView from 'routes/Cargo/CargoView'
 import Disconnected from 'components/Disconnected'
+import useAuth from 'hooks/useAuth'
 
 const CargoAircraft: NextPage<{ loading: boolean; NoAddress: ReactNode }> = ({ loading }) => {
   const router = useRouter()
+  const { user } = useAuth()
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data, isLoading } = useNFT(contract, router.query.aircraft as string)
@@ -23,10 +25,10 @@ const CargoAircraft: NextPage<{ loading: boolean; NoAddress: ReactNode }> = ({ l
   }, [owned, data])
 
   useEffect(() => {
-    if (!address) {
+    if (!user) {
       router.push('/cargo')
     }
-  }, [address, router])
+  }, [user, router])
 
   useEffect(() => {
     if (!!owned && !!data && !isLoading && !isLoadingOwn && !hasAircraft) {
@@ -34,7 +36,7 @@ const CargoAircraft: NextPage<{ loading: boolean; NoAddress: ReactNode }> = ({ l
     }
   }, [owned, data, isLoading, isLoadingOwn, router, hasAircraft])
 
-  if (!address) {
+  if (!user) {
     return <Disconnected />
   }
 

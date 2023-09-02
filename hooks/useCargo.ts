@@ -1,10 +1,9 @@
 import { NFT } from '@thirdweb-dev/sdk'
 import axios from 'config/axios'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useVaProviderContext } from 'context/VaProvider'
 import { cargos } from 'mocks/cargos'
 import { useRouter } from 'next/router'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Cargo, CargoStatus, FRoute } from 'types'
 import { getCallsign, getCargoWeight, getDistanceByCoords, getRandomInt, getCargoPrize } from 'utils'
 
@@ -14,14 +13,15 @@ interface UseCargo {
   getCargo: () => Promise<void>
   cargo?: Cargo
   isLoading: boolean
+  completed: number
 }
 
 const useCargo = (): UseCargo => {
   const router = useRouter()
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { atcs } = useVaProviderContext()
   const [cargo, setCargo] = useState<Cargo>()
   const [isLoading, setIsLoading] = useState(false)
+  const [completed, setCompleted] = useState(0)
 
   const getCargo = useCallback(async () => {
     setIsLoading(true)
@@ -37,14 +37,13 @@ const useCargo = (): UseCargo => {
 
   const newCargo = useCallback(
     async (route: FRoute, aircraft: NFT) => {
-      const distance = getDistanceByCoords(atcs, route)
+      const distance = await getDistanceByCoords(atcs, route)
       const details = cargos[getRandomInt(8)]
       const weight = getCargoWeight(aircraft)
       // FIXME: get current callsign
       const callsign = getCallsign()
       const prize = getCargoPrize(distance, aircraft)
-      const cargo = {
-        address,
+      const cargo: Cargo = {
         origin: route.origin,
         destination: route.destination,
         distance,
@@ -55,7 +54,8 @@ const useCargo = (): UseCargo => {
         callsign: router.query.pilot ? (router.query.pilot as string) : callsign,
         prize,
         status: CargoStatus.STARTED,
-        remote: !!router.query.pilot
+        remote: !!router.query.pilot,
+        isRewarded: false
       }
 
       try {
@@ -64,10 +64,23 @@ const useCargo = (): UseCargo => {
         console.error(error)
       }
     },
-    [atcs, address, router.query.pilot]
+    [atcs, router.query.pilot]
   )
 
-  return { newCargo, cargo, getCargo, isLoading }
+  const getCompletedCount = useCallback(async () => {
+    try {
+      const { data } = await axios.get<{ count: number }>('/api/cargo/count')
+      setCompleted(data.count)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
+
+  useEffect(() => {
+    getCompletedCount()
+  }, [getCompletedCount])
+
+  return { newCargo, cargo, getCargo, isLoading, completed }
 }
 
 export default useCargo

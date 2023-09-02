@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import type { NextPage } from 'next'
 import { Alert, AlertTitle, Box, Button, Container, Fade, LinearProgress, Typography } from '@mui/material'
 import Image from 'next/image'
@@ -12,6 +12,7 @@ import NoAddress from 'routes/Cargo/components/NoAddress'
 import CargoReady from 'routes/Cargo/components/CargoReady'
 import CargoList from 'routes/Cargo/components/CargoList'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { useRouter } from 'next/router'
 
 const initialState: FRoute = {
   origin: '',
@@ -19,11 +20,19 @@ const initialState: FRoute = {
 }
 
 const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, aircraft }) => {
+  const router = useRouter()
   const { smartAccountAddress: address } = useAlchemyProviderContext()
-  const { newCargo, cargo } = useCargo()
+  const { newCargo, cargo, completed } = useCargo()
   const { flights } = useVaProviderContext()
   const [selected, setSelected] = useState(initialState)
   const flightList = Object.entries(flights as Flight)
+
+  React.useEffect(() => {
+    if (router.query.origin && router.query.destination && aircraft) {
+      setSelected({ origin: router.query.origin as string, destination: router.query.destination as string })
+      newCargo({ origin: router.query.origin as string, destination: router.query.destination as string }, aircraft)
+    }
+  }, [aircraft, newCargo, router.query])
 
   if (loading || !flights) {
     return <LinearProgress />
@@ -37,6 +46,7 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
 
         <Fade in={!!address && !!selected.origin} unmountOnExit>
           <Box>
+            <Typography>Completed Cargos: {completed}</Typography>
             <CargoReady cargo={cargo} onCancel={() => setSelected(initialState)} />
           </Box>
         </Fade>

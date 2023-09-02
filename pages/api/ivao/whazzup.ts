@@ -1,8 +1,10 @@
 import axios from 'config/axios'
 import { IVAOClients } from 'context/VaProvider/VaProvider.types'
 import withAuth from 'lib/withAuth'
+import Atcs from 'models/Atcs'
 import moment, { Moment } from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { Atc } from 'types'
 
 let nextCall: Moment
 let clients: { pilots: IVAOClients[]; atcs: IVAOClients[] }[]
@@ -21,6 +23,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const response = await axios.get('https://api.ivao.aero/v2/tracker/whazzup')
 
+      if (response.data.clients.atcs) {
+        const { atcs } = response.data.clients
+        try {
+          atcs.forEach(async (atc: Atc) => {
+            await Atcs.findOneAndUpdate({ id: atc.id }, atc, { upsert: true })
+          })
+        } catch (error) {
+          console.error('ERROR =>', error)
+        }
+      }
       if (!response.data.clients.pilots) {
         res.status(202).send(clients)
         return

@@ -11,7 +11,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
     try {
       await connectDB()
-      const current = await Cargo.findOne({ userId: req.id })
+      const current = await Cargo.findOne({ userId: req.id, status: CargoStatus.STARTED })
 
       if (current) {
         res.status(202).send(current)
@@ -24,20 +24,13 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         details = await CargoDetails.create(cargo.details)
       }
 
-      const currentCargo = await Cargo.findOne({ userId: req.id, status: CargoStatus.STARTED })
+      const newCargo = await Cargo.create({
+        ...cargo,
+        userId: req.id,
+        details: details._id
+      })
 
-      if (!currentCargo) {
-        const newCargo = await Cargo.create({
-          ...cargo,
-          userId: req.id,
-          details: details._id
-        })
-
-        res.status(201).send(newCargo)
-        return
-      }
-
-      res.status(202).send(currentCargo)
+      res.status(201).send(newCargo)
       return
     } catch (error) {
       console.error('New Cargo ERROR =>', error)

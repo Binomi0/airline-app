@@ -68,15 +68,15 @@ const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string)
 
   const handleSelectPilot = React.useCallback(() => {
     localStorage.setItem('selected-pilot', session.callsign)
-    router.push(`/cargo?pilot=${session.callsign}`)
-  }, [router, session.callsign])
+    router.push(
+      `/cargo?pilot=${session.callsign}&origin=${session.flightPlan.departureId}&destination=${session.flightPlan.arrivalId}`
+    )
+  }, [router, session])
 
   const handleClickPilot = React.useCallback(() => {
     onSelect(session.callsign)
     setSize((s) => (s === 12 ? 6 : 12))
   }, [onSelect, session.callsign])
-
-  console.log({ index })
 
   return (
     <Grid item xs={size} key={session.id}>

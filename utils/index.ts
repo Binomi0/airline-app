@@ -1,6 +1,7 @@
 import { NFT } from '@thirdweb-dev/sdk'
 import { Atc, AttributeType, Cargo, IvaoPilot } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
+import axios from 'axios'
 
 // A unique identifier for your website
 const rpID = process.env.DOMAIN as string
@@ -59,22 +60,42 @@ export const formatNumber = (value: number = 0, decimals: number = 2) =>
     maximumFractionDigits: decimals
   }).format(isNaN(value) ? 0 : value)
 
-export const getDistanceByCoords = (atcs: Atc[], cargo: Pick<Cargo, 'origin' | 'destination'>) => {
+export const getDistanceByCoords = async (atcs: Atc[], cargo: Pick<Cargo, 'origin' | 'destination'>) => {
   if (!cargo.origin) return 0
 
-  const originTower = atcs.find((a) => a.callsign.startsWith(cargo.origin))
-  if (!originTower) return 0
+  let originTower = atcs.find((a) => a.callsign.startsWith(cargo.origin))
+  if (!originTower) {
+    try {
+      const response = await axios.get<Atc[]>(`/api/ivao/atcs?callsign=${cargo.origin}`)
+      console.log(response.data)
+      if (!response.data.length) return 100
+      originTower = response.data[0]
+    } catch (err) {
+      console.log('ERROR GETTING ATC', err)
+      return 100
+    }
+  }
 
-  const arrivalTower = atcs.find((a) => a.callsign.startsWith(cargo.destination))
-  if (!arrivalTower) return 0
+  let arrivalTower = atcs.find((a) => a.callsign.startsWith(cargo.destination))
+  if (!arrivalTower) {
+    try {
+      const response = await axios.get<Atc[]>(`/api/ivao/atcs?callsign=${cargo.destination}`)
+      console.log(response.data)
+      if (!response.data.length) return 100
+      arrivalTower = response.data[0]
+    } catch (err) {
+      console.log('ERROR GETTING ATC', err)
+      return 100
+    }
+  }
 
   const originCoords = {
-    latitude: originTower.lastTrack.latitude,
-    longitude: originTower.lastTrack.longitude
+    latitude: originTower?.lastTrack?.latitude,
+    longitude: originTower?.lastTrack?.longitude
   }
   const arrivalCoords = {
-    latitude: arrivalTower.lastTrack.latitude,
-    longitude: arrivalTower.lastTrack.longitude
+    latitude: arrivalTower?.lastTrack?.latitude,
+    longitude: arrivalTower?.lastTrack?.longitude
   }
   const horizontal = Math.pow(arrivalCoords.longitude - originCoords.longitude, 2)
   const vertical = Math.pow(arrivalCoords.latitude - originCoords.latitude, 2)

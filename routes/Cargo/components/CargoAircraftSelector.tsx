@@ -17,13 +17,13 @@ import React, { Dispatch, SetStateAction } from 'react'
 const CargoAircraftSelector: React.FC<{
   setAircraft: Dispatch<SetStateAction<NFT | undefined>>
   owned: NFT[]
-}> = ({ setAircraft, owned }) => {
+}> = ({ owned }) => {
   const router = useRouter()
 
   const handleSelectAircraft = React.useCallback(
     (nft: NFT) => () => {
       if (router.query.pilot) {
-        const url = `cargo/${nft.metadata.id}/new?pilot=${router.query.pilot}`
+        const url = `cargo/${nft.metadata.id}/new?pilot=${router.query.pilot}&origin=${router.query.origin}&destination=${router.query.destination}`
         router.push(url)
       }
     },
