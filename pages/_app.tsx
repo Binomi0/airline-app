@@ -15,6 +15,7 @@ import '../styles/globals.css'
 import { AlchemyProvider } from 'context/AlchemyProvider'
 import { AuthProvider } from 'context/AuthProvider'
 import CustomWeb3Provider from 'components/CustomWeb3Provider'
+import RightSidebar from 'components/Sidebar/Right'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -53,6 +54,7 @@ export default function MyApp(props: MyAppProps) {
                 <MainProvider>
                   <AppBar />
                   <Sidebar />
+                  <RightSidebar />
                 </MainProvider>
                 <Component loading={loading} {...props.pageProps} />
               </ErrorBoundary>

@@ -4,7 +4,8 @@ import { MainProviderContext } from './MainProvider.context'
 import { MainReducerState } from './MainProvider.types'
 
 export const INITIAL_STATE: MainReducerState = {
-  sidebarOpen: false
+  sidebarOpen: false,
+  rightSidebarOpen: false
 }
 
 export const MainProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -13,14 +14,15 @@ export const MainProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
   })
   const { Provider } = MainProviderContext
 
-  const toggleSidebar = useCallback(() => {
-    dispatch({ type: 'TOGGLE_SIDEBAR' })
+  const toggleSidebar = useCallback((side: 'left' | 'right') => {
+    dispatch({ type: 'TOGGLE_SIDEBAR', payload: side })
   }, [])
 
   return (
     <Provider
       value={{
         sidebarOpen: state.sidebarOpen,
+        rightSidebarOpen: state.rightSidebarOpen,
         toggleSidebar
       }}
     >

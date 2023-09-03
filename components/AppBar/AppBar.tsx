@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Alert,
   AppBar,
   Box,
-  Button,
   IconButton,
   Snackbar,
   Stack,
@@ -19,8 +18,6 @@ import GasBalanceBar from './components/GasBalanceBar'
 import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
-import { accountBackupSwal, askExportKeySwal, missingExportKeySwal, signedOutSwal } from 'lib/swal'
-import { downloadFile } from 'utils'
 import SignIn from './components/SignIn'
 import SignUp from './components/SignUp'
 import { useAuthProviderContext } from 'context/AuthProvider'
@@ -34,42 +31,11 @@ const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
   const { toggleSidebar } = useMainProviderContext()
   const trigger = useScrollTrigger()
-  const { addBackup, status, handleSignOut } = useAccountSigner()
-  const { smartAccountAddress, baseSigner } = useAlchemyProviderContext()
+  const { status, } = useAccountSigner()
+  const { smartAccountAddress } = useAlchemyProviderContext()
   const { user } = useAuthProviderContext()
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
-
-  const handleAddBackup = useCallback(async () => {
-    const confirm = await accountBackupSwal()
-    if (confirm.isConfirmed) addBackup()
-  }, [addBackup])
-
-  const handleExportKey = useCallback(async () => {
-    if (!user?.id) throw new Error('Missing userId')
-
-    const base64Key = localStorage.getItem(user.id)
-    if (!base64Key) {
-      if (baseSigner?.privateKey) {
-        const { isConfirmed } = await askExportKeySwal(baseSigner.privateKey)
-        if (isConfirmed) downloadFile(Buffer.from(baseSigner.privateKey).toString(), baseSigner.address)
-      } else {
-        return missingExportKeySwal()
-      }
-    } else {
-      if (smartAccountAddress) {
-        if (baseSigner?.privateKey) {
-          const { isConfirmed } = await askExportKeySwal(baseSigner.privateKey)
-          if (isConfirmed) downloadFile(base64Key, smartAccountAddress)
-        }
-      }
-    }
-  }, [baseSigner, smartAccountAddress, user])
-
-  const onSignOut = React.useCallback(async () => {
-    const confirm = await signedOutSwal()
-    if (confirm.isConfirmed) handleSignOut()
-  }, [handleSignOut])
 
   useEffect(() => {
     setSnack({ open: status === 'missingKey', message: 'Missing Key', status: 'error' })
@@ -94,7 +60,7 @@ const CustomAppBar: React.FC = () => {
       <AppBar position='sticky' color={trigger ? 'primary' : 'transparent'}>
         <Toolbar>
           <IconButton
-            onClick={toggleSidebar}
+            onClick={() => toggleSidebar('left')}
             size='large'
             edge='start'
             color='inherit'
@@ -128,17 +94,18 @@ const CustomAppBar: React.FC = () => {
                     <AirBalanceBar />
                   </>
                 )}
-                <Button disabled={status === 'loading'} variant='contained' color='success' onClick={handleAddBackup}>
-                  Add Account Backup
-                </Button>
-                <Button disabled={status === 'loading'} variant='contained' color='warning' onClick={handleExportKey}>
-                  Export Wallet
-                </Button>
-                <Button disabled={status === 'loading'} variant='contained' color='error' onClick={onSignOut}>
-                  Log Out
-                </Button>
               </>
             )}
+            <IconButton
+              onClick={() => toggleSidebar('right')}
+              size='large'
+              edge='start'
+              color='inherit'
+              aria-label='menu'
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
           </Stack>
         </Toolbar>
       </AppBar>

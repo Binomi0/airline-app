@@ -19,13 +19,13 @@ const Sidebar: React.FC = () => {
   const handleClick = useCallback(
     (route: string) => () => {
       router.push(route)
-      toggleSidebar()
+      toggleSidebar('left')
     },
     [router, toggleSidebar]
   )
 
   return (
-    <Drawer open={open} onClose={toggleSidebar} PaperProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.9)' } }}>
+    <Drawer open={open} onClose={()=> toggleSidebar('left')} PaperProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.9)' } }}>
       <Box p={2} color='white'>
         <Typography color={'primary'} variant='h2'>
           AIRLINE
