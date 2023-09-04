@@ -11,7 +11,7 @@ interface Props {
 const MCDUView = ({ pilot, onDisconnect }: Props) => {
   return (
     <Box>
-      <Image src={image} fill alt='flight' style={{ opacity: 0.4, filter: 'blur(0.2rem)' }} />
+      <Image src={image} fill objectFit='none' alt='flight' style={{ opacity: 0.4, filter: 'blur(0.2rem)' }} />
       <Stack direction='row' justifyContent='center' sx={{ fontFamily: 'B612 Mono', zIndex: -1 }}>
         <Stack justifyContent='space-between' sx={{ zIndex: 1 }}>
           <Box width={640} height={480} bgcolor='secondary.dark' p={2} sx={{ boxShadow: '0 0 100px inset #000' }}>

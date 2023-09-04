@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 namespace NodeJS {
   interface ProcessEnv {
     NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA: string
@@ -17,5 +18,6 @@ namespace NodeJS {
     EMAIL_SERVER_PORT: string
     EMAIL_FROM: string
     JWT_SECRET: string
+    PRIVATE_API_KEY: string
   }
 }
