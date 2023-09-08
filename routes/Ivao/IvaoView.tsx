@@ -1,13 +1,16 @@
-import { Box, Grid, LinearProgress, Typography } from '@mui/material'
+import { Box, Button, Grid, LinearProgress, Typography } from '@mui/material'
 import FlightDetails from 'components/FlightDetails'
 import { useVaProviderContext } from 'context/VaProvider'
 import React from 'react'
 import { IvaoPilot } from 'types'
 // import { filterLEOrigins } from 'utils'
 
+const STEP = 5
+
 const IvaoView = () => {
   const { pilots } = useVaProviderContext()
   const [current, setCurrent] = React.useState<IvaoPilot[]>([])
+  const [page, setPage] = React.useState(0)
 
   const handleSelect = React.useCallback(
     (callsign: string) => {
@@ -37,12 +40,17 @@ const IvaoView = () => {
       <Grid container spacing={2}>
         {current
           // .filter(filterLEOrigins)
-          // .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
-          .slice(0, 20)
+          .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
+          .slice(0, page + STEP)
           .map((session, index) => (
             <FlightDetails session={session} key={session.id} index={index} onSelect={handleSelect} />
           ))}
       </Grid>
+      <Box textAlign='center' my={20}>
+        <Button variant='contained' onClick={() => setPage((s) => s + STEP)}>
+          Load More...
+        </Button>
+      </Box>
     </>
   )
 }
