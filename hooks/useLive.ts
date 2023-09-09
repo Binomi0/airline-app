@@ -9,7 +9,7 @@ interface UseLiveReturnType {
 
 const useLive = (): UseLiveReturnType => {
   const { user } = useAuth()
-  const [live, setLive] = React.useState<ILive | undefined | null>()
+  const [live, setLive] = React.useState<ILive | undefined | null>(undefined)
 
   const getLive = React.useCallback(async () => {
     if (!user) return

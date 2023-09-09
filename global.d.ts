@@ -19,5 +19,6 @@ namespace NodeJS {
     EMAIL_FROM: string
     JWT_SECRET: string
     PRIVATE_API_KEY: string
+    NEXT_PUBLIC_MAPS_API_KEY: string
   }
 }

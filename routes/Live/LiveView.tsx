@@ -82,7 +82,7 @@ const LiveView: FC = () => {
               </Button>
             </Box>
           )}
-          <MCDUView pilot={pilot} onDisconnect={handleDisconnect} />
+          {pilot && <MCDUView pilot={pilot} onDisconnect={handleDisconnect} />}
         </Box>
       </Fade>
       <Fade in={!cargo && !isLoading}>

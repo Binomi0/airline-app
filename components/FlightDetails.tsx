@@ -28,6 +28,9 @@ import { NFT } from '@thirdweb-dev/react'
 import Swal from 'sweetalert2'
 import axios from 'config/axios'
 import { Close } from '@mui/icons-material'
+import { useTokenProviderContext } from 'context/TokenProvider'
+
+const DIGITS = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
 
 const stateIcons: Record<LastTrackStateEnum, ReactNode> = {
   'En Route': <ConnectingAirportsIcon color='primary' fontSize='large' />,
@@ -52,17 +55,32 @@ const stateColors: Record<
   Landed: 'success'
 }
 
-// eslint-disable-next-line no-unused-vars
-const FlightDetails: React.FC<{ aircraft?: NFT; session: IvaoPilot; onSelect: () => void; index: number }> = ({
-  session,
-  onSelect,
-  index,
-  aircraft
-}) => {
+interface Props {
+  onRemove: () => void
+  aircraft?: NFT
+  session: IvaoPilot
+  onSelect: () => void
+  index: number
+  selected: boolean
+}
+
+const FlightDetails = ({ session, onSelect, onRemove, index, aircraft, selected }: Props) => {
   const router = useRouter()
   const { palette } = useTheme()
-  const [size, setSize] = React.useState(6)
   const { cargo, newCargo } = useCargo()
+  const { airg } = useTokenProviderContext()
+
+  const requiredGas = React.useMemo(() => {
+    return (
+      (session.lastTrack.arrivalDistance + session.lastTrack.departureDistance) *
+      (session.flightPlan.peopleOnBoard * 0.024)
+    )
+  }, [session.flightPlan.peopleOnBoard, session.lastTrack.arrivalDistance, session.lastTrack.departureDistance])
+
+  const finalGas = React.useMemo(() => {
+    if (!cargo) return 0
+    return Math.max(requiredGas, cargo.weight)
+  }, [cargo, requiredGas])
 
   const flightValue = React.useMemo(() => {
     if (!session?.lastTrack) return 0
@@ -100,23 +118,26 @@ const FlightDetails: React.FC<{ aircraft?: NFT; session: IvaoPilot; onSelect: ()
   const handleClickPilot = React.useCallback(async () => {
     await handleNewCargo()
     onSelect()
-    setSize((s) => (s === 12 ? 6 : 12))
   }, [handleNewCargo, onSelect])
 
+  const handleUnSelectPilot = React.useCallback(() => {
+    onRemove()
+  }, [onRemove])
+
   return (
-    <Grid item xs={size} key={session.id}>
+    <Grid item xs={selected ? 12 : 6} key={session.id}>
       <Card
         sx={{
           boxSizing: 'border-box',
-          backgroundColor: index === 0 && size === 12 ? palette.secondary.light : palette.common.white,
-          boxShadow: index === 0 && size === 12 ? `0 0 50px ${palette.primary.dark}` : 'none'
+          backgroundColor: index === 0 && selected ? palette.secondary.light : palette.common.white,
+          boxShadow: index === 0 && selected ? `0 0 50px ${palette.primary.dark}` : 'none'
         }}
       >
         <CardHeader
           action={
             <Stack spacing={2} direction='row'>
               <Button
-                disabled={size === 12}
+                disabled={selected}
                 size='small'
                 variant='contained'
                 onClick={handleClickPilot}
@@ -124,8 +145,8 @@ const FlightDetails: React.FC<{ aircraft?: NFT; session: IvaoPilot; onSelect: ()
               >
                 {session.lastTrack.state}
               </Button>
-              {size === 12 && (
-                <IconButton onClick={() => setSize(6)}>
+              {selected && (
+                <IconButton onClick={handleUnSelectPilot}>
                   <Close />
                 </IconButton>
               )}
@@ -175,21 +196,30 @@ const FlightDetails: React.FC<{ aircraft?: NFT; session: IvaoPilot; onSelect: ()
                       ) */}
             </Typography>
           </Stack>
-          {size === 6 && <Box my={4}>Ground speed: {session.lastTrack.groundSpeed}</Box>}
+          {!selected && <Box my={4}>Ground speed: {session.lastTrack.groundSpeed}</Box>}
         </CardContent>
-        {size === 12 && (
+        {selected && (
           <Card>
             <CardHeader
-              title={`${Intl.NumberFormat('es-EN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-                cargo?.prize || 0
-              )} AIRL`}
-              subheader={`${cargo?.weight} KG - ${cargo?.details?.name}`}
+              title={`${Intl.NumberFormat('es-EN', DIGITS).format(cargo?.prize || 0)} AIRL`}
+              subheader={`${Intl.NumberFormat('es-EN', DIGITS).format(cargo?.weight || 0)} KG - ${
+                cargo?.details?.name
+              }`}
             />
-            <CardContent>{cargo?.details?.description}</CardContent>
+            <CardContent>
+              <Typography>Gas consumption: {Intl.NumberFormat('en-US', DIGITS).format(finalGas)} Liters</Typography>
+              <Typography>{cargo?.details?.description}</Typography>
+            </CardContent>
             <CardActions sx={{ justifyContent: 'flex-end' }}>
-              <Button size='large' variant='contained' onClick={handleSelectPilot}>
-                Select
-              </Button>
+              {airg?.isLessThan(requiredGas) ? (
+                <Button size='large' variant='contained' onClick={() => router.push('/gas')}>
+                  Go to Gas Station
+                </Button>
+              ) : (
+                <Button color='success' size='large' variant='contained' onClick={handleSelectPilot}>
+                  Select this cargo
+                </Button>
+              )}
             </CardActions>
           </Card>
         )}

@@ -11,6 +11,7 @@ const STEP = 5
 const IvaoView = () => {
   const { pilots } = useVaProviderContext()
   const [current, setCurrent] = React.useState<IvaoPilot[]>([])
+  const [selected, setSelected] = React.useState('')
   const [page, setPage] = React.useState(0)
   const { ownedAircrafts, isLoading } = useAircraftProviderContext()
 
@@ -19,7 +20,8 @@ const IvaoView = () => {
       const i = pilots.findIndex((c) => c.callsign === callsign)
       const newCurrent = [pilots[i], ...pilots.filter((c) => c.callsign !== callsign)]
       setCurrent(newCurrent)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      setSelected(callsign)
+      window.scrollTo({ top: 100, behavior: 'smooth' })
     },
     [pilots]
   )
@@ -27,23 +29,27 @@ const IvaoView = () => {
     () =>
       current
         // .filter(filterLEOrigins)
+        .filter((pilot) => pilot.flightPlan.arrivalId !== pilot.flightPlan.departureId)
         .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
         .slice(0, page + STEP)
         .map((pilot, index) => (
           <FlightDetails
+            selected={pilot.callsign === selected}
             aircraft={ownedAircrafts[0]}
             session={pilot}
             key={pilot.id}
             index={index}
             onSelect={() => handleSelect(pilot.callsign)}
+            onRemove={() => setSelected('')}
           />
         )),
-    [current, ownedAircrafts, handleSelect, page]
+    [current, handleSelect, ownedAircrafts, page, selected]
   )
 
   React.useEffect(() => {
-    setCurrent(pilots || [])
-  }, [pilots])
+    setCurrent(pilots)
+    if (selected) handleSelect(selected)
+  }, [handleSelect, pilots, selected])
 
   if (!pilots.length || isLoading) {
     return <LinearProgress />

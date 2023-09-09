@@ -20,6 +20,7 @@
     "@fontsource/roboto": "^4.5.8",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.1",
+    "@react-google-maps/api": "^2.19.2",
     "@simplewebauthn/browser": "^7.4.0",
     "@simplewebauthn/server": "^7.4.0",
     "@thirdweb-dev/auth": "^3",
