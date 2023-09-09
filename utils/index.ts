@@ -67,6 +67,7 @@ export const getDistanceByCoords = async (atcs: Atc[], cargo: Pick<Cargo, 'origi
   if (!originTower) {
     try {
       const response = await axios.get<Atc[]>(`/api/ivao/atcs?callsign=${cargo.origin}`)
+      console.log('ATC %s =>', cargo.origin, response.data)
       if (!response.data.length) return 100
       originTower = response.data[0]
     } catch (err) {
@@ -79,6 +80,7 @@ export const getDistanceByCoords = async (atcs: Atc[], cargo: Pick<Cargo, 'origi
   if (!arrivalTower) {
     try {
       const response = await axios.get<Atc[]>(`/api/ivao/atcs?callsign=${cargo.destination}`)
+      console.log('ATC %s =>', cargo.origin, response.data)
       if (!response.data.length) return 100
       arrivalTower = response.data[0]
     } catch (err) {
@@ -95,10 +97,14 @@ export const getDistanceByCoords = async (atcs: Atc[], cargo: Pick<Cargo, 'origi
     latitude: arrivalTower?.lastTrack?.latitude,
     longitude: arrivalTower?.lastTrack?.longitude
   }
+
+  console.log({originCoords})
+  console.log({arrivalCoords})
   const horizontal = Math.pow(arrivalCoords.longitude - originCoords.longitude, 2)
   const vertical = Math.pow(arrivalCoords.latitude - originCoords.latitude, 2)
   const result = Math.sqrt(horizontal + vertical)
 
+  console.log({result})
   return result * 100
 }
 

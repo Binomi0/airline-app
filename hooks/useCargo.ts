@@ -9,7 +9,7 @@ import { getCallsign, getCargoWeight, getDistanceByCoords, getRandomInt, getCarg
 
 interface UseCargo {
   // eslint-disable-next-line no-unused-vars
-  newCargo: (route: FRoute, owned: NFT) => void
+  newCargo: (route: FRoute, owned: NFT, callsign?: string) => Promise<void>
   getCargo: () => Promise<void>
   cargo?: Cargo
   isLoading: boolean
@@ -36,12 +36,12 @@ const useCargo = (): UseCargo => {
   }, [])
 
   const newCargo = useCallback(
-    async (route: FRoute, aircraft: NFT) => {
+    async (route: FRoute, aircraft: NFT, callsign?: string) => {
       const distance = await getDistanceByCoords(atcs, route)
       const details = cargos[getRandomInt(8)]
       const weight = getCargoWeight(aircraft)
       // FIXME: get current callsign
-      const callsign = getCallsign()
+      const _callsign = callsign ?? getCallsign()
       const prize = getCargoPrize(distance, aircraft)
       const cargo: Cargo = {
         origin: route.origin,
@@ -51,7 +51,7 @@ const useCargo = (): UseCargo => {
         aircraft,
         aircraftId: aircraft.metadata.id,
         weight,
-        callsign: router.query.pilot ? (router.query.pilot as string) : callsign,
+        callsign: _callsign,
         prize,
         status: CargoStatus.STARTED,
         remote: !!router.query.pilot,

@@ -35,7 +35,7 @@ const GasFarmed = () => {
   }, [claimRewards, getStakeInfo, stakeInfo])
 
   useEffect(() => {
-    const timer = setInterval(getStakeInfo, 15000)
+    const timer = setInterval(getStakeInfo, 30000)
     return () => clearInterval(timer)
   }, [getStakeInfo])
 

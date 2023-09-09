@@ -1,6 +1,9 @@
 import { Box, Button, Grid, LinearProgress, Typography } from '@mui/material'
+import {  useContract, useOwnedNFTs } from '@thirdweb-dev/react'
 import FlightDetails from 'components/FlightDetails'
 import { useVaProviderContext } from 'context/VaProvider'
+import { nftAircraftTokenAddress } from 'contracts/address'
+import useAuth from 'hooks/useAuth'
 import React from 'react'
 import { IvaoPilot } from 'types'
 // import { filterLEOrigins } from 'utils'
@@ -11,6 +14,9 @@ const IvaoView = () => {
   const { pilots } = useVaProviderContext()
   const [current, setCurrent] = React.useState<IvaoPilot[]>([])
   const [page, setPage] = React.useState(0)
+  const { user } = useAuth()
+  const { contract } = useContract(nftAircraftTokenAddress)
+  const { data = [] } = useOwnedNFTs(contract, user?.address)
 
   const handleSelect = React.useCallback(
     (callsign: string) => {
@@ -21,32 +27,32 @@ const IvaoView = () => {
     },
     [pilots]
   )
+  const renderPilots = React.useMemo(
+    () =>
+      current
+        // .filter(filterLEOrigins)
+        .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
+        .slice(0, page + STEP)
+        .map((pilot, index) => (
+          <FlightDetails aircraft={data[0]} session={pilot} key={pilot.id} index={index} onSelect={() => handleSelect(pilot.callsign)} />
+        )),
+    [current, data, handleSelect, page]
+  )
 
   React.useEffect(() => {
     setCurrent(pilots || [])
   }, [pilots])
 
-  if (!pilots.length) {
+  if (!pilots.length || !data) {
     return <LinearProgress />
   }
 
   return (
     <>
-      <Box textAlign='center'>
-        <Typography fontSize={64} fontFamily='B612 Mono' textTransform='uppercase'>
-          Current Pilots
-        </Typography>
-      </Box>
       <Grid container spacing={2}>
-        {current
-          // .filter(filterLEOrigins)
-          .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
-          .slice(0, page + STEP)
-          .map((session, index) => (
-            <FlightDetails session={session} key={session.id} index={index} onSelect={handleSelect} />
-          ))}
+        {renderPilots}
       </Grid>
-      <Box textAlign='center' my={20}>
+      <Box textAlign='center' my={10}>
         <Button variant='contained' onClick={() => setPage((s) => s + STEP)}>
           Load More...
         </Button>

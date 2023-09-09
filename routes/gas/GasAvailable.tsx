@@ -49,7 +49,7 @@ const GasAvailable = () => {
   )
 
   React.useEffect(() => {
-    const timer = setInterval(refetch, 15000)
+    const timer = setInterval(refetch, 60000)
     return () => clearInterval(timer)
   }, [refetch])
 

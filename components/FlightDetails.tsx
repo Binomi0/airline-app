@@ -10,7 +10,8 @@ import {
   LinearProgress,
   Box,
   CardActions,
-  useTheme
+  useTheme,
+  IconButton
 } from '@mui/material'
 import moment from 'moment'
 import React, { ReactNode } from 'react'
@@ -22,6 +23,11 @@ import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports'
 import AirlinesIcon from '@mui/icons-material/Airlines'
 import type { IvaoPilot, LastTrackStateEnum } from 'types'
 import { useRouter } from 'next/router'
+import useCargo from 'hooks/useCargo'
+import { NFT } from '@thirdweb-dev/react'
+import Swal from 'sweetalert2'
+import axios from 'config/axios'
+import { Close } from '@mui/icons-material'
 
 const stateIcons: Record<LastTrackStateEnum, ReactNode> = {
   'En Route': <ConnectingAirportsIcon color='primary' fontSize='large' />,
@@ -47,14 +53,16 @@ const stateColors: Record<
 }
 
 // eslint-disable-next-line no-unused-vars
-const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string) => void; index: number }> = ({
+const FlightDetails: React.FC<{ aircraft?: NFT; session: IvaoPilot; onSelect: () => void; index: number }> = ({
   session,
   onSelect,
-  index
+  index,
+  aircraft
 }) => {
   const router = useRouter()
   const { palette } = useTheme()
   const [size, setSize] = React.useState(6)
+  const { cargo, newCargo } = useCargo()
 
   const flightValue = React.useMemo(() => {
     if (!session?.lastTrack) return 0
@@ -66,22 +74,38 @@ const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string)
     return (completed / totalDistance) * 100
   }, [session?.lastTrack])
 
-  const handleSelectPilot = React.useCallback(() => {
-    localStorage.setItem('selected-pilot', session.callsign)
-    router.push(
-      `/cargo?pilot=${session.callsign}&origin=${session.flightPlan.departureId}&destination=${session.flightPlan.arrivalId}`
-    )
-  }, [router, session])
+  const handleSelectPilot = React.useCallback(async () => {
+    const { isConfirmed } = await Swal.fire({
+      title: `Callsign ${session.callsign}`,
+      text: 'Are you ready for this flight? Confirm to start.',
+      icon: 'question',
+      showCancelButton: true
+    })
+    if (isConfirmed) {
+      const { data: cargo } = await axios.post('/api/cargo/new', newCargo)
+      await axios.post('/api/live/new', { cargo })
+      router.push('/live')
+    }
+  }, [newCargo, router, session.callsign])
 
-  const handleClickPilot = React.useCallback(() => {
-    onSelect(session.callsign)
+  const handleNewCargo = React.useCallback(async () => {
+    if (!aircraft) return
+    await newCargo(
+      { origin: session.flightPlan.departureId, destination: session.flightPlan.arrivalId },
+      aircraft,
+      session.callsign
+    )
+  }, [aircraft, newCargo, session.callsign, session.flightPlan.arrivalId, session.flightPlan.departureId])
+
+  const handleClickPilot = React.useCallback(async () => {
+    await handleNewCargo()
+    onSelect()
     setSize((s) => (s === 12 ? 6 : 12))
-  }, [onSelect, session.callsign])
+  }, [handleNewCargo, onSelect])
 
   return (
     <Grid item xs={size} key={session.id}>
       <Card
-        onClick={handleClickPilot}
         sx={{
           boxSizing: 'border-box',
           backgroundColor: index === 0 && size === 12 ? palette.secondary.light : palette.common.white,
@@ -90,14 +114,22 @@ const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string)
       >
         <CardHeader
           action={
-            <Button
-              disabled
-              size='small'
-              variant='contained'
-              color={stateColors[session.lastTrack.state as LastTrackStateEnum]}
-            >
-              {session.lastTrack.state}
-            </Button>
+            <Stack spacing={2} direction='row'>
+              <Button
+                disabled={size === 12}
+                size='small'
+                variant='contained'
+                onClick={handleClickPilot}
+                color={stateColors[session.lastTrack.state as LastTrackStateEnum]}
+              >
+                {session.lastTrack.state}
+              </Button>
+              {size === 12 && (
+                <IconButton onClick={() => setSize(6)}>
+                  <Close />
+                </IconButton>
+              )}
+            </Stack>
           }
           avatar={
             <Avatar
@@ -143,14 +175,23 @@ const FlightDetails: React.FC<{ session: IvaoPilot; onSelect: (callsign: string)
                       ) */}
             </Typography>
           </Stack>
-          <Box my={4}>Ground speed: {session.lastTrack.groundSpeed}</Box>
+          {size === 6 && <Box my={4}>Ground speed: {session.lastTrack.groundSpeed}</Box>}
         </CardContent>
         {size === 12 && (
-          <CardActions sx={{ justifyContent: 'flex-end' }}>
-            <Button size='large' variant='contained' onClick={handleSelectPilot}>
-              Select
-            </Button>
-          </CardActions>
+          <Card>
+            <CardHeader
+              title={`${Intl.NumberFormat('es-EN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+                cargo?.prize || 0
+              )} AIRL`}
+              subheader={`${cargo?.weight} KG - ${cargo?.details?.name}`}
+            />
+            <CardContent>{cargo?.details?.description}</CardContent>
+            <CardActions sx={{ justifyContent: 'flex-end' }}>
+              <Button size='large' variant='contained' onClick={handleSelectPilot}>
+                Select
+              </Button>
+            </CardActions>
+          </Card>
         )}
       </Card>
     </Grid>

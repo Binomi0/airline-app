@@ -65,7 +65,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
   }, [])
 
   useEffect(() => {
-    const timer = setInterval(getBalance, 15000)
+    const timer = setInterval(getBalance, 60000)
     return () => clearInterval(timer)
   }, [getBalance])
 
