@@ -3,7 +3,7 @@ import { mongoose } from 'lib/mongoose'
 export interface ITransaction extends Document {
   email: string
   operation: string
-  amount: number
+  amount: string
   transactionDate: Date
   hash: string
   isCompleted: boolean
@@ -22,7 +22,7 @@ const transactionSchema: mongoose.Schema = new mongoose.Schema<ITransaction>(
       required: true
     },
     amount: {
-      type: Number,
+      type: String,
       required: true
     },
     transactionDate: {

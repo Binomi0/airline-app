@@ -1,13 +1,12 @@
 import { Grid, Card, CardContent, Stack, Typography, CardActions, Button, CircularProgress } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import { getNFTAttributes } from 'utils'
-import { coinTokenAddress } from 'contracts/address'
 import LicenseItemHeader from './License/LicenseItemHeader'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import useTokenBalance from 'hooks/useTokenBalance'
 import { Hex } from '@alchemy/aa-core'
 import Swal from 'sweetalert2'
+import { useTokenProviderContext } from 'context/TokenProvider'
 
 interface Props {
   nft: NFT
@@ -15,21 +14,19 @@ interface Props {
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
   claimNFT: ({ to, nft, quantity }: { to: Hex; nft: NFT; quantity: number }) => Promise<string | undefined>
-  getLicenses: () => void
 }
 
-const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming, getLicenses }) => {
+const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const { balance: airlBalance, refetch: getBalance } = useTokenBalance(coinTokenAddress)
+  const { airl } = useTokenProviderContext()
   const { name, description, image } = nft.metadata
 
   const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
 
   const handleClaimLicense = useCallback(async () => {
-    if (!airlBalance || !smartAccountAddress) return
+    if (!airl || !smartAccountAddress) return
 
-    const balance = await getBalance()
-    const hasEnough = balance.isGreaterThanOrEqualTo(attribute?.value || 0)
+    const hasEnough = airl.isGreaterThanOrEqualTo(attribute?.value || 0)
     if (hasEnough) {
       const { isConfirmed } = await Swal.fire({
         title: name as string,
@@ -45,8 +42,6 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming, getLic
           text: 'Claimed License! New aircrafts unlocked with this license, enjoy!',
           icon: 'success'
         })
-        getBalance()
-        getLicenses()
       }
     } else {
       Swal.fire({
@@ -55,7 +50,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming, getLic
         icon: 'question'
       })
     }
-  }, [airlBalance, smartAccountAddress, getBalance, attribute?.value, claimNFT, nft, name])
+  }, [airl, smartAccountAddress, attribute?.value, claimNFT, nft, name])
 
   const getNFTPrice = useCallback((nft: NFT) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
@@ -65,11 +60,6 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming, getLic
 
     return attribute.value
   }, [])
-
-  useEffect(() => {
-    const timer = setInterval(getBalance, 60000)
-    return () => clearInterval(timer)
-  }, [getBalance])
 
   return (
     <Grid item xs={12} md={6} lg={4}>
@@ -95,7 +85,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming, getLic
         {!owned && (
           <CardActions>
             <Button
-              color={airlBalance.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'}
+              color={airl.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'}
               disabled={isClaiming || !smartAccountAddress}
               variant='contained'
               onClick={handleClaimLicense}

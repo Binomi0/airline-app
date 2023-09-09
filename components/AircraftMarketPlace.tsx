@@ -3,12 +3,12 @@ import { Box, Grid, Fade, CircularProgress } from '@mui/material'
 import { NFT, useContract } from '@thirdweb-dev/react'
 import useLicense from 'hooks/useLicense'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
-import useAircrafts from 'hooks/useAircrafts'
 import AircraftItem from './AircraftItem'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useClaimNFT from 'hooks/useClaimNFT'
 import Swal from 'sweetalert2'
+import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 
 const mapLicenseFromAircraft = (license: string) => {
   switch (license) {
@@ -28,7 +28,7 @@ const mapLicenseFromAircraft = (license: string) => {
 const AircraftMarketPlace: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const licenses = useLicense(smartAccountAddress)
-  const { aircrafts, isLoading } = useAircrafts()
+  const { aircrafts, isLoading } = useAircraftProviderContext()
   const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
   const { claimAircraftNFT, isClaiming } = useClaimNFT(aircraftContract)
   const hasLicense = useCallback(

@@ -1,9 +1,7 @@
-import { Box, Button, Grid, LinearProgress, Typography } from '@mui/material'
-import {  useContract, useOwnedNFTs } from '@thirdweb-dev/react'
+import { Box, Button, Grid, LinearProgress } from '@mui/material'
 import FlightDetails from 'components/FlightDetails'
+import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useVaProviderContext } from 'context/VaProvider'
-import { nftAircraftTokenAddress } from 'contracts/address'
-import useAuth from 'hooks/useAuth'
 import React from 'react'
 import { IvaoPilot } from 'types'
 // import { filterLEOrigins } from 'utils'
@@ -14,9 +12,7 @@ const IvaoView = () => {
   const { pilots } = useVaProviderContext()
   const [current, setCurrent] = React.useState<IvaoPilot[]>([])
   const [page, setPage] = React.useState(0)
-  const { user } = useAuth()
-  const { contract } = useContract(nftAircraftTokenAddress)
-  const { data = [] } = useOwnedNFTs(contract, user?.address)
+  const { ownedAircrafts, isLoading } = useAircraftProviderContext()
 
   const handleSelect = React.useCallback(
     (callsign: string) => {
@@ -34,16 +30,22 @@ const IvaoView = () => {
         .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
         .slice(0, page + STEP)
         .map((pilot, index) => (
-          <FlightDetails aircraft={data[0]} session={pilot} key={pilot.id} index={index} onSelect={() => handleSelect(pilot.callsign)} />
+          <FlightDetails
+            aircraft={ownedAircrafts[0]}
+            session={pilot}
+            key={pilot.id}
+            index={index}
+            onSelect={() => handleSelect(pilot.callsign)}
+          />
         )),
-    [current, data, handleSelect, page]
+    [current, ownedAircrafts, handleSelect, page]
   )
 
   React.useEffect(() => {
     setCurrent(pilots || [])
   }, [pilots])
 
-  if (!pilots.length || !data) {
+  if (!pilots.length || isLoading) {
     return <LinearProgress />
   }
 

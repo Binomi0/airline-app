@@ -16,7 +16,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       const collection = await TransactionModel.create({
         email: req.user,
         operation: req.body.operation,
-        amount: req.body.amount,
+        amount: req.body.amount.toString(),
         transactionDate: Date.now(),
         hash: req.body.hash,
         isCompleted: false,

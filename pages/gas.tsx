@@ -3,22 +3,21 @@ import { Box, Container, LinearProgress, Stack, Typography } from '@mui/material
 import GasStationView from 'routes/gas/GasStationView'
 import styles from 'styles/Gas.module.css'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
-import { rewardTokenAddress } from 'contracts/address'
 import Image from 'next/image'
 import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import serverSidePropsHandler from 'components/ServerSideHandler'
-import useTokenBalance from 'hooks/useTokenBalance'
 import Disconnected from 'components/Disconnected'
-import { useAuthProviderContext } from 'context/AuthProvider'
+import { useTokenProviderContext } from 'context/TokenProvider'
+import useAuth from 'hooks/useAuth'
 
 interface Props {
   loading: boolean
 }
 
 const Gas: NextPage<Props> = ({ loading }) => {
-  const { balance } = useTokenBalance(rewardTokenAddress)
-  const { user } = useAuthProviderContext()
+  const { airg } = useTokenProviderContext()
+  const { user } = useAuth()
 
   if (loading) {
     return <LinearProgress />
@@ -28,8 +27,6 @@ const Gas: NextPage<Props> = ({ loading }) => {
     return <Disconnected />
   }
 
-  if (!balance) return null
-
   return (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} src={image} alt='banner' fill />
@@ -38,7 +35,7 @@ const Gas: NextPage<Props> = ({ loading }) => {
         <Stack direction='row-reverse'>
           <Stack direction='row' alignItems='center' spacing={1}>
             <LocalGasStationIcon />
-            <Typography variant='h2'>{formatNumber(balance.toNumber())}</Typography>
+            <Typography variant='h2'>{formatNumber(airg.toNumber())}</Typography>
             <Typography variant='h6'>AIRG</Typography>
           </Stack>
         </Stack>

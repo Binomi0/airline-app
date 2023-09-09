@@ -7,11 +7,11 @@ import { coinTokenAddress, stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import useStaking from 'hooks/useStaking'
 import useERC20 from 'hooks/useERC20'
-import useTokenBalance from 'hooks/useTokenBalance'
 import Swal from 'sweetalert2'
+import { useTokenProviderContext } from 'context/TokenProvider'
 
 const GasAvailable = () => {
-  const { balance: airl, refetch } = useTokenBalance(coinTokenAddress)
+  const { airl } = useTokenProviderContext()
   const { contract: staking } = useContract(stakingAddress)
   const { stake } = useStaking(staking)
   const { setAllowance } = useERC20(coinTokenAddress)
@@ -32,7 +32,6 @@ const GasAvailable = () => {
           const _amount = ethers.utils.parseEther(amount)
           await setAllowance(stakingAddress)
           await stake(_amount)
-          refetch()
           setLoading(false)
         } else {
           setLoading(false)
@@ -45,13 +44,8 @@ const GasAvailable = () => {
         })
       }
     },
-    [airl, setAllowance, stake, refetch]
+    [airl, setAllowance, stake]
   )
-
-  React.useEffect(() => {
-    const timer = setInterval(refetch, 60000)
-    return () => clearInterval(timer)
-  }, [refetch])
 
   return (
     <Grid item xs={4}>

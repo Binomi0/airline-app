@@ -18,6 +18,7 @@ import CustomWeb3Provider from 'components/CustomWeb3Provider'
 import RightSidebar from 'components/Sidebar/Right'
 import { AircraftProvider } from 'context/AircraftProvider/AircraftProvider.provider'
 import { LicenseProvider } from 'context/LicenseProvider/LicenseProvider.provider'
+import { TokenProvider } from 'context/TokenProvider'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -55,12 +56,14 @@ export default function MyApp(props: MyAppProps) {
               <ErrorBoundary>
                 <AircraftProvider>
                   <LicenseProvider>
-                    <MainProvider>
-                      <AppBar />
-                      <Sidebar />
-                      <RightSidebar />
-                    </MainProvider>
-                    <Component loading={loading} {...props.pageProps} />
+                    <TokenProvider>
+                      <MainProvider>
+                        <AppBar />
+                        <Sidebar />
+                        <RightSidebar />
+                      </MainProvider>
+                      <Component loading={loading} {...props.pageProps} />
+                    </TokenProvider>
                   </LicenseProvider>
                 </AircraftProvider>
               </ErrorBoundary>

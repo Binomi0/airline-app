@@ -16,7 +16,7 @@ import React, { Dispatch, SetStateAction } from 'react'
 
 const CargoAircraftSelector: React.FC<{
   setAircraft: Dispatch<SetStateAction<NFT | undefined>>
-  owned: NFT[]
+  owned: Readonly<NFT[]>
 }> = ({ owned }) => {
   const router = useRouter()
 

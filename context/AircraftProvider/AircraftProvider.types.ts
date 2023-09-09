@@ -1,12 +1,19 @@
-import { Wallet } from 'ethers'
+/* eslint-disable no-unused-vars */
+import { NFT } from '@thirdweb-dev/sdk'
 
-type Actions = SetBaseSigner
-type SetBaseSigner = Readonly<{ type: 'SET_BASE_SIGNER'; payload: Wallet | undefined }>
+type Actions = SetAircrafts | SetOwnedAircrafts
+type SetOwnedAircrafts = Readonly<{ type: 'SET_OWNED_AIRCRAFTS'; payload: Readonly<NFT[]> }>
+type SetAircrafts = Readonly<{ type: 'SET_AIRCRAFTS'; payload: Readonly<NFT[]> }>
 
-export type AircraftReducerState = {}
+export type AircraftReducerState = {
+  ownedAircrafts: Readonly<NFT[]>
+  aircrafts: Readonly<NFT[]>
+  isLoading: boolean
+}
 
 export type AircraftContextProps = AircraftReducerState & {
-  setBaseSigner: (signer?: Wallet) => void
+  setOwnedAircrafts: (aircrafts: Readonly<NFT[]>) => void
+  setAircrafts: (aircrafts: Readonly<NFT[]>) => void
 }
 
 export type AircraftReducerHandler = (state: AircraftReducerState, action: Actions) => AircraftReducerState

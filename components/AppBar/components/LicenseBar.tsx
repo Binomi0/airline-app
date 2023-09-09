@@ -1,27 +1,26 @@
 import { CircularProgress, AvatarGroup, Tooltip, Avatar } from '@mui/material'
 import { MediaRenderer } from '@thirdweb-dev/react'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import { nftLicenseTokenAddress } from 'contracts/address'
-import useOwnedNfts from 'hooks/useOwnedNFTs'
+import { useLicenseProviderContext } from 'context/LicenseProvider/LicenseProvider.context'
 import React from 'react'
 
 const LicenseBar = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const { data: ownedLicense, isLoading } = useOwnedNfts(nftLicenseTokenAddress)
+  const { ownedLicenses, isLoading } = useLicenseProviderContext()
 
   return (
     <div>
       {isLoading && smartAccountAddress ? (
-        <CircularProgress size={25} />
+        <CircularProgress size={24} />
       ) : (
-        ownedLicense &&
-        ownedLicense?.length > 0 && (
+        ownedLicenses &&
+        ownedLicenses?.length > 0 && (
           <AvatarGroup>
-            {ownedLicense
+            {ownedLicenses
               .map((license) => (
-                <Tooltip arrow title={(license?.rawMetadata?.name as string).split(' - ')[1]} key={license?.tokenId}>
+                <Tooltip arrow title={(license?.metadata?.name as string).split(' - ')[1]} key={license?.metadata.id}>
                   <Avatar>
-                    <MediaRenderer width='50px' height='50px' src={license?.rawMetadata?.image} />
+                    <MediaRenderer width='50px' height='50px' src={license?.metadata?.image} />
                   </Avatar>
                 </Tooltip>
               ))

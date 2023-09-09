@@ -1,25 +1,22 @@
 import React, { useState } from 'react'
 import { NextPage } from 'next'
-import { NFT, useContract, useOwnedNFTs } from '@thirdweb-dev/react'
-import { nftAircraftTokenAddress } from 'contracts/address'
+import { NFT } from '@thirdweb-dev/react'
 import CargoView from 'routes/Cargo/CargoView'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
 import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import { VaProvider } from 'context/VaProvider'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import Disconnected from 'components/Disconnected'
 import useLive from 'hooks/useLive'
 import { useRouter } from 'next/router'
 import useAuth from 'hooks/useAuth'
+import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 
 const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
   const router = useRouter()
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { user } = useAuth()
   const [aircraft, setAircraft] = useState<NFT>()
-  const { contract } = useContract(nftAircraftTokenAddress)
-  const { data: owned = [], isLoading: isLoadingNFTs } = useOwnedNFTs(contract, address)
+  const { ownedAircrafts, isLoading } = useAircraftProviderContext()
   const { live } = useLive()
 
   React.useEffect(() => {
@@ -30,11 +27,11 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
     return <Disconnected />
   }
 
-  if (isLoadingNFTs) {
+  if (isLoading) {
     return <LinearProgress />
   }
 
-  if (owned.length === 0) {
+  if (ownedAircrafts.length === 0) {
     return (
       <Box>
         <Container>
@@ -51,7 +48,7 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
       {aircraft ? (
         <CargoView loading={loading} aircraft={aircraft} />
       ) : (
-        <CargoAircraftSelector owned={owned} setAircraft={setAircraft} />
+        <CargoAircraftSelector owned={ownedAircrafts} setAircraft={setAircraft} />
       )}
     </VaProvider>
   )

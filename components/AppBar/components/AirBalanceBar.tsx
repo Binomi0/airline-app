@@ -1,18 +1,12 @@
 import React from 'react'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import { Stack, Typography } from '@mui/material'
-import { coinTokenAddress } from 'contracts/address'
-import useTokenBalance from 'hooks/useTokenBalance'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { useTokenProviderContext } from 'context/TokenProvider'
 
 const AirBalanceBar = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const { balance, refetch } = useTokenBalance(coinTokenAddress)
-
-  React.useEffect(() => {
-    const timer = setInterval(refetch, 60000)
-    return () => clearInterval(timer)
-  }, [refetch])
+  const { airl } = useTokenProviderContext()
 
   return smartAccountAddress ? (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>
@@ -21,7 +15,7 @@ const AirBalanceBar = () => {
         {Intl.NumberFormat('en', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
-        }).format(balance.toNumber())}{' '}
+        }).format(airl.toNumber())}{' '}
         AIRL
       </Typography>
     </Stack>

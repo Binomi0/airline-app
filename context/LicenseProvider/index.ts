@@ -1,11 +1,2 @@
-import React, { ReactNode } from 'react'
-
-interface Props {
-  children: ReactNode
-}
-
-const index = ({ children }: Props) => {
-  return children
-}
-
-export default index
+export * from './LicenseProvider.context'
+export * from './LicenseProvider.provider'
