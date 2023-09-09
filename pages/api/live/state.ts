@@ -38,13 +38,17 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         }
       )
 
-      res.status(202).end
+      res.status(202).end()
       return
     }
 
     const updated = await Live.findOneAndUpdate(
       { userId: req.id },
-      { status: lastTrackState, $addToSet: { track: { name: lastTrackState, value: new Date() } } },
+      {
+        status: lastTrackState,
+        $addToSet: { track: { name: lastTrackState, value: new Date() } },
+        isCompleted: lastTrackState === LastTrackStateEnum.On_Blocks
+      },
       { new: true }
     )
     res.status(201).send(updated)

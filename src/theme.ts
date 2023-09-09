@@ -1,8 +1,14 @@
-import { Roboto } from 'next/font/google'
+import { Roboto, Sora } from 'next/font/google'
 import { createTheme, responsiveFontSizes } from '@mui/material/styles'
 import { red } from '@mui/material/colors'
 
 export const roboto = Roboto({
+  weight: ['300', '400', '500', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  fallback: ['Helvetica', 'Arial', 'sans-serif']
+})
+export const sora = Sora({
   weight: ['300', '400', '500', '700'],
   subsets: ['latin'],
   display: 'swap',
@@ -22,9 +28,9 @@ let theme = createTheme({
     }
   },
   typography: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Sora',
     allVariants: {
-      fontFamily: 'Roboto'
+      fontFamily: 'Sora'
     },
     h1: {
       textShadow: '2px 2px 10px grey',

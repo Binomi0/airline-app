@@ -9,6 +9,7 @@ interface Props {
   onDisconnect: () => void
 }
 const MCDUView = ({ pilot, onDisconnect }: Props) => {
+  console.log({ pilot })
   return (
     <Box>
       <Image src={image} fill objectFit='none' alt='flight' style={{ opacity: 0.4, filter: 'blur(0.2rem)' }} />
@@ -17,7 +18,7 @@ const MCDUView = ({ pilot, onDisconnect }: Props) => {
           <Box width={640} height={480} bgcolor='secondary.dark' p={2} sx={{ boxShadow: '0 0 100px inset #000' }}>
             <Stack direction='row' justifyContent='space-between'>
               <Typography paragraph sx={{ fontFamily: 'B612 Mono' }}>
-                Already connected, tracking...
+                Connected, tracking... {pilot?.callsign}
               </Typography>
               <Typography fontSize={28} paragraph sx={{ fontFamily: 'B612 Mono', fontWeight: 500 }}>
                 {pilot?.flightPlan.departureId}/{pilot?.flightPlan.arrivalId}
@@ -27,6 +28,21 @@ const MCDUView = ({ pilot, onDisconnect }: Props) => {
               {pilot?.lastTrack.onGround ? 'En tierra' : 'En el aire'}
             </Typography>
             <Typography sx={{ fontFamily: 'B612 Mono' }}>Estado ({pilot?.lastTrack.state})</Typography>
+            <Typography sx={{ fontFamily: 'B612 Mono' }}>Speed ({pilot?.lastTrack.groundSpeed}) kt/h</Typography>
+            <Typography sx={{ fontFamily: 'B612 Mono' }}>Rating ({pilot?.rating})</Typography>
+            <Typography sx={{ fontFamily: 'B612 Mono' }}>People On Board {pilot?.flightPlan.peopleOnBoard}</Typography>
+            <Typography sx={{ fontFamily: 'B612 Mono' }}>
+              To arrival distance {Math.floor(pilot?.lastTrack.arrivalDistance || 0)} miles
+            </Typography>
+            <Typography sx={{ fontFamily: 'B612 Mono' }}>
+              From departure distance {Math.floor(pilot?.lastTrack.departureDistance || 0)} miles
+            </Typography>
+            <Typography sx={{ fontFamily: 'B612 Mono' }}>
+              SQUACK{' '}
+              {Number(pilot?.lastTrack.transponder) < 1000
+                ? `0${pilot?.lastTrack.transponder}`
+                : pilot?.lastTrack.transponder}
+            </Typography>
           </Box>
           <Button variant='text' color='secondary' onClick={onDisconnect}>
             <Typography sx={{ fontFamily: 'B612 Mono' }}>Disconnect</Typography>

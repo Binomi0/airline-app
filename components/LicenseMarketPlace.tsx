@@ -10,7 +10,7 @@ const LicenseMarketPlace: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const { contract } = useContract(nftLicenseTokenAddress)
   const { data: nfts = [], isLoading, error } = useNFTs(contract)
-  const { data: owned = [] } = useOwnedNFTs(contract, smartAccountAddress)
+  const { data: owned = [], refetch } = useOwnedNFTs(contract, smartAccountAddress)
   const { claimNFT, isClaiming } = useClaimNFT(contract)
 
   if (isLoading) {
@@ -35,6 +35,7 @@ const LicenseMarketPlace: React.FC = () => {
           (nft, i) =>
             i < 4 && (
               <LicenseItem
+                getLicenses={refetch}
                 isClaiming={isClaiming}
                 nft={nft}
                 claimNFT={claimNFT}

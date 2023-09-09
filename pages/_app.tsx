@@ -16,6 +16,8 @@ import { AlchemyProvider } from 'context/AlchemyProvider'
 import { AuthProvider } from 'context/AuthProvider'
 import CustomWeb3Provider from 'components/CustomWeb3Provider'
 import RightSidebar from 'components/Sidebar/Right'
+import { AircraftProvider } from 'context/AircraftProvider/AircraftProvider.provider'
+import { LicenseProvider } from 'context/LicenseProvider/LicenseProvider.provider'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -51,12 +53,16 @@ export default function MyApp(props: MyAppProps) {
             <ThemeProvider theme={theme}>
               <CssBaseline />
               <ErrorBoundary>
-                <MainProvider>
-                  <AppBar />
-                  <Sidebar />
-                  <RightSidebar />
-                </MainProvider>
-                <Component loading={loading} {...props.pageProps} />
+                <AircraftProvider>
+                  <LicenseProvider>
+                    <MainProvider>
+                      <AppBar />
+                      <Sidebar />
+                      <RightSidebar />
+                    </MainProvider>
+                    <Component loading={loading} {...props.pageProps} />
+                  </LicenseProvider>
+                </AircraftProvider>
               </ErrorBoundary>
             </ThemeProvider>
           </CustomWeb3Provider>

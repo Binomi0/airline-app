@@ -15,9 +15,10 @@ interface Props {
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
   claimNFT: ({ to, nft, quantity }: { to: Hex; nft: NFT; quantity: number }) => Promise<string | undefined>
+  getLicenses: () => void
 }
 
-const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
+const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming, getLicenses }) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const { balance: airlBalance, refetch: getBalance } = useTokenBalance(coinTokenAddress)
   const { name, description, image } = nft.metadata
@@ -45,6 +46,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimNFT, isClaiming }) => {
           icon: 'success'
         })
         getBalance()
+        getLicenses()
       }
     } else {
       Swal.fire({

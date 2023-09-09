@@ -82,11 +82,11 @@ const FlightDetails: React.FC<{ aircraft?: NFT; session: IvaoPilot; onSelect: ()
       showCancelButton: true
     })
     if (isConfirmed) {
-      const { data: cargo } = await axios.post('/api/cargo/new', newCargo)
-      await axios.post('/api/live/new', { cargo })
+      const { data } = await axios.post('/api/cargo/new', { ...cargo })
+      await axios.post('/api/live/new', { cargo: data })
       router.push('/live')
     }
-  }, [newCargo, router, session.callsign])
+  }, [cargo, router, session.callsign])
 
   const handleNewCargo = React.useCallback(async () => {
     if (!aircraft) return
