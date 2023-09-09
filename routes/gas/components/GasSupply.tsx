@@ -1,13 +1,21 @@
 import { Typography, CircularProgress } from '@mui/material'
-import { useTokenProviderContext } from 'context/TokenProvider'
-import { memo } from 'react'
+import { useContract, useContractRead } from '@thirdweb-dev/react'
+import { stakingAddress } from 'contracts/address'
+import { memo, useEffect } from 'react'
 import { formatNumber } from 'utils'
 
 const GasSupply = () => {
-  const { airl, isLoading } = useTokenProviderContext()
+  const { contract } = useContract(stakingAddress)
+  const { data, isLoading, refetch } = useContractRead(contract, 'getRewardTokenBalance')
+
+  useEffect(() => {
+    const timer = setInterval(refetch, 60000)
+    return () => clearInterval(timer)
+  }, [refetch])
+
   return (
     <Typography paragraph>
-      Available: {isLoading ? <CircularProgress size={14} /> : formatNumber(airl?.div(1e18).toNumber())} Liters
+      Available: {isLoading ? <CircularProgress size={14} /> : formatNumber(Number(data?.toString()) / 1e18)} Liters
     </Typography>
   )
 }

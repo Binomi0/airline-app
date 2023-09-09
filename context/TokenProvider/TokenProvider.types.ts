@@ -6,8 +6,8 @@ type SetAIRLToken = Readonly<{ type: 'SET_AIRL'; payload: Readonly<BigNumber> }>
 type SetAIRGToken = Readonly<{ type: 'SET_AIRG'; payload: Readonly<BigNumber> }>
 
 export type TokenReducerState = {
-  airl: Readonly<BigNumber>
-  airg: Readonly<BigNumber>
+  airl?: Readonly<BigNumber>
+  airg?: Readonly<BigNumber>
   isLoading: boolean
 }
 

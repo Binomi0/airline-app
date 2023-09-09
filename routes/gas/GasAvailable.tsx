@@ -19,7 +19,7 @@ const GasAvailable = () => {
 
   const handleStake = useCallback(
     async (amount: string) => {
-      if (airl.isGreaterThanOrEqualTo(amount)) {
+      if (airl?.isGreaterThanOrEqualTo(amount)) {
         setLoading(true)
         const { isConfirmed } = await Swal.fire({
           title: `Stake ${amount} AIRL`,
@@ -53,10 +53,10 @@ const GasAvailable = () => {
         <Box p={1}>
           <Typography variant='subtitle1'>Available to deposit</Typography>
           <Typography variant='subtitle2' paragraph>
-            {formatNumber(airl.toNumber())} AIRL
+            {formatNumber(airl?.toNumber() || 0)} AIRL
           </Typography>
           <GasForm
-            max={airl.toString()}
+            max={airl?.toString() || '0'}
             onClick={handleStake}
             loading={loading}
             label='Amount to Stake'

@@ -35,7 +35,7 @@ const Gas: NextPage<Props> = ({ loading }) => {
         <Stack direction='row-reverse'>
           <Stack direction='row' alignItems='center' spacing={1}>
             <LocalGasStationIcon />
-            <Typography variant='h2'>{formatNumber(airg.toNumber())}</Typography>
+            <Typography variant='h2'>{formatNumber(airg?.toNumber())}</Typography>
             <Typography variant='h6'>AIRG</Typography>
           </Stack>
         </Stack>

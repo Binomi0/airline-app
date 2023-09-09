@@ -15,7 +15,7 @@ const GasBalanceBar = () => {
         {Intl.NumberFormat('en', {
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
-        }).format(airg.toNumber())}{' '}
+        }).format(airg?.toNumber() || 0)}{' '}
         AIRG
       </Typography>
     </Stack>

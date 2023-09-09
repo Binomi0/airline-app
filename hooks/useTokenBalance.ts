@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState } from 'react'
 import alchemy from 'lib/alchemy'
 import { Hex } from '@alchemy/aa-core'
 
-const ZERO = new BigNumber(0)
 const useTokenBalance = (contract?: Hex) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const [balance, setBalance] = useState<BigNumber>(ZERO)
+  const [balance, setBalance] = useState<BigNumber | undefined>()
+  const [isFetched, setIsFetched] = useState<boolean>(false)
 
   const getBalance = useCallback(async () => {
     if (!contract || !smartAccountAddress) return new BigNumber(0)
@@ -15,6 +15,7 @@ const useTokenBalance = (contract?: Hex) => {
 
     const result = new BigNumber(tokenBalances[0].tokenBalance || '0').div(1e18)
     setBalance(result)
+    setIsFetched(true)
     return result
   }, [contract, smartAccountAddress])
 
@@ -22,7 +23,7 @@ const useTokenBalance = (contract?: Hex) => {
     getBalance()
   }, [getBalance])
 
-  return { balance, refetch: getBalance }
+  return { balance, refetch: getBalance, isFetched }
 }
 
 export default useTokenBalance

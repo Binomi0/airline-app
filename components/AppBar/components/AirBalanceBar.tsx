@@ -15,7 +15,7 @@ const AirBalanceBar = () => {
         {Intl.NumberFormat('en', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
-        }).format(airl.toNumber())}{' '}
+        }).format(airl?.toNumber() || 0)}{' '}
         AIRL
       </Typography>
     </Stack>
