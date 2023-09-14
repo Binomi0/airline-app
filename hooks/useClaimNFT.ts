@@ -25,11 +25,11 @@ interface UseClaimNFT {
 
 const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
   const [isClaiming, setIsClaiming] = useState(false)
-  const { smartAccountAddress, paymasterSigner, smartSigner } = useAlchemyProviderContext()
+  const { smartAccountAddress, paymasterSigner } = useAlchemyProviderContext()
 
   const claimAircraftNFT = useCallback(
     async ({ to, quantity, nft }: ClaimNFTPayload) => {
-      if (!paymasterSigner || !smartSigner || !contract || !smartAccountAddress) return
+      if (!paymasterSigner || !contract || !smartAccountAddress) return
       setIsClaiming(true)
 
       try {
@@ -46,7 +46,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           activePhase.price
         ]) as Hex
 
-        const { hash: approveTx } = await smartSigner.sendUserOperation({
+        const { hash: approveTx } = await paymasterSigner.sendUserOperation({
           target: coinTokenAddress,
           data: encodedApproveCallData
         })
@@ -83,7 +83,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         return ''
       }
     },
-    [contract, paymasterSigner, smartAccountAddress, smartSigner]
+    [contract, paymasterSigner, smartAccountAddress]
   )
 
   const claimNFT = useCallback(

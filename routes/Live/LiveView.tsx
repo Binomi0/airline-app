@@ -11,6 +11,7 @@ import Disconnected from 'components/Disconnected'
 import MCDUView from './components/MCDUView'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
+import useLive from 'hooks/useLive'
 
 const LiveView: FC = () => {
   const router = useRouter()
@@ -20,6 +21,7 @@ const LiveView: FC = () => {
   const [flightState, setFlightState] = useState<LastTrackState>(LastTrackStateEnum.Boarding)
   const pilot = useMemo(() => pilots.find((pilot) => pilot.callsign === cargo?.callsign), [pilots, cargo])
   // const pilot = pilots && pilots[0]
+  const { live } = useLive()
 
   const handleDisconnect = useCallback(async () => {
     const { isConfirmed } = await Swal.fire({
@@ -40,6 +42,12 @@ const LiveView: FC = () => {
   }, [])
 
   useEffect(() => {
+    if (live === null) {
+      router.push('/')
+    }
+  }, [live, router])
+
+  useEffect(() => {
     getCargo()
   }, [getCargo])
 
@@ -49,6 +57,7 @@ const LiveView: FC = () => {
 
   useEffect(() => {
     if (!pilot || pilot?.lastTrack.state === flightState) return
+
     axios.post('/api/live/state', { state: pilot.lastTrack.state })
     setFlightState(pilot.lastTrack.state as LastTrackState)
   }, [flightState, pilot])
@@ -60,12 +69,13 @@ const LiveView: FC = () => {
   return (
     <>
       <Fade in={!active && !pilot} unmountOnExit timeout={{ exit: 0 }}>
-        <Stack mt={10} spacing={10} alignItems='center'>
-          <Typography variant='h1'>Esperando conexión...</Typography>
+        <Stack mt={5} spacing={10} alignItems='center'>
+          <Typography variant='h2'>Esperando conexión...</Typography>
+          <Button onClick={handleDisconnect}>abort flight</Button>
           <Box bgcolor='primary.light' px={5} borderRadius={10}>
-            <Typography variant='h2'>{cargo?.callsign}</Typography>
+            <Typography variant='h3'>{cargo?.callsign}</Typography>
           </Box>
-          <Typography variant='h3' paragraph>
+          <Typography variant='h4' paragraph>
             Conéctate a IVAO para continuar.
           </Typography>
           <Box textAlign='center'>
