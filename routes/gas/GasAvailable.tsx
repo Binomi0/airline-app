@@ -11,7 +11,7 @@ import Swal from 'sweetalert2'
 import { useTokenProviderContext } from 'context/TokenProvider'
 
 const GasAvailable = () => {
-  const { airl, getAirlBalance, getAirgBalance } = useTokenProviderContext()
+  const { airl, getBalances } = useTokenProviderContext()
   const { contract: staking } = useContract(stakingAddress)
   const { stake } = useStaking(staking)
   const { setAllowance, getAllowance } = useERC20(coinTokenAddress)
@@ -35,8 +35,7 @@ const GasAvailable = () => {
             await setAllowance(stakingAddress)
           }
           await stake(_amount)
-          getAirlBalance()
-          getAirgBalance()
+          getBalances()
           setLoading(false)
         } else {
           setLoading(false)
@@ -49,7 +48,7 @@ const GasAvailable = () => {
         })
       }
     },
-    [airl, getAirlBalance, getAllowance, setAllowance, stake]
+    [airl, getBalances, getAllowance, setAllowance, stake]
   )
 
   return (

@@ -16,11 +16,11 @@ const GasDeposited = () => {
   const { withdraw, isLoading } = useStaking(contract)
   const { data: staking, refetch } = useContractRead(contract, 'stakers', [address])
   const maxAmount = (Number(staking?.amountStaked) / 1e18).toString()
-  const { getAirlBalance, getAirgBalance } = useTokenProviderContext()
+  const { getBalances } = useTokenProviderContext()
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
-      if (staking.amountStaked.gte(ethers.utils.parseEther(unstakeAmount))) {
+      if (staking?.amountStaked.gte(ethers.utils.parseEther(unstakeAmount))) {
         const { isConfirmed } = await Swal.fire({
           title: 'Unstaking AIRL token',
           text: `Are you sure you want to withdraw ${unstakeAmount} tokens?`,
@@ -36,8 +36,7 @@ const GasDeposited = () => {
             icon: 'success'
           })
           refetch()
-          getAirlBalance()
-          getAirgBalance()
+          getBalances()
         }
       } else {
         Swal.fire({
@@ -47,7 +46,7 @@ const GasDeposited = () => {
         })
       }
     },
-    [staking?.amountStaked, withdraw, refetch]
+    [staking?.amountStaked, withdraw, refetch, getBalances]
   )
 
   return (
@@ -56,7 +55,7 @@ const GasDeposited = () => {
         <Box p={1}>
           <Typography variant='subtitle1'>Deposited</Typography>
           <Typography variant='subtitle2' paragraph>
-            {staking ? formatNumber(Number(staking.amountStaked.toString()) / 1e18) : formatNumber()} AIRL
+            {staking ? formatNumber(Number(staking.amountStaked.toString()) / 1e18) : formatNumber()} AIRG
           </Typography>
           <GasForm
             max={maxAmount}
