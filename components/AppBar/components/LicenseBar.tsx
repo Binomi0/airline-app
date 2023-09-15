@@ -10,7 +10,7 @@ const LicenseBar = () => {
 
   return (
     <div>
-      {isLoading && smartAccountAddress ? (
+      {isLoading && !smartAccountAddress ? (
         <CircularProgress size={24} />
       ) : (
         ownedLicenses &&

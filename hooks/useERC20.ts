@@ -24,6 +24,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
   const getAllowance = useCallback(
     async (spender: string): Promise<BigNumber> => {
       if (!paymasterSigner || !smartAccountAddress || !contract) return new BigNumber(0)
+      setIsLoading(true)
 
       try {
         const allowance = await contract.erc20.allowanceOf(smartAccountAddress, spender)
@@ -32,6 +33,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         return new BigNumber(allowance.displayValue)
       } catch (error) {
         console.error('getAllowance', error)
+        setIsLoading(false)
         return new BigNumber(0)
       }
     },
@@ -45,26 +47,20 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
       try {
         setIsLoading(true)
 
-        const allowance = await getAllowance(to)
-        if (allowance.isZero()) {
-          const erc20Staking = new Contract(tokenAddress, AirlineCoin.abi)
-          const encodedCallData = erc20Staking.interface.encodeFunctionData('approve', [to, MAX_INT_ETH])
+        const erc20Staking = new Contract(tokenAddress, AirlineCoin.abi)
+        const encodedCallData = erc20Staking.interface.encodeFunctionData('approve', [to, MAX_INT_ETH])
 
-          const { hash } = await paymasterSigner.sendUserOperation({
-            target: tokenAddress,
-            data: encodedCallData as Hex
-          })
-
-          await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
-          setIsLoading(false)
-        }
+        const { hash } = await paymasterSigner.sendUserOperation({ target: tokenAddress, data: encodedCallData as Hex })
+        await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
+        setIsLoading(false)
         return true
       } catch (error) {
         console.error(error)
+        setIsLoading(false)
         return false
       }
     },
-    [getAllowance, paymasterSigner, tokenAddress]
+    [paymasterSigner, tokenAddress]
   )
   return { setAllowance, getAllowance, isLoading }
 }

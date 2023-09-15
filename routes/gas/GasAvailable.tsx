@@ -14,7 +14,7 @@ const GasAvailable = () => {
   const { airl } = useTokenProviderContext()
   const { contract: staking } = useContract(stakingAddress)
   const { stake } = useStaking(staking)
-  const { setAllowance } = useERC20(coinTokenAddress)
+  const { setAllowance, getAllowance } = useERC20(coinTokenAddress)
   const [loading, setLoading] = useState(false)
 
   const handleStake = useCallback(
@@ -30,7 +30,10 @@ const GasAvailable = () => {
         })
         if (isConfirmed) {
           const _amount = ethers.utils.parseEther(amount)
-          await setAllowance(stakingAddress)
+          const allowance = await getAllowance(stakingAddress)
+          if (allowance.isZero()) {
+            await setAllowance(stakingAddress)
+          }
           await stake(_amount)
           setLoading(false)
         } else {
@@ -44,7 +47,7 @@ const GasAvailable = () => {
         })
       }
     },
-    [airl, setAllowance, stake]
+    [airl, getAllowance, setAllowance, stake]
   )
 
   return (

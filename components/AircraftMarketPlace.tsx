@@ -49,7 +49,16 @@ const AircraftMarketPlace: React.FC = () => {
         showCancelButton: true
       })
       if (isConfirmed) {
-        claimAircraftNFT({ to: smartAccountAddress, quantity: 1, nft: aircraftNFT })
+        try {
+          await claimAircraftNFT({ to: smartAccountAddress, quantity: 1, nft: aircraftNFT })
+          Swal.fire({
+            title: aircraftNFT.metadata.name as string,
+            text: 'Claimed Aircraft! Enjoy your flights!',
+            icon: 'success'
+          })
+        } catch (err) {
+          console.error(err)
+        }
       }
     },
     [claimAircraftNFT, smartAccountAddress]
