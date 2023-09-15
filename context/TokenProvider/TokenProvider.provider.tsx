@@ -54,5 +54,5 @@ export const TokenProvider: FC<{ children: React.ReactNode }> = ({ children }) =
     if (isAIRGFetched) handleSetAIRG()
   }, [handleSetAIRG, isAIRGFetched])
 
-  return <Provider value={{ ...state, setAIRL, setAIRG }}>{children}</Provider>
+  return <Provider value={{ ...state, getAirlBalance, getAirgBalance, setAIRL, setAIRG }}>{children}</Provider>
 }

@@ -6,6 +6,7 @@ import { formatNumber } from 'utils'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useStaking from 'hooks/useStaking'
 import Swal from 'sweetalert2'
+import { useTokenProviderContext } from 'context/TokenProvider'
 
 const MIN_REWARDS_CLAIM = '100000000000000000000'
 
@@ -14,6 +15,7 @@ const GasFarmed = () => {
   const { contract } = useContract(stakingAddress)
   const { data: stakeInfo, refetch: getStakeInfo } = useContractRead(contract, 'getStakeInfo', [smartAccountAddress])
   const { claimRewards, isLoading: isClaiming } = useStaking(contract)
+  const { getAirgBalance } = useTokenProviderContext()
 
   const handleClaimRewards = useCallback(async () => {
     if (stakeInfo._rewards.gte(MIN_REWARDS_CLAIM)) {
@@ -24,6 +26,7 @@ const GasFarmed = () => {
         icon: 'success'
       })
       getStakeInfo()
+      getAirgBalance()
     } else {
       Swal.fire({
         title: 'Unsufficient Rewards',
@@ -32,7 +35,7 @@ const GasFarmed = () => {
       })
       return
     }
-  }, [claimRewards, getStakeInfo, stakeInfo])
+  }, [claimRewards, getStakeInfo, stakeInfo, getAirgBalance])
 
   useEffect(() => {
     const timer = setInterval(getStakeInfo, 30000)

@@ -42,7 +42,6 @@ const Gas: NextPage<Props> = ({ loading }) => {
         <Box my={2} textAlign='center'>
           <Typography variant='h1'>Gas Station</Typography>
         </Box>
-
         <GasStationView />
       </Container>
     </Box>

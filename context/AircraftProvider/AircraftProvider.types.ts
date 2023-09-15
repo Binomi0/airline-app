@@ -14,6 +14,7 @@ export type AircraftReducerState = {
 export type AircraftContextProps = AircraftReducerState & {
   setOwnedAircrafts: (aircrafts: Readonly<NFT[]>) => void
   setAircrafts: (aircrafts: Readonly<NFT[]>) => void
+  refetchAircrafts: () => void
 }
 
 export type AircraftReducerHandler = (state: AircraftReducerState, action: Actions) => AircraftReducerState

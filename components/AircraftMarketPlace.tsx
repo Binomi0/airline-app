@@ -28,7 +28,7 @@ const mapLicenseFromAircraft = (license: string) => {
 const AircraftMarketPlace: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const licenses = useLicense(smartAccountAddress)
-  const { aircrafts, isLoading } = useAircraftProviderContext()
+  const { aircrafts, isLoading, refetchAircrafts } = useAircraftProviderContext()
   const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
   const { claimAircraftNFT, isClaiming } = useClaimNFT(aircraftContract)
   const hasLicense = useCallback(
@@ -56,12 +56,13 @@ const AircraftMarketPlace: React.FC = () => {
             text: 'Claimed Aircraft! Enjoy your flights!',
             icon: 'success'
           })
+          refetchAircrafts()
         } catch (err) {
           console.error(err)
         }
       }
     },
-    [claimAircraftNFT, smartAccountAddress]
+    [claimAircraftNFT, refetchAircrafts, smartAccountAddress]
   )
 
   if (isLoading) {

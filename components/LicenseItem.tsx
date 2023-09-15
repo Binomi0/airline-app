@@ -14,9 +14,10 @@ interface Props {
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
   claimLicenseNFT: ({ to, nft, quantity }: { to: Hex; nft: NFT; quantity: number }) => Promise<string | undefined>
+  refetchLicenses: () => void
 }
 
-const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming }) => {
+const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming, refetchLicenses }) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const { airl } = useTokenProviderContext()
   const { name, description, image } = nft.metadata
@@ -42,6 +43,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
           text: 'Claimed License! New aircrafts unlocked with this license, enjoy!',
           icon: 'success'
         })
+        refetchLicenses()
       }
     } else {
       Swal.fire({
@@ -50,7 +52,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
         icon: 'question'
       })
     }
-  }, [airl, smartAccountAddress, attribute?.value, claimLicenseNFT, nft, name])
+  }, [airl, smartAccountAddress, attribute?.value, claimLicenseNFT, nft, name, refetchLicenses])
 
   const getNFTPrice = useCallback((nft: NFT) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')

@@ -8,7 +8,7 @@ import { useLicenseProviderContext } from 'context/LicenseProvider/LicenseProvid
 
 const LicenseMarketPlace: React.FC = () => {
   const { contract } = useContract(nftLicenseTokenAddress)
-  const { licenses, ownedLicenses: owned, isLoading } = useLicenseProviderContext()
+  const { licenses, ownedLicenses: owned, isLoading, refetchLicenses } = useLicenseProviderContext()
   const { claimLicenseNFT, isClaiming } = useClaimNFT(contract)
 
   if (isLoading) return <LinearProgress />
@@ -24,6 +24,7 @@ const LicenseMarketPlace: React.FC = () => {
               <LicenseItem
                 isClaiming={isClaiming}
                 nft={license}
+                refetchLicenses={refetchLicenses}
                 claimLicenseNFT={claimLicenseNFT}
                 key={license.metadata.id}
                 owned={owned.some((n) => license.metadata.id === n.metadata.id)}

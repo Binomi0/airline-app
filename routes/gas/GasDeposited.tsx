@@ -8,6 +8,7 @@ import { ethers } from 'ethers'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useStaking from 'hooks/useStaking'
 import Swal from 'sweetalert2'
+import { useTokenProviderContext } from 'context/TokenProvider'
 
 const GasDeposited = () => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
@@ -15,6 +16,7 @@ const GasDeposited = () => {
   const { withdraw, isLoading } = useStaking(contract)
   const { data: staking, refetch } = useContractRead(contract, 'stakers', [address])
   const maxAmount = (Number(staking?.amountStaked) / 1e18).toString()
+  const { getAirlBalance, getAirgBalance } = useTokenProviderContext()
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
@@ -34,6 +36,8 @@ const GasDeposited = () => {
             icon: 'success'
           })
           refetch()
+          getAirlBalance()
+          getAirgBalance()
         }
       } else {
         Swal.fire({

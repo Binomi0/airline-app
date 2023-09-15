@@ -14,6 +14,8 @@ export type TokenReducerState = {
 export type TokenContextProps = TokenReducerState & {
   setAIRL: (balance: Readonly<BigNumber>) => void
   setAIRG: (balance: Readonly<BigNumber>) => void
+  getAirlBalance: () => void
+  getAirgBalance: () => void
 }
 
 export type TokenReducerHandler = (state: TokenReducerState, action: Actions) => TokenReducerState

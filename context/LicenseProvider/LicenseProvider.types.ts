@@ -14,6 +14,7 @@ export type LicenseReducerState = {
 export type LicenseContextProps = LicenseReducerState & {
   setOwnedLicenses: (license: Readonly<NFT[]>) => void
   setLicenses: (licenses: Readonly<NFT[]>) => void
+  refetchLicenses: () => void
 }
 
 export type LicenseReducerHandler = (state: LicenseReducerState, action: Actions) => LicenseReducerState

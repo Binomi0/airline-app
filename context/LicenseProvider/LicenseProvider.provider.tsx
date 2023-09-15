@@ -19,7 +19,8 @@ export const LicenseProvider: FC<{ children: React.ReactNode }> = ({ children })
   const {
     data: ownedLicenses = [],
     isLoading: loadingOwnNFTs,
-    isFetched: isOwnedFetched
+    isFetched: isOwnedFetched,
+    refetch: refetchLicenses
   } = useOwnedNFTs(contract, user?.address)
   const [state, dispatch] = useReducer(aircraftProviderReducer, {
     ...INITIAL_STATE,
@@ -54,5 +55,5 @@ export const LicenseProvider: FC<{ children: React.ReactNode }> = ({ children })
     if (isFetched) handleUpdateLicenses()
   }, [handleUpdateLicenses, isFetched])
 
-  return <Provider value={{ ...state, isLoading, setOwnedLicenses, setLicenses }}>{children}</Provider>
+  return <Provider value={{ ...state, isLoading, setOwnedLicenses, setLicenses, refetchLicenses }}>{children}</Provider>
 }

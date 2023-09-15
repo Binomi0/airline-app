@@ -16,7 +16,7 @@ export const INITIAL_STATE: AircraftReducerState = {
 export const AircraftProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth()
   const { contract } = useContract(nftAircraftTokenAddress)
-  const { data: aircrafts = [], isLoading: loadingNFTs, isFetched } = useNFTs(contract)
+  const { data: aircrafts = [], isLoading: loadingNFTs, isFetched, refetch: refetchAircrafts } = useNFTs(contract)
   const {
     data: ownedAircrafts = [],
     isLoading: loadingOwnNFTs,
@@ -53,5 +53,7 @@ export const AircraftProvider: FC<{ children: React.ReactNode }> = ({ children }
     if (isFetched) handleUpdateAircrafts()
   }, [handleUpdateAircrafts, isFetched])
 
-  return <Provider value={{ ...state, isLoading, setOwnedAircrafts, setAircrafts }}>{children}</Provider>
+  return (
+    <Provider value={{ ...state, isLoading, setOwnedAircrafts, setAircrafts, refetchAircrafts }}>{children}</Provider>
+  )
 }
