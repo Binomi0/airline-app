@@ -10,6 +10,7 @@ contract StakingAirline is Staking20Base {
 
   constructor(
     uint80 _timeUnit,
+    address _defaultAdmin,
     uint256 _rewardRatioNumerator,
     uint256 _rewardRatioDenominator,
     address _stakingToken,
@@ -18,6 +19,7 @@ contract StakingAirline is Staking20Base {
   )
     Staking20Base(
       _timeUnit,
+      _defaultAdmin,
       _rewardRatioNumerator,
       _rewardRatioDenominator,
       _stakingToken,
@@ -25,7 +27,7 @@ contract StakingAirline is Staking20Base {
       _nativeTokenWrapper
     )
   {
-      minRewardBlock = block.number;
+    minRewardBlock = block.number;
   }
 
   /**
@@ -51,13 +53,13 @@ contract StakingAirline is Staking20Base {
    *
    *  @param _amount    Amount to stake.
    */
-//   function stake(uint256 _amount) external  virtual payable override nonReentrant {
-//     require(block.number > minRewardBlock);
-//     require(_amount > 1e18);
+  //   function stake(uint256 _amount) external  virtual payable override nonReentrant {
+  //     require(block.number > minRewardBlock);
+  //     require(_amount > 1e18);
 
-//     minRewardBlock = block.number;
-//     _stake(_amount);
-//   }
+  //     minRewardBlock = block.number;
+  //     _stake(_amount);
+  //   }
 
   /**
    *  @notice    Withdraw staked ERC20 tokens.
@@ -66,13 +68,13 @@ contract StakingAirline is Staking20Base {
    *
    *  @param _amount    Amount to withdraw.
    */
-//   function withdraw(uint256 _amount) external virtual override nonReentrant {
-//     require(block.number > minRewardBlock);
-//     require(_amount > 1e18);
+  //   function withdraw(uint256 _amount) external virtual override nonReentrant {
+  //     require(block.number > minRewardBlock);
+  //     require(_amount > 1e18);
 
-//     minRewardBlock = block.number;
-//     _withdraw(_amount);
-//   }
+  //     minRewardBlock = block.number;
+  //     _withdraw(_amount);
+  //   }
 
   /**
    *  @notice    Claim accumulated rewards.
@@ -80,12 +82,12 @@ contract StakingAirline is Staking20Base {
    *  @dev       See {_claimRewards}. Override that to implement custom logic.
    *             See {_calculateRewards} for reward-calculation logic.
    */
-//   function claimRewards() external virtual override nonReentrant {
-//     require(block.number > minRewardBlock);
-//     require(rewardTokenBalance > 1e21);
+  //   function claimRewards() external virtual override nonReentrant {
+  //     require(block.number > minRewardBlock);
+  //     require(rewardTokenBalance > 1e21);
 
-//     _claimRewards();
-//   }
+  //     _claimRewards();
+  //   }
 
   /**
    *  @dev    Mint ERC20 rewards to the staker. Override for custom logic.

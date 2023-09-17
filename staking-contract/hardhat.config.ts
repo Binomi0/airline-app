@@ -1,16 +1,16 @@
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
+import { HardhatUserConfig } from 'hardhat/config'
+import '@nomicfoundation/hardhat-toolbox'
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.13",
+    version: '0.8.13',
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
-      },
-    },
-  },
-};
+        runs: 200
+      }
+    }
+  }
+}
 
-export default config;
+export default config
