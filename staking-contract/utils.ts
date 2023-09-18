@@ -3,12 +3,12 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { ethers } from 'hardhat'
 import { AircraftNFT, AirlineCoin, LicenseNFT } from './typechain-types'
 import { aircrafts, licenses } from './contants'
-import { hexlify } from 'ethers/lib/utils'
 
 export async function deployAirlineCoin(owner: string) {
   const AirlineCoin = await ethers.getContractFactory('AirlineCoin')
   const airlineCoin = await AirlineCoin.deploy(owner, 'Airline Coin', 'AIRL')
   await airlineCoin.deployed()
+
   return airlineCoin
 }
 
@@ -16,6 +16,7 @@ export async function deployLicenseNFT(owner: string) {
   const License = await ethers.getContractFactory('LicenseNFT')
   const license = await License.deploy(owner, 'License', 'AIRC', owner, 0, owner)
   await license.deployed()
+
   return license
 }
 
@@ -31,6 +32,7 @@ export async function deployAircraftNFT(owner: SignerWithAddress, licenseAddress
     licenseAddress
   )
   await aircraft.deployed()
+
   return aircraft
 }
 

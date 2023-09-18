@@ -7,13 +7,8 @@ contract AircraftNFT is ERC1155Drop {
   // Dirección del contrato ERC-1155
   address public erc1155LicenseAddress;
 
-  // When a user get a license unlock next one
-  // mapping(address => uint256) private allowedClaimers;
-
   // Admin required license
   mapping(uint256 => uint256) public requiredLicense;
-
-  event TokenId(uint256 tokenId);
 
   constructor(
     address _defaultAdmin,
