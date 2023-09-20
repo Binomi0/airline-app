@@ -84,7 +84,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming,
           ))}
         </CardContent>
 
-        {!owned && (
+        {!owned && smartAccountAddress && (
           <CardActions>
             <Button
               color={airl?.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'}

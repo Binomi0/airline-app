@@ -5,6 +5,7 @@ import { getNFTAttributes } from 'utils'
 import AircraftCardHeader from './Aircraft/CardHeader'
 import AircraftActions from './Aircraft/AircraftActions'
 import useAircraft from 'hooks/useAircraft'
+import useAuth from 'hooks/useAuth'
 
 const AircraftItem: React.FC<{
   nft: NFT
@@ -12,6 +13,7 @@ const AircraftItem: React.FC<{
   onClaim: () => void
   hasLicense?: boolean
 }> = ({ nft, isClaiming, onClaim, hasLicense }) => {
+  const {user} = useAuth()
   const { hasAircraft } = useAircraft(nft.metadata.id)
 
   return (
@@ -28,13 +30,13 @@ const AircraftItem: React.FC<{
           ))}
         </CardContent>
 
-        <AircraftActions
+        {user && <AircraftActions
           isClaiming={isClaiming}
           name={nft.metadata.name as string}
           hasAircraft={hasAircraft}
           hasLicense={hasLicense}
           onClaim={onClaim}
-        />
+        />}
       </Card>
     </Grid>
   )

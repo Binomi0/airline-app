@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useMemo, useReducer } from 'react'
+import React, { type FC, useCallback, useReducer } from 'react'
 import aircraftProviderReducer from './LicenseProvider.reducer'
 import { LicenseProviderContext } from './LicenseProvider.context'
 import { LicenseReducerState } from './LicenseProvider.types'
@@ -15,10 +15,9 @@ export const INITIAL_STATE: LicenseReducerState = {
 export const LicenseProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth()
   const { contract } = useContract(nftLicenseTokenAddress)
-  const { data: licenses = [], isLoading: loadingNFTs, isFetched } = useNFTs(contract)
+  const { data: licenses = [], isLoading, isFetched } = useNFTs(contract)
   const {
     data: ownedLicenses = [],
-    isLoading: loadingOwnNFTs,
     isFetched: isOwnedFetched,
     refetch: refetchLicenses
   } = useOwnedNFTs(contract, user?.address)
@@ -28,8 +27,6 @@ export const LicenseProvider: FC<{ children: React.ReactNode }> = ({ children })
     ownedLicenses
   })
   const { Provider } = LicenseProviderContext
-
-  const isLoading = useMemo(() => loadingNFTs || loadingOwnNFTs, [loadingNFTs, loadingOwnNFTs])
 
   const setOwnedLicenses = useCallback(
     (license: Readonly<NFT[]>) => dispatch({ type: 'SET_OWNED_LICENSE', payload: license }),
