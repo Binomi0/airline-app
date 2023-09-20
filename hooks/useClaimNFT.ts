@@ -90,6 +90,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           return
         }
 
+
         const allowance = await getAllowance(nftLicenseTokenAddress)
         if (allowance.isZero()) {
           await setAllowance(nftLicenseTokenAddress)
@@ -105,8 +106,8 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           activePhase.price,
           {
             proof: ['0x0000000000000000000000000000000000000000000000000000000000000000'],
-            quantityLimitPerWallet: 0,
-            pricePerToken: 0,
+            quantityLimitPerWallet: activePhase.maxClaimablePerWallet,
+            pricePerToken: activePhase.price,
             currency: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
           },
           '0x00'

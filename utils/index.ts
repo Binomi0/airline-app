@@ -2,6 +2,7 @@ import { NFT } from '@thirdweb-dev/sdk'
 import { Atc, AttributeType, Cargo, IvaoPilot } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 import axios from 'axios'
+import BigNumber from 'bignumber.js'
 
 // A unique identifier for your website
 const rpID = process.env.DOMAIN as string
@@ -175,4 +176,61 @@ export const validateEmail = (email?: string) => {
   if (!email) return false
   const expression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
   return expression.test(email)
+}
+
+export const getFuelForFlight = (distance: BigNumber, aircraftType: string, passengers: number = 2) => {
+  switch (aircraftType) {
+    case 'AN225': {
+      return distance.multipliedBy(9.99)
+    }
+    case 'A20N': {
+      return distance.multipliedBy(0.0225 * Math.min(passengers, 2))
+    }
+    case 'A21N': {
+      return distance.multipliedBy(2.8)
+    }
+    case 'A319': {
+      return distance.multipliedBy(2.45)
+    }
+    case 'A320': {
+      return distance.multipliedBy(3)
+    }
+    case 'A321': {
+      return distance.multipliedBy(2.225)
+    }
+    case 'A339': {
+      return distance.multipliedBy(2.21)
+    }
+    case 'B350': {
+      return distance.multipliedBy(0.67)
+    }
+    case 'B748': {
+      return distance.multipliedBy(4)
+    }
+    case 'B738': {
+      return distance.multipliedBy(2.5)
+    }
+    case 'B739': {
+      return distance.multipliedBy(2.45)
+    }
+    case 'B737': {
+      return distance.multipliedBy(2.75)
+    }
+    case 'B763': {
+      return distance.multipliedBy(4.8)
+    }
+    case 'B77W': {
+      return distance.multipliedBy(5.5)
+    }
+    case 'B788': {
+      return distance.multipliedBy(2.4)
+    }
+    case 'C172': {
+      return distance.multipliedBy(0.36)
+    }
+    case 'C700':
+      return distance.multipliedBy(5.43)
+    default:
+      return distance.multipliedBy(1.325)
+  }
 }

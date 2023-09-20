@@ -20,6 +20,7 @@ import { accountBackupSwal, askExportKeySwal, missingExportKeySwal, signedOutSwa
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { downloadFile } from 'utils'
+import Link from 'next/link'
 
 const RightSidebar: React.FC = () => {
   const { user } = useAuth()
@@ -102,10 +103,12 @@ const RightSidebar: React.FC = () => {
               </Stack>
             </ListItemButton>
             <ListItemButton>
+              <Link href='/flights'>
               <Stack direction='row' spacing={5}>
                 <LocalAirportIcon color='primary' />
                 <Typography>My Flights</Typography>
               </Stack>
+              </Link>
             </ListItemButton>
             <ListItemButton onClick={onSignOut}>
               <Stack direction='row' spacing={5}>

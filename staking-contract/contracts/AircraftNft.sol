@@ -42,7 +42,6 @@ contract AircraftNFT is ERC1155Drop {
     if (_tokenId >= nextTokenIdToLazyMint) {
       revert('Not enough minted tokens');
     }
-    require(_receiver != msg.sender, 'Can not send to itself');
     require(_allowlistProof.currency == _currency, 'Wrong currency');
     require(_allowlistProof.quantityLimitPerWallet == _quantity, 'Maximum exceeded');
     require(_allowlistProof.pricePerToken == _pricePerToken, 'Wrong price per token');

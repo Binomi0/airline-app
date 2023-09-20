@@ -1,5 +1,5 @@
 import { Box, Button, Grid, LinearProgress } from '@mui/material'
-import FlightDetails from 'components/FlightDetails'
+import Flights from 'routes/Ivao/components/Flights'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useVaProviderContext } from 'context/VaProvider'
 import React from 'react'
@@ -33,7 +33,7 @@ const IvaoView = () => {
         .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
         .slice(0, page + STEP)
         .map((pilot, index) => (
-          <FlightDetails
+          <Flights
             selected={pilot.callsign === selected}
             aircraft={ownedAircrafts[0]}
             session={pilot}

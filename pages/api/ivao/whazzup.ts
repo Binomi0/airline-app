@@ -9,6 +9,16 @@ import { Atc } from 'types'
 let nextCall: Moment
 let clients: { pilots: IVAOClients[]; atcs: IVAOClients[] }[]
 
+const logDiferentAircrafts = (clients: IVAOClients) => {
+  const result = clients.pilots.reduce((acc, curr) => {
+    const currentCode = curr.flightPlan.aircraft.icaoCode
+    const accCode = acc[currentCode]
+
+    return accCode ? {...acc, [currentCode]: acc[currentCode] + 1} : {...acc, [currentCode]: 1}
+  }, {} as Record<string, number>)
+  console.log({ result })
+}
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
     res.status(405).end()
@@ -22,6 +32,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       console.info('requesting IVAO data at %s', now.format('HH:mm:ss'))
 
       const response = await axios.get('https://api.ivao.aero/v2/tracker/whazzup')
+
+      logDiferentAircrafts(response.data.clients)
 
       if (response.data.clients.atcs) {
         const { atcs } = response.data.clients

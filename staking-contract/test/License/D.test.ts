@@ -24,12 +24,14 @@ describe('License D NFT', async function () {
     expect(await license.owner()).to.equal(owner.address)
   })
 
-  it('Should set new claim conditions', async () => {
+  it.only('Should set new claim conditions', async () => {
     const { license, airlineCoin } = await loadFixture(deployContracts)
     await setClaimConditionsLicense(license, 0, airlineCoin)
 
     const cc = await license.claimCondition(0)
+    console.log({cc})
     expect(cc.maxClaimableSupply).to.be.equal(BigNumber.from('100'))
+    expect(cc.pricePerToken.toNumber()).to.equal(0)
   })
 
   it('Any address should be able to claim license D', async () => {
