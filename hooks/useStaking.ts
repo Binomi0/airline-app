@@ -21,7 +21,7 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
 
         const { hash } = await paymasterSigner.sendUserOperation({ target, data })
 
-        await axios.post('/api/transaction/user', { operation: 'stake', amount: amount.toString(), hash })
+        await axios.post('/api/transaction/user', { operation: 'stake', amount, hash })
         await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
 
         setIsLoading(false)
@@ -41,7 +41,7 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
 
       const { hash } = await paymasterSigner.sendUserOperation({ target, data })
 
-      await axios.post('/api/transaction/user', { operation: 'claimRewards', amount: amount.toString(), hash })
+      await axios.post('/api/transaction/user', { operation: 'claimRewards', amount, hash })
       await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
 
       setIsLoading(false)

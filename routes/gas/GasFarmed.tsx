@@ -19,7 +19,7 @@ const GasFarmed = () => {
 
   const handleClaimRewards = useCallback(async () => {
     if (stakeInfo._rewards.gte(MIN_REWARDS_CLAIM)) {
-      await claimRewards(stakeInfo?._rewards)
+      await claimRewards(Number(stakeInfo?._rewards || 0).toString())
       Swal.fire({
         title: 'Claimed Rewards!',
         text: 'Gas already collected',
