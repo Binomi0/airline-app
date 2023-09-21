@@ -5,6 +5,6 @@ export const nativeTokenWrapperAddress = '0xA200a3D3D681eAfF7bed661047d9f0a65274
 // export const nftAircraftTokenAddress = '0x72ba96225Df9f55f107D921F88Cb721C627653A4'
 export const nftAircraftTokenAddress = '0x05CB78918E39858Dab834216DE4E29a5F399B8a8' // NEW
 // export const nftLicenseTokenAddress = '0x8d483c2Ec89CEe3058839D5DeDb92AfBAB6340a5'
-export const nftLicenseTokenAddress = '0xF441a9F903203Ebc1bB3424a976435f5c6D0CCFD' // NEW
+export const nftLicenseTokenAddress = '0x876E78DF3bA70e0895faD1461578b5d38aF3cfAc' // NEW
 export const factoryAddress = '0x152546eaCCe1Bd86F11Ffd6ccf607bb77fc26E4E'
 export const flightNftAddress = '0xF2219dA181DCE1636511D5f65F7B5a1B1c9C5103'
