@@ -4,8 +4,6 @@ pragma solidity ^0.8.13;
 import '@thirdweb-dev/contracts/base/ERC1155Drop.sol';
 
 contract LicenseNFT is ERC1155Drop {
-  mapping(address => uint256) private allowedClaimers;
-
   constructor(
     address _defaultAdmin,
     string memory _name,
@@ -24,22 +22,17 @@ contract LicenseNFT is ERC1155Drop {
     AllowlistProof calldata _allowlistProof,
     bytes memory _data
   ) internal view virtual override {
-    if (_tokenId >= nextTokenIdToLazyMint) {
-      revert('Not enough minted tokens');
-    }
     require(_allowlistProof.currency == _currency, 'Wrong currency');
     require(_allowlistProof.quantityLimitPerWallet == _quantity, 'Maximum exceeded');
     require(_allowlistProof.pricePerToken == _pricePerToken, 'Wrong price per token');
+    require(_data.length > 0, 'Input data is empty');
 
-    if (_tokenId == 0) {} else if (_tokenId == 1) {
-      uint256 balance = this.balanceOf(_receiver, 0);
-      require(balance > 0, 'Do not have required license 0');
-    } else if (_tokenId == 2) {
-      uint256 balance = this.balanceOf(_receiver, 1);
-      require(balance > 0, 'Do not have required license 1');
-    } else if (_tokenId == 3) {
-      uint256 balance = this.balanceOf(_receiver, 2);
-      require(balance > 0, 'Do not have required license 2');
+    if (_tokenId > 0) {
+      uint256 requiredTokenId = abi.decode(_data, (uint256));
+      require(requiredTokenId == _tokenId - 1, 'Invalid token Id');
+
+      uint256 balance = this.balanceOf(_receiver, requiredTokenId);
+      require(balance > 0, 'Do not have required license');
     }
   }
 
@@ -57,5 +50,6 @@ contract LicenseNFT is ERC1155Drop {
     require(_allowlistProof.currency == _currency, 'Wrong currency');
     require(_allowlistProof.quantityLimitPerWallet == _quantity, 'Maximum exceeded');
     require(_allowlistProof.pricePerToken == _pricePerToken, 'Wrong price per token');
+    require(_data.length > 0, 'Input data is empty');
   }
 }

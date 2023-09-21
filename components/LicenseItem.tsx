@@ -37,7 +37,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming,
         showConfirmButton: true
       })
       if (isConfirmed) {
-        await claimLicenseNFT({ to: smartAccountAddress, nft, quantity: 1 })
+        await claimLicenseNFT(nft)
         Swal.fire({
           title: name as string,
           text: 'Claimed License! New aircrafts unlocked with this license, enjoy!',

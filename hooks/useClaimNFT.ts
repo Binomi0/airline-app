@@ -6,17 +6,11 @@ import { NFT, SmartContract } from '@thirdweb-dev/sdk'
 import { Hex } from '@alchemy/aa-core'
 import useERC20 from './useERC20'
 
-interface ClaimNFTPayload {
-  to: Hex
-  quantity: number
-  nft: NFT
-}
-
 interface UseClaimNFT {
   // eslint-disable-next-line no-unused-vars
-  claimAircraftNFT: (payload: ClaimNFTPayload) => Promise<string | undefined>
+  claimAircraftNFT: (nft: NFT) => Promise<string | undefined>
   // eslint-disable-next-line no-unused-vars
-  claimLicenseNFT: (payload: ClaimNFTPayload) => Promise<string | undefined>
+  claimLicenseNFT: (nft: NFT) => Promise<string | undefined>
   isClaiming: boolean
 }
 
@@ -26,14 +20,18 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
   const { setAllowance, getAllowance } = useERC20(coinTokenAddress)
 
   const claimAircraftNFT = useCallback(
-    async ({ to, quantity, nft }: ClaimNFTPayload) => {
+    async (aircraftNFT: NFT) => {
       if (!paymasterSigner || !contract || !smartAccountAddress) {
         throw new Error('Missing params')
       }
       setIsClaiming(true)
 
       try {
-        const canClaim = await contract.erc1155.claimConditions.canClaim(nft.metadata.id, 1, smartAccountAddress)
+        const canClaim = await contract.erc1155.claimConditions.canClaim(
+          aircraftNFT.metadata.id,
+          1,
+          smartAccountAddress
+        )
         if (!canClaim) {
           setIsClaiming(false)
           throw new Error('user cannot claim this Aircraft')
@@ -44,21 +42,25 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           await setAllowance(nftAircraftTokenAddress)
         }
 
-        const activePhase = await contract.erc1155.claimConditions.getActive(nft.metadata.id, { withAllowList: true })
+        const activePhase = await contract.erc1155.claimConditions.getActive(aircraftNFT.metadata.id, {
+          withAllowList: true
+        })
         const erc1155Contract = new ethers.Contract(nftAircraftTokenAddress, contract.abi)
+        const nftId = Number(aircraftNFT.metadata.id)
+        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0 ? nftId - 1 : 0])
         const encodedCallData = erc1155Contract.interface.encodeFunctionData('claim', [
-          to,
-          nft.metadata.id,
-          quantity,
+          smartAccountAddress,
+          aircraftNFT.metadata.id,
+          1,
           activePhase.currencyAddress,
           activePhase.price,
           {
             proof: ['0x0000000000000000000000000000000000000000000000000000000000000000'],
-            quantityLimitPerWallet: 0,
-            pricePerToken: 0,
-            currency: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+            quantityLimitPerWallet: activePhase.maxClaimablePerWallet,
+            pricePerToken: activePhase.price,
+            currency: activePhase.currencyAddress
           },
-          '0x00'
+          ethers.utils.hexlify(encodedData)
         ])
 
         const { hash: claimHash } = await paymasterSigner.sendUserOperation({
@@ -79,7 +81,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
   )
 
   const claimLicenseNFT = useCallback(
-    async ({ to, quantity, nft }: ClaimNFTPayload) => {
+    async (nft: NFT) => {
       try {
         if (!paymasterSigner || !contract || !smartAccountAddress) return
         setIsClaiming(true)
@@ -90,7 +92,6 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           return
         }
 
-
         const allowance = await getAllowance(nftLicenseTokenAddress)
         if (allowance.isZero()) {
           await setAllowance(nftLicenseTokenAddress)
@@ -98,19 +99,20 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
 
         const activePhase = await contract.erc1155.claimConditions.getActive(nft.metadata.id, { withAllowList: true })
         const erc1155Contract = new ethers.Contract(nftLicenseTokenAddress, contract.abi)
+        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nft.metadata.id])
         const encodedCallData = erc1155Contract.interface.encodeFunctionData('claim', [
-          to,
+          smartAccountAddress,
           nft.metadata.id,
-          quantity,
+          1,
           coinTokenAddress,
           activePhase.price,
           {
             proof: ['0x0000000000000000000000000000000000000000000000000000000000000000'],
             quantityLimitPerWallet: activePhase.maxClaimablePerWallet,
             pricePerToken: activePhase.price,
-            currency: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+            currency: activePhase.currencyAddress
           },
-          '0x00'
+          ethers.utils.hexlify(encodedData)
         ])
 
         const { hash: claimHash } = await paymasterSigner.sendUserOperation({

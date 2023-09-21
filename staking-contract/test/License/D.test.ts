@@ -24,12 +24,11 @@ describe('License D NFT', async function () {
     expect(await license.owner()).to.equal(owner.address)
   })
 
-  it.only('Should set new claim conditions', async () => {
+  it('Should set new claim conditions', async () => {
     const { license, airlineCoin } = await loadFixture(deployContracts)
     await setClaimConditionsLicense(license, 0, airlineCoin)
 
     const cc = await license.claimCondition(0)
-    console.log({cc})
     expect(cc.maxClaimableSupply).to.be.equal(BigNumber.from('100'))
     expect(cc.pricePerToken.toNumber()).to.equal(0)
   })
@@ -38,7 +37,7 @@ describe('License D NFT', async function () {
     const { license, owner, otherAccount, airlineCoin } = await loadFixture(deployContracts)
     await lazyMintLicense('1', 0, owner, license)
     await setClaimConditionsLicense(license, 0, airlineCoin)
-    await mintLicense(license, otherAccount, 0, airlineCoin)
+    await mintLicense(license, otherAccount, 0, airlineCoin, 0)
 
     const balance = await license.balanceOf(otherAccount.address, 0)
     expect(balance).to.equal(1)
@@ -48,7 +47,7 @@ describe('License D NFT', async function () {
     const { license, owner, airlineCoin, thirdAccount } = await loadFixture(deployContracts)
     await lazyMintLicense('1', 0, owner, license)
     await setClaimConditionsLicense(license, 0, airlineCoin)
-    await mintLicense(license, thirdAccount, 0, airlineCoin)
+    await mintLicense(license, thirdAccount, 0, airlineCoin, 0)
 
     const balance = await license.balanceOf(thirdAccount.address, 0)
     expect(balance).to.equal(1)

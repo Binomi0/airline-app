@@ -11,6 +11,7 @@ const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E449764
 const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
 
 interface UseWallet {
+  // eslint-disable-next-line no-unused-vars
   initWallet: (id: string) => void
   isLoaded: boolean
 }

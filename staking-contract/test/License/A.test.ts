@@ -45,7 +45,7 @@ describe('License A NFT', async function () {
     expect(balance).to.equal(0)
 
     try {
-      await mintLicense(license, otherAccount, 3, airlineCoin)
+      await mintLicense(license, otherAccount, 3, airlineCoin, 2)
       expect(false).to.equal(true)
     } catch (error) {
       expect(true).to.equal(true)
@@ -56,25 +56,25 @@ describe('License A NFT', async function () {
     const { license, owner, otherAccount, airlineCoin } = await loadFixture(deployContracts)
     await lazyMintLicense('4', 0, owner, license)
     await setClaimConditionsLicense(license, 0, airlineCoin)
-    await mintLicense(license, otherAccount, 0, airlineCoin)
+    await mintLicense(license, otherAccount, 0, airlineCoin, 0)
 
     expect(await license.balanceOf(otherAccount.address, 0)).to.equal(1)
     expect(await license.balanceOf(otherAccount.address, 1)).to.equal(0)
 
     await setClaimConditionsLicense(license, 1, airlineCoin)
-    await mintLicense(license, otherAccount, 1, airlineCoin)
+    await mintLicense(license, otherAccount, 1, airlineCoin, 0)
 
     expect(await license.balanceOf(otherAccount.address, 1)).to.equal(1)
     expect(await license.balanceOf(otherAccount.address, 2)).to.equal(0)
 
     await setClaimConditionsLicense(license, 2, airlineCoin)
-    await mintLicense(license, otherAccount, 2, airlineCoin)
+    await mintLicense(license, otherAccount, 2, airlineCoin, 1)
 
     expect(await license.balanceOf(otherAccount.address, 2)).to.equal(1)
     expect(await license.balanceOf(otherAccount.address, 3)).to.equal(0)
 
     await setClaimConditionsLicense(license, 3, airlineCoin)
-    await mintLicense(license, otherAccount, 3, airlineCoin)
+    await mintLicense(license, otherAccount, 3, airlineCoin, 2)
 
     expect(await license.balanceOf(otherAccount.address, 3)).to.equal(1)
   })

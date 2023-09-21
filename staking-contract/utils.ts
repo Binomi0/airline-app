@@ -58,10 +58,11 @@ export async function mintLicense(
   otherAccount: SignerWithAddress,
   tokenId: number,
   airlineCoin: AirlineCoin,
+  requiredLicenseId: number,
   amount = 1
 ) {
   const cc = await license.claimCondition(tokenId)
-  const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [tokenId])
+  const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [requiredLicenseId])
 
   await license.claim(
     otherAccount.address,

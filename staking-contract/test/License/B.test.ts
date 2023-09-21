@@ -1,4 +1,4 @@
-import { time, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { BigNumber } from 'ethers'
@@ -45,7 +45,7 @@ describe('License B NFT', async function () {
     expect(balance).to.equal(0)
 
     try {
-      await mintLicense(license, otherAccount, 2, airlineCoin)
+      await mintLicense(license, otherAccount, 2, airlineCoin, 1)
       expect(false).to.equal(true)
     } catch (error) {
       expect(true).to.equal(true)
@@ -56,19 +56,19 @@ describe('License B NFT', async function () {
     const { license, owner, otherAccount, airlineCoin } = await loadFixture(deployContracts)
     await lazyMintLicense('3', 0, owner, license)
     await setClaimConditionsLicense(license, 0, airlineCoin)
-    await mintLicense(license, otherAccount, 0, airlineCoin)
+    await mintLicense(license, otherAccount, 0, airlineCoin, 0)
 
     expect(await license.balanceOf(otherAccount.address, 0)).to.equal(1)
     expect(await license.balanceOf(otherAccount.address, 1)).to.equal(0)
 
     await setClaimConditionsLicense(license, 1, airlineCoin)
-    await mintLicense(license, otherAccount, 1, airlineCoin)
+    await mintLicense(license, otherAccount, 1, airlineCoin, 0)
 
     expect(await license.balanceOf(otherAccount.address, 1)).to.equal(1)
     expect(await license.balanceOf(otherAccount.address, 2)).to.equal(0)
 
     await setClaimConditionsLicense(license, 2, airlineCoin)
-    await mintLicense(license, otherAccount, 2, airlineCoin)
+    await mintLicense(license, otherAccount, 2, airlineCoin, 1)
 
     expect(await license.balanceOf(otherAccount.address, 2)).to.equal(1)
   })

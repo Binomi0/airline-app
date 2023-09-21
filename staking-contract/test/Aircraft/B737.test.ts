@@ -65,13 +65,13 @@ describe('Aircraft Boeing 737', async function () {
 
     await lazyMintLicense('3', 0, owner, license)
     await setClaimConditionsLicense(license, 0, airlineCoin)
-    await mintLicense(license, otherAccount, 0, airlineCoin)
+    await mintLicense(license, otherAccount, 0, airlineCoin, 0)
     await lazyMintLicense('3', 1, owner, license)
     await setClaimConditionsLicense(license, 1, airlineCoin)
-    await mintLicense(license, otherAccount, 1, airlineCoin)
+    await mintLicense(license, otherAccount, 1, airlineCoin, 0)
     await lazyMintLicense('3', 2, owner, license)
     await setClaimConditionsLicense(license, 2, airlineCoin)
-    await mintLicense(license, otherAccount, 2, airlineCoin)
+    await mintLicense(license, otherAccount, 2, airlineCoin, 1)
 
     expect(await license.balanceOf(otherAccount.address, 0)).to.equal(1)
     expect(await license.balanceOf(otherAccount.address, 1)).to.equal(1)
