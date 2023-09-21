@@ -35,21 +35,4 @@ contract LicenseNFT is ERC1155Drop {
       require(balance > 0, 'Do not have required license');
     }
   }
-
-  function _afterClaim(
-    uint256 _tokenId,
-    address _receiver,
-    uint256 _quantity,
-    address _currency,
-    uint256 _pricePerToken,
-    AllowlistProof calldata _allowlistProof,
-    bytes memory _data
-  ) internal view virtual override {
-    require(_tokenId < nextTokenIdToLazyMint, 'Invalid token id');
-    require(_receiver != msg.sender, 'Can not send to itself');
-    require(_allowlistProof.currency == _currency, 'Wrong currency');
-    require(_allowlistProof.quantityLimitPerWallet == _quantity, 'Maximum exceeded');
-    require(_allowlistProof.pricePerToken == _pricePerToken, 'Wrong price per token');
-    require(_data.length > 0, 'Input data is empty');
-  }
 }
