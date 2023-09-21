@@ -6,13 +6,15 @@ import { Hex, SimpleSmartAccountOwner, SimpleSmartContractAccount, SmartAccountP
 import { sepolia } from '@wagmi/chains'
 import axios from 'config/axios'
 import { useAuthProviderContext } from 'context/AuthProvider'
+import { User } from 'types'
+import { missingKeySwal } from 'lib/swal'
 
 const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
 
 interface UseWallet {
   // eslint-disable-next-line no-unused-vars
-  initWallet: (id: string) => void
+  initWallet: (user: User) => Promise<void>
   isLoaded: boolean
 }
 
@@ -23,7 +25,7 @@ const useWallet = (): UseWallet => {
 
   const initialize = useCallback(
     async (signer: Wallet) => {
-      if (!signer) return
+      if (!signer || !user) return
 
       const owner: SimpleSmartAccountOwner = {
         // @ts-ignore
@@ -60,16 +62,14 @@ const useWallet = (): UseWallet => {
       if (!user?.address) {
         const address = await smartSigner.account.getAddress()
 
-        if (user) {
-          const updateUser = axios.post('/api/user/update', { address })
-          const updateWallet = axios.post('/api/wallet', {
-            id: user.id,
-            smartAccountAddress: address,
-            signerAddress: signer.address
-          })
+        const updateUser = axios.post('/api/user/update', { address })
+        const updateWallet = axios.post('/api/wallet', {
+          id: user.id,
+          smartAccountAddress: address,
+          signerAddress: signer.address
+        })
 
-          await Promise.all([updateUser, updateWallet])
-        }
+        await Promise.all([updateUser, updateWallet])
         setSmartAccountAddress(address)
       } else {
         try {
@@ -96,17 +96,46 @@ const useWallet = (): UseWallet => {
   )
 
   const initWallet = useCallback(
-    (id: string) => {
-      const walletId = localStorage.getItem(id)
-      if (!walletId) {
-        const random = Wallet.createRandom()
-        localStorage.setItem(id, Buffer.from(random.privateKey).toString('base64'))
+    async (user: User) => {
+      if (!user || !user.id) throw new Error('Missing user while initializing wallet')
 
-        initialize(random)
-      } else {
-        const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
+      try {
+        if (!user.address) {
+          const random = Wallet.createRandom()
+          const base64Key = Buffer.from(random.privateKey).toString('base64')
 
-        initialize(signer)
+          localStorage.setItem(user.id, base64Key)
+          await initialize(random)
+          return
+        }
+
+        const walletId = localStorage.getItem(user.id)
+
+        if (walletId) {
+          const signer = new Wallet(Buffer.from(walletId, 'base64').toString().slice(0, 66))
+          await initialize(signer)
+          return
+        } else {
+          const { value: file } = await missingKeySwal()
+          if (!file) throw new Error('Missing file')
+
+          const reader = new FileReader()
+          reader.onload = async (e) => {
+            if (!e.target?.result) {
+              throw new Error('Missing content file')
+            }
+
+            const base64Key = (e.target.result as string).split('base64,')[1]
+            localStorage.setItem(user.id as string, base64Key)
+
+            const key = Buffer.from(base64Key, 'base64').toString()
+            initialize(new Wallet(key.slice(0, 66)))
+            return
+          }
+          reader.readAsDataURL(file)
+        }
+      } catch (err) {
+        console.error(err)
       }
     },
     [initialize]

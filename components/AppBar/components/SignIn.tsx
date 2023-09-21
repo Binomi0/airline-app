@@ -12,14 +12,11 @@ interface Props {
 }
 
 const SignIn = ({ onInteraction }: Props) => {
-  const { loadAccount, status } = useAccountSigner()
+  const { onSignIn, status } = useAccountSigner()
   const [requestEmail, setRequestEmail] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
 
-  const handleSignIn = React.useCallback(
-    async (email: string) => validateEmail(email) && loadAccount(email),
-    [loadAccount]
-  )
+  const handleSignIn = React.useCallback(async (email: string) => validateEmail(email) && onSignIn(email), [onSignIn])
 
   const handleAccess = React.useCallback(
     async (value: string) => {
@@ -29,7 +26,7 @@ const SignIn = ({ onInteraction }: Props) => {
         if (auth.success) {
           await handleSignIn(value)
         }
-        setRequestEmail(false)
+
         onInteraction()
         setLoading(false)
       } catch (error) {

@@ -13,8 +13,8 @@ const CustomWeb3Provider = ({ children }: Props) => {
   const { initWallet, isLoaded } = useWallet()
 
   React.useEffect(() => {
-    if (user?.id && !isLoaded) initWallet(user.id)
-  }, [initWallet, isLoaded, user?.id])
+    if (user && !isLoaded) initWallet(user)
+  }, [initWallet, isLoaded, user])
 
   return (
     <ThirdwebProvider
