@@ -9,36 +9,23 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useClaimNFT from 'hooks/useClaimNFT'
 import Swal from 'sweetalert2'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
-
-const mapLicenseFromAircraft = (license: string) => {
-  switch (license) {
-    case 'A':
-      return '3'
-    case 'B':
-      return '2'
-    case 'C':
-      return '1'
-    case 'D':
-      return '0'
-    default:
-      return ''
-  }
-}
+import { useTokenProviderContext } from 'context/TokenProvider'
 
 const AircraftMarketPlace: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
+  const { getAirlBalance } = useTokenProviderContext()
   const licenses = useLicense(smartAccountAddress)
-  const { aircrafts, isLoading, refetchAircrafts } = useAircraftProviderContext()
+  const { aircrafts, isLoading } = useAircraftProviderContext()
   const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
   const { claimAircraftNFT, isClaiming } = useClaimNFT(aircraftContract)
   const hasLicense = useCallback(
-    (aircraft: NFT) =>
-      licenses.current.get(mapLicenseFromAircraft(getLicenseIdFromAttributes(getNFTAttributes(aircraft)))),
+    (aircraft: NFT) => licenses.current.get(getLicenseIdFromAttributes(getNFTAttributes(aircraft))),
     [licenses]
   )
 
   const handleClaim = useCallback(
-    async (aircraftNFT: NFT) => {
+    (aircraftNFT: NFT) => async (refetch: () => void) => {
+      console.log('handleClaim')
       if (!smartAccountAddress) {
         throw new Error('Missing account address')
       }
@@ -56,13 +43,14 @@ const AircraftMarketPlace: React.FC = () => {
             text: 'Claimed Aircraft! Enjoy your flights!',
             icon: 'success'
           })
-          refetchAircrafts()
+          refetch()
+          getAirlBalance()
         } catch (err) {
           console.error(err)
         }
       }
     },
-    [claimAircraftNFT, refetchAircrafts, smartAccountAddress]
+    [claimAircraftNFT, getAirlBalance, smartAccountAddress]
   )
 
   if (isLoading) {
@@ -76,18 +64,15 @@ const AircraftMarketPlace: React.FC = () => {
     <Box my={4}>
       <Fade in unmountOnExit>
         <Grid container spacing={6}>
-          {aircrafts.map(
-            (aircraft, i) =>
-              i > 0 && (
-                <AircraftItem
-                  nft={aircraft}
-                  key={aircraft.metadata.id}
-                  onClaim={() => handleClaim(aircraft)}
-                  isClaiming={isClaiming}
-                  hasLicense={hasLicense(aircraft)}
-                />
-              )
-          )}
+          {aircrafts.map((aircraft) => (
+            <AircraftItem
+              nft={aircraft}
+              key={aircraft.metadata.id}
+              onClaim={handleClaim(aircraft)}
+              isClaiming={isClaiming}
+              hasLicense={hasLicense(aircraft)}
+            />
+          ))}
         </Grid>
       </Fade>
     </Box>

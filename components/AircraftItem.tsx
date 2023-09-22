@@ -1,6 +1,6 @@
 import { Grid, Card, CardContent, Stack, Typography } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { getNFTAttributes } from 'utils'
 import AircraftCardHeader from './Aircraft/CardHeader'
 import AircraftActions from './Aircraft/AircraftActions'
@@ -10,11 +10,16 @@ import useAuth from 'hooks/useAuth'
 const AircraftItem: React.FC<{
   nft: NFT
   isClaiming: boolean
-  onClaim: () => void
+  // eslint-disable-next-line no-unused-vars
+  onClaim: (refetch: () => void) => void
   hasLicense?: boolean
 }> = ({ nft, isClaiming, onClaim, hasLicense }) => {
   const {user} = useAuth()
-  const { hasAircraft } = useAircraft(nft.metadata.id)
+  const { hasAircraft, refetch } = useAircraft(nft.metadata.id)
+
+  const handleClaim = useCallback(() => {
+    onClaim(refetch)
+  }, [onClaim, refetch])
 
   return (
     <Grid item xs={12} lg={6}>
@@ -35,7 +40,7 @@ const AircraftItem: React.FC<{
           name={nft.metadata.name as string}
           hasAircraft={hasAircraft}
           hasLicense={hasLicense}
-          onClaim={onClaim}
+          onClaim={handleClaim}
         />}
       </Card>
     </Grid>

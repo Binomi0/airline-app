@@ -4,7 +4,6 @@ pragma solidity ^0.8.13;
 import '@thirdweb-dev/contracts/base/ERC1155Drop.sol';
 
 contract AircraftNFT is ERC1155Drop {
-  // Dirección del contrato ERC-1155
   address public erc1155LicenseAddress;
 
   // Admin required license
@@ -42,6 +41,7 @@ contract AircraftNFT is ERC1155Drop {
     if (_tokenId >= nextTokenIdToLazyMint) {
       revert('Not enough minted tokens');
     }
+    require(_data.length > 0, 'Input data is empty');
     require(_allowlistProof.currency == _currency, 'Wrong currency');
     require(_allowlistProof.quantityLimitPerWallet == _quantity, 'Maximum exceeded');
     require(_allowlistProof.pricePerToken == _pricePerToken, 'Wrong price per token');
@@ -49,40 +49,5 @@ contract AircraftNFT is ERC1155Drop {
     ERC1155Drop erc1155Contract = ERC1155Drop(erc1155LicenseAddress);
     uint256 balance = erc1155Contract.balanceOf(_receiver, requiredLicense[_tokenId]);
     require(balance > 0, 'Do not have required license');
-
-    // Decoding the uint256 (first 32 bytes)
-    uint256 intValue;
-    assembly {
-      intValue := mload(add(_data, 0x20))
-    }
-
-    require(intValue == requiredLicense[_tokenId], 'Not allowed to claim...');
-  }
-
-  function _afterClaim(
-    uint256 _tokenId,
-    address _receiver,
-    uint256 _quantity,
-    address _currency,
-    uint256 _pricePerToken,
-    AllowlistProof calldata _allowlistProof,
-    bytes memory _data
-  ) internal view virtual override {
-    if (_tokenId >= nextTokenIdToLazyMint) {
-      revert('Not enough minted tokens');
-    }
-
-    require(_receiver != msg.sender, 'Can not send to itself');
-    require(_allowlistProof.currency == _currency, 'Wrong currency');
-    require(_allowlistProof.quantityLimitPerWallet == _quantity, 'm exceeded');
-    require(_allowlistProof.pricePerToken == _pricePerToken, 'Wrong price per token');
-
-    // Decoding the uint256 (first 32 bytes)
-    uint256 intValue;
-    assembly {
-      intValue := mload(add(_data, 0x20))
-    }
-
-    require(intValue == requiredLicense[_tokenId], 'Not allowed to claim...');
   }
 }
