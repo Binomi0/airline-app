@@ -4,7 +4,6 @@ import React, { useCallback } from 'react'
 import { getNFTAttributes } from 'utils'
 import LicenseItemHeader from './License/LicenseItemHeader'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import { Hex } from '@alchemy/aa-core'
 import Swal from 'sweetalert2'
 import { useTokenProviderContext } from 'context/TokenProvider'
 
@@ -13,7 +12,7 @@ interface Props {
   owned: boolean
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
-  claimLicenseNFT: ({ to, nft, quantity }: { to: Hex; nft: NFT; quantity: number }) => Promise<string | undefined>
+  claimLicenseNFT: (nft: NFT) => Promise<string | undefined>
   refetchLicenses: () => void
 }
 
