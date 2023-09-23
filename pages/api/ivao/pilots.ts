@@ -1,21 +1,21 @@
-import { mongoose } from 'lib/mongoose'
 import withAuth from 'lib/withAuth'
-import Atcs from 'models/Atc'
+import { connectDB, mongoose } from 'lib/mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Atc} from 'types'
+import { PilotModel } from 'models'
+import { Pilot } from 'models/Pilot'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
     res.status(405).end()
     return
   }
-  try {
-    const query = req.query.callsign ? { callsign: { $regex: req.query.callsign as string, $options: 'i' } } : {}
-    const atcs = await Atcs.find<Atc>(query)
 
-    res.status(200).send(atcs)
+  try {
+    await connectDB()
+    const pilots = await PilotModel.find<Pilot>({})
+
+    res.status(200).send(pilots)
   } catch (error) {
-    console.error('error =>', error)
     res.status(500).end()
   } finally {
     // await mongoose.disconnect()

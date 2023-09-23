@@ -30,7 +30,9 @@ const IVAOPage = ({ loading }: Props) => {
           >
             IVAO Active Flights
           </Typography>
+
           <IvaoView />
+
         </Box>
       </Container>
     </VaProvider>

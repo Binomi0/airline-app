@@ -71,7 +71,7 @@ const LiveView: FC = () => {
       <Fade in={!active && !pilot} unmountOnExit timeout={{ exit: 0 }}>
         <Stack mt={5} spacing={10} alignItems='center'>
           <Typography variant='h2'>Esperando conexión...</Typography>
-          <Button onClick={handleDisconnect}>abort flight</Button>
+          <Button color='warning' size='large' variant='contained' onClick={handleDisconnect}>cancel current flight</Button>
           <Box bgcolor='primary.light' px={5} borderRadius={10}>
             <Typography variant='h3'>{cargo?.callsign}</Typography>
           </Box>

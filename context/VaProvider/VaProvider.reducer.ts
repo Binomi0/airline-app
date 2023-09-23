@@ -12,11 +12,22 @@ const sortAtcs = (a: Atc, b: Atc) => {
 
 export const vaProviderReducer: VaReducerHandler = (state, action) => {
   switch (action.type) {
-    case 'SET_CLIENTS':
+    case 'SET_ATCS':
       return {
         ...state,
-        pilots: action.payload.pilots,
-        atcs: action.payload.atcs.sort(sortAtcs)
+        atcs: action.payload
+      }
+
+    case 'SET_TOWERS': {
+      return {
+        ...state,
+        towers: action.payload
+      }
+    }
+    case 'SET_PILOTS':
+      return {
+        ...state,
+        pilots: action.payload,
       }
     case 'SET_FLIGHTS':
       return {

@@ -1,19 +1,19 @@
-import { Box, Button, Grid, LinearProgress } from '@mui/material'
+import { Box, Button, Grid, LinearProgress, Typography } from '@mui/material'
 import Flights from 'routes/Ivao/components/Flights'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useVaProviderContext } from 'context/VaProvider'
-import React from 'react'
+import React, { memo } from 'react'
 import { IvaoPilot } from 'types'
 // import { filterLEOrigins } from 'utils'
 
-const STEP = 5
+const STEP = 12
 
 const IvaoView = () => {
   const { pilots } = useVaProviderContext()
-  const [current, setCurrent] = React.useState<IvaoPilot[]>([])
+  const [current, setCurrent] = React.useState<Readonly<IvaoPilot[]>>([])
   const [selected, setSelected] = React.useState('')
   const [page, setPage] = React.useState(0)
-  const { ownedAircrafts, isLoading } = useAircraftProviderContext()
+  const { ownedAircrafts } = useAircraftProviderContext()
 
   const handleSelect = React.useCallback(
     (callsign: string) => {
@@ -29,8 +29,10 @@ const IvaoView = () => {
     () =>
       current
         // .filter(filterLEOrigins)
-        .filter((pilot) => pilot.flightPlan.arrivalId !== pilot.flightPlan.departureId)
-        .filter((pilot) => pilot?.lastTrack?.state === 'Boarding')
+        .filter(
+          (pilot) =>
+            pilot.flightPlan.arrivalId !== pilot.flightPlan.departureId && pilot?.lastTrack?.state === 'Boarding'
+        )
         .slice(0, page + STEP)
         .map((pilot, index) => (
           <Flights
@@ -39,11 +41,11 @@ const IvaoView = () => {
             session={pilot}
             key={pilot.id}
             index={index}
-            onSelect={() => handleSelect(pilot.callsign)}
+            onSelect={() => setSelected(pilot.callsign)}
             onRemove={() => setSelected('')}
           />
         )),
-    [current, handleSelect, ownedAircrafts, page, selected]
+    [current, ownedAircrafts, page, selected]
   )
 
   React.useEffect(() => {
@@ -51,11 +53,11 @@ const IvaoView = () => {
     if (selected) handleSelect(selected)
   }, [handleSelect, pilots, selected])
 
-  if (!pilots.length || isLoading) {
+  if (!pilots.length) {
     return <LinearProgress />
   }
 
-  return (
+  return ownedAircrafts ? (
     <>
       <Grid container spacing={2}>
         {renderPilots}
@@ -66,7 +68,11 @@ const IvaoView = () => {
         </Button>
       </Box>
     </>
+  ) : (
+    <Box>
+      <Typography>You need an aircraft to select a flight</Typography>
+    </Box>
   )
 }
 
-export default IvaoView
+export default memo(IvaoView)
