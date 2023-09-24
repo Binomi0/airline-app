@@ -64,29 +64,8 @@ export const formatNumber = (value: number = 0, decimals: number = 2) =>
 export const getDistanceByCoords = async (atcs: Readonly<Atc[]>, cargo: Pick<Cargo, 'origin' | 'destination'>) => {
   if (!cargo.origin) return 0
 
-  let originTower = atcs.find((a) => a.callsign.startsWith(cargo.origin))
-  if (!originTower) {
-    try {
-      const response = await axios.get<Atc[]>(`/api/ivao/atcs?callsign=${cargo.origin}`)
-      if (!response.data.length) return 100
-      originTower = response.data[0]
-    } catch (err) {
-      console.error('ERROR GETTING ATC', err)
-      return 100
-    }
-  }
-
-  let arrivalTower = atcs.find((a) => a.callsign.startsWith(cargo.destination))
-  if (!arrivalTower) {
-    try {
-      const response = await axios.get<Atc[]>(`/api/ivao/atcs?callsign=${cargo.destination}`)
-      if (!response.data.length) return 100
-      arrivalTower = response.data[0]
-    } catch (err) {
-      console.error('ERROR GETTING ATC', err)
-      return 100
-    }
-  }
+  const originTower = atcs.find((a) => a.callsign && a.callsign.startsWith(cargo.origin))
+  const arrivalTower = atcs.find((a) => a.callsign && a.callsign.startsWith(cargo.destination))
 
   const originCoords = {
     latitude: originTower?.lastTrack?.latitude,
@@ -97,8 +76,8 @@ export const getDistanceByCoords = async (atcs: Readonly<Atc[]>, cargo: Pick<Car
     longitude: arrivalTower?.lastTrack?.longitude
   }
 
-  const horizontal = Math.pow(arrivalCoords.longitude - originCoords.longitude, 2)
-  const vertical = Math.pow(arrivalCoords.latitude - originCoords.latitude, 2)
+  const horizontal = Math.pow(Number(arrivalCoords.longitude) - Number(originCoords.longitude), 2)
+  const vertical = Math.pow(Number(arrivalCoords.latitude) - Number(originCoords.latitude), 2)
   const result = Math.sqrt(horizontal + vertical)
 
   return result * 100

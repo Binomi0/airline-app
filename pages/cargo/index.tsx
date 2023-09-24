@@ -7,17 +7,17 @@ import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import { VaProvider } from 'context/VaProvider'
 import Disconnected from 'components/Disconnected'
-import useLive from 'hooks/useLive'
 import { useRouter } from 'next/router'
 import useAuth from 'hooks/useAuth'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 
 const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
   const router = useRouter()
   const { user } = useAuth()
   const [aircraft, setAircraft] = useState<NFT>()
   const { ownedAircrafts, isLoading } = useAircraftProviderContext()
-  const { live } = useLive()
+  const { live } = useLiveFlightProviderContext()
 
   React.useEffect(() => {
     if (live) router.push('/live')

@@ -4,9 +4,10 @@ import CargoItem from './CargoItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
 import { FRoute } from 'types'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { getCallsign } from 'utils'
 
 const CargoList: React.FC<{
-  newCargo: (route: FRoute, aircraft: NFT) => void
+  newCargo: (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => void
   setSelected: Dispatch<SetStateAction<FRoute>>
   flights: [string, FRoute[]][]
   aircraft?: NFT
@@ -18,7 +19,7 @@ const CargoList: React.FC<{
       if (!aircraft) {
         throw new Error('Missing aircraft')
       }
-      newCargo({ origin, destination }, aircraft)
+      newCargo({ origin, destination }, aircraft, getCallsign(), false)
       setSelected({ origin, destination })
     },
     [newCargo, setSelected, aircraft]

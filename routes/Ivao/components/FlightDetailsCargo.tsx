@@ -10,21 +10,18 @@ const DIGITS = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
 
 interface Props {
   cargo: Cargo
-  session: IvaoPilot
+  pilot: IvaoPilot
   onSelectFlight: () => void
 }
 
-const FlightDetailsCargo = ({ cargo, session, onSelectFlight }: Props) => {
+const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
   const { airg } = useTokenProviderContext()
 
   const requiredGas = React.useMemo(() => {
-    const { arrivalDistance, departureDistance } = session.lastTrack
+    const { arrivalDistance, departureDistance } = pilot.lastTrack
 
-    return getFuelForFlight(
-      new BigNumber(arrivalDistance).plus(departureDistance),
-      session.flightPlan.aircraft.icaoCode
-    )
-  }, [session.flightPlan.aircraft.icaoCode, session.lastTrack])
+    return getFuelForFlight(new BigNumber(arrivalDistance).plus(departureDistance), pilot.flightPlan.aircraft.icaoCode)
+  }, [pilot.flightPlan.aircraft.icaoCode, pilot.lastTrack])
 
   const finalGas = React.useMemo(() => {
     if (!cargo) return 0

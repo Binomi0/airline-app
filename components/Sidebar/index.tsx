@@ -9,12 +9,12 @@ import LocalAirportIcon from '@mui/icons-material/LocalAirport'
 import { useMainProviderContext } from 'context/MainProvider'
 import SidebarItem from './SidebarItem'
 import { useRouter } from 'next/router'
-import useLive from 'hooks/useLive'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 
 const Sidebar: React.FC = () => {
   const router = useRouter()
   const { sidebarOpen: open, toggleSidebar } = useMainProviderContext()
-  const { live } = useLive()
+  const { live } = useLiveFlightProviderContext()
 
   const handleClick = useCallback(
     (route: string) => () => {
@@ -25,7 +25,11 @@ const Sidebar: React.FC = () => {
   )
 
   return (
-    <Drawer open={open} onClose={()=> toggleSidebar('left')} PaperProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.9)' } }}>
+    <Drawer
+      open={open}
+      onClose={() => toggleSidebar('left')}
+      PaperProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.9)' } }}
+    >
       <Box p={2} color='white'>
         <Typography color={'primary'} variant='h2'>
           AIRLINE

@@ -2,14 +2,13 @@ import { NFT } from '@thirdweb-dev/sdk'
 import axios from 'config/axios'
 import { useVaProviderContext } from 'context/VaProvider'
 import { cargos } from 'mocks/cargos'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { Cargo, CargoStatus, FRoute } from 'types'
-import { getCallsign, getCargoWeight, getDistanceByCoords, getRandomInt, getCargoPrize } from 'utils'
+import { getCargoWeight, getDistanceByCoords, getRandomInt, getCargoPrize } from 'utils'
 
 interface UseCargo {
   // eslint-disable-next-line no-unused-vars
-  newCargo: (route: FRoute, owned: NFT, callsign?: string) => Promise<void>
+  newCargo: (route: FRoute, owned: NFT, callsign: string, remote: boolean) => Promise<void>
   getCargo: () => Promise<void>
   cargo?: Cargo
   isLoading: boolean
@@ -17,7 +16,6 @@ interface UseCargo {
 }
 
 const useCargo = (): UseCargo => {
-  const router = useRouter()
   const { atcs } = useVaProviderContext()
   const [cargo, setCargo] = useState<Cargo>()
   const [isLoading, setIsLoading] = useState(false)
@@ -36,13 +34,14 @@ const useCargo = (): UseCargo => {
   }, [])
 
   const newCargo = useCallback(
-    async (route: FRoute, aircraft: NFT, callsign?: string) => {
-      if (!atcs) return
+    async (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => {
+      if (!atcs) {
+        throw new Error('Missing required ATCs')
+      }
       const distance = await getDistanceByCoords(atcs, route)
       const details = cargos[getRandomInt(8)]
       const weight = getCargoWeight(aircraft)
       // FIXME: get current callsign
-      const _callsign = callsign ?? getCallsign()
       const prize = getCargoPrize(distance, aircraft)
       const cargo: Cargo = {
         origin: route.origin,
@@ -52,10 +51,10 @@ const useCargo = (): UseCargo => {
         aircraft,
         aircraftId: aircraft.metadata.id,
         weight,
-        callsign: _callsign,
+        callsign,
         prize,
         status: CargoStatus.STARTED,
-        remote: !!router.query.pilot,
+        remote,
         isRewarded: false
       }
 
@@ -65,13 +64,14 @@ const useCargo = (): UseCargo => {
         console.error(error)
       }
     },
-    [atcs, router.query.pilot]
+    [atcs]
   )
 
   const getCompletedCount = useCallback(async () => {
     try {
       const { data } = await axios.get<{ count: number }>('/api/cargo/count')
       setCompleted(data.count)
+      console.log('Remaining =>', data)
     } catch (error) {
       console.error(error)
     }
@@ -80,10 +80,6 @@ const useCargo = (): UseCargo => {
   useEffect(() => {
     getCompletedCount()
   }, [getCompletedCount])
-
-  useEffect(() => {
-    getCargo()
-  }, [getCargo])
 
   return { newCargo, cargo, getCargo, isLoading, completed }
 }

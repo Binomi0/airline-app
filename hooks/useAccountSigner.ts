@@ -57,9 +57,8 @@ const useAccountSigner = () => {
     try {
       const { data } = await axios.get<{ user: User }>('/api/user/get')
 
-      signIn(data.user)
-
       await initWallet(data.user)
+      signIn(data.user)
       setStatus('success')
     } catch (err) {
       setStatus('error')

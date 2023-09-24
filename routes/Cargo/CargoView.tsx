@@ -22,17 +22,22 @@ const initialState: FRoute = {
 const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, aircraft }) => {
   const router = useRouter()
   const { smartAccountAddress: address } = useAlchemyProviderContext()
-  const { newCargo, cargo, completed } = useCargo()
+  const { newCargo, cargo, completed, getCargo } = useCargo()
   const { flights } = useVaProviderContext()
   const [selected, setSelected] = useState(initialState)
   const flightList = Object.entries(flights as Flight)
 
   React.useEffect(() => {
-    if (router.query.origin && router.query.destination && aircraft) {
-      setSelected({ origin: router.query.origin as string, destination: router.query.destination as string })
-      newCargo({ origin: router.query.origin as string, destination: router.query.destination as string }, aircraft)
+    const { origin, destination, callsign } = router.query
+    if (origin && destination && callsign && aircraft) {
+      setSelected({ origin: origin as string, destination: destination as string })
+      newCargo({ origin: origin as string, destination: destination as string }, aircraft, callsign as string, true)
     }
   }, [aircraft, newCargo, router.query])
+
+  React.useEffect(() => {
+    getCargo()
+  }, [getCargo])
 
   if (loading || !flights) {
     return <LinearProgress />

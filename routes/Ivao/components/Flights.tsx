@@ -1,8 +1,7 @@
 import { Grid, Card, useTheme } from '@mui/material'
 import React from 'react'
-import type { IvaoPilot } from 'types'
+import type { Cargo, FRoute, IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
-import useCargo from 'hooks/useCargo'
 import { NFT } from '@thirdweb-dev/react'
 import Swal from 'sweetalert2'
 import axios from 'config/axios'
@@ -13,20 +12,21 @@ import FlightDetails from './FlightDetails'
 interface Props {
   onRemove: () => void
   aircraft?: NFT
-  session: IvaoPilot
+  pilot: IvaoPilot
   onSelect: () => void
   index: number
   selected: boolean
+  cargo?: Cargo
+  newCargo: (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => Promise<void>
 }
 
-const Flights = ({ session, onSelect, onRemove, index, aircraft, selected }: Props) => {
+const Flights = ({ pilot, onSelect, onRemove, index, aircraft, selected, newCargo, cargo }: Props) => {
   const router = useRouter()
   const { palette } = useTheme()
-  const { cargo, newCargo } = useCargo()
 
   const handleSelectFlight = React.useCallback(async () => {
     const { isConfirmed } = await Swal.fire({
-      title: `Callsign ${session.callsign}`,
+      title: `Callsign ${pilot.callsign}`,
       text: 'Are you ready for this flight? Confirm to start.',
       icon: 'question',
       showCancelButton: true
@@ -36,16 +36,17 @@ const Flights = ({ session, onSelect, onRemove, index, aircraft, selected }: Pro
       await axios.post('/api/live/new', { cargo: data })
       router.push('/live')
     }
-  }, [cargo, router, session.callsign])
+  }, [pilot.callsign, cargo, router])
 
   const handleNewCargo = React.useCallback(async () => {
     if (!aircraft) return
     await newCargo(
-      { origin: session.flightPlan.departureId, destination: session.flightPlan.arrivalId },
+      { origin: pilot.flightPlan.departureId, destination: pilot.flightPlan.arrivalId },
       aircraft,
-      session.callsign
+      pilot.callsign,
+      true
     )
-  }, [aircraft, newCargo, session.callsign, session.flightPlan.arrivalId, session.flightPlan.departureId])
+  }, [aircraft, newCargo, pilot.callsign, pilot.flightPlan.arrivalId, pilot.flightPlan.departureId])
 
   const handleClickPilot = React.useCallback(async () => {
     await handleNewCargo()
@@ -57,7 +58,7 @@ const Flights = ({ session, onSelect, onRemove, index, aircraft, selected }: Pro
   }, [onRemove])
 
   return (
-    <Grid item xs={selected ? 12 : 6} key={session.id}>
+    <Grid item xs={selected ? 12 : 6} key={pilot.id}>
       <Card
         sx={{
           boxSizing: 'border-box',
@@ -67,14 +68,12 @@ const Flights = ({ session, onSelect, onRemove, index, aircraft, selected }: Pro
       >
         <FlightDetailsHeader
           selected={selected}
-          session={session}
+          pilot={pilot}
           onClickPilot={handleClickPilot}
           onUnSelectPilot={handleUnSelectPilot}
         />
-        <FlightDetails selected={selected} session={session} />
-        {selected && cargo && (
-          <FlightDetailsCargo cargo={cargo} session={session} onSelectFlight={handleSelectFlight} />
-        )}
+        <FlightDetails selected={selected} pilot={pilot} />
+        {selected && cargo && <FlightDetailsCargo cargo={cargo} pilot={pilot} onSelectFlight={handleSelectFlight} />}
       </Card>
     </Grid>
   )

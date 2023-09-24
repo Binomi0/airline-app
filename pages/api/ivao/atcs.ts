@@ -2,7 +2,7 @@ import { mongoose } from 'lib/mongoose'
 import withAuth from 'lib/withAuth'
 import Atcs from 'models/Atc'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Atc} from 'types'
+import { Atc } from 'types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {

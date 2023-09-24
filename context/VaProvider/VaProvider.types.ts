@@ -11,7 +11,6 @@ export type VaReducerState = {
 }
 
 export type VaContextProps = VaReducerState & {
-  setCurrentPilot: (pilot?: Readonly<IvaoPilot>) => void
   setFilter: (value: string) => void
 }
 
@@ -20,10 +19,6 @@ export type IVAOClients = VaReducerState
 type SetPilots = Readonly<{
   type: 'SET_PILOTS'
   payload: Readonly<IvaoPilot[]>
-}>
-type SetCurrentPilot = Readonly<{
-  type: 'SET_CURRENT_PILOT'
-  payload?: Readonly<IvaoPilot>
 }>
 type SetFlights = Readonly<{
   type: 'SET_FLIGHTS'
@@ -42,6 +37,6 @@ type SetTowers = Readonly<{
   payload: Readonly<Atc[]>
 }>
 
-type Actions = SetPilots | SetCurrentPilot | SetFlights | SetFilter | SetAtcs | SetTowers
+type Actions = SetPilots | SetFlights | SetFilter | SetAtcs | SetTowers
 
 export type VaReducerHandler = (state: VaReducerState, action: Actions) => VaReducerState

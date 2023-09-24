@@ -1,27 +1,21 @@
-import { useMemo, useEffect, useCallback, useState } from 'react'
-import type { FC } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { Fade, Box, Typography, Button, CircularProgress, Stack } from '@mui/material'
-import { useVaProviderContext } from 'context/VaProvider'
 import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import axios from 'config/axios'
 import { LastTrackState, LastTrackStateEnum } from 'types'
-import Disconnected from 'components/Disconnected'
 import MCDUView from './components/MCDUView'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
-import useLive from 'hooks/useLive'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 
-const LiveView: FC = () => {
+interface Props {}
+
+const LiveView = ({}: Props) => {
   const router = useRouter()
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { cargo, getCargo, isLoading } = useCargo()
-  const { pilots, setCurrentPilot, active } = useVaProviderContext()
+  const { setPilot, pilot } = useLiveFlightProviderContext()
   const [flightState, setFlightState] = useState<LastTrackState>(LastTrackStateEnum.Boarding)
-  const pilot = useMemo(() => pilots.find((pilot) => pilot.callsign === cargo?.callsign), [pilots, cargo])
-  // const pilot = pilots && pilots[0]
-  const { live } = useLive()
 
   const handleDisconnect = useCallback(async () => {
     const { isConfirmed } = await Swal.fire({
@@ -31,29 +25,19 @@ const LiveView: FC = () => {
       showCancelButton: true
     })
     if (isConfirmed) {
-      setCurrentPilot()
+      setPilot()
       await Promise.all([axios.delete('/api/live'), axios.delete('/api/cargo')])
       router.push('/')
     }
-  }, [router, setCurrentPilot])
+  }, [router, setPilot])
 
   const handleClaim = useCallback(() => {
     axios.post('/api/live/state', { state: LastTrackStateEnum.On_Blocks })
   }, [])
 
   useEffect(() => {
-    if (live === null) {
-      router.push('/')
-    }
-  }, [live, router])
-
-  useEffect(() => {
     getCargo()
   }, [getCargo])
-
-  useEffect(() => {
-    setCurrentPilot(pilot)
-  }, [pilot, setCurrentPilot])
 
   useEffect(() => {
     if (!pilot || pilot?.lastTrack.state === flightState) return
@@ -62,16 +46,14 @@ const LiveView: FC = () => {
     setFlightState(pilot.lastTrack.state as LastTrackState)
   }, [flightState, pilot])
 
-  if (!address) {
-    return <Disconnected />
-  }
-
   return (
     <>
-      <Fade in={!active && !pilot} unmountOnExit timeout={{ exit: 0 }}>
+      <Fade in={!pilot} unmountOnExit timeout={{ exit: 0 }}>
         <Stack mt={5} spacing={10} alignItems='center'>
           <Typography variant='h2'>Esperando conexión...</Typography>
-          <Button color='warning' size='large' variant='contained' onClick={handleDisconnect}>cancel current flight</Button>
+          <Button color='warning' size='large' variant='contained' onClick={handleDisconnect}>
+            cancel current flight
+          </Button>
           <Box bgcolor='primary.light' px={5} borderRadius={10}>
             <Typography variant='h3'>{cargo?.callsign}</Typography>
           </Box>
@@ -83,7 +65,7 @@ const LiveView: FC = () => {
           </Box>
         </Stack>
       </Fade>
-      <Fade in={!!active && !!pilot} unmountOnExit>
+      <Fade in={!!pilot} unmountOnExit>
         <Box mt={10}>
           {pilot?.lastTrack.state === 'On Blocks' && (
             <Box textAlign='center' my={2}>

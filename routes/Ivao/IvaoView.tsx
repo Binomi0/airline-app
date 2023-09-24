@@ -3,8 +3,9 @@ import Flights from 'routes/Ivao/components/Flights'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useVaProviderContext } from 'context/VaProvider'
 import React, { memo } from 'react'
-import { IvaoPilot } from 'types'
-// import { filterLEOrigins } from 'utils'
+import { IvaoPilot, LastTrackStateEnum } from 'types'
+import { filterLEOrigins } from 'utils'
+import useCargo from 'hooks/useCargo'
 
 const STEP = 12
 
@@ -14,6 +15,7 @@ const IvaoView = () => {
   const [selected, setSelected] = React.useState('')
   const [page, setPage] = React.useState(0)
   const { ownedAircrafts } = useAircraftProviderContext()
+  const { cargo, newCargo } = useCargo()
 
   const handleSelect = React.useCallback(
     (callsign: string) => {
@@ -25,32 +27,39 @@ const IvaoView = () => {
     },
     [pilots]
   )
+
   const renderPilots = React.useMemo(
     () =>
       current
-        // .filter(filterLEOrigins)
+        .filter(filterLEOrigins)
         .filter(
           (pilot) =>
-            pilot.flightPlan.arrivalId !== pilot.flightPlan.departureId && pilot?.lastTrack?.state === 'Boarding'
+            pilot.flightPlan.arrivalId !== pilot.flightPlan.departureId &&
+            pilot?.lastTrack?.state === LastTrackStateEnum.Boarding
         )
         .slice(0, page + STEP)
         .map((pilot, index) => (
           <Flights
+            cargo={cargo}
+            newCargo={newCargo}
             selected={pilot.callsign === selected}
             aircraft={ownedAircrafts[0]}
-            session={pilot}
+            pilot={pilot}
             key={pilot.id}
             index={index}
             onSelect={() => setSelected(pilot.callsign)}
             onRemove={() => setSelected('')}
           />
-        )),
-    [current, ownedAircrafts, page, selected]
+        ))
+        .reverse(),
+    [cargo, current, newCargo, ownedAircrafts, page, selected]
   )
 
   React.useEffect(() => {
     setCurrent(pilots)
-    if (selected) handleSelect(selected)
+    if (selected) {
+      handleSelect(selected)
+    }
   }, [handleSelect, pilots, selected])
 
   if (!pilots.length) {

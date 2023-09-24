@@ -24,10 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return
   }
   try {
-    const query = req.query.callsign ? { callsign: { $regex: req.query.callsign as string, $options: 'i' } } : {}
-    const atcs = await Atcs.find<Atc>(query)
-
-    const towers = atcs.filter((a) => a.callsign.includes('TWR'))
+    const towers = await Atcs.find<Atc>({ callsign: { $regex: 'TWR', $options: 'i' } })
 
     const flights: Flight = towers.reduce((acc: Flight, curr: Atc) => {
       const others: Atc[] = towers.filter((t) => {

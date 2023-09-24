@@ -1,11 +1,13 @@
+import { AxiosError } from 'axios'
 import axios from 'config/axios'
 import { mongoose } from 'lib/mongoose'
 import withAuth from 'lib/withAuth'
 import { PilotModel, AtcModel } from 'models'
+import Live, { ILive } from 'models/Live'
 import { Pilot } from 'models/Pilot'
 import moment, { Moment } from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Atc, IvaoPilot } from 'types'
+import { Atc, IvaoPilot, LastTrackStateEnum } from 'types'
 
 let nextCall: Moment
 
@@ -96,11 +98,9 @@ async function processBatchAtcs(batch: Atc[]) {
 
   for (const atc of batch) {
     const updateOperation = {
-      updateOne: {
+      replaceOne: {
         filter: { callsign: atc.callsign },
-        update: {
-          $set: { lastTrack: atc.lastTrack, atcSession: atc.atcSession, atis: atc.atis, userId: atc.userId }
-        }
+        replacement: atc
       }
     }
 
@@ -110,37 +110,36 @@ async function processBatchAtcs(batch: Atc[]) {
   await AtcModel.bulkWrite(bulkOps)
 }
 
-async function processBatchPilots(batch: Pilot[]) {
+async function processBatchPilots(batch: Pilot[], lives: ILive[]) {
   const bulkOps = []
 
   for (const pilot of batch) {
     const updateOperation = {
-      updateOne: {
+      replaceOne: {
         filter: { userId: pilot.userId },
-        update: {
-          $set: { lastTrack: pilot.lastTrack, pilotSession: pilot.pilotSession }
-        }
+        replacement: pilot
       }
     }
 
     bulkOps.push(updateOperation)
   }
 
+  console.log('BULK OPS', bulkOps.length)
   await AtcModel.bulkWrite(bulkOps)
 }
 
 const getCreateAndUpdateAtcs = async (atcs: Atc[]): Promise<{ update: Atc[]; create: Atc[] }> => {
-  const update = await AtcModel.find<Atc>({ callsign: { $in: atcs.map((atc) => atc.callsign) } })
-  const create = atcs.filter((atc) => !update.some((a) => a.callsign === atc.callsign))
+  const current = await AtcModel.find<Atc>({ callsign: { $in: atcs.map((atc) => atc.callsign) } })
+  const create = atcs.filter((atc) => !current.some((a) => a.callsign === atc.callsign))
+  const update = atcs.filter((atc) => current.some((a) => a.callsign === atc.callsign))
 
-  console.log({update: update.length})
-  console.log({create: create.length})
   return { update, create }
 }
 
 const getCreateAndUpdatePilots = async (pilots: Pilot[]): Promise<{ update: Pilot[]; create: Pilot[] }> => {
-  const update = await PilotModel.find<Pilot>({ userId: { $in: pilots.map((pilot) => pilot.userId) } })
-  const create = pilots.filter((pilot) => !update.some((a) => a.userId === pilot.userId))
+  const current = await PilotModel.find<Pilot>({ userId: { $in: pilots.map((pilot) => pilot.userId) } })
+  const create = pilots.filter((pilot) => !current.some((a) => a.userId === pilot.userId))
+  const update = pilots.filter((pilot) => current.some((a) => a.userId === pilot.userId))
 
   return { update, create }
 }
@@ -208,24 +207,41 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }
         }
 
+        const lives = await Live.find({})
+
         if (update.length) {
           const totalItems = update.length
           for (let i = 0; i < totalItems; i += batchSize) {
             const batch = update.slice(i, i + batchSize)
             try {
-              await processBatchPilots(batch)
+              await processBatchPilots(batch, lives)
             } catch (err) {
               res.status(500).send(err)
               break
             }
           }
         }
+
+        const oneHourAgo = new Date()
+        oneHourAgo.setUTCHours(oneHourAgo.getUTCHours() - 4)
+        const toKeep = new Set()
+        lives.forEach((l) => toKeep.add(l.callsign))
+        update.forEach((a) => toKeep.add(a.callsign))
+        create.forEach((a) => toKeep.add(a.callsign))
+
+        const deleteItem = await PilotModel.find({ callsign: { $nin: Array.from(toKeep) } })
+
+        console.log('PILOTS TO DELETE', deleteItem.length)
+
+        if (deleteItem.length) {
+          await PilotModel.deleteMany({ callsign: { $nin: Array.from(toKeep) } })
+        }
       }
 
       res.status(200).end()
     } catch (err) {
-      // console.error(err)
-      res.status(500).send([])
+      console.error((err as AxiosError).message)
+      res.status(500).send((err as AxiosError).message)
     } finally {
       // await mongoose.disconnect()
       return

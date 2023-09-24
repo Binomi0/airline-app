@@ -19,6 +19,8 @@ import RightSidebar from 'components/Sidebar/Right'
 import { AircraftProvider } from 'context/AircraftProvider/AircraftProvider.provider'
 import { LicenseProvider } from 'context/LicenseProvider/LicenseProvider.provider'
 import { TokenProvider } from 'context/TokenProvider'
+import { VaProvider } from 'context/VaProvider'
+import { LiveFlightsProvider } from 'context/LiveFlightProvider'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -57,12 +59,16 @@ export default function MyApp(props: MyAppProps) {
                 <AircraftProvider>
                   <LicenseProvider>
                     <TokenProvider>
-                      <MainProvider>
-                        <AppBar />
-                        <Sidebar />
-                        <RightSidebar />
-                      </MainProvider>
-                      <Component loading={loading} {...props.pageProps} />
+                      <VaProvider>
+                        <LiveFlightsProvider>
+                          <MainProvider>
+                            <AppBar />
+                            <Sidebar />
+                            <RightSidebar />
+                          </MainProvider>
+                          <Component loading={loading} {...props.pageProps} />
+                        </LiveFlightsProvider>
+                      </VaProvider>
                     </TokenProvider>
                   </LicenseProvider>
                 </AircraftProvider>

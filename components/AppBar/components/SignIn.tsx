@@ -16,7 +16,10 @@ const SignIn = ({ onInteraction }: Props) => {
   const [requestEmail, setRequestEmail] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
 
-  const handleSignIn = React.useCallback(async (email: string) => validateEmail(email) && onSignIn(email), [onSignIn])
+  const handleSignIn = React.useCallback(
+    async (email: string) => validateEmail(email) && (await onSignIn(email)),
+    [onSignIn]
+  )
 
   const handleAccess = React.useCallback(
     async (value: string) => {
@@ -25,6 +28,8 @@ const SignIn = ({ onInteraction }: Props) => {
         const { data: auth } = await axios.post('/api/webauthn/check', { email: value })
         if (auth.success) {
           await handleSignIn(value)
+        } else {
+          console.log('Crendential not set, maybe ask for passkey process')
         }
 
         onInteraction()

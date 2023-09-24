@@ -15,8 +15,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const pilots = await PilotModel.find<Pilot>({})
 
     res.status(200).send(pilots)
-  } catch (error) {
-    res.status(500).end()
+  } catch (err) {
+    res.status(500).send(err)
   } finally {
     // await mongoose.disconnect()
   }

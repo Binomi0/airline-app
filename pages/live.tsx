@@ -1,12 +1,11 @@
 import React from 'react'
 import { Container, LinearProgress } from '@mui/material'
-import { VaProvider } from 'context/VaProvider'
 import LiveView from 'routes/Live/LiveView'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
-import useLive from 'hooks/useLive'
 import useAuth from 'hooks/useAuth'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 
 interface Props {
   loading: boolean
@@ -15,7 +14,7 @@ interface Props {
 const LivePage = ({ loading }: Props) => {
   const router = useRouter()
   const { user } = useAuth()
-  const { live } = useLive()
+  const { live } = useLiveFlightProviderContext()
 
   React.useEffect(() => {
     if (live === null) {
@@ -27,17 +26,15 @@ const LivePage = ({ loading }: Props) => {
     return <LinearProgress />
   }
 
-  if (!user) {
+  if (!user || live === null) {
     return <Disconnected />
   }
 
-  return (
-    <VaProvider>
-      <Container>
-        <LiveView />
-      </Container>
-    </VaProvider>
-  )
+  return live ? (
+    <Container>
+      <LiveView />
+    </Container>
+  ) : null
 }
 
 export const getServerSideProps = serverSidePropsHandler

@@ -18,13 +18,9 @@ export const INITIAL_STATE: IVAOClients = {
 }
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const {user} = useAuth()
+  const { user } = useAuth()
   const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE })
   const { Provider } = VaProviderContext
-
-  // const setClients = useCallback((clients: Readonly<IVAOClients>) => {
-  //   dispatch({ type: 'SET_CLIENTS', payload: clients })
-  // }, [])
 
   const setPilots = useCallback((pilots: IvaoPilot[]) => {
     dispatch({ type: 'SET_PILOTS', payload: pilots })
@@ -42,20 +38,14 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     dispatch({ type: 'SET_FLIGHTS', payload: flights })
   }, [])
 
-  const setCurrentPilot = useCallback(
-    (pilot?: Readonly<IvaoPilot>) => dispatch({ type: 'SET_CURRENT_PILOT', payload: pilot }),
-    []
-  )
-
   const setFilter = useCallback((value: string) => {
     dispatch({ type: 'SET_FILTER', payload: value })
   }, [])
 
   const getAtcs = useCallback(async () => {
-    const responseAtcs = await axios.get<{ atcs: Atc[]; flights: Flight }>('/api/ivao/atcs')
-    setAtcs(responseAtcs.data.atcs)
+    const responseAtcs = await axios.get<Atc[]>('/api/ivao/atcs')
 
-    dispatch({ type: 'SET_FLIGHTS', payload: responseAtcs.data.flights })
+    setAtcs(responseAtcs.data)
   }, [setAtcs])
 
   const getPilots = useCallback(async () => {
@@ -76,22 +66,32 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     setFlights(response.data)
   }, [setFlights])
 
-  const getIVAOData = useCallback(() => {
-    axios.get('/api/ivao/whazzup')
+  const getIVAOData = useCallback(async () => {
+    try {
+      await axios.get('/api/ivao/whazzup')
+    } catch (err) {
+      console.error(err)
+    }
   }, [])
 
   useEffect(() => {
+    if (!user) return
     const timer = setInterval(getIVAOData, 20000)
     return () => clearInterval(timer)
-  }, [getIVAOData])
+  }, [getIVAOData, user])
 
   useEffect(() => {
     if (!user) return
-    getPilots()
+    const timer = setInterval(getPilots, 10000)
+    return () => clearInterval(timer)
+  }, [getPilots, user])
+
+  useEffect(() => {
+    if (!user) return
     getAtcs()
     getTowers()
     getFlights()
-  }, [getPilots, getAtcs, getTowers, getFlights, user])
+  }, [getAtcs, getFlights, getTowers, user])
 
   return (
     <Provider
@@ -103,8 +103,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
         flights: state.flights,
         filter: state.filter,
         origins: state.origins,
-        setFilter,
-        setCurrentPilot
+        setFilter
       }}
     >
       {children}

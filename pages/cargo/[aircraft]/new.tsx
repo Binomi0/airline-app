@@ -9,8 +9,8 @@ import React from 'react'
 import CargoView from 'routes/Cargo/CargoView'
 import Disconnected from 'components/Disconnected'
 import useAuth from 'hooks/useAuth'
-import useLive from 'hooks/useLive'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 
 const CargoAircraft: NextPage<{ loading: boolean; NoAddress: React.ReactNode }> = ({ loading }) => {
   const router = useRouter()
@@ -18,7 +18,7 @@ const CargoAircraft: NextPage<{ loading: boolean; NoAddress: React.ReactNode }> 
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data, isLoading } = useNFT(contract, router.query.aircraft as string)
   const { ownedAircrafts: owned, isLoading: isLoadingOwn } = useAircraftProviderContext()
-  const { live } = useLive()
+  const { live } = useLiveFlightProviderContext()
 
   const hasAircraft = React.useMemo(() => {
     if (!owned || !data) return false

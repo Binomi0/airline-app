@@ -6,12 +6,12 @@ import { stateColors, stateIcons } from '../constants'
 
 interface Props {
   selected: boolean
-  session: IvaoPilot
+  pilot: IvaoPilot
   onClickPilot: () => void
   onUnSelectPilot: () => void
 }
 
-const FlightDetailsHeader = ({ selected, onClickPilot, onUnSelectPilot, session }: Props) => {
+const FlightDetailsHeader = ({ selected, onClickPilot, onUnSelectPilot, pilot }: Props) => {
   return (
     <CardHeader
       action={
@@ -21,9 +21,9 @@ const FlightDetailsHeader = ({ selected, onClickPilot, onUnSelectPilot, session 
             size='small'
             variant='contained'
             onClick={onClickPilot}
-            color={stateColors[session.lastTrack.state as LastTrackStateEnum]}
+            color={stateColors[pilot.lastTrack.state as LastTrackStateEnum]}
           >
-            {session.lastTrack.state}
+            {pilot.lastTrack.state}
           </Button>
           {selected && (
             <IconButton onClick={onUnSelectPilot}>
@@ -38,11 +38,11 @@ const FlightDetailsHeader = ({ selected, onClickPilot, onUnSelectPilot, session 
             backgroundColor: 'white'
           }}
         >
-          {session ? stateIcons[session.lastTrack.state as LastTrackStateEnum] : '?'}
+          {pilot ? stateIcons[pilot.lastTrack.state as LastTrackStateEnum] : '?'}
         </Avatar>
       }
-      title={`FLIGHT DETECTED (${session.flightPlan.aircraftId}) - [${session.callsign}]`}
-      subheader={`${session.flightPlan.departureId} - ${session.flightPlan.arrivalId} (${session.lastTrack.state})`}
+      title={`FLIGHT DETECTED (${pilot.flightPlan.aircraftId}) - [${pilot.callsign}]`}
+      subheader={`${pilot.flightPlan.departureId} - ${pilot.flightPlan.arrivalId} (${pilot.lastTrack.state})`}
     />
   )
 }
