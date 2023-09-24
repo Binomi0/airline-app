@@ -8,7 +8,7 @@ const atcSchema: mongoose.Schema = new mongoose.Schema<AtcSchema>(
     time: Number,
     id: Number,
     userId: Number,
-    callsign: String,
+    callsign: {type: String, unique: true, index: true},
     serverId: String,
     softwareTypeId: String,
     softwareVersion: String,

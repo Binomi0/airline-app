@@ -1,9 +1,8 @@
-import React, { type FC, useCallback, useReducer } from 'react'
-import aircraftProviderReducer from './LicenseProvider.reducer'
+import React, { type FC } from 'react'
 import { LicenseProviderContext } from './LicenseProvider.context'
 import { LicenseReducerState } from './LicenseProvider.types'
 import { nftLicenseTokenAddress } from 'contracts/address'
-import { NFT, useContract, useNFTs, useOwnedNFTs } from '@thirdweb-dev/react'
+import { useContract, useNFTs, useOwnedNFTs } from '@thirdweb-dev/react'
 import useAuth from 'hooks/useAuth'
 
 export const INITIAL_STATE: LicenseReducerState = {
@@ -15,42 +14,9 @@ export const INITIAL_STATE: LicenseReducerState = {
 export const LicenseProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth()
   const { contract } = useContract(nftLicenseTokenAddress)
-  const { data: licenses = [], isLoading, isFetched } = useNFTs(contract)
-  const {
-    data: ownedLicenses = [],
-    isFetched: isOwnedFetched,
-    refetch: refetchLicenses
-  } = useOwnedNFTs(contract, user?.address)
-  const [state, dispatch] = useReducer(aircraftProviderReducer, {
-    ...INITIAL_STATE,
-    licenses,
-    ownedLicenses
-  })
+  const { data: licenses = [], isLoading } = useNFTs(contract)
+  const { data: owned = [], refetch } = useOwnedNFTs(contract, user?.address)
   const { Provider } = LicenseProviderContext
 
-  const setOwnedLicenses = useCallback(
-    (license: Readonly<NFT[]>) => dispatch({ type: 'SET_OWNED_LICENSE', payload: license }),
-    []
-  )
-  const setLicenses = useCallback(
-    (licenses: Readonly<NFT[]>) => dispatch({ type: 'SET_LICENSES', payload: licenses }),
-    []
-  )
-  const handleUpdateOwnedLicenses = useCallback(async () => {
-    setOwnedLicenses(ownedLicenses)
-  }, [ownedLicenses, setOwnedLicenses])
-
-  const handleUpdateLicenses = useCallback(async () => {
-    setLicenses(licenses)
-  }, [licenses, setLicenses])
-
-  React.useEffect(() => {
-    if (isOwnedFetched) handleUpdateOwnedLicenses()
-  }, [handleUpdateOwnedLicenses, isOwnedFetched])
-
-  React.useEffect(() => {
-    if (isFetched) handleUpdateLicenses()
-  }, [handleUpdateLicenses, isFetched])
-
-  return <Provider value={{ ...state, isLoading, setOwnedLicenses, setLicenses, refetchLicenses }}>{children}</Provider>
+  return <Provider value={{ ownedLicenses: owned, licenses, isLoading, refetchLicenses: refetch }}>{children}</Provider>
 }

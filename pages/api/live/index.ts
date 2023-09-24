@@ -17,7 +17,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return
     } catch (error) {
       console.error('get Live ERROR =>', error)
-      res.status(500).end()
+      res.status(500).send(error)
       return
     }
   } else if (req.method === 'DELETE') {

@@ -37,6 +37,7 @@ const useCargo = (): UseCargo => {
 
   const newCargo = useCallback(
     async (route: FRoute, aircraft: NFT, callsign?: string) => {
+      if (!atcs) return
       const distance = await getDistanceByCoords(atcs, route)
       const details = cargos[getRandomInt(8)]
       const weight = getCargoWeight(aircraft)

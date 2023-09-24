@@ -4,8 +4,8 @@ import { useCallback, useState } from 'react'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { deleteCookie } from 'cookies-next'
-import { logInSwal, missingKeySwal, backupDoneSwal } from 'lib/swal'
-import { AccountSignerStatus, WebAuthnUri } from 'types'
+import { backupDoneSwal, loginSuccessSwal } from 'lib/swal'
+import { AccountSignerStatus, User, WebAuthnUri } from 'types'
 import useWallet from './useWallet'
 import { useAuthProviderContext } from 'context/AuthProvider'
 import { useRouter } from 'next/router'
@@ -53,51 +53,40 @@ const useAccountSigner = () => {
     }
   }, [])
 
-  const loadAccount = useCallback(
+  const loadAccount = useCallback(async () => {
+    try {
+      const { data } = await axios.get<{ user: User }>('/api/user/get')
+
+      signIn(data.user)
+
+      await initWallet(data.user)
+      setStatus('success')
+    } catch (err) {
+      setStatus('error')
+      throw new Error('While loading account')
+    }
+  }, [initWallet, signIn])
+
+  const handleSignIn = useCallback(
     async (email: string) => {
       setStatus('loading')
       try {
         const { verified } = await verifyCredential(email)
-        if (verified) {
-          const { data } = await axios.get('/api/user/get')
-          const walletId = localStorage.getItem(data.user.id)
-          if (walletId) {
-            initWallet(data.user.id)
-            signIn(data.user)
-            setStatus('success')
-            logInSwal()
-            return
-          } else {
-            const { value: file } = await missingKeySwal()
-            if (file) {
-              const reader = new FileReader()
-              reader.onload = async (e) => {
-                if (!e.target?.result) {
-                  throw new Error('Missing file')
-                }
-
-                initWallet(data.user.id)
-                signIn(data.user)
-                setStatus('success')
-                logInSwal()
-                return
-              }
-              reader.readAsDataURL(file)
-            } else {
-              throw new Error('Missing file')
-            }
-          }
-        } else {
-          // User cancelled challeng or timeout
+        if (!verified) {
+          // User cancelled challenge or timeout
           setStatus('error')
+          return
         }
+
+        await loadAccount()
+        loginSuccessSwal()
       } catch (err) {
         const error = err as Error
         console.error('err =>', error)
         setStatus(error.message === 'Missing wallet key' ? 'missingKey' : 'error')
       }
     },
-    [initWallet, signIn, verifyCredential]
+    [loadAccount, verifyCredential]
   )
 
   const handleSignUp = useCallback(
@@ -106,19 +95,14 @@ const useAccountSigner = () => {
       try {
         const { verified } = await createCredential(email)
         if (verified) {
-          const { data } = await axios.get('/api/user/get')
-          initWallet(data.user.id)
-          signIn(data.user)
-          setStatus('success')
-          return true
+          await loadAccount()
         }
-        return false
       } catch (err) {
         console.error('[handleSignUp] Error =>', err)
         setStatus('error')
       }
     },
-    [createCredential, initWallet, signIn]
+    [createCredential, loadAccount]
   )
 
   const handleSignOut = useCallback(() => {
@@ -168,6 +152,7 @@ const useAccountSigner = () => {
     addBackup,
     handleSignUp,
     loadAccount,
+    onSignIn: handleSignIn,
     handleSignOut,
     verifyCredential,
     status

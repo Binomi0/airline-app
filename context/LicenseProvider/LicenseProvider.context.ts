@@ -11,3 +11,5 @@ export const useLicenseProviderContext = (): LicenseContextProps => {
 
   return context
 }
+
+export const useLicenseProvider = () => useContext(LicenseProviderContext)

@@ -3,64 +3,43 @@ import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
 import axios from 'config/axios'
-import type { Atc, FRoute, Flight, IvaoPilot } from 'types'
+import type { Atc, Flight, IvaoPilot } from 'types'
+import useAuth from 'hooks/useAuth'
 
 export const INITIAL_STATE: IVAOClients = {
   pilots: [],
   atcs: [],
+  towers: [],
   active: undefined,
   flights: {},
   origins: [],
   // filter: [""],
-  filter: ['LE', 'GC']
+  filter: ['L', 'G']
 }
 
-const reduceOthers = (origin: string, others: Atc[]): FRoute[] =>
-  others.reduce((acc: FRoute[], curr: Atc) => {
-    if (acc.some((ac) => ac.destination === curr.callsign.split('_')[0])) {
-      return acc
-    }
-    return [
-      ...acc,
-      {
-        origin,
-        destination: curr.callsign.split('_')[0]
-      }
-    ]
-  }, [] as FRoute[])
-
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const {user} = useAuth()
   const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE })
   const { Provider } = VaProviderContext
 
-  const setFlights = useCallback(
-    (atcs: Readonly<Atc[]>) => {
-      const towers = atcs.filter(
-        (a) => a.callsign.includes('TWR') && state.filter.some((i) => a.callsign.startsWith(i))
-      )
+  // const setClients = useCallback((clients: Readonly<IVAOClients>) => {
+  //   dispatch({ type: 'SET_CLIENTS', payload: clients })
+  // }, [])
 
-      const flights: Flight = towers.reduce((acc: Flight, curr: Atc) => {
-        const others: Atc[] = towers.filter((t) => {
-          return t.id !== curr.id && t.callsign.split('_')[0] !== curr.callsign.split('_')[0]
-        })
+  const setPilots = useCallback((pilots: IvaoPilot[]) => {
+    dispatch({ type: 'SET_PILOTS', payload: pilots })
+  }, [])
 
-        const origin = curr.callsign.split('_')[0]
-        if (acc[origin]) {
-          return acc
-        }
-        return {
-          ...acc,
-          [origin]: reduceOthers(origin, others)
-        }
-      }, {})
+  const setAtcs = useCallback((atcs: Atc[]) => {
+    dispatch({ type: 'SET_ATCS', payload: atcs })
+  }, [])
 
-      dispatch({ type: 'SET_FLIGHTS', payload: flights })
-    },
-    [state.filter]
-  )
+  const setTowers = useCallback((towers: Readonly<Atc[]>) => {
+    dispatch({ type: 'SET_TOWERS', payload: towers })
+  }, [])
 
-  const setClients = useCallback((clients: Readonly<IVAOClients>) => {
-    dispatch({ type: 'SET_CLIENTS', payload: clients })
+  const setFlights = useCallback((flights: Readonly<Flight>) => {
+    dispatch({ type: 'SET_FLIGHTS', payload: flights })
   }, [])
 
   const setCurrentPilot = useCallback(
@@ -72,34 +51,60 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     dispatch({ type: 'SET_FILTER', payload: value })
   }, [])
 
-  const getClients = useCallback(async () => {
-    const response = await axios.get('/api/ivao/whazzup')
+  const getAtcs = useCallback(async () => {
+    const responseAtcs = await axios.get<{ atcs: Atc[]; flights: Flight }>('/api/ivao/atcs')
+    setAtcs(responseAtcs.data.atcs)
 
-    setClients(response.data as Readonly<IVAOClients>)
-    setFlights(response.data.atcs as Readonly<Atc[]>)
-  }, [setClients, setFlights])
+    dispatch({ type: 'SET_FLIGHTS', payload: responseAtcs.data.flights })
+  }, [setAtcs])
+
+  const getPilots = useCallback(async () => {
+    const response = await axios.get<IvaoPilot[]>('/api/ivao/pilots')
+
+    setPilots(response.data)
+  }, [setPilots])
+
+  const getTowers = useCallback(async () => {
+    const response = await axios.get<Atc[]>('/api/ivao/towers')
+
+    setTowers(response.data)
+  }, [setTowers])
+
+  const getFlights = useCallback(async () => {
+    const response = await axios.get<Flight>('/api/ivao/flights')
+
+    setFlights(response.data)
+  }, [setFlights])
+
+  const getIVAOData = useCallback(() => {
+    axios.get('/api/ivao/whazzup')
+  }, [])
 
   useEffect(() => {
-    const timer = setInterval(getClients, 20000)
+    const timer = setInterval(getIVAOData, 20000)
     return () => clearInterval(timer)
-  }, [getClients])
+  }, [getIVAOData])
 
   useEffect(() => {
-    getClients()
-  }, [getClients])
+    if (!user) return
+    getPilots()
+    getAtcs()
+    getTowers()
+    getFlights()
+  }, [getPilots, getAtcs, getTowers, getFlights, user])
+
   return (
     <Provider
       value={{
         pilots: state.pilots,
         atcs: state.atcs,
+        towers: state.towers,
         active: state.active,
         flights: state.flights,
         filter: state.filter,
         origins: state.origins,
-        setFlights,
         setFilter,
-        setCurrentPilot,
-        setClients
+        setCurrentPilot
       }}
     >
       {children}

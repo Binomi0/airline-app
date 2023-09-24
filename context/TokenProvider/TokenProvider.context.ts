@@ -11,3 +11,5 @@ export const useTokenProviderContext = (): TokenContextProps => {
 
   return context
 }
+
+export const useTokenProvider = () => useContext(TokenProviderContext)

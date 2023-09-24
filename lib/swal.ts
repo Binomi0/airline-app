@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2'
 
-export const logInSwal = async () =>
+export const loginSuccessSwal = async () =>
   Swal.fire({
     title: 'Connected!',
     text: 'You are now logged in',

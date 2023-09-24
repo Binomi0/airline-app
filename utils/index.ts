@@ -61,7 +61,7 @@ export const formatNumber = (value: number = 0, decimals: number = 2) =>
     maximumFractionDigits: decimals
   }).format(isNaN(value) ? 0 : value)
 
-export const getDistanceByCoords = async (atcs: Atc[], cargo: Pick<Cargo, 'origin' | 'destination'>) => {
+export const getDistanceByCoords = async (atcs: Readonly<Atc[]>, cargo: Pick<Cargo, 'origin' | 'destination'>) => {
   if (!cargo.origin) return 0
 
   let originTower = atcs.find((a) => a.callsign.startsWith(cargo.origin))

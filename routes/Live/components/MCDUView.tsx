@@ -6,9 +6,12 @@ import Image from 'next/image'
 import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/api'
 import { useVaProviderContext } from 'context/VaProvider'
 
-const getOriginCoords = (flightPlan: IvaoPilot['flightPlan'], atcs: Atc[]) => {
-  const atc = atcs.find((atc) => atc.callsign.startsWith(flightPlan.departureId))
+const getOriginCoords = (flightPlan: IvaoPilot['flightPlan'], atcs: Readonly<Atc[]>) => {
+  console.log('flightPlan.departureId =>', flightPlan.departureId)
+  const atc = atcs.find((atc) => atc.callsign.includes(flightPlan.departureId))
+  console.log({atc})
   if (!atc) {
+    console.error('Origin ATC not found', atc)
     return { lat: 0, lng: 0 }
   }
   const lat = atc.lastTrack.latitude
@@ -17,9 +20,12 @@ const getOriginCoords = (flightPlan: IvaoPilot['flightPlan'], atcs: Atc[]) => {
   return { lat, lng }
 }
 
-const getDestinationCoords = (flightPlan: IvaoPilot['flightPlan'], atcs: Atc[]) => {
-  const atc = atcs.find((atc) => atc.callsign.startsWith(flightPlan.arrivalId))
+const getDestinationCoords = (flightPlan: IvaoPilot['flightPlan'], atcs: Readonly<Atc[]>) => {
+  console.log('flightPlan.arrivalId =>', flightPlan.arrivalId)
+  const atc = atcs.find((atc) => atc.callsign.includes(flightPlan.arrivalId))
+  console.log({atc})
   if (!atc) {
+    console.error('Destination ATC not found', atc)
     return { lat: 0, lng: 0 }
   }
   const lat = atc.lastTrack.latitude
@@ -45,6 +51,8 @@ const MCDUView = ({ pilot, onDisconnect }: Props) => {
   })
   const [map, setMap] = React.useState<google.maps.Map | undefined>(undefined)
   const { atcs } = useVaProviderContext()
+  console.log(atcs.find(a => a.callsign.includes('LEAL')))
+  console.log(atcs.find(a => a.callsign.includes('LEBL')))
 
   const onLoad = React.useCallback(
     function callback(newMap: google.maps.Map) {
@@ -66,6 +74,8 @@ const MCDUView = ({ pilot, onDisconnect }: Props) => {
   }, [])
 
   if (!pilot) return <LinearProgress />
+
+  console.log({pilot})
 
   return (
     <Box>

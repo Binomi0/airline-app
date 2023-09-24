@@ -4,8 +4,7 @@ import React, { useCallback } from 'react'
 import { getNFTAttributes } from 'utils'
 import LicenseItemHeader from './License/LicenseItemHeader'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import { Hex } from '@alchemy/aa-core'
-import Swal from 'sweetalert2'
+import useLicense from 'hooks/useLicense'
 import { useTokenProviderContext } from 'context/TokenProvider'
 
 interface Props {
@@ -13,46 +12,20 @@ interface Props {
   owned: boolean
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
-  claimLicenseNFT: ({ to, nft, quantity }: { to: Hex; nft: NFT; quantity: number }) => Promise<string | undefined>
-  refetchLicenses: () => void
+  claimLicenseNFT: (refetch: () => void) => Promise<void>
 }
 
-const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming, refetchLicenses }) => {
+const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming }) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const { airl } = useTokenProviderContext()
-  const { name, description, image } = nft.metadata
+  const {airl} = useTokenProviderContext()
+  const { hasLicense, refetch } = useLicense(nft.metadata.id)
 
+  const { name, description, image } = nft.metadata
   const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
 
   const handleClaimLicense = useCallback(async () => {
-    if (!airl || !smartAccountAddress) return
-
-    const hasEnough = airl.isGreaterThanOrEqualTo(attribute?.value || 0)
-    if (hasEnough) {
-      const { isConfirmed } = await Swal.fire({
-        title: name as string,
-        text: `Do you want to get this license for ${attribute?.value} AIRL?`,
-        icon: 'question',
-        showCancelButton: true,
-        showConfirmButton: true
-      })
-      if (isConfirmed) {
-        await claimLicenseNFT(nft)
-        Swal.fire({
-          title: name as string,
-          text: 'Claimed License! New aircrafts unlocked with this license, enjoy!',
-          icon: 'success'
-        })
-        refetchLicenses()
-      }
-    } else {
-      Swal.fire({
-        title: 'Not enough tokens',
-        text: `You need at least ${attribute?.value} AIRL token to claim`,
-        icon: 'question'
-      })
-    }
-  }, [airl, smartAccountAddress, attribute?.value, claimLicenseNFT, nft, name, refetchLicenses])
+    claimLicenseNFT(refetch)
+  }, [claimLicenseNFT, refetch])
 
   const getNFTPrice = useCallback((nft: NFT) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
@@ -84,7 +57,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming,
           ))}
         </CardContent>
 
-        {!owned && smartAccountAddress && (
+        {smartAccountAddress && !hasLicense && (
           <CardActions>
             <Button
               color={airl?.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'}
