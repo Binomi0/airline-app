@@ -1,8 +1,6 @@
 import React, { useCallback } from 'react'
 import { Box, Grid, Fade, CircularProgress } from '@mui/material'
 import { NFT, useContract } from '@thirdweb-dev/react'
-import useLicense from 'hooks/useLicense'
-import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
 import AircraftItem from './AircraftItem'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
@@ -14,14 +12,9 @@ import { useTokenProviderContext } from 'context/TokenProvider'
 const AircraftMarketPlace: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const { getAirlBalance } = useTokenProviderContext()
-  const licenses = useLicense(smartAccountAddress)
   const { aircrafts, isLoading } = useAircraftProviderContext()
   const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
   const { claimAircraftNFT, isClaiming } = useClaimNFT(aircraftContract)
-  const hasLicense = useCallback(
-    (aircraft: NFT) => licenses.current.get(getLicenseIdFromAttributes(getNFTAttributes(aircraft))),
-    [licenses]
-  )
 
   const handleClaim = useCallback(
     (aircraftNFT: NFT) => async (refetch: () => void) => {
@@ -70,7 +63,6 @@ const AircraftMarketPlace: React.FC = () => {
               key={aircraft.metadata.id}
               onClaim={handleClaim(aircraft)}
               isClaiming={isClaiming}
-              hasLicense={hasLicense(aircraft)}
             />
           ))}
         </Grid>

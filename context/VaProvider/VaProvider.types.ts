@@ -11,7 +11,6 @@ export type VaReducerState = {
 }
 
 export type VaContextProps = VaReducerState & {
-  // setClients: (clients: Readonly<IVAOClients>) => void
   setCurrentPilot: (pilot?: Readonly<IvaoPilot>) => void
   setFilter: (value: string) => void
 }

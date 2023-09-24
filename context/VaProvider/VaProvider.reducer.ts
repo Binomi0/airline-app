@@ -1,14 +1,4 @@
-import { Atc } from 'types'
 import { VaReducerHandler } from './VaProvider.types'
-
-const sortAtcs = (a: Atc, b: Atc) => {
-  if (a.callsign > b.callsign) {
-    return 1
-  } else if (a.callsign < b.callsign) {
-    return -1
-  }
-  return 0
-}
 
 export const vaProviderReducer: VaReducerHandler = (state, action) => {
   switch (action.type) {
