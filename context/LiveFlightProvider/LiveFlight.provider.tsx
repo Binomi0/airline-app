@@ -11,7 +11,7 @@ export const INITIAL_STATE: LiveFlightReducerState = {
 }
 
 export const LiveFlightsProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { live } = useLive()
+  const { live, getLive } = useLive()
   const { pilots } = useVaProviderContext()
   const [state, dispatch] = useReducer(liveFlightProviderReducer, { ...INITIAL_STATE })
   const { Provider } = LiveFlightProviderContext
@@ -38,7 +38,8 @@ export const LiveFlightsProvider: FC<{ children: React.ReactNode }> = ({ childre
       value={{
         pilot: state.pilot,
         live,
-        setPilot
+        setPilot,
+        getLive
       }}
     >
       {children}

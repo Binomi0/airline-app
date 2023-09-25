@@ -12,15 +12,15 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useMainProviderContext } from 'context/MainProvider'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { useAuthProviderContext } from 'context/AuthProvider'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import LicenseBar from './components/LicenseBar'
 import GasBalanceBar from './components/GasBalanceBar'
 import AirBalanceBar from './components/AirBalanceBar'
 import useAccountSigner from 'hooks/useAccountSigner'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider/AlchemyProvider.context'
 import SignIn from './components/SignIn'
 import SignUp from './components/SignUp'
-import { useAuthProviderContext } from 'context/AuthProvider'
 import { AppBarSnack, UserActionStatus } from 'components/AppBar'
 
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')

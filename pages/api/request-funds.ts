@@ -30,7 +30,10 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
     // amount to fill to each connected smartAccountAddress
     const amount = 2
-
+    const balance = await sdk.wallet.balance(coinTokenAddress)
+    if (balance.value.lte(amount)) {
+      throw new Error('Missing funds in main account')
+    }
     sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
     await Wallet.create({
       id: req.body.id,

@@ -8,21 +8,23 @@ import axios from 'config/axios'
 import FlightDetailsHeader from './FlightDetailsHeader'
 import FlightDetailsCargo from './FlightDetailsCargo'
 import FlightDetails from './FlightDetails'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 
 interface Props {
   onRemove: () => void
   aircraft?: NFT
   pilot: IvaoPilot
   onSelect: () => void
-  index: number
   selected: boolean
   cargo?: Cargo
+  // eslint-disable-next-line no-unused-vars
   newCargo: (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => Promise<void>
 }
 
-const Flights = ({ pilot, onSelect, onRemove, index, aircraft, selected, newCargo, cargo }: Props) => {
+const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, cargo }: Props) => {
   const router = useRouter()
   const { palette } = useTheme()
+  const {setPilot, getLive} = useLiveFlightProviderContext()
 
   const handleSelectFlight = React.useCallback(async () => {
     const { isConfirmed } = await Swal.fire({
@@ -34,19 +36,18 @@ const Flights = ({ pilot, onSelect, onRemove, index, aircraft, selected, newCarg
     if (isConfirmed) {
       const { data } = await axios.post('/api/cargo/new', { ...cargo })
       await axios.post('/api/live/new', { cargo: data })
+      await getLive()
+      setPilot(pilot)
       router.push('/live')
     }
-  }, [pilot.callsign, cargo, router])
+  }, [pilot, cargo, getLive, setPilot, router])
 
   const handleNewCargo = React.useCallback(async () => {
     if (!aircraft) return
-    await newCargo(
-      { origin: pilot.flightPlan.departureId, destination: pilot.flightPlan.arrivalId },
-      aircraft,
-      pilot.callsign,
-      true
-    )
-  }, [aircraft, newCargo, pilot.callsign, pilot.flightPlan.arrivalId, pilot.flightPlan.departureId])
+    const { arrivalId: destination, departureId: origin } = pilot.flightPlan
+
+    await newCargo({ origin, destination }, aircraft, pilot.callsign, true)
+  }, [aircraft, newCargo, pilot.callsign, pilot.flightPlan])
 
   const handleClickPilot = React.useCallback(async () => {
     await handleNewCargo()
@@ -62,8 +63,8 @@ const Flights = ({ pilot, onSelect, onRemove, index, aircraft, selected, newCarg
       <Card
         sx={{
           boxSizing: 'border-box',
-          backgroundColor: index === 0 && selected ? palette.secondary.light : palette.common.white,
-          boxShadow: index === 0 && selected ? `0 0 50px ${palette.primary.dark}` : 'none'
+          backgroundColor: selected ? palette.secondary.light : palette.common.white,
+          boxShadow: selected ? `0 0 50px ${palette.primary.dark}` : 'none'
         }}
       >
         <FlightDetailsHeader

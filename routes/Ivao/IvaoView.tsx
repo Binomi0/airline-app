@@ -42,16 +42,14 @@ const IvaoView = () => {
           <Flights
             cargo={cargo}
             newCargo={newCargo}
-            selected={pilot.callsign === selected}
+            selected={pilot.callsign === selected && index === 0}
             aircraft={ownedAircrafts[0]}
             pilot={pilot}
             key={pilot.id}
-            index={index}
             onSelect={() => setSelected(pilot.callsign)}
             onRemove={() => setSelected('')}
           />
-        ))
-        .reverse(),
+        )),
     [cargo, current, newCargo, ownedAircrafts, page, selected]
   )
 

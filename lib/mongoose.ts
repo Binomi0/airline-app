@@ -6,7 +6,7 @@ const mongoURI = process.env.MONGODB_URI
 
 const connectDB = async () => {
   try {
-    if (!mongoose.connection.readyState) {
+    if (mongoose.connection.readyState === 0) {
       await mongoose.connect(mongoURI, {
         dbName: process.env.NODE_ENV === 'development' ? DB.develop : DB.production
       })

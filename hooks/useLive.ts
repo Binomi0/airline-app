@@ -5,6 +5,7 @@ import useAuth from './useAuth'
 
 interface UseLiveReturnType {
   live?: ILive | null
+  getLive: () => Promise<void>
 }
 
 const useLive = (): UseLiveReturnType => {
@@ -18,6 +19,7 @@ const useLive = (): UseLiveReturnType => {
       if (response.status === 204) {
         return null
       }
+      setLive(response.data)
       return response.data
     } catch (error) {
       console.error(error)
@@ -29,7 +31,7 @@ const useLive = (): UseLiveReturnType => {
     getLive().then(setLive)
   }, [getLive])
 
-  return { live }
+  return { live, getLive }
 }
 
 export default useLive

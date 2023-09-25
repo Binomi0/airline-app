@@ -3,11 +3,11 @@ import axios from 'config/axios'
 import { mongoose } from 'lib/mongoose'
 import withAuth from 'lib/withAuth'
 import { PilotModel, AtcModel } from 'models'
-import Live, { ILive } from 'models/Live'
+import Live from 'models/Live'
 import { Pilot } from 'models/Pilot'
 import moment, { Moment } from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Atc, IvaoPilot, LastTrackStateEnum } from 'types'
+import { Atc, IvaoPilot } from 'types'
 
 let nextCall: Moment
 
@@ -110,7 +110,7 @@ async function processBatchAtcs(batch: Atc[]) {
   await AtcModel.bulkWrite(bulkOps)
 }
 
-async function processBatchPilots(batch: Pilot[], lives: ILive[]) {
+async function processBatchPilots(batch: Pilot[]) {
   const bulkOps = []
 
   for (const pilot of batch) {
@@ -125,7 +125,7 @@ async function processBatchPilots(batch: Pilot[], lives: ILive[]) {
   }
 
   console.log('BULK OPS', bulkOps.length)
-  await AtcModel.bulkWrite(bulkOps)
+  await PilotModel.bulkWrite(bulkOps)
 }
 
 const getCreateAndUpdateAtcs = async (atcs: Atc[]): Promise<{ update: Atc[]; create: Atc[] }> => {
@@ -196,6 +196,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           await removeDuplicates(PilotModel, '$userId')
         }
         const { pilots } = response.data.clients
+        console.log('VLG7GL', pilots.find(p => p.callsign === 'LIC9900'))
         const { update, create } = await getCreateAndUpdatePilots(pilots)
 
         if (create.length) {
@@ -207,14 +208,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }
         }
 
-        const lives = await Live.find({})
-
         if (update.length) {
           const totalItems = update.length
           for (let i = 0; i < totalItems; i += batchSize) {
             const batch = update.slice(i, i + batchSize)
             try {
-              await processBatchPilots(batch, lives)
+              await processBatchPilots(batch)
             } catch (err) {
               res.status(500).send(err)
               break
@@ -222,13 +221,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }
         }
 
-        const oneHourAgo = new Date()
-        oneHourAgo.setUTCHours(oneHourAgo.getUTCHours() - 4)
+        const lives = await Live.find({})
         const toKeep = new Set()
         lives.forEach((l) => toKeep.add(l.callsign))
         update.forEach((a) => toKeep.add(a.callsign))
         create.forEach((a) => toKeep.add(a.callsign))
-
         const deleteItem = await PilotModel.find({ callsign: { $nin: Array.from(toKeep) } })
 
         console.log('PILOTS TO DELETE', deleteItem.length)
@@ -243,11 +240,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       console.error((err as AxiosError).message)
       res.status(500).send((err as AxiosError).message)
     } finally {
-      // await mongoose.disconnect()
+      await mongoose.connection.close()
       return
     }
   } else {
-    // await mongoose.disconnect()
+    await mongoose.connection.close()
     res.status(200).end()
   }
 }

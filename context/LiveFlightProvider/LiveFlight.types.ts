@@ -9,6 +9,7 @@ export type LiveFlightReducerState = {
 export type LiveFlightContextProps = LiveFlightReducerState & {
   // eslint-disable-next-line no-unused-vars
   setPilot: (pilot?: Readonly<IvaoPilot>) => void
+  getLive: () => Promise<void>
 }
 
 type SetPilot = Readonly<{
