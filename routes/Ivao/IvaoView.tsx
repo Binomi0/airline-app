@@ -6,16 +6,20 @@ import React, { memo } from 'react'
 import { IvaoPilot, LastTrackStateEnum } from 'types'
 // import { filterLEOrigins } from 'utils'
 import useCargo from 'hooks/useCargo'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
+import { useRouter } from 'next/router'
 
 const STEP = 12
 
 const IvaoView = () => {
+  const router = useRouter()
+  const { cargo, newCargo } = useCargo()
   const { pilots } = useVaProviderContext()
+  const { ownedAircrafts } = useAircraftProviderContext()
+  const {live} = useLiveFlightProviderContext()
   const [current, setCurrent] = React.useState<Readonly<IvaoPilot[]>>([])
   const [selected, setSelected] = React.useState('')
   const [page, setPage] = React.useState(0)
-  const { ownedAircrafts } = useAircraftProviderContext()
-  const { cargo, newCargo } = useCargo()
 
   const handleSelect = React.useCallback(
     (callsign: string) => {
@@ -32,11 +36,6 @@ const IvaoView = () => {
     () =>
       current
         // .filter(filterLEOrigins)
-        .filter(
-          (pilot) =>
-            pilot.flightPlan.arrivalId !== pilot.flightPlan.departureId &&
-            pilot?.lastTrack?.state === LastTrackStateEnum.Boarding
-        )
         .slice(0, page + STEP)
         .map((pilot, index) => (
           <Flights
@@ -59,6 +58,12 @@ const IvaoView = () => {
       handleSelect(selected)
     }
   }, [handleSelect, pilots, selected])
+
+  React.useEffect(() => {
+    if (live) {
+      router.push('/live')
+    }
+  }, [live, router])
 
   if (!pilots.length) {
     return <LinearProgress />

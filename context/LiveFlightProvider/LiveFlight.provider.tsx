@@ -21,8 +21,6 @@ export const LiveFlightsProvider: FC<{ children: React.ReactNode }> = ({ childre
   }, [])
 
   useEffect(() => {
-    console.log({ pilots })
-    console.log({ live })
     if (pilots.length && !!live) {
       const current = pilots.find((pilot) => pilot.callsign === live.callsign)
       if (current) {

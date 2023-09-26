@@ -38,30 +38,32 @@ const useCargo = (): UseCargo => {
       if (!atcs) {
         throw new Error('Missing required ATCs')
       }
-      const distance = await getDistanceByCoords(atcs, route)
-      const details = cargos[getRandomInt(8)]
-      const weight = getCargoWeight(aircraft)
-      // FIXME: get current callsign
-      const prize = getCargoPrize(distance, aircraft)
-      const cargo: Cargo = {
-        origin: route.origin,
-        destination: route.destination,
-        distance,
-        details,
-        aircraft,
-        aircraftId: aircraft.metadata.id,
-        weight,
-        callsign,
-        prize,
-        status: CargoStatus.STARTED,
-        remote,
-        isRewarded: false
-      }
 
       try {
+        const distance = await getDistanceByCoords(atcs, route)
+        const details = cargos[getRandomInt(8)]
+        const weight = getCargoWeight(aircraft)
+        // FIXME: get current callsign
+        const prize = getCargoPrize(distance, aircraft)
+        const cargo: Cargo = {
+          origin: route.origin,
+          destination: route.destination,
+          distance,
+          details,
+          aircraft,
+          aircraftId: aircraft.metadata.id,
+          weight,
+          callsign,
+          prize,
+          status: CargoStatus.STARTED,
+          remote,
+          isRewarded: false
+        }
         setCargo(cargo)
-      } catch (error) {
+      } catch (err) {
+        const error = err as Error
         console.error(error)
+        throw new Error(error.message)
       }
     },
     [atcs]

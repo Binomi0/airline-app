@@ -67,6 +67,13 @@ export const getDistanceByCoords = async (atcs: Readonly<Atc[]>, cargo: Pick<Car
   const originTower = atcs.find((a) => a.callsign && a.callsign.startsWith(cargo.origin))
   const arrivalTower = atcs.find((a) => a.callsign && a.callsign.startsWith(cargo.destination))
 
+  if (!originTower) {
+    throw new Error(`Missing tower for ${cargo.origin}`)
+  }
+  if (!arrivalTower) {
+    throw new Error(`Missing tower for ${cargo.origin}`)
+  }
+
   const originCoords = {
     latitude: originTower?.lastTrack?.latitude,
     longitude: originTower?.lastTrack?.longitude

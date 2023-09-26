@@ -24,7 +24,7 @@ interface Props {
 const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, cargo }: Props) => {
   const router = useRouter()
   const { palette } = useTheme()
-  const {setPilot, getLive} = useLiveFlightProviderContext()
+  const { setPilot, getLive } = useLiveFlightProviderContext()
 
   const handleSelectFlight = React.useCallback(async () => {
     const { isConfirmed } = await Swal.fire({
@@ -46,13 +46,16 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, carg
     if (!aircraft) return
     const { arrivalId: destination, departureId: origin } = pilot.flightPlan
 
-    await newCargo({ origin, destination }, aircraft, pilot.callsign, true)
-  }, [aircraft, newCargo, pilot.callsign, pilot.flightPlan])
+    if (!origin || !destination) {
+      throw new Error('Missing origin or destination')
+    }
+
+    return await newCargo({ origin, destination }, aircraft, pilot.callsign, true)
+  }, [aircraft, newCargo, pilot])
 
   const handleClickPilot = React.useCallback(async () => {
-    await handleNewCargo()
-    onSelect()
-  }, [handleNewCargo, onSelect])
+    handleNewCargo().then(onSelect).catch(onRemove)
+  }, [handleNewCargo, onRemove, onSelect])
 
   const handleUnSelectPilot = React.useCallback(() => {
     onRemove()
