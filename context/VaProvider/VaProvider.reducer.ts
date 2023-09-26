@@ -17,17 +17,12 @@ export const vaProviderReducer: VaReducerHandler = (state, action) => {
     case 'SET_PILOTS':
       return {
         ...state,
-        pilots: action.payload,
+        pilots: action.payload
       }
     case 'SET_FLIGHTS':
       return {
         ...state,
         flights: action.payload
-      }
-    case 'SET_CURRENT_PILOT':
-      return {
-        ...state,
-        active: action.payload
       }
     case 'SET_FILTER':
       return {
