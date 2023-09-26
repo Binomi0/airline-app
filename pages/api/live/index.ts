@@ -1,4 +1,3 @@
-import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import Live from 'models/Live'
 import { NextApiResponse } from 'next'
@@ -6,7 +5,6 @@ import { NextApiResponse } from 'next'
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     try {
-      await connectDB()
       const live = await Live.findOne({ userId: req.id, isCompleted: false })
       if (!live) {
         res.status(204).end()
@@ -22,7 +20,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
   } else if (req.method === 'DELETE') {
     try {
-      await connectDB()
       await Live.findOneAndRemove({ userId: req.id })
 
       res.status(202).end()

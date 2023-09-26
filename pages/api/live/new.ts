@@ -1,4 +1,3 @@
-import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { LiveModel as Live } from 'models'
 import { NextApiResponse } from 'next'
@@ -16,7 +15,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   const { cargo } = req.body
 
   try {
-    await connectDB()
     const live = await Live.findOne({ userId: req.id })
     if (!live) {
       const current = await Live.create({

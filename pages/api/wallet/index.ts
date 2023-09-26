@@ -11,7 +11,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return
     }
     try {
-      await connectDB()
       const wallet = await Wallet.findOne({ email: req.user })
       await User.findOneAndUpdate({ email: req.user }, { address: req.body.smartAccountAddress })
       if (!wallet?.starterGift) {
@@ -26,7 +25,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return
     }
   } else if (req.method === 'GET') {
-    await connectDB()
     const wallet = await Wallet.findOne({ email: req.user })
     if (!wallet) {
       res.status(404).end()

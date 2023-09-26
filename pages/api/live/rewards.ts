@@ -1,4 +1,3 @@
-import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
 import sdk from 'lib/twSdk'
@@ -49,7 +48,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    await connectDB()
     const cargo = await Cargo.findOne({ userId: req.id, status: CargoStatus.STARTED })
     if (!cargo) throw new Error(`Missing cargo for userId: ${req.id}`)
     else if (cargo.isRewarded) {

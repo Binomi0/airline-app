@@ -2,7 +2,6 @@ import { NextApiResponse } from 'next'
 import { coinTokenAddress } from 'contracts/address'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import sdk from 'lib/twSdk'
-import { connectDB } from 'lib/mongoose'
 import Wallet from 'models/Wallet'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
@@ -20,7 +19,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   const { smartAccountAddress } = req.body
-  await connectDB()
   try {
     const requested = await Wallet.findOne({ smartAccountAddress })
     if (requested) {

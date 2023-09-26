@@ -1,4 +1,3 @@
-import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import User from 'models/User'
 import { NextApiResponse } from 'next'
@@ -11,7 +10,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
 
     const { address } = req.body
-    await connectDB()
     const user = await User.findOneAndUpdate({ email: req.user }, { address })
 
     res.status(200).send(user)

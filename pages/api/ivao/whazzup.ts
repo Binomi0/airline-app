@@ -1,13 +1,12 @@
-import { AxiosError } from 'axios'
 import axios from 'config/axios'
 import { mongoose } from 'lib/mongoose'
 import withAuth from 'lib/withAuth'
 import { PilotModel, AtcModel } from 'models'
-import Live from 'models/Live'
+import Live, { ILive } from 'models/Live'
 import { Pilot } from 'models/Pilot'
 import moment, { Moment } from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Atc, IvaoPilot } from 'types'
+import { Atc, IvaoPilot, LastTrackStateEnum } from 'types'
 
 let nextCall: Moment
 
@@ -110,7 +109,7 @@ async function processBatchAtcs(batch: Atc[]) {
   await AtcModel.bulkWrite(bulkOps)
 }
 
-async function processBatchPilots(batch: Pilot[]) {
+async function processBatchPilots(batch: Pilot[], lives: ILive[]) {
   const bulkOps = []
 
   for (const pilot of batch) {
@@ -121,7 +120,12 @@ async function processBatchPilots(batch: Pilot[]) {
       }
     }
 
-    bulkOps.push(updateOperation)
+    if (
+      pilot.lastTrack.state === LastTrackStateEnum.Boarding ||
+      lives.some((live) => live.callsign === pilot.callsign)
+    ) {
+      bulkOps.push(updateOperation)
+    }
   }
 
   console.log('BULK OPS', bulkOps.length)
@@ -172,7 +176,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           try {
             await AtcModel.insertMany(create, { ordered: false })
           } catch (err) {
-            res.status(500).send(err)
+            res.status(500).send({ error: err, message: 'While processing atcs insertMany' })
             return
           }
         }
@@ -184,7 +188,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             try {
               await processBatchAtcs(batch)
             } catch (err) {
-              res.status(500).send(err)
+              res.status(500).send({ error: err, message: 'While processing atcs batch' })
               break
             }
           }
@@ -196,26 +200,29 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           await removeDuplicates(PilotModel, '$userId')
         }
         const { pilots } = response.data.clients
-        console.log('VLG7GL', pilots.find(p => p.callsign === 'LIC9900'))
+        console.log('Incoming %s pilots from IVAO', pilots.length)
         const { update, create } = await getCreateAndUpdatePilots(pilots)
+        console.log('Should udpate %s pilots', update.length)
+        console.log('Should create %s pilots', create.length)
 
         if (create.length) {
           try {
             await PilotModel.insertMany(create, { ordered: false })
           } catch (err) {
-            res.status(500).send(err)
+            res.status(500).send({ error: err, message: 'While processing pilots insertMany' })
             return
           }
         }
 
         if (update.length) {
           const totalItems = update.length
+          const lives = await Live.find({})
           for (let i = 0; i < totalItems; i += batchSize) {
             const batch = update.slice(i, i + batchSize)
             try {
-              await processBatchPilots(batch)
+              await processBatchPilots(batch, lives)
             } catch (err) {
-              res.status(500).send(err)
+              res.status(500).send({ error: err, message: 'While processing pilots batch' })
               break
             }
           }
@@ -224,8 +231,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const lives = await Live.find({})
         const toKeep = new Set()
         lives.forEach((l) => toKeep.add(l.callsign))
-        update.forEach((a) => toKeep.add(a.callsign))
-        create.forEach((a) => toKeep.add(a.callsign))
+        update.forEach((p) => toKeep.add(p.callsign))
+        create.forEach((p) => toKeep.add(p.callsign))
         const deleteItem = await PilotModel.find({ callsign: { $nin: Array.from(toKeep) } })
 
         console.log('PILOTS TO DELETE', deleteItem.length)
@@ -237,14 +244,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       res.status(200).end()
     } catch (err) {
-      console.error((err as AxiosError).message)
-      res.status(500).send((err as AxiosError).message)
+      res.status(500).send({ error: err, message: 'While removing duplicates or deleting' })
     } finally {
       await mongoose.connection.close()
       return
     }
   } else {
-    await mongoose.connection.close()
+    // await mongoose.connection.close()
     res.status(200).end()
   }
 }

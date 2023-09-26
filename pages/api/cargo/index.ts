@@ -1,4 +1,3 @@
-import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import Cargo from 'models/Cargo'
 import { NextApiResponse } from 'next'
@@ -7,7 +6,6 @@ import { CargoStatus } from 'types'
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     try {
-      await connectDB()
       const cargo = await Cargo.findOne({ userId: req.id, status: CargoStatus.STARTED })
 
       if (!cargo) {
@@ -22,7 +20,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
   } else if (req.method === 'DELETE') {
     try {
-      await connectDB()
       const current = await Cargo.findOneAndDelete({ userId: req.id, status: CargoStatus.STARTED })
       if (current) {
         res.status(202).end()

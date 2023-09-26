@@ -1,4 +1,3 @@
-import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import Cargo from 'models/Cargo'
 import CargoDetails from 'models/Cargo/CargoDetails'
@@ -10,7 +9,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     const cargo = req.body
 
     try {
-      await connectDB()
       const current = await Cargo.findOne({ userId: req.id, status: CargoStatus.STARTED })
 
       if (current) {

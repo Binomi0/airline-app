@@ -1,4 +1,3 @@
-import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import Cargo from 'models/Cargo'
 import { NextApiResponse } from 'next'
@@ -7,7 +6,6 @@ import { CargoStatus } from 'types'
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     try {
-      await connectDB()
       const cargo = await Cargo.aggregate([
         {
           $match: {

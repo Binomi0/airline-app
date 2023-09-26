@@ -1,4 +1,3 @@
-import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
 import TransactionModel from 'models/Transaction'
@@ -11,8 +10,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
 
     try {
-      await connectDB()
-
       const collection = await TransactionModel.create({
         email: req.user,
         operation: req.body.operation,

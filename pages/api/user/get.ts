@@ -1,12 +1,10 @@
 import { NextApiResponse } from 'next'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
-import { connectDB } from 'lib/mongoose'
 import User from 'models/User'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     try {
-      await connectDB()
       const user = await User.findOne({ email: req.user }, { projection: { _id: 0 } })
 
       if (!user) {
