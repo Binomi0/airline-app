@@ -4,7 +4,7 @@ import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftPro
 import { useVaProviderContext } from 'context/VaProvider'
 import React, { memo } from 'react'
 import { IvaoPilot, LastTrackStateEnum } from 'types'
-import { filterLEOrigins } from 'utils'
+// import { filterLEOrigins } from 'utils'
 import useCargo from 'hooks/useCargo'
 
 const STEP = 12
@@ -31,7 +31,7 @@ const IvaoView = () => {
   const renderPilots = React.useMemo(
     () =>
       current
-        .filter(filterLEOrigins)
+        // .filter(filterLEOrigins)
         .filter(
           (pilot) =>
             pilot.flightPlan.arrivalId !== pilot.flightPlan.departureId &&
