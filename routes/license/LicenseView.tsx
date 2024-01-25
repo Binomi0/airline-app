@@ -2,16 +2,16 @@ import { Box, Typography, Grid, LinearProgress } from '@mui/material'
 import React, { useCallback } from 'react'
 import { NFT, useContract } from '@thirdweb-dev/react'
 import { nftLicenseTokenAddress } from 'contracts/address'
-import LicenseItem from './LicenseItem'
+import LicenseItem from './components/LicenseItem'
 import useClaimNFT from 'hooks/useClaimNFT'
 import { useLicenseProviderContext } from 'context/LicenseProvider/LicenseProvider.context'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import Swal from 'sweetalert2'
 import { getNFTAttributes } from 'utils'
 
-const LicenseMarketPlace: React.FC = () => {
+const LicenseView: React.FC = () => {
   const { contract } = useContract(nftLicenseTokenAddress)
-  const { licenses, ownedLicenses: owned, refetchLicenses,  isLoading } = useLicenseProviderContext()
+  const { licenses, ownedLicenses: owned, refetchLicenses, isLoading } = useLicenseProviderContext()
   const { claimLicenseNFT, isClaiming } = useClaimNFT(contract)
   const { airl, getAirlBalance } = useTokenProviderContext()
 
@@ -77,4 +77,4 @@ const LicenseMarketPlace: React.FC = () => {
   )
 }
 
-export default LicenseMarketPlace
+export default LicenseView

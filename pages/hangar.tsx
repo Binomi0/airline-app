@@ -1,10 +1,10 @@
 import type { NextPage } from 'next'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
-import AircraftMarketPlace from 'components/AircraftMarketPlace'
 import styles from 'styles/Hangar.module.css'
 import Image from 'next/image'
 import image from 'public/img/airplanes3.png'
 import serverSidePropsHandler from 'components/ServerSideHandler'
+import HangarView from 'routes/hangar/HangarView'
 
 interface HangarProps {
   loading: boolean
@@ -23,7 +23,7 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
           <Typography variant='h1'>Main Hangar</Typography>
         </Box>
 
-        <AircraftMarketPlace />
+        <HangarView />
 
         {/* {address && <MyAircrafts />} */}
       </Container>

@@ -5,14 +5,12 @@ const filterPilotsByAtc = (atcs: Readonly<Atc[]>) => (pilot: IvaoPilot) => {
   const { arrivalId, departureId } = pilot.flightPlan
 
   return atcs.some((atc) => {
-    const callsign = atc.callsign.slice(0, 4)
+    const callsign = atc.callsign?.slice(0, 4) ?? ''
     const hasMatch = callsign.includes(arrivalId) || callsign.includes(departureId)
     const isNotTraining = arrivalId !== departureId
     const isBoarding = pilot?.lastTrack?.state === LastTrackStateEnum.Boarding
 
-    return (
-      hasMatch && isNotTraining && isBoarding
-    )
+    return hasMatch && isNotTraining && isBoarding
   })
 }
 

@@ -7,6 +7,7 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { getCallsign } from 'utils'
 
 const CargoList: React.FC<{
+  // eslint-disable-next-line no-unused-vars
   newCargo: (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => void
   setSelected: Dispatch<SetStateAction<FRoute>>
   flights: [string, FRoute[]][]
@@ -28,7 +29,7 @@ const CargoList: React.FC<{
   return (
     <Fade in={flights.length > 0 && !!address} unmountOnExit>
       <Grid container spacing={2}>
-        {flights.map(([key, value], index) => (
+        {flights.slice(0, 12).map(([key, value], index) => (
           <CargoItem onSelect={handleSelect} key={key} origin={key} flights={value} delay={500 * (index + 1)} />
         ))}
       </Grid>

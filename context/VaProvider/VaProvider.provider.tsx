@@ -82,6 +82,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     if (!user) return
+    getPilots()
     const timer = setInterval(getPilots, 10000)
     return () => clearInterval(timer)
   }, [getPilots, user])

@@ -2,7 +2,7 @@ import { Grid, Card, CardContent, Stack, Typography, CardActions, Button, Circul
 import { NFT } from '@thirdweb-dev/react'
 import React, { useCallback } from 'react'
 import { getNFTAttributes } from 'utils'
-import LicenseItemHeader from './License/LicenseItemHeader'
+import LicenseItemHeader from './LicenseItemHeader'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useLicense from 'hooks/useLicense'
 import { useTokenProviderContext } from 'context/TokenProvider'
@@ -17,7 +17,7 @@ interface Props {
 
 const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming }) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const {airl} = useTokenProviderContext()
+  const { airl } = useTokenProviderContext()
   const { hasLicense, refetch } = useLicense(nft.metadata.id)
 
   const { name, description, image } = nft.metadata

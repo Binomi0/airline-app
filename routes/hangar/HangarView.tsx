@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { Box, Grid, Fade, CircularProgress } from '@mui/material'
 import { NFT, useContract } from '@thirdweb-dev/react'
-import AircraftItem from './AircraftItem'
+import AircraftItem from './components/AircraftItem'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useClaimNFT from 'hooks/useClaimNFT'
@@ -9,7 +9,7 @@ import Swal from 'sweetalert2'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useTokenProviderContext } from 'context/TokenProvider'
 
-const AircraftMarketPlace: React.FC = () => {
+const HangarView: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const { getAirlBalance } = useTokenProviderContext()
   const { aircrafts, isLoading } = useAircraftProviderContext()
@@ -71,4 +71,4 @@ const AircraftMarketPlace: React.FC = () => {
   )
 }
 
-export default AircraftMarketPlace
+export default HangarView

@@ -50,8 +50,10 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, carg
       throw new Error('Missing origin or destination')
     }
 
-    return await newCargo({ origin, destination }, aircraft, pilot.callsign, true)
-  }, [aircraft, newCargo, pilot])
+    if (pilot.callsign !== cargo?.callsign) {
+      await newCargo({ origin, destination }, aircraft, pilot.callsign, true)
+    }
+  }, [aircraft, cargo?.callsign, newCargo, pilot.callsign, pilot.flightPlan])
 
   const handleClickPilot = React.useCallback(async () => {
     handleNewCargo().then(onSelect).catch(onRemove)
