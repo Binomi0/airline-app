@@ -1,4 +1,4 @@
-import { Grid, Card, CardContent, Stack, Typography } from '@mui/material'
+import { Grid, Card, CardContent, Stack, Typography, Paper } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
 import React, { useCallback } from 'react'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
@@ -7,6 +7,7 @@ import AircraftActions from './Aircraft/AircraftActions'
 import useAircraft from 'hooks/useAircraft'
 import useAuth from 'hooks/useAuth'
 import useLicense from 'hooks/useLicense'
+import classes from './aircraft.module.css'
 
 const AircraftItem: React.FC<{
   nft: NFT
@@ -14,7 +15,7 @@ const AircraftItem: React.FC<{
   // eslint-disable-next-line no-unused-vars
   onClaim: (refetch: () => void) => void
 }> = ({ nft, isClaiming, onClaim }) => {
-  const {user} = useAuth()
+  const { user } = useAuth()
   const { hasAircraft, refetch: refetchAircraft } = useAircraft(nft.metadata.id)
   const { hasLicense, refetch: refetchLicense } = useLicense(getLicenseIdFromAttributes(getNFTAttributes(nft)))
 
@@ -29,7 +30,16 @@ const AircraftItem: React.FC<{
 
   return (
     <Grid item xs={12} lg={6}>
-      <Card>
+      <Paper
+        className={classes.paper}
+        sx={
+          {
+            // borderRadius: '16px',
+            // backgroundImage: 'linear-gradient(45deg, #000, #444);',
+            // color: '#fff'
+          }
+        }
+      >
         <AircraftCardHeader nft={nft} />
 
         <CardContent>
@@ -41,14 +51,16 @@ const AircraftItem: React.FC<{
           ))}
         </CardContent>
 
-        {user && <AircraftActions
-          isClaiming={isClaiming}
-          name={nft.metadata.name as string}
-          hasAircraft={hasAircraft}
-          hasLicense={hasLicense}
-          onClaim={handleClaim}
-        />}
-      </Card>
+        {user && (
+          <AircraftActions
+            isClaiming={isClaiming}
+            name={nft.metadata.name as string}
+            hasAircraft={hasAircraft}
+            hasLicense={hasLicense}
+            onClaim={handleClaim}
+          />
+        )}
+      </Paper>
     </Grid>
   )
 }

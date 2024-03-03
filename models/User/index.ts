@@ -1,6 +1,12 @@
 import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
 
+// Unlock more va's by adding into this type
+export type IvaoVaType = 'IVAO'
+export interface VaUser {
+  type: IvaoVaType
+  userId: number
+}
 export interface IUser extends Document {
   id: string
   userId: string
@@ -12,6 +18,7 @@ export interface IUser extends Document {
   verificationDate?: number
   emailVerified: boolean
   aircrafts?: ObjectId[]
+  vaUser: VaUser
 }
 
 const userSchema: mongoose.Schema = new mongoose.Schema<IUser>(

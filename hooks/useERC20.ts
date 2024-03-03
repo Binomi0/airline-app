@@ -55,7 +55,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         setIsLoading(false)
         return true
       } catch (error) {
-        console.error(error)
+        console.error('[setAllowance]', error)
         setIsLoading(false)
         return false
       }

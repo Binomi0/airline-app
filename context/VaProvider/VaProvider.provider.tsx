@@ -5,7 +5,9 @@ import { VaProviderContext } from './VaProvider.context'
 import axios from 'config/axios'
 import type { Atc, Flight, IvaoPilot } from 'types'
 import useAuth from 'hooks/useAuth'
+import { getCookie } from 'cookies-next'
 
+const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
   pilots: [],
   atcs: [],
@@ -48,7 +50,10 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     setAtcs(responseAtcs.data)
   }, [setAtcs])
 
+  const cookie = getCookie('token')
+  console.log({ cookie })
   const getPilots = useCallback(async () => {
+    console.log('getPilots headers =>', axios.defaults.headers)
     const response = await axios.get<IvaoPilot[]>('/api/ivao/pilots')
 
     setPilots(response.data)
@@ -70,19 +75,19 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     try {
       await axios.get('/api/ivao/whazzup')
     } catch (err) {
-      console.error(err)
+      console.error('getIVAOData', err)
     }
   }, [])
 
   useEffect(() => {
     if (!user) return
-    const timer = setInterval(getIVAOData, 20000)
+    const timer = setInterval(getIVAOData, MIN_IVAO_REQ_DELAY)
     return () => clearInterval(timer)
   }, [getIVAOData, user])
 
   useEffect(() => {
     if (!user) return
-    const timer = setInterval(getPilots, 10000)
+    const timer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
     return () => clearInterval(timer)
   }, [getPilots, user])
 

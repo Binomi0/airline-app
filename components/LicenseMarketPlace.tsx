@@ -11,7 +11,7 @@ import { getNFTAttributes } from 'utils'
 
 const LicenseMarketPlace: React.FC = () => {
   const { contract } = useContract(nftLicenseTokenAddress)
-  const { licenses, ownedLicenses: owned, refetchLicenses,  isLoading } = useLicenseProviderContext()
+  const { licenses, ownedLicenses: owned, refetchLicenses, isLoading } = useLicenseProviderContext()
   const { claimLicenseNFT, isClaiming } = useClaimNFT(contract)
   const { airl, getAirlBalance } = useTokenProviderContext()
 
@@ -32,14 +32,17 @@ const LicenseMarketPlace: React.FC = () => {
           showConfirmButton: true
         })
         if (isConfirmed) {
-          await claimLicenseNFT(nft)
+          // await claimLicenseNFT(nft)
           Swal.fire({
             title: name as string,
             text: 'Claimed License! New aircrafts unlocked with this license, enjoy!',
             icon: 'success'
           })
+          console.log('UNO')
           getAirlBalance()
+          console.log('DOS')
           refetchLicenses
+          console.log('TRES')
           refetch()
         }
       } else {

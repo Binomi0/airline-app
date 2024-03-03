@@ -246,7 +246,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     } catch (err) {
       res.status(500).send({ error: err, message: 'While removing duplicates or deleting' })
     } finally {
-      await mongoose.connection.close()
+      // await mongoose.connection.close()
       return
     }
   } else {

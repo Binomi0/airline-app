@@ -8,6 +8,8 @@ import useClaimNFT from 'hooks/useClaimNFT'
 import Swal from 'sweetalert2'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useTokenProviderContext } from 'context/TokenProvider'
+import { Aircraft } from 'types'
+import AircraftList from './Aircraft/AircraftList'
 
 const AircraftMarketPlace: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
@@ -57,14 +59,7 @@ const AircraftMarketPlace: React.FC = () => {
     <Box my={4}>
       <Fade in unmountOnExit>
         <Grid container spacing={6}>
-          {aircrafts.map((aircraft) => (
-            <AircraftItem
-              nft={aircraft}
-              key={aircraft.metadata.id}
-              onClaim={handleClaim(aircraft)}
-              isClaiming={isClaiming}
-            />
-          ))}
+          <AircraftList aircrafts={aircrafts} onClaim={handleClaim} isClaiming={isClaiming} />
         </Grid>
       </Fade>
     </Box>

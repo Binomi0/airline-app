@@ -10,8 +10,9 @@ const connectDB = async () => {
       await mongoose.connect(mongoURI, {
         dbName: process.env.NODE_ENV === 'development' ? DB.develop : DB.production
       })
+      console.info('New MongoDB Connected')
     }
-    console.info('MongoDB Connected')
+    console.info('MongoDB already connected')
   } catch (error) {
     console.error('Error connecting to MongoDB:', error)
   }

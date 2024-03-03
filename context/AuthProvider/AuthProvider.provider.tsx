@@ -17,7 +17,7 @@ interface Props {
 export const AuthProvider = ({ children, user }: Props) => {
   const [state, dispatch] = useReducer(authProviderReducer, {
     ...INITIAL_STATE,
-    ...(user ? { user } : {})
+    user
   })
   const { Provider } = AuthProviderContext
 

@@ -20,7 +20,7 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
 
       const { email } = decoded.data
       if (!email) {
-        deleteCookie('token')
+        deleteCookie('token', { req: ctx.req, res: ctx.res })
         return {
           props: {
             token: null,
@@ -41,8 +41,9 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
               userId: user.userId,
               email: user.email,
               emailVerified: user.emailVerified,
-              address: user.address.toString(),
-              role: user.role
+              address: user.address?.toString(),
+              role: user.role,
+              vaUser: JSON.parse(JSON.stringify(user.vaUser))
             }
           }
         }
