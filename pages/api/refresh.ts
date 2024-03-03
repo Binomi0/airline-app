@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import { setCookie } from 'cookies-next'
 import withAuth from 'lib/withAuth'
 import User from 'models/User'
+import axios from 'config/axios'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
@@ -19,7 +20,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const token = jwt.sign({ data: { email: req.body.email, id: user?.id } }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     })
+    console.log('REFRESHING TOKEN')
     setCookie('token', token, { req, res })
+    axios.defaults.headers.Authorization = `Bearer ${token}`
     res.status(200).end()
     return
   } catch (err) {

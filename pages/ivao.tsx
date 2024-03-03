@@ -1,9 +1,9 @@
 import React from 'react'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
-import IvaoView from 'routes/Ivao/IvaoView'
 import Disconnected from 'components/Disconnected'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import useAuth from 'hooks/useAuth'
+import IvaoStatus from 'routes/Ivao/components/IvaoStatus'
 
 interface Props {
   loading: boolean
@@ -17,6 +17,7 @@ const IVAOPage = ({ loading }: Props) => {
 
   return (
     <Container>
+      <IvaoStatus user={user} />
       <Box mt={10}>
         <Typography
           textTransform='uppercase'
@@ -29,7 +30,7 @@ const IVAOPage = ({ loading }: Props) => {
           IVAO Active Flights
         </Typography>
 
-        <IvaoView />
+        {/* <IvaoView /> */}
       </Box>
     </Container>
   )

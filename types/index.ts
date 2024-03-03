@@ -2,6 +2,7 @@
 import { NFT } from '@thirdweb-dev/sdk'
 import { atc } from 'mocks'
 import ivaoPilot from 'mocks/ivaoPilot'
+import { VaUser } from 'models/User'
 import { ObjectId } from 'mongodb'
 
 export interface AircraftAttributes {
@@ -116,6 +117,7 @@ export interface User {
   id?: string
   email?: string
   address?: string
+  vaUser?: VaUser
 }
 
 export interface Authenticator {

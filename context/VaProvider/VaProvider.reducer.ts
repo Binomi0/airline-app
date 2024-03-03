@@ -2,10 +2,12 @@ import { Atc, IvaoPilot, LastTrackStateEnum } from 'types'
 import { VaReducerHandler } from './VaProvider.types'
 
 const filterPilotsByAtc = (atcs: Readonly<Atc[]>) => (pilot: IvaoPilot) => {
+  if (!pilot.flightPlan) return
   const { arrivalId, departureId } = pilot.flightPlan
 
   return atcs.some((atc) => {
-    const callsign = atc.callsign?.slice(0, 4) ?? ''
+    if (!atc.callsign) return
+    const callsign = atc.callsign.slice(0, 4)
     const hasMatch = callsign.includes(arrivalId) || callsign.includes(departureId)
     const isNotTraining = arrivalId !== departureId
     const isBoarding = pilot?.lastTrack?.state === LastTrackStateEnum.Boarding

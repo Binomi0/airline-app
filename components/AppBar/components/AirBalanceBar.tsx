@@ -1,14 +1,17 @@
 import React from 'react'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import { Stack, Typography } from '@mui/material'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useTokenProviderContext } from 'context/TokenProvider'
 
-const AirBalanceBar = () => {
-  const { smartAccountAddress } = useAlchemyProviderContext()
+interface Props {
+  show: boolean
+  smartAccountAddress?: string
+}
+
+const AirBalanceBar = ({ show, smartAccountAddress }: Props) => {
   const { airl } = useTokenProviderContext()
 
-  return smartAccountAddress ? (
+  return show && smartAccountAddress ? (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>
       <AirplaneTicketIcon color='inherit' fontSize='medium' />
       <Typography variant='h6'>

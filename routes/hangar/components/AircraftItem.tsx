@@ -1,4 +1,4 @@
-import { Grid, Card, CardContent, Stack, Typography } from '@mui/material'
+import { Grid, Card, CardContent, Stack, Typography, Paper } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
 import React, { useCallback } from 'react'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
@@ -7,6 +7,7 @@ import AircraftActions from './AircraftActions'
 import useAircraft from 'hooks/useAircraft'
 import useAuth from 'hooks/useAuth'
 import useLicense from 'hooks/useLicense'
+import classes from './aircraft.module.css'
 
 const AircraftItem: React.FC<{
   nft: NFT
@@ -29,7 +30,16 @@ const AircraftItem: React.FC<{
 
   return (
     <Grid item xs={12} lg={6}>
-      <Card>
+      <Paper
+        className={classes.paper}
+        sx={
+          {
+            // borderRadius: '16px',
+            // backgroundImage: 'linear-gradient(45deg, #000, #444);',
+            // color: '#fff'
+          }
+        }
+      >
         <AircraftCardHeader nft={nft} />
 
         <CardContent>
@@ -50,7 +60,7 @@ const AircraftItem: React.FC<{
             onClaim={handleClaim}
           />
         )}
-      </Card>
+      </Paper>
     </Grid>
   )
 }

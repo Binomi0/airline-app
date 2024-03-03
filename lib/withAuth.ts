@@ -12,6 +12,7 @@ export interface CustomNextApiRequest extends NextApiRequest {
 const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, res: NextApiResponse) => {
   try {
     const token = getCookie('token', { req, res })
+    // const token = req.headers.authorization?.split(' ')[1]
     if (token) {
       const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
       if (decoded.data.email) {
