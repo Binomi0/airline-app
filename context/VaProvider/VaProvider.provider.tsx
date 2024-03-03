@@ -5,7 +5,6 @@ import { VaProviderContext } from './VaProvider.context'
 import axios from 'config/axios'
 import type { Atc, Flight, IvaoPilot } from 'types'
 import useAuth from 'hooks/useAuth'
-import { getCookie } from 'cookies-next'
 
 const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
@@ -50,10 +49,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     setAtcs(responseAtcs.data)
   }, [setAtcs])
 
-  const cookie = getCookie('token')
-  console.log({ cookie })
   const getPilots = useCallback(async () => {
-    console.log('getPilots headers =>', axios.defaults.headers)
     const response = await axios.get<IvaoPilot[]>('/api/ivao/pilots')
 
     setPilots(response.data)

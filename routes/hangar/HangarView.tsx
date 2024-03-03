@@ -1,15 +1,13 @@
 import React, { useCallback } from 'react'
 import { Box, Grid, Fade, CircularProgress } from '@mui/material'
 import { NFT, useContract } from '@thirdweb-dev/react'
-import AircraftItem from './components/AircraftItem'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useClaimNFT from 'hooks/useClaimNFT'
 import Swal from 'sweetalert2'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useTokenProviderContext } from 'context/TokenProvider'
-import { Aircraft } from 'types'
-import AircraftList from './Aircraft/AircraftList'
+import AircraftItem from './components/AircraftItem'
 
 const HangarView: React.FC = () => {
   const { smartAccountAddress } = useAlchemyProviderContext()
@@ -20,7 +18,6 @@ const HangarView: React.FC = () => {
 
   const handleClaim = useCallback(
     (aircraftNFT: NFT) => async (refetch: () => void) => {
-      console.log('handleClaim')
       if (!smartAccountAddress) {
         throw new Error('Missing account address')
       }
@@ -55,11 +52,19 @@ const HangarView: React.FC = () => {
       </Box>
     )
   }
+
   return (
     <Box my={4}>
       <Fade in unmountOnExit>
         <Grid container spacing={6}>
-          <AircraftList aircrafts={aircrafts} onClaim={handleClaim} isClaiming={isClaiming} />
+          {aircrafts.map((aircraft) => (
+            <AircraftItem
+              nft={aircraft}
+              key={aircraft.metadata.id}
+              onClaim={handleClaim(aircraft)}
+              isClaiming={isClaiming}
+            />
+          ))}
         </Grid>
       </Fade>
     </Box>

@@ -18,5 +18,4 @@ axios.interceptors.response.use(
   }
 )
 
-axios.defaults.headers.Authorization = `Bearer ${token}`
 export default axios

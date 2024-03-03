@@ -11,10 +11,9 @@ export interface CustomNextApiRequest extends NextApiRequest {
 
 const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, res: NextApiResponse) => {
   try {
-    const token = getCookie('token', { req, res })
-    // const token = req.headers.authorization?.split(' ')[1]
-    if (token) {
-      const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
+    const cookieToken = getCookie('token', { req, res })
+    if (cookieToken) {
+      const decoded = jwt.verify(cookieToken as string, process.env.JWT_SECRET) as JwtPayload
       if (decoded.data.email) {
         await connectDB()
         const user = await User.findOne({ email: decoded.data.email }, { _id: 1 })

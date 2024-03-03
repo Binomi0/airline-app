@@ -1,4 +1,4 @@
-import { Grid, Card, Box, Typography } from '@mui/material'
+import { Grid, Box, Typography } from '@mui/material'
 import React, { useCallback } from 'react'
 import { formatNumber } from 'utils'
 import { useContract, useContractRead } from '@thirdweb-dev/react'
@@ -9,6 +9,7 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useStaking from 'hooks/useStaking'
 import Swal from 'sweetalert2'
 import { useTokenProviderContext } from 'context/TokenProvider'
+import GradientCard from 'components/GradientCard'
 
 const GasDeposited = () => {
   const { smartAccountAddress: address } = useAlchemyProviderContext()
@@ -50,8 +51,8 @@ const GasDeposited = () => {
   )
 
   return (
-    <Grid item xs={4}>
-      <Card>
+    <Grid item xs={12} md={4}>
+      <GradientCard>
         <Box p={1}>
           <Typography variant='subtitle1'>Deposited</Typography>
           <Typography variant='subtitle2' paragraph>
@@ -65,7 +66,7 @@ const GasDeposited = () => {
             buttonText='Remove from Staking'
           />
         </Box>
-      </Card>
+      </GradientCard>
     </Grid>
   )
 }

@@ -1,5 +1,4 @@
 import axios from 'config/axios'
-import { mongoose } from 'lib/mongoose'
 import withAuth from 'lib/withAuth'
 import { PilotModel, AtcModel } from 'models'
 import Live, { ILive } from 'models/Live'
@@ -109,43 +108,54 @@ async function processBatchAtcs(batch: Atc[]) {
   await AtcModel.bulkWrite(bulkOps)
 }
 
+const hasSameCallsign = (callsign: string) => (live: ILive) => live.callsign === callsign
+
 async function processBatchPilots(batch: Pilot[], lives: ILive[]) {
   const bulkOps = []
 
   for (const pilot of batch) {
-    const updateOperation = {
-      replaceOne: {
-        filter: { userId: pilot.userId },
-        replacement: pilot
+    if (pilot.lastTrack.state === LastTrackStateEnum.Boarding || lives.some(hasSameCallsign(pilot.callsign))) {
+      const updateOperation = {
+        replaceOne: {
+          filter: { userId: pilot.userId },
+          replacement: pilot
+        }
       }
-    }
-
-    if (
-      pilot.lastTrack.state === LastTrackStateEnum.Boarding ||
-      lives.some((live) => live.callsign === pilot.callsign)
-    ) {
       bulkOps.push(updateOperation)
     }
   }
 
-  console.log('BULK OPS', bulkOps.length)
-  await PilotModel.bulkWrite(bulkOps)
+  if (bulkOps.length) {
+    console.log('BULK OPS', bulkOps.length)
+    await PilotModel.bulkWrite(bulkOps)
+  }
 }
 
 const getCreateAndUpdateAtcs = async (atcs: Atc[]): Promise<{ update: Atc[]; create: Atc[] }> => {
   const current = await AtcModel.find<Atc>({ callsign: { $in: atcs.map((atc) => atc.callsign) } })
-  const create = atcs.filter((atc) => !current.some((a) => a.callsign === atc.callsign))
-  const update = atcs.filter((atc) => current.some((a) => a.callsign === atc.callsign))
 
-  return { update, create }
+  const reducedPilots = atcs.reduce(
+    (acc, curr) => ({
+      create: !current.some((a) => a.callsign === curr.callsign) ? [...acc.create, curr] : acc.create,
+      update: current.some((a) => a.callsign === curr.callsign) ? [...acc.update, curr] : acc.update
+    }),
+    { create: [] as Atc[], update: [] as Atc[] }
+  )
+
+  return reducedPilots
 }
 
 const getCreateAndUpdatePilots = async (pilots: Pilot[]): Promise<{ update: Pilot[]; create: Pilot[] }> => {
   const current = await PilotModel.find<Pilot>({ userId: { $in: pilots.map((pilot) => pilot.userId) } })
-  const create = pilots.filter((pilot) => !current.some((a) => a.userId === pilot.userId))
-  const update = pilots.filter((pilot) => current.some((a) => a.userId === pilot.userId))
+  const reducedPilots = pilots.reduce(
+    (acc, curr) => ({
+      create: !current.some((a) => a.userId === curr.userId) ? [...acc.create, curr] : acc.create,
+      update: current.some((a) => a.userId === curr.userId) ? [...acc.update, curr] : acc.update
+    }),
+    { create: [] as Pilot[], update: [] as Pilot[] }
+  )
 
-  return { update, create }
+  return reducedPilots
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -245,12 +255,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(200).end()
     } catch (err) {
       res.status(500).send({ error: err, message: 'While removing duplicates or deleting' })
-    } finally {
-      // await mongoose.connection.close()
-      return
     }
   } else {
-    // await mongoose.connection.close()
     res.status(200).end()
   }
 }

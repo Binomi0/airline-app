@@ -1,4 +1,4 @@
-import { Grid, Card, Box, Typography, Stack, Button } from '@mui/material'
+import { Grid, Box, Typography, Stack, Button } from '@mui/material'
 import React, { useCallback, useEffect } from 'react'
 import { useContract, useContractRead } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
@@ -7,6 +7,7 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useStaking from 'hooks/useStaking'
 import Swal from 'sweetalert2'
 import { useTokenProviderContext } from 'context/TokenProvider'
+import GradientCard from 'components/GradientCard'
 
 const MIN_REWARDS_CLAIM = '100000000000000000000'
 
@@ -43,8 +44,8 @@ const GasFarmed = () => {
   }, [getStakeInfo])
 
   return (
-    <Grid item xs={4}>
-      <Card>
+    <Grid item xs={12} md={4}>
+      <GradientCard>
         <Box p={1}>
           <Typography variant='subtitle1'>Farmed Gasoline (AIRG)</Typography>
           <Typography variant='caption'>
@@ -61,7 +62,7 @@ const GasFarmed = () => {
             </Button>
           </Stack>
         </Box>
-      </Card>
+      </GradientCard>
     </Grid>
   )
 }

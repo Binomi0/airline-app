@@ -1,11 +1,12 @@
 import { Grid, Card, CardContent, Stack, Typography, CardActions, Button, CircularProgress } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { getNFTAttributes } from 'utils'
 import LicenseItemHeader from './LicenseItemHeader'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useLicense from 'hooks/useLicense'
 import { useTokenProviderContext } from 'context/TokenProvider'
+import GradientCard from 'components/GradientCard'
 
 interface Props {
   nft: NFT
@@ -19,13 +20,15 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
   const { smartAccountAddress } = useAlchemyProviderContext()
   const { airl } = useTokenProviderContext()
   const { hasLicense, refetch } = useLicense(nft.metadata.id)
+  const [claimingNFT, setClaimingNFT] = useState(-1)
 
   const { name, description, image } = nft.metadata
   const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
 
   const handleClaimLicense = useCallback(async () => {
+    setClaimingNFT(Number(nft.metadata.id))
     claimLicenseNFT(refetch)
-  }, [claimLicenseNFT, refetch])
+  }, [claimLicenseNFT, nft.metadata.id, refetch])
 
   const getNFTPrice = useCallback((nft: NFT) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
@@ -38,7 +41,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
 
   return (
     <Grid item xs={12} md={6} lg={4}>
-      <Card>
+      <GradientCard border={owned ? '3px solid green' : undefined}>
         <LicenseItemHeader
           name={name as string}
           description={description as string}
@@ -65,7 +68,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
               variant='contained'
               onClick={handleClaimLicense}
             >
-              {isClaiming ? (
+              {isClaiming && claimingNFT === Number(nft.metadata.id) ? (
                 <CircularProgress size={25} />
               ) : (
                 `Claim ${(nft.metadata.name as string)?.split(' - ')[1]} for ${getNFTPrice(nft)} AIRL`
@@ -73,7 +76,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
             </Button>
           </CardActions>
         )}
-      </Card>
+      </GradientCard>
     </Grid>
   )
 }

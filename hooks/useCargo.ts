@@ -73,7 +73,6 @@ const useCargo = (): UseCargo => {
     try {
       const { data } = await axios.get<{ count: number }>('/api/cargo/count')
       setCompleted(data.count)
-      console.log('Remaining =>', data)
     } catch (error) {
       console.error(error)
     }

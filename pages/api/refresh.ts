@@ -20,14 +20,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const token = jwt.sign({ data: { email: req.body.email, id: user?.id } }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     })
-    console.log('REFRESHING TOKEN')
     setCookie('token', token, { req, res })
-    axios.defaults.headers.Authorization = `Bearer ${token}`
     res.status(200).end()
     return
   } catch (err) {
     const error = err as Error
-    console.log(err)
+    console.error(err)
     res.status(400).send(error)
   }
 }

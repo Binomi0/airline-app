@@ -12,52 +12,61 @@ interface Props {
 }
 
 const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<Props> => {
-  const token = getCookie('token', { req: ctx.req, res: ctx.res }) as string
-  // mongoose.deleteModel('Live')
-  if (token) {
-    try {
-      const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
+  try {
+    const token = getCookie('token', { req: ctx.req, res: ctx.res }) as string
+    if (token) {
+      try {
+        const decoded = jwt.verify(token as string, process.env.JWT_SECRET) as JwtPayload
 
-      const { email } = decoded.data
-      if (!email) {
-        deleteCookie('token', { req: ctx.req, res: ctx.res })
-        return {
-          props: {
-            token: null,
-            user: null
-          }
-        }
-      }
-
-      await connectDB()
-      const user = await User.findOne({ email })
-
-      if (user) {
-        return {
-          props: {
-            token,
-            user: {
-              id: user.id,
-              userId: user.userId,
-              email: user.email,
-              emailVerified: user.emailVerified,
-              address: user.address?.toString(),
-              role: user.role,
-              vaUser: JSON.parse(JSON.stringify(user.vaUser))
+        const { email } = decoded.data
+        if (!email) {
+          deleteCookie('token', { req: ctx.req, res: ctx.res })
+          return {
+            props: {
+              token: null,
+              user: null
             }
           }
         }
-      }
-    } catch (err) {
-      deleteCookie('token', { req: ctx.req, res: ctx.res })
-      return {
-        props: {
-          token: null,
-          user: null
+
+        try {
+          await connectDB()
+          const user = await User.findOne({ email })
+
+          if (user) {
+            return {
+              props: {
+                token,
+                user: {
+                  id: user.id,
+                  userId: user.userId,
+                  email: user.email,
+                  emailVerified: user.emailVerified,
+                  address: user.address?.toString(),
+                  role: user.role,
+                  ...(user.vaUser
+                    ? {
+                        vaUser: JSON.parse(JSON.stringify(user.vaUser))
+                      }
+                    : {})
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error(new Date(), '[serverSidePropsHandler] error finding user or connecting to DB =>', err)
         }
+      } catch (err) {
+        console.error(new Date(), '[serverSidePropsHandler] error decoding jwt =>', err)
       }
     }
+  } catch (err) {
+    console.error(new Date(), '[serverSidePropsHandler] ERROR WHILE GETTING COOKIE TOKEN =>', err)
   }
+  // mongoose.deleteModel('Live')
+
+  console.log(new Date(), '[serverSidePropsHandler] end no token received.')
+  deleteCookie('token', { req: ctx.req, res: ctx.res })
 
   return {
     props: {

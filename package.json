@@ -42,7 +42,7 @@
     "nodemailer": "^6.9.4",
     "react": "^18.2",
     "react-dom": "^18.2",
-    "react-window": "^1.8.9",
+    "react-window": "^1.8.10",
     "sharp": "^0.32.1",
     "sweetalert2": "^11.7.27",
     "uuid": "^9.0.0"

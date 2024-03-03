@@ -1,4 +1,4 @@
-import { Grow, Grid, Card, CardContent, Typography } from '@mui/material'
+import { Grow, Grid, CardContent, Typography, Paper } from '@mui/material'
 import Link from 'next/link'
 import styles from '../styles/Home.module.css'
 import { memo } from 'react'
@@ -14,14 +14,14 @@ const HomeGridItem: React.FC<IGridItem> = ({ link, title, text, delay }) => (
   <Grow in timeout={{ enter: delay }}>
     <Grid item xs={12} md={6} lg={6} p={2}>
       <Link href={link}>
-        <Card className={styles.card}>
+        <Paper className={styles.card}>
           <CardContent className={styles.text}>
-            <Typography component='h4' variant='h4' color='white' paragraph>
+            <Typography component='h4' variant='h4' paragraph>
               {title}
             </Typography>
-            <Typography color='white'>{text}</Typography>
+            <Typography>{text}</Typography>
           </CardContent>
-        </Card>
+        </Paper>
       </Link>
     </Grid>
   </Grow>

@@ -1,4 +1,4 @@
-import { Grid, Card, CardContent, Stack, Typography, Paper } from '@mui/material'
+import { Grid, CardContent, Stack, Typography } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
 import React, { useCallback } from 'react'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
@@ -7,14 +7,16 @@ import AircraftActions from './AircraftActions'
 import useAircraft from 'hooks/useAircraft'
 import useAuth from 'hooks/useAuth'
 import useLicense from 'hooks/useLicense'
-import classes from './aircraft.module.css'
+import GradientCard from 'components/GradientCard'
 
-const AircraftItem: React.FC<{
+interface Props {
   nft: NFT
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
   onClaim: (refetch: () => void) => void
-}> = ({ nft, isClaiming, onClaim }) => {
+}
+
+const AircraftItem = ({ nft, isClaiming, onClaim }: Props) => {
   const { user } = useAuth()
   const { hasAircraft, refetch: refetchAircraft } = useAircraft(nft.metadata.id)
   const { hasLicense, refetch: refetchLicense } = useLicense(getLicenseIdFromAttributes(getNFTAttributes(nft)))
@@ -30,16 +32,7 @@ const AircraftItem: React.FC<{
 
   return (
     <Grid item xs={12} lg={6}>
-      <Paper
-        className={classes.paper}
-        sx={
-          {
-            // borderRadius: '16px',
-            // backgroundImage: 'linear-gradient(45deg, #000, #444);',
-            // color: '#fff'
-          }
-        }
-      >
+      <GradientCard>
         <AircraftCardHeader nft={nft} />
 
         <CardContent>
@@ -60,7 +53,7 @@ const AircraftItem: React.FC<{
             onClaim={handleClaim}
           />
         )}
-      </Paper>
+      </GradientCard>
     </Grid>
   )
 }
