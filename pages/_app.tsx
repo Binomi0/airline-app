@@ -21,6 +21,7 @@ import { LicenseProvider } from 'context/LicenseProvider/LicenseProvider.provide
 import { TokenProvider } from 'context/TokenProvider'
 import { VaProvider } from 'context/VaProvider'
 import { LiveFlightsProvider } from 'context/LiveFlightProvider'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -67,6 +68,7 @@ export default function MyApp(props: MyAppProps) {
                             <RightSidebar />
                           </MainProvider>
                           <Component loading={loading} {...props.pageProps} />
+                          <SpeedInsights />
                         </LiveFlightsProvider>
                       </VaProvider>
                     </TokenProvider>

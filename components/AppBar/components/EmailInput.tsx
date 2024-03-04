@@ -1,4 +1,4 @@
-import { Close } from '@mui/icons-material'
+import Close from '@mui/icons-material/Close'
 import { Stack, TextField, IconButton, Button, CircularProgress } from '@mui/material'
 import React, { ChangeEvent, KeyboardEvent } from 'react'
 import { validateEmail } from 'utils'
@@ -31,11 +31,14 @@ const EmailInput = ({ onSubmit, onCancel, loading }: Props) => {
     setEmail(event.target.value)
   }, [])
 
-  const handleKeyDown = React.useCallback((event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      handleAccess()
-    }
-  }, [handleAccess])
+  const handleKeyDown = React.useCallback(
+    (event: KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        handleAccess()
+      }
+    },
+    [handleAccess]
+  )
 
   return loading ? (
     <CircularProgress color='primary' />
