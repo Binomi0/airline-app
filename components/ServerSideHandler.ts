@@ -31,14 +31,8 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
         }
 
         try {
-          console.log('serverSideProps 1/3')
           await connectDB()
-          console.log('serverSideProps 2/3')
           const user = await User.findOne({ email })
-          console.log('serverSideProps 3/3')
-
-          console.log({ user })
-          console.timeEnd('serverSideHandler')
 
           if (user) {
             return {
@@ -71,8 +65,8 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
     console.error(new Date(), '[serverSidePropsHandler] ERROR WHILE GETTING COOKIE TOKEN =>', err)
   }
 
-  // console.log(new Date(), '[serverSidePropsHandler] end no token received.')
-  // deleteCookie('token', { req: ctx.req, res: ctx.res })
+  console.log(new Date(), '[serverSidePropsHandler] end no token received.')
+  deleteCookie('token', { req: ctx.req, res: ctx.res })
 
   return {
     props: {
