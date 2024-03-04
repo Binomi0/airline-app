@@ -45,6 +45,7 @@ export default function MyApp(props: MyAppProps) {
     }
   }, [])
 
+  return <Component />
   return (
     <CacheProvider value={emotionCache}>
       <AuthProvider user={props.pageProps.user}>

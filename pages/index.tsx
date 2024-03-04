@@ -7,6 +7,7 @@ import image from 'public/img/Cyb3rYoga.png'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
+  return <div>aIrLIne ApP</div>
   return (
     <Box position='relative'>
       <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />
