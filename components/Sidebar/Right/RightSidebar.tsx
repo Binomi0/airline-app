@@ -15,7 +15,7 @@ import LocalAirportIcon from '@mui/icons-material/LocalAirport'
 import { useMainProviderContext } from 'context/MainProvider'
 import { useTheme } from '@mui/system'
 import useAuth from 'hooks/useAuth'
-import {  Backup, ExitToApp, ImportExport, VerifiedUser } from '@mui/icons-material'
+import { Backup, ExitToApp, ImportExport, VerifiedUser } from '@mui/icons-material'
 import { accountBackupSwal, askExportKeySwal, missingExportKeySwal, signedOutSwal } from 'lib/swal'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
@@ -57,13 +57,11 @@ const RightSidebar: React.FC = () => {
     }
   }, [baseSigner?.address, baseSigner?.privateKey, smartAccountAddress, toggleSidebar, user?.id])
 
-
   const onSignOut = React.useCallback(async () => {
     toggleSidebar('right')
     const confirm = await signedOutSwal()
     if (confirm.isConfirmed) handleSignOut()
   }, [handleSignOut, toggleSidebar])
-
 
   if (!user) {
     return null
@@ -104,15 +102,15 @@ const RightSidebar: React.FC = () => {
             </ListItemButton>
             <ListItemButton>
               <Link href='/flights'>
-              <Stack direction='row' spacing={5}>
-                <LocalAirportIcon color='primary' />
-                <Typography>My Flights</Typography>
-              </Stack>
+                <Stack direction='row' spacing={5}>
+                  <LocalAirportIcon color='primary' />
+                  <Typography>My Flights</Typography>
+                </Stack>
               </Link>
             </ListItemButton>
             <ListItemButton onClick={onSignOut}>
               <Stack direction='row' spacing={5}>
-                <ExitToApp color='error'  />
+                <ExitToApp color='error' />
                 <Typography>Log Out</Typography>
               </Stack>
             </ListItemButton>

@@ -23,7 +23,7 @@ interface UseWallet {
 const useWallet = (): UseWallet => {
   const [isLoaded, setIsLoaded] = useState(false)
   const { user } = useAuthProviderContext()
-  const { setSmartAccountAddress, setSmartSigner } = useAlchemyProviderContext()
+  const { setSmartAccountAddress, setSmartSigner, setBaseSigner } = useAlchemyProviderContext()
 
   const initialize = useCallback(
     async (_signer: Wallet) => {
@@ -48,8 +48,7 @@ const useWallet = (): UseWallet => {
             policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA
           }
         })
-      ) // chain
-        .extend(alchemyEnhancedApiActions(alchemy))
+      ).extend(alchemyEnhancedApiActions(alchemy))
 
       if (!user?.address) {
         const address = await signer.getAddress()
@@ -77,10 +76,11 @@ const useWallet = (): UseWallet => {
         setSmartAccountAddress(user.address as Hex)
       }
 
+      setBaseSigner(_signer)
       setSmartSigner(smartClient)
       setIsLoaded(true)
     },
-    [setSmartAccountAddress, setSmartSigner, user]
+    [setBaseSigner, setSmartAccountAddress, setSmartSigner, user]
   )
 
   const initWallet = useCallback(
@@ -93,6 +93,7 @@ const useWallet = (): UseWallet => {
           const base64Key = Buffer.from(random.privateKey).toString('base64')
 
           localStorage.setItem(user.id, base64Key)
+
           await initialize(random)
           return
         }

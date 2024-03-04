@@ -1,20 +1,21 @@
-import { Hex, SmartAccountSigner, SmartAccountClient } from '@alchemy/aa-core'
+import { Hex, SmartAccountClient } from '@alchemy/aa-core'
+import { Wallet } from 'ethers'
 
 type Actions = SetBaseSigner | SetSmartSigner | SetPaymasterSigner | SetSmartAccountAddress
-type SetBaseSigner = Readonly<{ type: 'SET_BASE_SIGNER'; payload: SmartAccountSigner | undefined }>
+type SetBaseSigner = Readonly<{ type: 'SET_BASE_SIGNER'; payload: Wallet | undefined }>
 type SetSmartSigner = Readonly<{ type: 'SET_SMART_SIGNER'; payload: SmartAccountClient | undefined }>
 type SetPaymasterSigner = Readonly<{ type: 'SET_PAYMASTER_SIGNER'; payload: any | undefined }>
 type SetSmartAccountAddress = Readonly<{ type: 'SET_SMART_ACCOUNT_ADDRESS'; payload: Hex | undefined }>
 
 export type AlchemyReducerState = {
-  baseSigner?: SmartAccountSigner
+  baseSigner?: Wallet
   smartSigner?: SmartAccountClient
   paymasterSigner?: any
   smartAccountAddress?: Hex
 }
 
 export type AlchemyContextProps = AlchemyReducerState & {
-  setBaseSigner: (signer?: SmartAccountSigner) => void
+  setBaseSigner: (signer?: Wallet) => void
   setSmartSigner: (SmartAccountClient?: any) => void
   setPaymasterSigner: (signer?: any) => void
   setSmartAccountAddress: (address?: Hex) => void

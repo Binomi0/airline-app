@@ -25,7 +25,7 @@ const useAlchemyWallet = () => {
         data: encodedApproveCallData
       })
 
-      await smartSigner.waitForUserOperationTransaction(tx1 as Hex)
+      await smartSigner.waitForUserOperationTransaction(tx1)
 
       const encodedCallData = erc20Contract.interface.encodeFunctionData('transferFrom', [
         smartAccountAddress,
@@ -37,7 +37,7 @@ const useAlchemyWallet = () => {
         data: encodedCallData
       })
 
-      await smartSigner.waitForUserOperationTransaction(hash as Hex)
+      await smartSigner.waitForUserOperationTransaction(hash)
 
       return hash
     },

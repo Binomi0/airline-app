@@ -1,4 +1,3 @@
-import { mongoose } from 'lib/mongoose'
 import withAuth from 'lib/withAuth'
 import Atcs from 'models/Atc'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -21,8 +20,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (error) {
     console.error('error =>', error)
     res.status(500).end()
-  } finally {
-    // await mongoose.disconnect()
   }
 }
 

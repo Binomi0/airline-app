@@ -15,6 +15,7 @@ interface Props {
   setUserActionStarted: React.Dispatch<React.SetStateAction<UserActionStatus>>
   matches: boolean
   smartAccountAddress?: string
+  // eslint-disable-next-line no-unused-vars
   toggleSidebar: (side: 'left' | 'right') => void
 }
 
@@ -33,6 +34,8 @@ const AppBarAuth = ({
       setStep(1)
     }
   }, [user])
+
+  console.log({ step })
 
   return (
     <Stack direction='row' alignItems='center' height={50} spacing={1}>

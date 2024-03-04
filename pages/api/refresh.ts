@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken'
 import { setCookie } from 'cookies-next'
 import withAuth from 'lib/withAuth'
 import User from 'models/User'
-import axios from 'config/axios'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
