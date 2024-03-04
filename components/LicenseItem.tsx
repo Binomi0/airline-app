@@ -1,11 +1,13 @@
 import { Grid, Card, CardContent, Stack, Typography, CardActions, Button, CircularProgress } from '@mui/material'
 import { NFT, useBalance, useClaimNFT, useContract, useUser } from '@thirdweb-dev/react'
+// import ReactGA from 'lib/analytics'
 import React, { useCallback } from 'react'
 import { getNFTAttributes } from 'utils'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import { coinTokenAddress } from 'contracts/address'
 import BigNumber from 'bignumber.js'
 import LicenseItemHeader from './License/LicenseItemHeader'
+import { event } from 'lib/gtag'
 
 const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({ nft, owned }) => {
   const { user } = useUser()
@@ -21,6 +23,13 @@ const LicenseItem: React.FC<{ nft: NFT; owned: boolean }> = ({ nft, owned }) => 
     if (!attribute) {
       throw new Error('missing price in nft')
     }
+
+    event({
+      action: 'claim_license',
+      category: 'license',
+      label: `Claim License: #${nft.metadata.id}`,
+      value: attribute.value.toString()
+    })
 
     const hasEnough = new BigNumber(airlBalance.displayValue).isGreaterThan(attribute.value)
     if (hasEnough) {

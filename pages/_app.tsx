@@ -4,7 +4,7 @@ import { AppProps } from 'next/app'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { CacheProvider, EmotionCache } from '@emotion/react'
-import { Router, useRouter } from 'next/router'
+import { Router } from 'next/router'
 import {
   ThirdwebProvider,
   coinbaseWallet,
@@ -18,26 +18,31 @@ import {
   Sepolia
   // Goerli
 } from '@thirdweb-dev/chains'
-import ReactGA from 'react-ga'
+import Script from 'next/script'
 import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
 import ErrorBoundary from 'components/ErrorBoundary'
 import { factoryAddress } from 'contracts/address'
 import { MainProvider } from 'context/MainProvider'
+import * as gtag from 'lib/gtag'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
-import Script from 'next/script'
 
-const tag = process.env['NEXT_PUBLIC_GOOGLE_ANALYTICS_TAG'] || ''
+const trackingId = gtag.GA_TRACKING_ID || ''
 
-ReactGA.initialize(tag, {
-  debug: process.env['NODE_ENV'] === 'development',
-  testMode: process.env['NODE_ENV'] === 'development',
-  gaOptions: {
-    name: 'tracker1'
-  }
-})
+// export function reportWebVitals({ id, name, label, value }: NextWebVitalsMetric) {
+//   // Use `window.gtag` if you initialized Google Analytics as this example:
+//   // https://github.com/vercel/next.js/blob/canary/examples/with-google-analytics/pages/_app.js
+//   if (typeof window !== undefined) {
+//     window.gtag('event', name, {
+//       event_category: label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
+//       value: Math.round(name === 'CLS' ? value * 1000 : value), // values must be integers
+//       event_label: id, // id unique to current page load
+//       non_interaction: true // avoids affecting bounce rate.
+//     })
+//   }
+// }
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -49,7 +54,6 @@ export interface MyAppProps extends AppProps {
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache } = props
   const [loading, setLoading] = React.useState(false)
-  const router = useRouter()
 
   React.useEffect(() => {
     const toggleLoading = (status: boolean) => () => setLoading(status)
@@ -62,10 +66,6 @@ export default function MyApp(props: MyAppProps) {
       Router.events.off('routeChangeComplete', toggleLoading(false))
     }
   }, [])
-
-  React.useEffect(() => {
-    ReactGA.pageview(router.asPath, ['tracker1'])
-  }, [router.asPath])
 
   return (
     <>
@@ -109,17 +109,14 @@ export default function MyApp(props: MyAppProps) {
             </ErrorBoundary>
           </ThemeProvider>
         </CacheProvider>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NODE_ENV}`}
-          strategy='afterInteractive'
-        />
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${trackingId}`} strategy='afterInteractive' />
         <Script id='google-analytics' strategy='afterInteractive'>
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
 
-            gtag('config', ${process.env.NODE_ENV});
+            gtag('config', ${trackingId});
         `}
         </Script>
       </ThirdwebProvider>
