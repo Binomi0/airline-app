@@ -68,10 +68,10 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           data: encodedCallData as Hex
         })
 
-        await paymasterSigner.waitForUserOperationTransaction(claimHash as Hex)
+        const txHash = await paymasterSigner.waitForUserOperationTransaction(claimHash as Hex)
 
         setIsClaiming(false)
-        return claimHash
+        return txHash
       } catch (err) {
         setIsClaiming(false)
         throw new Error((err as Error).message)
@@ -121,8 +121,10 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           data: encodedCallData as Hex
         })
 
+        const txHash = await paymasterSigner.waitForUserOperationTransaction(claimHash as `0x${string}`)
+
         setIsClaiming(false)
-        return claimHash
+        return txHash
       } catch (err) {
         console.error(err)
         setIsClaiming(false)

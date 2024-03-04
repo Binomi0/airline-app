@@ -1,16 +1,18 @@
 import { Wallet } from 'ethers'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useCallback, useState } from 'react'
-import { withAlchemyGasManager } from '@alchemy/aa-alchemy'
-import { Hex, SimpleSmartAccountOwner, SimpleSmartContractAccount, SmartAccountProvider } from '@alchemy/aa-core'
-import { sepolia } from '@wagmi/chains'
+import { alchemyEnhancedApiActions, createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
+import { Hex, SmartAccountSigner, WalletClientSigner, sepolia } from '@alchemy/aa-core'
 import axios from 'config/axios'
 import { useAuthProviderContext } from 'context/AuthProvider'
 import { User } from 'types'
 import { missingKeySwal } from 'lib/swal'
+import alchemy from 'lib/alchemy'
+import { createWalletClient, http } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 
-const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
-const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
+// const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
+// const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
 
 interface UseWallet {
   // eslint-disable-next-line no-unused-vars
@@ -21,52 +23,41 @@ interface UseWallet {
 const useWallet = (): UseWallet => {
   const [isLoaded, setIsLoaded] = useState(false)
   const { user } = useAuthProviderContext()
-  const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner } = useAlchemyProviderContext()
+  const { setSmartAccountAddress, setSmartSigner } = useAlchemyProviderContext()
 
   const initialize = useCallback(
-    async (signer: Wallet) => {
-      if (!signer || !user) return
+    async (_signer: Wallet) => {
+      if (!_signer || !user) return
 
-      const owner: SimpleSmartAccountOwner = {
-        // @ts-ignore
-        signMessage: async (msg) => signer.signMessage(msg),
-        getAddress: async () => signer.address as Hex,
-        // @ts-ignore
-        signTypedData: signer.signTypedData
-      }
+      const account = privateKeyToAccount(_signer.privateKey as Hex)
 
-      const smartSigner = new SmartAccountProvider(
-        // the demo key below is public and rate-limited, it's better to create a new one
-        // you can get started with a free account @ https://www.alchemy.com/
-        process.env.NEXT_PUBLIC_ALCHEMY_URL_ETH_SEPOLIA || '', // rpcUrl
-        ENTRY_POINT, // entryPointAddress
-        sepolia // chain
-      ).connect(
-        (rpcClient) =>
-          new SimpleSmartContractAccount({
-            entryPointAddress: ENTRY_POINT,
-            chain: sepolia,
-            factoryAddress: SIMPLE_ACCOUNT_FACTORY_ADDRESS,
-            rpcClient,
-            owner,
-            // optionally if you already know the account's address
-            accountAddress: user?.address ? (user.address as Hex) : ('' as Hex)
-          })
-      )
-
-      const newPaymasterSigner = withAlchemyGasManager(smartSigner, {
-        policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA || '',
-        entryPoint: ENTRY_POINT
+      const walletClient = createWalletClient({
+        account,
+        chain: sepolia,
+        transport: http()
       })
 
+      const signer: SmartAccountSigner = new WalletClientSigner(walletClient, 'json-rpc')
+
+      const smartClient = (
+        await createModularAccountAlchemyClient({
+          chain: sepolia,
+          apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY_ETH_SEPOLIA,
+          signer,
+          gasManagerConfig: {
+            policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA
+          }
+        })
+      ) // chain
+        .extend(alchemyEnhancedApiActions(alchemy))
+
       if (!user?.address) {
-        const address = await smartSigner.account.getAddress()
+        const address = await signer.getAddress()
 
         const updateUser = axios.post('/api/user/update', { address })
         const updateWallet = axios.post('/api/wallet', {
           id: user.id,
-          smartAccountAddress: address,
-          signerAddress: signer.address
+          smartAccountAddress: address
         })
 
         await Promise.all([updateUser, updateWallet])
@@ -78,8 +69,7 @@ const useWallet = (): UseWallet => {
           const updateUser = axios.post('/api/user/update', { address: user.address })
           const updateWallet = axios.post('/api/wallet', {
             id: user.id,
-            smartAccountAddress: user.address,
-            signerAddress: signer.address
+            smartAccountAddress: user.address
           })
 
           await Promise.all([updateUser, updateWallet])
@@ -87,12 +77,10 @@ const useWallet = (): UseWallet => {
         setSmartAccountAddress(user.address as Hex)
       }
 
-      setBaseSigner(signer)
-      setSmartSigner(smartSigner)
-      setPaymasterSigner(newPaymasterSigner)
+      setSmartSigner(smartClient)
       setIsLoaded(true)
     },
-    [setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, user]
+    [setSmartAccountAddress, setSmartSigner, user]
   )
 
   const initWallet = useCallback(

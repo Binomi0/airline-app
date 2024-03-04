@@ -17,17 +17,13 @@ export const AircraftProvider: FC<{ children: React.ReactNode }> = ({ children }
   const { user } = useAuth()
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data: aircrafts = [], isLoading, isFetched, refetch: refetchAircrafts } = useNFTs(contract)
-  const {
-    data: ownedAircrafts = [],
-    isFetched: isOwnedFetched
-  } = useOwnedNFTs(contract, user?.address)
+  const { data: ownedAircrafts = [], isFetched: isOwnedFetched } = useOwnedNFTs(contract, user?.address)
   const [state, dispatch] = useReducer(aircraftProviderReducer, {
     ...INITIAL_STATE,
     aircrafts,
     ownedAircrafts
   })
   const { Provider } = AircraftProviderContext
-
 
   const setOwnedAircrafts = useCallback(
     (owned: Readonly<NFT[]>) => dispatch({ type: 'SET_OWNED_AIRCRAFTS', payload: owned }),

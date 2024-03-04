@@ -2,7 +2,7 @@ import React, { FC, useCallback, useReducer } from 'react'
 import alchemyProviderReducer from './AlchemyProvider.reducer'
 import { AlchemyProviderContext } from './AlchemyProvider.context'
 import { AlchemyReducerState } from './AlchemyProvider.types'
-import { Hex, SmartAccountProvider } from '@alchemy/aa-core'
+import { Hex, SmartAccountClient } from '@alchemy/aa-core'
 import { Wallet } from 'ethers'
 
 export const INITIAL_STATE: AlchemyReducerState = {
@@ -24,12 +24,12 @@ export const AlchemyProvider: FC<{ children: React.ReactNode }> = ({ children })
   )
 
   const setSmartSigner = useCallback(
-    (signer?: SmartAccountProvider) => dispatch({ type: 'SET_SMART_SIGNER', payload: signer }),
+    (signer?: SmartAccountClient) => dispatch({ type: 'SET_SMART_SIGNER', payload: signer }),
     []
   )
 
   const setPaymasterSigner = useCallback(
-    (signer?: SmartAccountProvider) => dispatch({ type: 'SET_PAYMASTER_SIGNER', payload: signer }),
+    (signer?: SmartAccountClient) => dispatch({ type: 'SET_PAYMASTER_SIGNER', payload: signer }),
     []
   )
 
