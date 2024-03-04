@@ -1,5 +1,5 @@
+import React from 'react'
 import { IconButton, Stack } from '@mui/material'
-import React, { useEffect, useState } from 'react'
 import { User } from 'types'
 import { UserActionStatus } from '..'
 import AirBalanceBar from './AirBalanceBar'
@@ -27,15 +27,9 @@ const AppBarAuth = ({
   setUserActionStarted,
   toggleSidebar
 }: Props) => {
-  const [step, setStep] = useState(0)
-
-  useEffect(() => {
-    setStep(user ? 1 : 0)
-  }, [user])
-
   return (
     <Stack direction='row' alignItems='center' height={50} spacing={1}>
-      {step ? (
+      {!user ? (
         <>
           {userActionStarted !== 'signUp' && <SignIn onInteraction={setUserActionStarted} />}
           {userActionStarted !== 'signIn' && <SignUp onInteraction={setUserActionStarted} />}

@@ -1,6 +1,6 @@
 import AppBar from './AppBar'
 
-export type UserActionStatus = 'signIn' | 'signUp' | undefined
+export type UserActionStatus = 'signIn' | 'signUp' | 'code' | undefined
 
 export type AppBarSnackStatus = 'success' | 'error' | 'warning' | 'info'
 
