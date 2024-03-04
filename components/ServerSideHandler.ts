@@ -12,7 +12,6 @@ interface Props {
 }
 
 const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<Props> => {
-  console.time('serverSideHandler')
   try {
     const token = getCookie('token', { req: ctx.req, res: ctx.res }) as string
     if (token) {

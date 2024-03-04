@@ -38,13 +38,10 @@ const LicenseView: React.FC = () => {
             text: 'Claimed License! New aircrafts unlocked with this license, enjoy!',
             icon: 'success'
           })
-          console.time('getAirlBalance')
           await getAirlBalance()
           console.timeEnd()
-          console.time('refetchLicenses')
           await refetchLicenses()
           console.timeEnd()
-          console.log('TRES')
           refetch()
         }
       } else {
