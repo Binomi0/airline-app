@@ -30,16 +30,12 @@ const AppBarAuth = ({
   const [step, setStep] = useState(0)
 
   useEffect(() => {
-    if (user) {
-      setStep(1)
-    }
+    setStep(user ? 1 : 0)
   }, [user])
-
-  console.log({ step })
 
   return (
     <Stack direction='row' alignItems='center' height={50} spacing={1}>
-      {!user ? (
+      {step ? (
         <>
           {userActionStarted !== 'signUp' && <SignIn onInteraction={setUserActionStarted} />}
           {userActionStarted !== 'signIn' && <SignUp onInteraction={setUserActionStarted} />}
