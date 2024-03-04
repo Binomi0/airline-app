@@ -63,10 +63,9 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
   } catch (err) {
     console.error(new Date(), '[serverSidePropsHandler] ERROR WHILE GETTING COOKIE TOKEN =>', err)
   }
-  // mongoose.deleteModel('Live')
 
-  console.log(new Date(), '[serverSidePropsHandler] end no token received.')
-  deleteCookie('token', { req: ctx.req, res: ctx.res })
+  // console.log(new Date(), '[serverSidePropsHandler] end no token received.')
+  // deleteCookie('token', { req: ctx.req, res: ctx.res })
 
   return {
     props: {
