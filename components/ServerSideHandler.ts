@@ -12,6 +12,7 @@ interface Props {
 }
 
 const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<Props> => {
+  console.time('serverSideHandler')
   try {
     const token = getCookie('token', { req: ctx.req, res: ctx.res }) as string
     if (token) {
@@ -30,8 +31,14 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
         }
 
         try {
+          console.log('serverSideProps 1/3')
           await connectDB()
+          console.log('serverSideProps 2/3')
           const user = await User.findOne({ email })
+          console.log('serverSideProps 3/3')
+
+          console.log({ user })
+          console.timeEnd('serverSideHandler')
 
           if (user) {
             return {

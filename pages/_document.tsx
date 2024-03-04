@@ -5,6 +5,7 @@ import { AppType } from 'next/app'
 import theme, { roboto } from '../src/theme'
 import createEmotionCache from '../src/createEmotionCache'
 import { MyAppProps } from './_app'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 interface MyDocumentProps extends DocumentProps {
   emotionStyleTags: JSX.Element[]
@@ -32,6 +33,7 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
       <body>
         <Main />
         <NextScript />
+        <SpeedInsights />
       </body>
     </Html>
   )
