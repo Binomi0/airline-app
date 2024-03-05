@@ -11,7 +11,7 @@ import { useAuthProviderContext } from 'context/AuthProvider'
 import { useRouter } from 'next/router'
 
 const useAccountSigner = () => {
-  const { setBaseSigner, setSmartAccountAddress, setPaymasterSigner, setSmartSigner } = useAlchemyProviderContext()
+  const { setBaseSigner, setSmartAccountAddress, setSmartSigner } = useAlchemyProviderContext()
   const { signIn, signOut, user } = useAuthProviderContext()
   const [status, setStatus] = useState<AccountSignerStatus>()
   const { initWallet } = useWallet()
@@ -107,27 +107,28 @@ const useAccountSigner = () => {
   const handleSignOut = useCallback(() => {
     setBaseSigner(undefined)
     setSmartAccountAddress(undefined)
-    setPaymasterSigner(undefined)
     setSmartSigner(undefined)
     deleteCookie('token')
     signOut()
     router.asPath !== '/' && router.push('/')
-  }, [router, setBaseSigner, setPaymasterSigner, setSmartAccountAddress, setSmartSigner, signOut])
+  }, [router, setBaseSigner, setSmartAccountAddress, setSmartSigner, signOut])
 
   const addBackup = useCallback(async () => {
     if (!user?.email || !user?.id) {
+      if (!user?.id) {
+        setStatus('missingKey')
+        throw new Error('missing Id')
+      }
       throw new Error('Missing required params email or id')
     }
     try {
+      // Validate again user?
       const credential = await createCredential(user?.email)
       if (credential.verified) {
         const walletId = localStorage.getItem(user.id)
         if (!walletId) {
+          // Create a new random one if he already has an account but not a wallet in this device
           const random = Wallet.createRandom()
-          if (!user.id) {
-            setStatus('missingKey')
-            throw new Error('missing Id')
-          }
 
           backupDoneSwal()
           localStorage.setItem(user.id, Buffer.from(random.privateKey).toString('base64'))

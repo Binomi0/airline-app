@@ -19,11 +19,11 @@ interface UseERC20ReturnType {
 const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
   const [isLoading, setIsLoading] = useState(false)
   const { contract } = useContract(tokenAddress, 'token')
-  const { smartSigner, smartAccountAddress, baseSigner } = useAlchemyProviderContext()
+  const { smartSigner, smartAccountAddress } = useAlchemyProviderContext()
 
   const getAllowance = useCallback(
     async (spender: string): Promise<BigNumber> => {
-      if (!baseSigner || !smartSigner || !smartAccountAddress || !contract) return new BigNumber(0)
+      if (!smartAccountAddress || !contract) return new BigNumber(0)
       setIsLoading(true)
 
       try {
@@ -37,30 +37,28 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         return new BigNumber(0)
       }
     },
-    [baseSigner, smartSigner, smartAccountAddress, contract]
+    [smartAccountAddress, contract]
   )
 
   const setAllowance = useCallback(
     async (to: string) => {
-      if (!smartSigner || !smartSigner.account) return false
-
+      if (!smartSigner) return false
       try {
         setIsLoading(true)
 
-        const erc20Staking = new Contract(tokenAddress, AirlineCoin.abi)
-        const encodedCallData = erc20Staking.interface.encodeFunctionData('approve', [to, MAX_INT_ETH])
+        const erc20Contract = new Contract(tokenAddress, AirlineCoin.abi)
+        const encodedCallData = erc20Contract.interface.encodeFunctionData('approve', [to, MAX_INT_ETH])
 
         const uo = await smartSigner.sendUserOperation({
-          account: smartSigner.account,
           uo: { target: tokenAddress, data: encodedCallData as Hex }
         })
-        await smartSigner.waitForUserOperationTransaction(uo)
+        const {} = await smartSigner.waitForUserOperationTransaction(uo)
         setIsLoading(false)
         return true
       } catch (error) {
         console.error('[setAllowance]', error)
         setIsLoading(false)
-        return false
+        throw new Error('Error while setAllowance')
       }
     },
     [smartSigner, tokenAddress]

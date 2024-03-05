@@ -13,6 +13,7 @@ export const missingKeySwal = async () =>
     text: 'We could not find your key in this device, do you want to import it?',
     icon: 'question',
     input: 'file',
+    showCancelButton: true,
     inputLabel: 'Upload your file key',
     inputAttributes: {
       accept: 'application/x-pem-file',

@@ -6,11 +6,11 @@ import AirlineCoin from 'contracts/abi/AirlineCoin.json'
 import { Hex } from '@alchemy/aa-core'
 
 const useAlchemyWallet = () => {
-  const { smartSigner, paymasterSigner, smartAccountAddress } = useAlchemyProviderContext()
+  const { smartSigner, smartAccountAddress } = useAlchemyProviderContext()
 
   const sendTransaction = useCallback(
     async (target: string, value: string) => {
-      if (!paymasterSigner || !smartAccountAddress || !smartSigner?.account) return
+      if (!smartAccountAddress || !smartSigner) return
 
       const amount = ethers.utils.parseEther(value)
       const erc20Contract = new ethers.Contract(coinTokenAddress, AirlineCoin.abi)
@@ -20,9 +20,11 @@ const useAlchemyWallet = () => {
         smartAccountAddress,
         amount
       ]) as Hex
-      const { hash: tx1 } = await paymasterSigner.sendUserOperation({
-        target: coinTokenAddress,
-        data: encodedApproveCallData
+      const { hash: tx1 } = await smartSigner.sendUserOperation({
+        uo: {
+          target: coinTokenAddress,
+          data: encodedApproveCallData
+        }
       })
 
       await smartSigner.waitForUserOperationTransaction(tx1)
@@ -32,7 +34,7 @@ const useAlchemyWallet = () => {
         target,
         amount
       ]) as Hex
-      const { hash } = await paymasterSigner.sendUserOperation({
+      const { hash } = await smartSigner.sendUserOperation({
         target: coinTokenAddress,
         data: encodedCallData
       })
@@ -41,7 +43,7 @@ const useAlchemyWallet = () => {
 
       return hash
     },
-    [paymasterSigner, smartAccountAddress, smartSigner]
+    [smartAccountAddress, smartSigner]
   )
 
   return { sendTransaction }

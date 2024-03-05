@@ -7,7 +7,9 @@ const useLicense = (id?: string) => {
   const { contract } = useContract(nftLicenseTokenAddress)
   const { data, refetch } = useNFTBalance(contract, smartAccountAddress, id)
 
-  return { hasLicense: smartAccountAddress ? !data?.isZero() : false, refetch }
+  const hasLicense = smartAccountAddress && data ? !data.isZero() : false
+
+  return { hasLicense, refetch }
 }
 
 export default useLicense

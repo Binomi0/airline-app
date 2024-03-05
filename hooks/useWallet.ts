@@ -1,15 +1,12 @@
 import { Wallet } from 'ethers'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useCallback, useState } from 'react'
-import { alchemyEnhancedApiActions, createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
-import { Hex, SmartAccountSigner, SmartContractAccount, WalletClientSigner, sepolia } from '@alchemy/aa-core'
+import { createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
+import { Hex, LocalAccountSigner, sepolia } from '@alchemy/aa-core'
 import axios from 'config/axios'
 import { useAuthProviderContext } from 'context/AuthProvider'
 import { User } from 'types'
 import { missingKeySwal } from 'lib/swal'
-import alchemy from 'lib/alchemy'
-import { createWalletClient, http } from 'viem'
-import { privateKeyToAccount } from 'viem/accounts'
 
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 // const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -29,39 +26,28 @@ const useWallet = (): UseWallet => {
     async (_signer: Wallet) => {
       if (!_signer || !user) return
 
-      const account = privateKeyToAccount(_signer.privateKey as Hex)
-
-      const walletClient = createWalletClient({
-        account,
+      const signer = LocalAccountSigner.privateKeyToAccountSigner(_signer.privateKey as Hex)
+      const smartAccountClient = await createModularAccountAlchemyClient({
+        apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY_ETH_SEPOLIA,
         chain: sepolia,
-        transport: http()
+        signer,
+        gasManagerConfig: {
+          policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA
+        }
       })
 
-      const signer: SmartAccountSigner = new WalletClientSigner(walletClient, 'json-rpc')
-
-      const smartClient = (
-        await createModularAccountAlchemyClient({
-          chain: sepolia,
-          apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY_ETH_SEPOLIA,
-          signer,
-          gasManagerConfig: {
-            policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA
-          }
-        })
-      ).extend(alchemyEnhancedApiActions(alchemy))
-
       if (!user?.address) {
-        const address = await signer.getAddress()
+        const smartAccountAddress = smartAccountClient.getAddress()
 
-        const updateUser = axios.post('/api/user/update', { address })
+        const updateUser = axios.post('/api/user/update', { address: smartAccountAddress })
         const updateWallet = axios.post('/api/wallet', {
           id: user.id,
-          smartAccountAddress: address,
+          smartAccountAddress: smartAccountAddress,
           signerAddress: _signer.address
         })
 
         await Promise.all([updateUser, updateWallet])
-        setSmartAccountAddress(address)
+        setSmartAccountAddress(smartAccountAddress)
       } else {
         try {
           await axios.get('/api/wallet')
@@ -75,11 +61,12 @@ const useWallet = (): UseWallet => {
 
           await Promise.all([updateUser, updateWallet])
         }
+
         setSmartAccountAddress(user.address as Hex)
       }
 
-      setBaseSigner(smartClient.account)
-      setSmartSigner(smartClient)
+      setBaseSigner(_signer)
+      setSmartSigner<typeof smartAccountClient>(smartAccountClient)
       setIsLoaded(true)
     },
     [setBaseSigner, setSmartAccountAddress, setSmartSigner, user]
@@ -108,7 +95,9 @@ const useWallet = (): UseWallet => {
           return
         } else {
           const { value: file } = await missingKeySwal()
-          if (!file) throw new Error('Missing file')
+          if (!file) {
+            throw new Error('Missing file')
+          }
 
           const reader = new FileReader()
           reader.onload = async (e) => {

@@ -99,16 +99,11 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         if (allowance.isZero()) {
           await setAllowance(nftLicenseTokenAddress)
         }
-        console.log(allowance.toString())
-        console.log(allowance.isZero())
 
         const activePhase = await contract.erc1155.claimConditions.getActive(nft.metadata.id, { withAllowList: true })
-        console.log({ activePhase })
         const erc1155Contract = new ethers.Contract(nftLicenseTokenAddress, contract.abi)
         const nftId = Number(nft.metadata.id)
-        console.log({ nftId })
         const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0 ? nftId - 1 : 0])
-        console.log({ encodedData })
         const encodedCallData = erc1155Contract.interface.encodeFunctionData('claim', [
           smartAccountAddress,
           nft.metadata.id,

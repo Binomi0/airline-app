@@ -7,10 +7,10 @@ import { useCallback, useState } from 'react'
 
 const useSafeTransferFrom = (contract: SmartContract<BaseContract>) => {
   const [loading, setLoading] = useState(false)
-  const { paymasterSigner } = useAlchemyProviderContext()
+  const { smartSigner } = useAlchemyProviderContext()
 
   const safeTransferFrom = useCallback(async () => {
-    if (!paymasterSigner) return
+    if (!smartSigner) return
     setLoading(true)
 
     const erc1155Contract = new ethers.Contract(nftLicenseTokenAddress, contract.abi)
@@ -22,15 +22,15 @@ const useSafeTransferFrom = (contract: SmartContract<BaseContract>) => {
       '0x' // DATA
     ])
 
-    const { hash } = await paymasterSigner.sendUserOperation({
+    const { hash } = await smartSigner.sendUserOperation({
       target: nftLicenseTokenAddress,
       data: encodedCallData as Hex
     })
 
-    await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
+    await smartSigner.waitForUserOperationTransaction(hash as Hex)
 
     setLoading(false)
-  }, [contract.abi, paymasterSigner])
+  }, [contract.abi, smartSigner])
 
   return {
     safeTransferFrom,

@@ -12,11 +12,6 @@ export const mainProviderReducer: AlchemyReducerHandler = (state, action) => {
         ...state,
         smartSigner: action.payload
       }
-    case 'SET_PAYMASTER_SIGNER':
-      return {
-        ...state,
-        paymasterSigner: action.payload
-      }
     case 'SET_SMART_ACCOUNT_ADDRESS':
       return {
         ...state,
