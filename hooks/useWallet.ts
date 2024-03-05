@@ -2,7 +2,7 @@ import { Wallet } from 'ethers'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useCallback, useState } from 'react'
 import { alchemyEnhancedApiActions, createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
-import { Hex, SmartAccountSigner, WalletClientSigner, sepolia } from '@alchemy/aa-core'
+import { Hex, SmartAccountSigner, SmartContractAccount, WalletClientSigner, sepolia } from '@alchemy/aa-core'
 import axios from 'config/axios'
 import { useAuthProviderContext } from 'context/AuthProvider'
 import { User } from 'types'
@@ -56,7 +56,8 @@ const useWallet = (): UseWallet => {
         const updateUser = axios.post('/api/user/update', { address })
         const updateWallet = axios.post('/api/wallet', {
           id: user.id,
-          smartAccountAddress: address
+          smartAccountAddress: address,
+          signerAddress: _signer.address
         })
 
         await Promise.all([updateUser, updateWallet])
@@ -68,7 +69,8 @@ const useWallet = (): UseWallet => {
           const updateUser = axios.post('/api/user/update', { address: user.address })
           const updateWallet = axios.post('/api/wallet', {
             id: user.id,
-            smartAccountAddress: user.address
+            smartAccountAddress: user.address,
+            signerAddress: _signer.address
           })
 
           await Promise.all([updateUser, updateWallet])
@@ -76,7 +78,7 @@ const useWallet = (): UseWallet => {
         setSmartAccountAddress(user.address as Hex)
       }
 
-      setBaseSigner(_signer)
+      setBaseSigner(smartClient.account)
       setSmartSigner(smartClient)
       setIsLoaded(true)
     },

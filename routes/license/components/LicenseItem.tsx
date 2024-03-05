@@ -1,4 +1,4 @@
-import { Grid, Card, CardContent, Stack, Typography, CardActions, Button, CircularProgress } from '@mui/material'
+import { Grid, Card, CardContent, Stack, Typography, CardActions, Button, CircularProgress, Box } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
 import React, { useCallback, useState } from 'react'
 import { getNFTAttributes } from 'utils'
@@ -41,6 +41,24 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
 
   return (
     <Grid item xs={12} md={6} lg={4}>
+      {hasLicense && (
+        <Box position='relative'>
+          <Box
+            sx={{
+              '&:before': {
+                opacity: 0.1,
+                fontSize: '64px',
+                color: 'green',
+                content: '"OWNED"',
+                position: 'absolute',
+                top: 80,
+                left: 50,
+                transform: 'rotate(345deg)'
+              }
+            }}
+          />
+        </Box>
+      )}
       <GradientCard border={owned ? '3px solid green' : undefined}>
         <LicenseItemHeader
           name={name as string}

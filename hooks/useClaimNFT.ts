@@ -16,12 +16,12 @@ interface UseClaimNFT {
 
 const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
   const [isClaiming, setIsClaiming] = useState(false)
-  const { smartAccountAddress, paymasterSigner } = useAlchemyProviderContext()
+  const { smartAccountAddress, smartSigner } = useAlchemyProviderContext()
   const { setAllowance, getAllowance } = useERC20(coinTokenAddress)
 
   const claimAircraftNFT = useCallback(
     async (aircraftNFT: NFT) => {
-      if (!paymasterSigner || !contract || !smartAccountAddress) {
+      if (!smartSigner || !smartSigner.account || !contract || !smartAccountAddress) {
         throw new Error('Missing params')
       }
       setIsClaiming(true)
@@ -63,12 +63,15 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           ethers.utils.hexlify(encodedData)
         ])
 
-        const { hash: claimHash } = await paymasterSigner.sendUserOperation({
-          target: nftAircraftTokenAddress,
-          data: encodedCallData as Hex
+        const uo = await smartSigner.sendUserOperation({
+          account: smartSigner.account,
+          uo: {
+            target: nftAircraftTokenAddress,
+            data: encodedCallData as Hex
+          }
         })
 
-        const txHash = await paymasterSigner.waitForUserOperationTransaction(claimHash as Hex)
+        const txHash = await smartSigner.waitForUserOperationTransaction(uo)
 
         setIsClaiming(false)
         return txHash
@@ -77,13 +80,13 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         throw new Error((err as Error).message)
       }
     },
-    [contract, getAllowance, paymasterSigner, setAllowance, smartAccountAddress]
+    [contract, getAllowance, setAllowance, smartAccountAddress, smartSigner]
   )
 
   const claimLicenseNFT = useCallback(
     async (nft: NFT) => {
       try {
-        if (!paymasterSigner || !contract || !smartAccountAddress) return
+        if (!smartSigner || !smartSigner.account || !contract || !smartAccountAddress) return
         setIsClaiming(true)
 
         const canClaim = await contract.erc1155.claimConditions.canClaim(nft.metadata.id, 1, smartAccountAddress)
@@ -96,11 +99,16 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         if (allowance.isZero()) {
           await setAllowance(nftLicenseTokenAddress)
         }
+        console.log(allowance.toString())
+        console.log(allowance.isZero())
 
         const activePhase = await contract.erc1155.claimConditions.getActive(nft.metadata.id, { withAllowList: true })
+        console.log({ activePhase })
         const erc1155Contract = new ethers.Contract(nftLicenseTokenAddress, contract.abi)
         const nftId = Number(nft.metadata.id)
+        console.log({ nftId })
         const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0 ? nftId - 1 : 0])
+        console.log({ encodedData })
         const encodedCallData = erc1155Contract.interface.encodeFunctionData('claim', [
           smartAccountAddress,
           nft.metadata.id,
@@ -116,12 +124,15 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           ethers.utils.hexlify(encodedData)
         ])
 
-        const { hash: claimHash } = await paymasterSigner.sendUserOperation({
-          target: nftLicenseTokenAddress,
-          data: encodedCallData as Hex
+        const uo = await smartSigner.sendUserOperation({
+          account: smartSigner.account,
+          uo: {
+            target: nftLicenseTokenAddress,
+            data: encodedCallData as Hex
+          }
         })
 
-        const txHash = await paymasterSigner.waitForUserOperationTransaction(claimHash as `0x${string}`)
+        const txHash = await smartSigner.waitForUserOperationTransaction(uo)
 
         setIsClaiming(false)
         return txHash
@@ -131,7 +142,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         throw new Error('While claiming NFT')
       }
     },
-    [contract, getAllowance, paymasterSigner, setAllowance, smartAccountAddress]
+    [contract, getAllowance, setAllowance, smartAccountAddress, smartSigner]
   )
 
   return { claimLicenseNFT, claimAircraftNFT, isClaiming }

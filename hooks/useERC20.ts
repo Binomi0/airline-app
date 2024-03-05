@@ -19,11 +19,11 @@ interface UseERC20ReturnType {
 const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
   const [isLoading, setIsLoading] = useState(false)
   const { contract } = useContract(tokenAddress, 'token')
-  const { paymasterSigner, smartAccountAddress } = useAlchemyProviderContext()
+  const { smartSigner, smartAccountAddress, baseSigner } = useAlchemyProviderContext()
 
   const getAllowance = useCallback(
     async (spender: string): Promise<BigNumber> => {
-      if (!paymasterSigner || !smartAccountAddress || !contract) return new BigNumber(0)
+      if (!baseSigner || !smartSigner || !smartAccountAddress || !contract) return new BigNumber(0)
       setIsLoading(true)
 
       try {
@@ -37,12 +37,12 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         return new BigNumber(0)
       }
     },
-    [contract, paymasterSigner, smartAccountAddress]
+    [baseSigner, smartSigner, smartAccountAddress, contract]
   )
 
   const setAllowance = useCallback(
     async (to: string) => {
-      if (!paymasterSigner) return false
+      if (!smartSigner || !smartSigner.account) return false
 
       try {
         setIsLoading(true)
@@ -50,8 +50,11 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         const erc20Staking = new Contract(tokenAddress, AirlineCoin.abi)
         const encodedCallData = erc20Staking.interface.encodeFunctionData('approve', [to, MAX_INT_ETH])
 
-        const { hash } = await paymasterSigner.sendUserOperation({ target: tokenAddress, data: encodedCallData as Hex })
-        await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
+        const uo = await smartSigner.sendUserOperation({
+          account: smartSigner.account,
+          uo: { target: tokenAddress, data: encodedCallData as Hex }
+        })
+        await smartSigner.waitForUserOperationTransaction(uo)
         setIsLoading(false)
         return true
       } catch (error) {
@@ -60,7 +63,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         return false
       }
     },
-    [paymasterSigner, tokenAddress]
+    [smartSigner, tokenAddress]
   )
   return { setAllowance, getAllowance, isLoading }
 }

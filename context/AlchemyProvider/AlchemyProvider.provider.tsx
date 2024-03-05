@@ -2,8 +2,7 @@ import React, { FC, useCallback, useReducer } from 'react'
 import alchemyProviderReducer from './AlchemyProvider.reducer'
 import { AlchemyProviderContext } from './AlchemyProvider.context'
 import { AlchemyReducerState } from './AlchemyProvider.types'
-import { Hex, SmartAccountClient } from '@alchemy/aa-core'
-import { Wallet } from 'ethers'
+import { Hex, SmartAccountClient, SmartContractAccount } from '@alchemy/aa-core'
 
 export const INITIAL_STATE: AlchemyReducerState = {
   baseSigner: undefined,
@@ -19,7 +18,7 @@ export const AlchemyProvider: FC<{ children: React.ReactNode }> = ({ children })
   const { Provider } = AlchemyProviderContext
 
   const setBaseSigner = useCallback(
-    (signer?: Readonly<Wallet>) => dispatch({ type: 'SET_BASE_SIGNER', payload: signer }),
+    (signer?: Readonly<SmartContractAccount>) => dispatch({ type: 'SET_BASE_SIGNER', payload: signer }),
     []
   )
 
