@@ -17,17 +17,9 @@ export const TokenProvider: FC<{ children: React.ReactNode }> = ({ children }) =
   const { Provider } = TokenProviderContext
   const isLoading = airlFetched && airgFetched
 
-  const getBalances = useCallback(() => {
-    Promise.all([getAirlBalance, getAirgBalance])
+  const getBalances = useCallback(async () => {
+    await Promise.all([getAirlBalance(), getAirgBalance()])
   }, [getAirgBalance, getAirlBalance])
-
-  React.useEffect(() => {
-    getAirlBalance()
-  }, [getAirlBalance])
-
-  React.useEffect(() => {
-    getAirgBalance()
-  }, [getAirgBalance])
 
   return <Provider value={{ airl, airg, getAirlBalance, getAirgBalance, getBalances, isLoading }}>{children}</Provider>
 }

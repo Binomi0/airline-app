@@ -68,3 +68,48 @@ export const askExportKeySwal = async (qrcode: string) =>
     confirmButtonText: 'Download Walley KEY',
     showLoaderOnConfirm: true
   })
+
+export const handleStakeSwal = async (amount: string) =>
+  Swal.fire({
+    title: `Stake ${amount} AIRL`,
+    text: `Are you sure you want to stake ${amount} tokens?`,
+    icon: 'question',
+    showCancelButton: true,
+    showConfirmButton: true
+  })
+
+export const handleUnStakeSwal = async (unstakeAmount: string) =>
+  Swal.fire({
+    title: 'Unstaking AIRL token',
+    text: `Are you sure you want to withdraw ${unstakeAmount} tokens?`,
+    icon: 'question',
+    showCancelButton: true,
+    showConfirmButton: true
+  })
+
+export const amountExceedBalanceSwal = async () =>
+  Swal.fire({
+    title: 'Amount exceed balance',
+    text: 'Cannot stake more tokens than current balance',
+    icon: 'info'
+  })
+
+export const unstakedSwal = async () =>
+  Swal.fire({
+    title: 'UnStaked!',
+    text: 'Funds already claimed from staking, hope your planes are full!',
+    icon: 'success'
+  })
+export const stakedSwal = async () =>
+  Swal.fire({
+    title: 'Staked!',
+    text: 'Wow! Good increase your fuel rate!',
+    icon: 'success'
+  })
+
+export const maxWithdrawExceeded = async () =>
+  Swal.fire({
+    title: 'Maximun exceeded',
+    text: 'Cannot withdraw more than deposited :)',
+    icon: 'info'
+  })

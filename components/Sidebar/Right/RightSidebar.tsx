@@ -11,7 +11,8 @@ import {
   Typography
 } from '@mui/material'
 import React, { useCallback } from 'react'
-import LocalAirportIcon from '@mui/icons-material/LocalAirport'
+import AirlinesIcon from '@mui/icons-material/Airlines'
+import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import { useMainProviderContext } from 'context/MainProvider'
 import { useTheme } from '@mui/system'
 import useAuth from 'hooks/useAuth'
@@ -23,14 +24,23 @@ import { accountBackupSwal, askExportKeySwal, missingExportKeySwal, signedOutSwa
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { downloadFile } from 'utils'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const RightSidebar: React.FC = () => {
   const { user } = useAuth()
   const theme = useTheme()
+  const router = useRouter()
   const { rightSidebarOpen: open, toggleSidebar } = useMainProviderContext()
   const { addBackup, handleSignOut } = useAccountSigner()
   const { smartAccountAddress, baseSigner } = useAlchemyProviderContext()
+
+  const handleClick = useCallback(
+    (route: string) => () => {
+      toggleSidebar('right')
+      router.push(route)
+    },
+    [router, toggleSidebar]
+  )
 
   const handleAddBackup = useCallback(async () => {
     toggleSidebar('right')
@@ -103,13 +113,17 @@ const RightSidebar: React.FC = () => {
                 <Typography>Export Wallet</Typography>
               </Stack>
             </ListItemButton>
-            <ListItemButton>
-              <Link href='/flights'>
-                <Stack direction='row' spacing={5}>
-                  <LocalAirportIcon color='primary' />
-                  <Typography>My Flights</Typography>
-                </Stack>
-              </Link>
+            <ListItemButton onClick={handleClick('/flights')}>
+              <Stack direction='row' spacing={5}>
+                <AirplaneTicketIcon color='primary' />
+                <Typography>My Flights</Typography>
+              </Stack>
+            </ListItemButton>
+            <ListItemButton onClick={handleClick('/user/aircraft')}>
+              <Stack direction='row' spacing={5}>
+                <AirlinesIcon color='primary' />
+                <Typography>My Aircrafts</Typography>
+              </Stack>
             </ListItemButton>
             <ListItemButton onClick={onSignOut}>
               <Stack direction='row' spacing={5}>

@@ -6,20 +6,30 @@ import { formatNumber } from 'utils'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useStaking from 'hooks/useStaking'
 import Swal from 'sweetalert2'
-import { useTokenProviderContext } from 'context/TokenProvider'
 import GradientCard from 'components/GradientCard'
 
 const MIN_REWARDS_CLAIM = '100000000000000000000'
 
-const GasFarmed = () => {
+interface Props {
+  getAirgBalance: () => void
+}
+
+const GasFarmed = ({ getAirgBalance }: Props) => {
   const { smartAccountAddress } = useAlchemyProviderContext()
   const { contract } = useContract(stakingAddress)
   const { data: stakeInfo, refetch: getStakeInfo } = useContractRead(contract, 'getStakeInfo', [smartAccountAddress])
   const { claimRewards, isLoading: isClaiming } = useStaking(contract)
-  const { getAirgBalance } = useTokenProviderContext()
 
   const handleClaimRewards = useCallback(async () => {
-    if (stakeInfo._rewards.gte(MIN_REWARDS_CLAIM)) {
+    if (stakeInfo?._rewards.gte(MIN_REWARDS_CLAIM)) {
+      const { isConfirmed } = await Swal.fire({
+        title: `Claim ${formatNumber(Number(stakeInfo?._rewards || 0) / 1e18)} AIRG?`,
+        text: `You will get ${formatNumber(Number(stakeInfo?._rewards || 0) / 1e18)} AIRG fuel tokens`,
+        icon: 'question',
+        showCancelButton: true
+      })
+      if (!isConfirmed) return
+
       await claimRewards(Number(stakeInfo?._rewards || 0).toString())
       Swal.fire({
         title: 'Claimed Rewards!',
@@ -34,7 +44,6 @@ const GasFarmed = () => {
         text: 'You need to collect at least 100L in order to claim gas',
         icon: 'warning'
       })
-      return
     }
   }, [claimRewards, getStakeInfo, stakeInfo, getAirgBalance])
 

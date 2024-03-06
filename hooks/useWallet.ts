@@ -1,12 +1,13 @@
 import { Wallet } from 'ethers'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useCallback, useState } from 'react'
-import { createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
+import { alchemyEnhancedApiActions, createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
 import { Hex, LocalAccountSigner, sepolia } from '@alchemy/aa-core'
 import axios from 'config/axios'
 import { useAuthProviderContext } from 'context/AuthProvider'
 import { User } from 'types'
 import { missingKeySwal } from 'lib/swal'
+import alchemy from 'lib/alchemy'
 
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 // const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -35,7 +36,7 @@ const useWallet = (): UseWallet => {
           policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA
         }
       })
-
+      const extendedSmartAccountClient = smartAccountClient.extend(alchemyEnhancedApiActions(alchemy))
       if (!user?.address) {
         const smartAccountAddress = smartAccountClient.getAddress()
 
@@ -66,7 +67,7 @@ const useWallet = (): UseWallet => {
       }
 
       setBaseSigner(_signer)
-      setSmartSigner<typeof smartAccountClient>(smartAccountClient)
+      setSmartSigner<typeof extendedSmartAccountClient>(extendedSmartAccountClient)
       setIsLoaded(true)
     },
     [setBaseSigner, setSmartAccountAddress, setSmartSigner, user]
@@ -116,6 +117,7 @@ const useWallet = (): UseWallet => {
         }
       } catch (err) {
         console.error(err)
+        throw new Error('While initialize wallet')
       }
     },
     [initialize]

@@ -11,11 +11,13 @@ const useTokenBalance = (contract?: Hex) => {
 
   const getBalance = useCallback(async () => {
     if (!contract || !smartAccountAddress) return new BigNumber(0)
-    const { tokenBalances } = await alchemy.core.getTokenBalances(smartAccountAddress, [contract])
 
+    const { tokenBalances } = await alchemy.core.getTokenBalances(smartAccountAddress, [contract])
     const result = new BigNumber(tokenBalances[0].tokenBalance || '0').div(1e18)
+
     setBalance(result)
     setIsFetched(true)
+
     return result
   }, [contract, smartAccountAddress])
 

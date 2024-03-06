@@ -7,12 +7,17 @@ import { coinTokenAddress, stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import useStaking from 'hooks/useStaking'
 import useERC20 from 'hooks/useERC20'
-import Swal from 'sweetalert2'
-import { useTokenProviderContext } from 'context/TokenProvider'
 import GradientCard from 'components/GradientCard'
+import { amountExceedBalanceSwal, handleStakeSwal, stakedSwal } from 'lib/swal'
+import BigNumber from 'bignumber.js'
 
-const GasAvailable = () => {
-  const { airl, getBalances } = useTokenProviderContext()
+interface Props {
+  airl?: Readonly<BigNumber>
+  getAirlBalance: () => void
+  getStakingInfo: () => void
+}
+
+const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
   const { contract: staking } = useContract(stakingAddress)
   const { stake } = useStaking(staking)
   const { setAllowance, getAllowance } = useERC20(coinTokenAddress)
@@ -22,34 +27,25 @@ const GasAvailable = () => {
     async (amount: string) => {
       if (airl?.isGreaterThanOrEqualTo(amount)) {
         setLoading(true)
-        const { isConfirmed } = await Swal.fire({
-          title: `Stake ${amount} AIRL`,
-          text: `Are you sure you want to stake ${amount} tokens?`,
-          icon: 'question',
-          showCancelButton: true,
-          showConfirmButton: true
-        })
+        const { isConfirmed } = await handleStakeSwal(amount)
         if (isConfirmed) {
           const _amount = ethers.utils.parseEther(amount)
           const allowance = await getAllowance(stakingAddress)
+
           if (allowance.isZero()) {
             await setAllowance(stakingAddress)
           }
           await stake(_amount)
-          getBalances()
-          setLoading(false)
-        } else {
-          setLoading(false)
+          stakedSwal()
+          getAirlBalance()
+          getStakingInfo()
         }
+        setLoading(false)
       } else {
-        Swal.fire({
-          title: 'Amount exceed balance',
-          text: 'Cannot stake more tokens than current balance',
-          icon: 'info'
-        })
+        amountExceedBalanceSwal()
       }
     },
-    [airl, getBalances, getAllowance, setAllowance, stake]
+    [airl, getAirlBalance, getAllowance, getStakingInfo, setAllowance, stake]
   )
 
   return (
@@ -58,7 +54,7 @@ const GasAvailable = () => {
         <Box p={1}>
           <Typography variant='subtitle1'>Available to deposit</Typography>
           <Typography variant='subtitle2' paragraph>
-            {formatNumber(airl?.toNumber() || 0)} AIRL
+            {airl ? formatNumber(Number(airl.toNumber() || 0)) : formatNumber()} AIRL
           </Typography>
           <GasForm
             max={airl?.toString() || '0'}

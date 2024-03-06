@@ -13,7 +13,7 @@ export type TokenReducerState = {
 export type TokenContextProps = TokenReducerState & {
   getAirlBalance: () => Promise<BigNumber>
   getAirgBalance: () => Promise<BigNumber>
-  getBalances: () => void
+  getBalances: () => Promise<void>
 }
 
 export type TokenReducerHandler = (state: TokenReducerState, action: Actions) => TokenReducerState

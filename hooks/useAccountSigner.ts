@@ -62,9 +62,10 @@ const useAccountSigner = () => {
       setStatus('success')
     } catch (err) {
       setStatus('error')
+      signOut()
       throw new Error('While loading account')
     }
-  }, [initWallet, signIn])
+  }, [initWallet, signIn, signOut])
 
   const handleSignIn = useCallback(
     async (email: string) => {

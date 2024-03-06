@@ -5,49 +5,37 @@ import { useContract, useContractRead } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import { ethers } from 'ethers'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useStaking from 'hooks/useStaking'
-import Swal from 'sweetalert2'
-import { useTokenProviderContext } from 'context/TokenProvider'
 import GradientCard from 'components/GradientCard'
+import { handleUnStakeSwal, maxWithdrawExceeded, unstakedSwal } from 'lib/swal'
 
-const GasDeposited = () => {
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
+interface Props {
+  getAirlBalance: () => void
+  staking: any
+  getStakingInfo: () => void
+}
+
+const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
   const { contract } = useContract(stakingAddress)
   const { withdraw, isLoading } = useStaking(contract)
-  const { data: staking, refetch } = useContractRead(contract, 'stakers', [address])
   const maxAmount = (Number(staking?.amountStaked) / 1e18).toString()
-  const { getBalances } = useTokenProviderContext()
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
       if (staking?.amountStaked.gte(ethers.utils.parseEther(unstakeAmount))) {
-        const { isConfirmed } = await Swal.fire({
-          title: 'Unstaking AIRL token',
-          text: `Are you sure you want to withdraw ${unstakeAmount} tokens?`,
-          icon: 'question',
-          showCancelButton: true,
-          showConfirmButton: true
-        })
+        const { isConfirmed } = await handleUnStakeSwal(unstakeAmount)
         if (isConfirmed) {
           await withdraw(ethers.utils.parseEther(unstakeAmount))
-          Swal.fire({
-            title: 'UnStaked!',
-            text: 'Funds already claimed from staking, hope your planes are full!',
-            icon: 'success'
-          })
-          refetch()
-          getBalances()
+          unstakedSwal()
+
+          getStakingInfo()
+          getAirlBalance()
         }
       } else {
-        Swal.fire({
-          title: 'Maximun exceeded',
-          text: 'Cannot withdraw more than deposited :)',
-          icon: 'info'
-        })
+        maxWithdrawExceeded()
       }
     },
-    [staking?.amountStaked, withdraw, refetch, getBalances]
+    [staking?.amountStaked, withdraw, getStakingInfo, getAirlBalance]
   )
 
   return (

@@ -76,6 +76,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         setIsClaiming(false)
         return txHash
       } catch (err) {
+        console.error('While claiming aircraft:', err)
         setIsClaiming(false)
         throw new Error((err as Error).message)
       }
@@ -123,7 +124,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           account: smartSigner.account,
           uo: {
             target: nftLicenseTokenAddress,
-            data: encodedCallData as Hex
+            data: encodedCallData
           }
         })
 
@@ -132,7 +133,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         setIsClaiming(false)
         return txHash
       } catch (err) {
-        console.error(err)
+        console.error('While claiming license:', err)
         setIsClaiming(false)
         throw new Error('While claiming NFT')
       }

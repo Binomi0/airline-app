@@ -1,20 +1,35 @@
 import { Sepolia } from '@thirdweb-dev/chains'
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useCallback } from 'react'
 import { ThirdwebProvider } from '@thirdweb-dev/react'
 import useWallet from 'hooks/useWallet'
 import { useAuthProviderContext } from 'context/AuthProvider'
+import { User } from 'types'
 
 interface Props {
   children: ReactNode
 }
 
 const CustomWeb3Provider = ({ children }: Props) => {
-  const { user } = useAuthProviderContext()
+  const { user, signOut } = useAuthProviderContext()
   const { initWallet, isLoaded } = useWallet()
 
+  const handleInit = useCallback(
+    async (_user: User) => {
+      try {
+        await initWallet(_user)
+      } catch (err) {
+        console.error('CustomWeb3Provider init err =>', err)
+        signOut()
+      }
+    },
+    [initWallet, signOut]
+  )
+
   React.useEffect(() => {
-    if (user && !isLoaded) initWallet(user)
-  }, [initWallet, isLoaded, user])
+    if (user && !isLoaded) {
+      handleInit(user)
+    }
+  }, [handleInit, isLoaded, user])
 
   return (
     <ThirdwebProvider

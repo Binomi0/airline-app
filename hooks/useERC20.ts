@@ -52,7 +52,8 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         const uo = await smartSigner.sendUserOperation({
           uo: { target: tokenAddress, data: encodedCallData as Hex }
         })
-        const {} = await smartSigner.waitForUserOperationTransaction(uo)
+        const txHash = await smartSigner.waitForUserOperationTransaction(uo)
+        console.log({ txHash })
         setIsLoading(false)
         return true
       } catch (error) {

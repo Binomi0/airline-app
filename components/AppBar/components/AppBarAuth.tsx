@@ -7,7 +7,7 @@ import GasBalanceBar from './GasBalanceBar'
 import LicenseBar from './LicenseBar'
 import SignIn from './SignIn'
 import SignUp from './SignUp'
-import MenuIcon from '@mui/icons-material/Menu'
+import SummarizeIcon from '@mui/icons-material/Summarize'
 
 interface Props {
   user?: User
@@ -49,7 +49,7 @@ const AppBarAuth = ({
         aria-label='menu'
         sx={{ mr: 2 }}
       >
-        <MenuIcon />
+        <SummarizeIcon />
       </IconButton>
     </Stack>
   )

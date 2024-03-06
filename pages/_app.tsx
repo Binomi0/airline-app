@@ -67,7 +67,7 @@ export default function MyApp(props: MyAppProps) {
                             <Sidebar />
                             <RightSidebar />
                           </MainProvider>
-                          <Component loading={loading} {...props.pageProps} />
+                          <Component loading={loading} />
                           <SpeedInsights />
                         </LiveFlightsProvider>
                       </VaProvider>

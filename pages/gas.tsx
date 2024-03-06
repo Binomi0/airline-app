@@ -10,14 +10,20 @@ import serverSidePropsHandler from 'components/ServerSideHandler'
 import Disconnected from 'components/Disconnected'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import useAuth from 'hooks/useAuth'
+import { useContract, useContractRead } from '@thirdweb-dev/react'
+import { stakingAddress } from 'contracts/address'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
 interface Props {
   loading: boolean
 }
 
 const Gas: NextPage<Props> = ({ loading }) => {
-  const { airg } = useTokenProviderContext()
   const { user } = useAuth()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const { airg, airl, getAirlBalance, getAirgBalance } = useTokenProviderContext()
+  const { contract } = useContract(stakingAddress)
+  const { data: staking, refetch: getStakingInfo } = useContractRead(contract, 'stakers', [address])
 
   if (loading) {
     return <LinearProgress />
@@ -42,7 +48,13 @@ const Gas: NextPage<Props> = ({ loading }) => {
         <Box my={2} textAlign='center'>
           <Typography variant='h1'>Gas Station</Typography>
         </Box>
-        <GasStationView />
+        <GasStationView
+          staking={staking}
+          airl={airl}
+          getAirlBalance={getAirlBalance}
+          getAirgBalance={getAirgBalance}
+          getStakingInfo={getStakingInfo}
+        />
       </Container>
     </Box>
   )
