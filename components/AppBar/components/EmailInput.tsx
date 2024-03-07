@@ -8,9 +8,10 @@ interface Props {
   onSubmit: (email: string) => void
   onCancel: () => void
   loading: boolean
+  color: 'primary' | 'secondary'
 }
 
-const EmailInput = ({ onSubmit, onCancel, loading }: Props) => {
+const EmailInput = ({ onSubmit, onCancel, loading, color }: Props) => {
   const [email, setEmail] = React.useState('')
   const [error, setError] = React.useState('')
   const emailRef = React.useRef<HTMLInputElement>(null)
@@ -49,6 +50,7 @@ const EmailInput = ({ onSubmit, onCancel, loading }: Props) => {
         inputProps={{
           style: { color: 'white' }
         }}
+        color={color}
         autoFocus
         variant='outlined'
         size='small'
@@ -62,12 +64,12 @@ const EmailInput = ({ onSubmit, onCancel, loading }: Props) => {
         InputProps={{
           endAdornment: (
             <IconButton onClick={onCancel}>
-              <Close color='primary' />
+              <Close color={color} />
             </IconButton>
           )
         }}
       />
-      <Button disabled={loading} variant='contained' onClick={handleAccess}>
+      <Button disabled={loading} variant='contained' color={color} onClick={handleAccess}>
         ENTER
       </Button>
     </Stack>

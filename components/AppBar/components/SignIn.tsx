@@ -11,7 +11,7 @@ interface Props {
 }
 
 const SignIn = ({ onInteraction }: Props) => {
-  const { onSignIn, status } = useAccountSigner()
+  const { onSignIn, handleSignUp, status } = useAccountSigner()
   const [loading, setLoading] = React.useState(false)
 
   const handleSignIn = React.useCallback(
@@ -27,6 +27,7 @@ const SignIn = ({ onInteraction }: Props) => {
         if (auth.success) {
           await handleSignIn(value)
         } else {
+          await handleSignUp(value)
           console.debug('Crendential not set, maybe ask for passkey process')
         }
 
@@ -36,11 +37,16 @@ const SignIn = ({ onInteraction }: Props) => {
         console.error(error)
       }
     },
-    [handleSignIn, onInteraction]
+    [handleSignIn, handleSignUp, onInteraction]
   )
 
   return (
-    <EmailInput onCancel={() => onInteraction()} onSubmit={handleAccess} loading={status === 'loading' || loading} />
+    <EmailInput
+      color='secondary'
+      onCancel={() => onInteraction()}
+      onSubmit={handleAccess}
+      loading={status === 'loading' || loading}
+    />
   )
 }
 

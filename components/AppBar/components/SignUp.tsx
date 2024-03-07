@@ -84,6 +84,7 @@ const SignUp = ({ onInteraction }: Props) => {
         />
       ) : (
         <EmailInput
+          color='primary'
           onCancel={() => {
             setRequestCode(false)
             onInteraction()
