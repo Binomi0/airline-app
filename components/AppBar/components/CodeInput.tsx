@@ -1,5 +1,5 @@
 import Close from '@mui/icons-material/Close'
-import { Stack, TextField, IconButton, Button } from '@mui/material'
+import { Stack, TextField, IconButton, Button, CircularProgress } from '@mui/material'
 import React from 'react'
 
 interface Props {
@@ -22,14 +22,15 @@ const CodeInput = ({ onCancel, onSubmit, loading }: Props) => {
     setError(isValid ? '' : 'Invalid code')
   }, [onSubmit])
 
-  return (
+  return loading ? (
+    <CircularProgress />
+  ) : (
     <Stack direction='row' spacing={2}>
       <TextField
         inputProps={{
           style: { color: 'white' }
         }}
         autoFocus
-        disabled={loading}
         variant='outlined'
         size='small'
         label='CODE'
@@ -45,7 +46,7 @@ const CodeInput = ({ onCancel, onSubmit, loading }: Props) => {
           )
         }}
       />
-      <Button disabled={loading} variant='contained' onClick={handleValidateCode}>
+      <Button variant='contained' onClick={handleValidateCode}>
         SEND CODE
       </Button>
     </Stack>
