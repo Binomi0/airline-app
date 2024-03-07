@@ -1,5 +1,5 @@
 import React from 'react'
-import { IconButton, Stack } from '@mui/material'
+import { Button, IconButton, Stack } from '@mui/material'
 import { User } from 'types'
 import { UserActionStatus } from '..'
 import AirBalanceBar from './AirBalanceBar'
@@ -29,28 +29,52 @@ const AppBarAuth = ({
 }: Props) => {
   return (
     <Stack direction='row' alignItems='center' height={50} spacing={1}>
-      {!user ? (
+      {!user && (
         <>
-          {userActionStarted !== 'signUp' && <SignIn onInteraction={setUserActionStarted} />}
-          {userActionStarted !== 'signIn' && <SignUp onInteraction={setUserActionStarted} />}
-        </>
-      ) : (
-        <>
-          <LicenseBar />
-          <GasBalanceBar show={matches} smartAccountAddress={smartAccountAddress} />
-          <AirBalanceBar show={matches} smartAccountAddress={smartAccountAddress} />
+          {!userActionStarted && (
+            <>
+              <Button
+                variant='contained'
+                color='secondary'
+                onClick={() => {
+                  setUserActionStarted('signIn')
+                }}
+              >
+                Connect
+              </Button>
+              <Button
+                variant='contained'
+                onClick={() => {
+                  setUserActionStarted('signUp')
+                }}
+              >
+                Create Account
+              </Button>
+            </>
+          )}
+          {userActionStarted === 'signIn' && <SignIn onInteraction={setUserActionStarted} />}
+          {['signUp', 'code'].some((status) => status === userActionStarted) && (
+            <SignUp onInteraction={setUserActionStarted} />
+          )}
         </>
       )}
-      <IconButton
-        onClick={() => toggleSidebar('right')}
-        size='large'
-        edge='start'
-        color='inherit'
-        aria-label='menu'
-        sx={{ mr: 2 }}
-      >
-        <SummarizeIcon />
-      </IconButton>
+      {user && (
+        <>
+          <LicenseBar smartAccountAddress={smartAccountAddress} />
+          <GasBalanceBar show={matches} smartAccountAddress={smartAccountAddress} />
+          <AirBalanceBar show={matches} smartAccountAddress={smartAccountAddress} />
+          <IconButton
+            onClick={() => toggleSidebar('right')}
+            size='large'
+            edge='start'
+            color='inherit'
+            aria-label='menu'
+            sx={{ mr: 2 }}
+          >
+            <SummarizeIcon />
+          </IconButton>
+        </>
+      )}
     </Stack>
   )
 }

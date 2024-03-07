@@ -4,10 +4,10 @@ import { useCallback, useState } from 'react'
 import { alchemyEnhancedApiActions, createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
 import { Hex, LocalAccountSigner, sepolia } from '@alchemy/aa-core'
 import axios from 'config/axios'
-import { useAuthProviderContext } from 'context/AuthProvider'
 import { User } from 'types'
 import { missingKeySwal } from 'lib/swal'
 import alchemy from 'lib/alchemy'
+import useAuth from './useAuth'
 
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 // const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -20,12 +20,12 @@ interface UseWallet {
 
 const useWallet = (): UseWallet => {
   const [isLoaded, setIsLoaded] = useState(false)
-  const { user } = useAuthProviderContext()
+  const { user } = useAuth()
   const { setSmartAccountAddress, setSmartSigner, setBaseSigner } = useAlchemyProviderContext()
 
   const initialize = useCallback(
-    async (_signer: Wallet) => {
-      if (!_signer || !user) return
+    async (_signer: Wallet, userId?: string) => {
+      if (!_signer || !userId) return
 
       const signer = LocalAccountSigner.privateKeyToAccountSigner(_signer.privateKey as Hex)
       const smartAccountClient = await createModularAccountAlchemyClient({
@@ -42,7 +42,7 @@ const useWallet = (): UseWallet => {
 
         const updateUser = axios.post('/api/user/update', { address: smartAccountAddress })
         const updateWallet = axios.post('/api/wallet', {
-          id: user.id,
+          id: userId,
           smartAccountAddress: smartAccountAddress,
           signerAddress: _signer.address
         })
@@ -53,14 +53,11 @@ const useWallet = (): UseWallet => {
         try {
           await axios.get('/api/wallet')
         } catch (error) {
-          const updateUser = axios.post('/api/user/update', { address: user.address })
-          const updateWallet = axios.post('/api/wallet', {
+          await axios.post('/api/wallet', {
             id: user.id,
             smartAccountAddress: user.address,
             signerAddress: _signer.address
           })
-
-          await Promise.all([updateUser, updateWallet])
         }
 
         setSmartAccountAddress(user.address as Hex)
@@ -84,15 +81,14 @@ const useWallet = (): UseWallet => {
 
           localStorage.setItem(user.id, base64Key)
 
-          await initialize(random)
+          await initialize(random, user.id)
           return
         }
 
         const walletId = localStorage.getItem(user.id)
-
         if (walletId) {
           const signer = new Wallet(Buffer.from(walletId, 'base64').toString().slice(0, 66))
-          await initialize(signer)
+          await initialize(signer, user.id)
           return
         } else {
           const { value: file } = await missingKeySwal()
@@ -110,7 +106,7 @@ const useWallet = (): UseWallet => {
             localStorage.setItem(user.id as string, base64Key)
 
             const key = Buffer.from(base64Key, 'base64').toString()
-            initialize(new Wallet(key.slice(0, 66)))
+            initialize(new Wallet(key.slice(0, 66)), user.id)
             return
           }
           reader.readAsDataURL(file)

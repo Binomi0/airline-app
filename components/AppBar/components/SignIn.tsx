@@ -1,4 +1,3 @@
-import { Button } from '@mui/material'
 import useAccountSigner from 'hooks/useAccountSigner'
 import React from 'react'
 import { validateEmail } from 'utils'
@@ -13,7 +12,6 @@ interface Props {
 
 const SignIn = ({ onInteraction }: Props) => {
   const { onSignIn, status } = useAccountSigner()
-  const [requestEmail, setRequestEmail] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
 
   const handleSignIn = React.useCallback(
@@ -29,7 +27,7 @@ const SignIn = ({ onInteraction }: Props) => {
         if (auth.success) {
           await handleSignIn(value)
         } else {
-          console.log('Crendential not set, maybe ask for passkey process')
+          console.debug('Crendential not set, maybe ask for passkey process')
         }
 
         onInteraction()
@@ -42,31 +40,7 @@ const SignIn = ({ onInteraction }: Props) => {
   )
 
   return (
-    <>
-      {!requestEmail && (
-        <Button
-          disabled={status === 'loading' || loading}
-          variant='contained'
-          color='secondary'
-          onClick={() => {
-            setRequestEmail(true)
-            onInteraction('signIn')
-          }}
-        >
-          Connect
-        </Button>
-      )}
-      {requestEmail && (
-        <EmailInput
-          onCancel={() => {
-            setRequestEmail(false)
-            onInteraction()
-          }}
-          onSubmit={handleAccess}
-          loading={loading}
-        />
-      )}
-    </>
+    <EmailInput onCancel={() => onInteraction()} onSubmit={handleAccess} loading={status === 'loading' || loading} />
   )
 }
 

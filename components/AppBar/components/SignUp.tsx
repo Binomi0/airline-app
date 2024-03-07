@@ -1,12 +1,11 @@
-import { Button } from '@mui/material'
 import axios from 'config/axios'
 import useAccountSigner from 'hooks/useAccountSigner'
 import React, { useCallback } from 'react'
 import { validateEmail } from 'utils'
 import EmailInput from './EmailInput'
 import CodeInput from './CodeInput'
-import { useAuthProviderContext } from 'context/AuthProvider'
 import { UserActionStatus } from 'components/AppBar'
+import { CircularProgress } from '@mui/material'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars
@@ -15,32 +14,33 @@ interface Props {
 
 const SignUp = ({ onInteraction }: Props) => {
   const { handleSignUp, status } = useAccountSigner()
-  const { user } = useAuthProviderContext()
-  const [requestEmail, setRequestEmail] = React.useState(false)
   const [requestCode, setRequestCode] = React.useState(false)
   const [email, setEmail] = React.useState('')
   const [loading, setLoading] = React.useState(false)
 
-  const onSignUp = useCallback(async (email: string) => validateEmail(email) && handleSignUp(email), [handleSignUp])
+  const onSignUp = useCallback(
+    async (email: string) => validateEmail(email) && (await handleSignUp(email)),
+    [handleSignUp]
+  )
 
   const handleAccess = React.useCallback(
     async (value: string) => {
       try {
-        onInteraction('signUp')
+        setLoading(true)
         const { data: user } = await axios.post('/api/user/check', { email: value })
         if (user.success) {
           if (!user.emailVerified) {
             await axios.post('/api/user/create', { email: value })
+            setRequestCode(true)
+          } else {
+            onInteraction('signIn')
           }
           setEmail(value)
-          setRequestEmail(false)
-          setRequestCode(!user.emailVerified)
         } else {
           const { data } = await axios.post('/api/user/create', { email: value })
           if (data.success) {
             setEmail(value)
             setRequestCode(true)
-            setRequestEmail(false)
           }
         }
         setLoading(false)
@@ -72,41 +72,25 @@ const SignUp = ({ onInteraction }: Props) => {
 
   return (
     <>
-      {!user && (
-        <>
-          {!requestCode && !requestEmail && (
-            <Button
-              disabled={status === 'loading' || loading}
-              variant='contained'
-              onClick={() => {
-                setRequestEmail(true)
-                onInteraction('signUp')
-              }}
-            >
-              Create Account
-            </Button>
-          )}
-          {requestEmail && (
-            <EmailInput
-              onCancel={() => {
-                setRequestEmail(false)
-                onInteraction()
-              }}
-              onSubmit={handleAccess}
-              loading={loading}
-            />
-          )}
-          {requestCode && (
-            <CodeInput
-              onCancel={() => {
-                setRequestCode(false)
-                onInteraction()
-              }}
-              onSubmit={handleValidateCode}
-              loading={loading}
-            />
-          )}
-        </>
+      {loading || (status === 'loading' && <CircularProgress />)}
+      {requestCode ? (
+        <CodeInput
+          onCancel={() => {
+            setRequestCode(false)
+            onInteraction()
+          }}
+          onSubmit={handleValidateCode}
+          loading={status === 'loading' || loading}
+        />
+      ) : (
+        <EmailInput
+          onCancel={() => {
+            setRequestCode(false)
+            onInteraction()
+          }}
+          onSubmit={handleAccess}
+          loading={status === 'loading' || loading}
+        />
       )}
     </>
   )

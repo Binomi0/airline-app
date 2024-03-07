@@ -42,7 +42,7 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
                   userId: user.userId,
                   email: user.email,
                   emailVerified: user.emailVerified,
-                  address: user.address?.toString(),
+                  address: user.address?.toString() || null,
                   role: user.role,
                   ...(user.vaUser
                     ? {

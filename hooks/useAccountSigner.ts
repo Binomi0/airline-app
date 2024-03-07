@@ -75,7 +75,7 @@ const useAccountSigner = () => {
         if (!verified) {
           // User cancelled challenge or timeout
           setStatus('error')
-          return
+          throw new Error('while verify user credentials')
         }
 
         await loadAccount()

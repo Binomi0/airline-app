@@ -29,18 +29,19 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     // amount to fill to each connected smartAccountAddress
     const amount = 2
     const balance = await sdk.wallet.balance(coinTokenAddress)
+    console.log('current main account balance =>', balance)
     if (balance.value.lte(amount)) {
       throw new Error('Missing funds in main account')
     }
-    sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
-    await Wallet.create({
-      id: req.body.id,
-      email: req.user,
-      smartAccountAddress: req.body.smartAccountAddress,
-      signerAddress: req.body.signerAddress,
-      amount,
-      starterGift: true
-    })
+    // sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
+    // await Wallet.create({
+    //   id: req.body.id,
+    //   email: req.user,
+    //   smartAccountAddress: req.body.smartAccountAddress,
+    //   signerAddress: req.body.signerAddress,
+    //   amount,
+    //   starterGift: true
+    // })
 
     res.status(201).end()
   } catch (error) {
