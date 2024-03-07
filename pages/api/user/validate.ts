@@ -25,7 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await transporter.sendMail({
           from: process.env.EMAIL_FROM,
           to: req.body.email,
-          subject: 'Airline | Wellcome!',
+          subject: 'Airline | Welcome!',
           text: '¡Bienvenido! Register process already finished, thanks!',
           html: '<p>¡Bienvenido! Register process already finished, thanks!</p>'
         })

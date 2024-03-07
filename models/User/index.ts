@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb'
 export type IvaoVaType = 'IVAO'
 export interface VaUser {
   type: IvaoVaType
-  userId: number
+  pilotId: string
 }
 export interface IUser extends Document {
   id: string
@@ -18,7 +18,7 @@ export interface IUser extends Document {
   verificationDate?: number
   emailVerified: boolean
   aircrafts?: ObjectId[]
-  vaUser: VaUser
+  vaUser?: ObjectId
 }
 
 const userSchema: mongoose.Schema = new mongoose.Schema<IUser>(
@@ -55,7 +55,11 @@ const userSchema: mongoose.Schema = new mongoose.Schema<IUser>(
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Aircraft'
       }
-    ]
+    ],
+    vaUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'VirtualAirline'
+    }
   },
   {
     timestamps: true

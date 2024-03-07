@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { NextPage } from 'next'
 import { NFT } from '@thirdweb-dev/react'
 import CargoView from 'routes/Cargo/CargoView'
-import { Box, Container, LinearProgress, Typography } from '@mui/material'
+import { Button, Container, LinearProgress, Stack, Typography } from '@mui/material'
 import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import { VaProvider } from 'context/VaProvider'
@@ -33,13 +33,14 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
 
   if (ownedAircrafts.length === 0) {
     return (
-      <Box>
-        <Container>
-          <Box mt={10}>
-            <Typography>Tienes que tener al menos 1 aeronave para acceder a esta sección.</Typography>
-          </Box>
-        </Container>
-      </Box>
+      <Container>
+        <Stack height='calc(100vh - 64px)' alignItems='center' justifyContent='center' spacing={2}>
+          <Typography variant='h4'>Tienes que tener al menos 1 aeronave para acceder a esta sección.</Typography>
+          <Button variant='contained' onClick={() => router.push('/hangar')}>
+            Ir al Hangar
+          </Button>
+        </Stack>
+      </Container>
     )
   }
 

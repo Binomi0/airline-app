@@ -1,6 +1,8 @@
-import { Alert, AlertTitle, Box, Button, Stack, Typography, darken } from '@mui/material'
+import { Alert, AlertTitle, Box, Button, Stack, TextField, Typography, darken } from '@mui/material'
+import axios from 'config/axios'
+import { useAuthProviderContext } from 'context/AuthProvider'
 import { useVaProviderContext } from 'context/VaProvider'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { User } from 'types'
 
 interface Props {
@@ -8,24 +10,43 @@ interface Props {
 }
 
 const IvaoStatus = ({ user }: Props) => {
+  const { signIn } = useAuthProviderContext()
   const [color, setColor] = useState('#fff')
   const { pilots } = useVaProviderContext()
+  const inputRef = useRef<HTMLInputElement>()
 
-  const isConnected = useMemo(
-    () => pilots.some((pilot) => pilot.userId === user.vaUser?.userId),
-    [pilots, user.vaUser?.userId]
+  const isFlying = useMemo(
+    () => pilots.some((pilot) => pilot.userId.toString() === user.vaUser?.pilotId),
+    [pilots, user.vaUser?.pilotId]
   )
 
+  const handleAddIVAOUser = useCallback(async () => {
+    if (!inputRef.current?.value) return
+
+    try {
+      await axios.post('/api/user/add-ivao', {
+        vaUser: { type: 'IVAO', pilotId: inputRef.current.value }
+      })
+
+      signIn({ ...user, vaUser: { type: 'IVAO', pilotId: inputRef.current.value } })
+    } catch (err) {
+      console.error(err)
+    }
+  }, [signIn, user])
+
   useEffect(() => {
-    setColor(isConnected ? '#00FF00' : '#FFF000')
-  }, [isConnected])
+    setColor(isFlying ? '#00FF00' : '#FFF000')
+  }, [isFlying])
 
   return (
     <Box mt={2}>
       {!user?.vaUser ? (
         <Alert severity='info'>
           <AlertTitle>Conecta tu cuenta de IVAO para continuar</AlertTitle>
-          <Button variant='contained'>Add IVAO identification</Button>
+          <TextField inputRef={inputRef} />
+          <Button onClick={handleAddIVAOUser} variant='contained'>
+            Add IVAO identification
+          </Button>
         </Alert>
       ) : (
         <Stack direction='row' spacing={2} alignItems='center'>
@@ -38,7 +59,7 @@ const IvaoStatus = ({ user }: Props) => {
               background: `linear-gradient(270deg, ${darken(color, 0.1)}, ${darken(color, 0.7)}`
             }}
           />
-          <Typography>{isConnected ? 'Estás Conectado a IVAO' : 'No estás conectado a IVAO'}</Typography>
+          <Typography>Estás Conectado a IVAO</Typography>
         </Stack>
       )}
     </Box>

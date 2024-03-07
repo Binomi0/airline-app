@@ -9,7 +9,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     res.status(405).end()
     return
   }
-  if (!req.body.smartAccountAddress || !req.body.smartAccountAddress || !req.body.id) {
+  if (!req.body.smartAccountAddress || !req.body.id) {
     res.status(400).end()
     return
   }
