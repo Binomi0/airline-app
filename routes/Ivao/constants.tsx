@@ -8,13 +8,13 @@ import { LastTrackStateEnum } from 'types'
 import { ReactNode } from 'react'
 
 export const stateIcons: Record<LastTrackStateEnum, ReactNode> = {
-  'En Route': <ConnectingAirportsIcon color='primary' fontSize='large' />,
-  Boarding: <FlightIcon color='info' fontSize='large' />,
-  Approach: <FlightLandIcon color='secondary' fontSize='large' />,
-  Departing: <FlightTakeoffIcon color='warning' fontSize='large' />,
-  'On Blocks': <AirplaneTicketIcon color='info' fontSize='large' />,
-  'Initial Climb': <FlightTakeoffIcon color='warning' fontSize='large' />,
-  Landed: <AirlinesIcon color='success' fontSize='large' />
+  'En Route': <ConnectingAirportsIcon color='primary' />,
+  Boarding: <FlightIcon color='info' />,
+  Approach: <FlightLandIcon color='secondary' />,
+  Departing: <FlightTakeoffIcon color='warning' />,
+  'On Blocks': <AirplaneTicketIcon color='info' />,
+  'Initial Climb': <FlightTakeoffIcon color='warning' />,
+  Landed: <AirlinesIcon color='success' />
 }
 
 export const stateColors: Record<
@@ -29,4 +29,3 @@ export const stateColors: Record<
   'Initial Climb': 'warning',
   Landed: 'success'
 }
-

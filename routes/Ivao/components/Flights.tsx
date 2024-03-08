@@ -1,4 +1,4 @@
-import { Grid, Card, useTheme } from '@mui/material'
+import { Grid, useTheme } from '@mui/material'
 import React from 'react'
 import type { Cargo, FRoute, IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
@@ -9,6 +9,7 @@ import FlightDetailsHeader from './FlightDetailsHeader'
 import FlightDetailsCargo from './FlightDetailsCargo'
 import FlightDetails from './FlightDetails'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
+import GradientCard from 'components/GradientCard'
 
 interface Props {
   onRemove: () => void
@@ -65,7 +66,10 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, carg
 
   return (
     <Grid item xs={selected ? 12 : 6} key={pilot.id}>
-      <Card
+      <GradientCard
+        angle='45deg'
+        from={palette.grey[400]}
+        to={palette.primary.dark}
         sx={{
           boxSizing: 'border-box',
           backgroundColor: selected ? palette.secondary.light : palette.common.white,
@@ -80,7 +84,7 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, carg
         />
         <FlightDetails selected={selected} pilot={pilot} />
         {selected && cargo && <FlightDetailsCargo cargo={cargo} pilot={pilot} onSelectFlight={handleSelectFlight} />}
-      </Card>
+      </GradientCard>
     </Grid>
   )
 }

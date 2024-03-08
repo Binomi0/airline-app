@@ -45,12 +45,19 @@ export enum CargoStatus {
 export type Flight = Record<string, FRoute[]>
 export type Atc = typeof atc
 export interface Cargo {
+  // where it starts
   origin: string
+  // where it finish
   destination: string
+  // total distance in NM
   distance: number
+  // Detailed info about cargo
   details: CargoDetail
+  // selected aircraft nft data
   aircraft: NFT
+  // selected aircraft id
   aircraftId: string
+  // pilot callsign
   callsign: string
   weight: number
   prize: number

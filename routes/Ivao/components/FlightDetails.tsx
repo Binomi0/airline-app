@@ -30,7 +30,7 @@ const FlightDetails = ({ pilot, selected }: Props) => {
             .format('HH:mm')}
           h
         </Typography>
-        <Stack width='75%'>
+        <Stack width='75%' height={40} justifyContent='center' px={1}>
           <LinearProgress
             color={stateColors[pilot.lastTrack.state as LastTrackStateEnum]}
             variant='determinate'

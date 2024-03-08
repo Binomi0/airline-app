@@ -10,6 +10,8 @@ interface UseCargo {
   // eslint-disable-next-line no-unused-vars
   newCargo: (route: FRoute, owned: NFT, callsign: string, remote: boolean) => Promise<void>
   getCargo: () => Promise<void>
+  // eslint-disable-next-line no-unused-vars
+  setCargo: (cargo?: Cargo) => void
   cargo?: Cargo
   isLoading: boolean
   completed: number
@@ -82,7 +84,7 @@ const useCargo = (): UseCargo => {
     getCompletedCount()
   }, [getCompletedCount])
 
-  return { newCargo, cargo, getCargo, isLoading, completed }
+  return { newCargo, cargo, getCargo, setCargo, isLoading, completed }
 }
 
 export default useCargo

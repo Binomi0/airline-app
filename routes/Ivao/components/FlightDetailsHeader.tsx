@@ -1,5 +1,5 @@
 import Close from '@mui/icons-material/Close'
-import { CardHeader, Stack, Button, IconButton, Avatar } from '@mui/material'
+import { CardHeader, Stack, Button, IconButton, Avatar, useTheme } from '@mui/material'
 import React from 'react'
 import { IvaoPilot, LastTrackStateEnum } from 'types'
 import { stateColors, stateIcons } from '../constants'
@@ -12,6 +12,8 @@ interface Props {
 }
 
 const FlightDetailsHeader = ({ selected, onClickPilot, onUnSelectPilot, pilot }: Props) => {
+  const { palette } = useTheme()
+
   return (
     <CardHeader
       action={
@@ -35,7 +37,7 @@ const FlightDetailsHeader = ({ selected, onClickPilot, onUnSelectPilot, pilot }:
       avatar={
         <Avatar
           sx={{
-            backgroundColor: 'white'
+            backgroundColor: palette.primary.contrastText
           }}
         >
           {pilot ? stateIcons[pilot.lastTrack.state as LastTrackStateEnum] : '?'}

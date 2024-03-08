@@ -33,6 +33,7 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
           await connectDB()
           const user = await User.findOne({ email }).populate('vaUser', 'pilotId type -_id')
 
+          console.log({ user })
           if (user) {
             return {
               props: {
@@ -65,7 +66,7 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
   }
 
   console.log(new Date(), '[serverSidePropsHandler] end no token received.')
-  deleteCookie('token', { req: ctx.req, res: ctx.res })
+  // deleteCookie('token', { req: ctx.req, res: ctx.res })
 
   return {
     props: {

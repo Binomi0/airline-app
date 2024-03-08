@@ -1,63 +1,51 @@
-import { Box, Button, Grid, LinearProgress, Typography } from '@mui/material'
-import Flights from 'routes/Ivao/components/Flights'
-import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
-import { useVaProviderContext } from 'context/VaProvider'
-import React, { memo } from 'react'
-import { IvaoPilot, LastTrackStateEnum } from 'types'
+import { Box, LinearProgress, Stack, Typography } from '@mui/material'
+import React, { memo, useCallback, useState } from 'react'
+import { User } from 'types'
 // import { filterLEOrigins } from 'utils'
-import useCargo from 'hooks/useCargo'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import { useRouter } from 'next/router'
+import IvaoStatus from './components/IvaoStatus'
+import IvaoAtcs from './components/IvaoAtcs'
+import useCargo from 'hooks/useCargo'
+import { getCallsign } from 'utils'
+import { nftAircraftTokenAddress } from 'contracts/address'
+import { useContract, useNFTs } from '@thirdweb-dev/react'
+// import IvaoPilots from './components/IvaoPilots'
+import SportsScoreIcon from '@mui/icons-material/SportsScore'
+import FlagIcon from '@mui/icons-material/Flag'
 
-const STEP = 12
+interface Props {
+  user: User
+}
 
-const IvaoView = () => {
+const IvaoView = ({ user }: Props) => {
   const router = useRouter()
-  const { cargo, newCargo } = useCargo()
-  const { pilots } = useVaProviderContext()
-  const { ownedAircrafts } = useAircraftProviderContext()
-  const {live} = useLiveFlightProviderContext()
-  const [current, setCurrent] = React.useState<Readonly<IvaoPilot[]>>([])
-  const [selected, setSelected] = React.useState('')
-  const [page, setPage] = React.useState(0)
+  const { live } = useLiveFlightProviderContext()
+  const [start, setStart] = useState('')
+  const [end, setEnd] = useState('')
+  const { cargo, newCargo, setCargo } = useCargo()
+  const { contract } = useContract(nftAircraftTokenAddress)
+  const { data: aircrafts = [], isLoading, isFetched, refetch: refetchAircrafts } = useNFTs(contract)
 
-  const handleSelect = React.useCallback(
-    (callsign: string) => {
-      const i = pilots.findIndex((c) => c.callsign === callsign)
-      const newCurrent = [pilots[i], ...pilots.filter((c) => c.callsign !== callsign)]
-      setCurrent(newCurrent)
-      setSelected(callsign)
-      window.scrollTo({ top: 100, behavior: 'smooth' })
-    },
-    [pilots]
-  )
-
-  const renderPilots = React.useMemo(
-    () =>
-      current
-        // .filter(filterLEOrigins)
-        .slice(0, page + STEP)
-        .map((pilot, index) => (
-          <Flights
-            cargo={cargo}
-            newCargo={newCargo}
-            selected={pilot.callsign === selected && index === 0}
-            aircraft={ownedAircrafts[0]}
-            pilot={pilot}
-            key={pilot.id}
-            onSelect={() => setSelected(pilot.callsign)}
-            onRemove={() => setSelected('')}
-          />
-        )),
-    [cargo, current, newCargo, ownedAircrafts, page, selected]
-  )
+  const handleSelectAtc = useCallback((callsign: string, side: 'start' | 'end') => {
+    if (side === 'start') {
+      if (end === callsign) return
+      setStart(callsign)
+    } else if (side === 'end') {
+      if (start === callsign) return
+      setEnd(callsign)
+    } else {
+      throw new Error('side should be one of `start` or `end`')
+    }
+  }, [])
 
   React.useEffect(() => {
-    setCurrent(pilots)
-    if (selected) {
-      handleSelect(selected)
+    if (start && end && aircrafts) {
+      newCargo({ origin: start, destination: end }, aircrafts[0], getCallsign(), false)
+    } else {
+      setCargo()
     }
-  }, [handleSelect, pilots, selected])
+  }, [end, newCargo, setCargo, aircrafts, start])
 
   React.useEffect(() => {
     if (live) {
@@ -65,25 +53,47 @@ const IvaoView = () => {
     }
   }, [live, router])
 
-  if (!pilots.length) {
-    return <LinearProgress />
-  }
-
-  return ownedAircrafts ? (
-    <>
-      <Grid container spacing={2}>
-        {renderPilots}
-      </Grid>
-      <Box textAlign='center' my={10}>
-        <Button variant='contained' onClick={() => setPage((s) => s + STEP)}>
-          Load More...
-        </Button>
+  return (
+    <Stack direction='row'>
+      <IvaoAtcs onSelect={handleSelectAtc} start={start} end={end} />
+      <Box px={2} width='100%'>
+        <IvaoStatus user={user} />
+        <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
+          {start && (
+            <Box textAlign='center'>
+              <FlagIcon color='success' fontSize='large' />
+              <Typography variant='h3'>Start</Typography>
+              <Typography>{start}</Typography>
+            </Box>
+          )}
+          {start && end && (
+            <Stack height={100} width='100%' justifyContent='center'>
+              <LinearProgress variant='determinate' value={0} />
+            </Stack>
+          )}
+          {start && end && (
+            <Box textAlign='center'>
+              <SportsScoreIcon fontSize='large' />
+              <Typography variant='h3'>End</Typography>
+              <Typography>{end}</Typography>
+            </Box>
+          )}
+        </Stack>
+        {cargo && (
+          <Stack direction='column' width='100%' alignItems='center' justifyContent='center'>
+            <Typography align='center'>Distance: {cargo.distance}</Typography>
+            <Typography align='center'>Prize: {cargo.prize}</Typography>
+            <Typography align='center'>Name: {cargo.details.name}</Typography>
+            <Typography width={300} align='justify'>
+              Description: {cargo.details.description}
+            </Typography>
+            <Typography align='center'>Rewards: {cargo.rewards}</Typography>
+            <Typography align='center'>Score: {cargo.score}</Typography>
+          </Stack>
+        )}
+        {/* <IvaoPilots /> */}
       </Box>
-    </>
-  ) : (
-    <Box>
-      <Typography>You need an aircraft to select a flight</Typography>
-    </Box>
+    </Stack>
   )
 }
 

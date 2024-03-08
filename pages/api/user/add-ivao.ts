@@ -1,6 +1,6 @@
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import User from 'models/User'
-import VirtualAirline from 'models/VirtualAirline'
+import { VirtualAirlineModel } from 'models'
 import { NextApiResponse } from 'next'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
@@ -12,7 +12,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
     try {
       const { vaUser } = req.body
-      await VirtualAirline.create({ type: vaUser.type, pilotId: vaUser.pilotId, _id: req.id })
+      await VirtualAirlineModel.create({ type: vaUser.type, pilotId: vaUser.pilotId, _id: req.id })
       const user = await User.findOneAndUpdate({ email: req.user }, { vaUser: req.id }, { new: true })
 
       res.status(200).send(user)
