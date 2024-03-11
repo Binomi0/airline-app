@@ -39,7 +39,7 @@ const IvaoStatus = ({ user }: Props) => {
   }, [isFlying])
 
   return (
-    <Box mt={2}>
+    <Box my={2}>
       {!user?.vaUser ? (
         <Alert severity='info'>
           <AlertTitle>Conecta tu cuenta de IVAO para continuar</AlertTitle>

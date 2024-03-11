@@ -46,7 +46,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       expiresIn: '7d'
     })
     setCookie('token', token, { req, res })
-    res.send({ verified: verification.verified, id: user?.id, emailVerified: user?.emailVerified })
+    res.send({ verified: verification.verified, id: user?.id, emailVerified: user?.emailVerified, token })
     return
   } catch (err) {
     console.error('login-response error =>', err)

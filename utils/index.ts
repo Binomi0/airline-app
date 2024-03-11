@@ -1,7 +1,6 @@
 import { NFT } from '@thirdweb-dev/sdk'
 import { Atc, AttributeType, Cargo, IvaoPilot } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
-import axios from 'axios'
 import BigNumber from 'bignumber.js'
 
 // A unique identifier for your website

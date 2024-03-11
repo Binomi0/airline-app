@@ -45,7 +45,6 @@ const useCargo = (): UseCargo => {
         const distance = await getDistanceByCoords(atcs, route)
         const details = cargos[getRandomInt(8)]
         const weight = getCargoWeight(aircraft)
-        // FIXME: get current callsign
         const prize = getCargoPrize(distance, aircraft)
         const cargo: Cargo = {
           origin: route.origin,
@@ -57,6 +56,7 @@ const useCargo = (): UseCargo => {
           weight,
           callsign,
           prize,
+          rewards: 0,
           status: CargoStatus.STARTED,
           remote,
           isRewarded: false

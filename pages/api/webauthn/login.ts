@@ -5,7 +5,7 @@ import { connectDB } from 'lib/mongoose'
 import Webauthn from 'models/Webauthn'
 
 // Human-readable title for your website
-const rpName = 'ELIXIR'
+const rpName = 'WEIFLY'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {

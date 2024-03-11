@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import IvaoStatus from './components/IvaoStatus'
 import IvaoAtcs from './components/IvaoAtcs'
 import useCargo from 'hooks/useCargo'
-import { getCallsign } from 'utils'
+import { formatNumber, getCallsign } from 'utils'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useContract, useNFTs } from '@thirdweb-dev/react'
 // import IvaoPilots from './components/IvaoPilots'
@@ -27,17 +27,20 @@ const IvaoView = ({ user }: Props) => {
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data: aircrafts = [], isLoading, isFetched, refetch: refetchAircrafts } = useNFTs(contract)
 
-  const handleSelectAtc = useCallback((callsign: string, side: 'start' | 'end') => {
-    if (side === 'start') {
-      if (end === callsign) return
-      setStart(callsign)
-    } else if (side === 'end') {
-      if (start === callsign) return
-      setEnd(callsign)
-    } else {
-      throw new Error('side should be one of `start` or `end`')
-    }
-  }, [])
+  const handleSelectAtc = useCallback(
+    (callsign: string, side: 'start' | 'end') => {
+      if (side === 'start') {
+        if (end === callsign) return
+        setStart(callsign)
+      } else if (side === 'end') {
+        if (start === callsign) return
+        setEnd(callsign)
+      } else {
+        throw new Error('side should be one of `start` or `end`')
+      }
+    },
+    [end, start]
+  )
 
   React.useEffect(() => {
     if (start && end && aircrafts) {
@@ -58,6 +61,9 @@ const IvaoView = ({ user }: Props) => {
       <IvaoAtcs onSelect={handleSelectAtc} start={start} end={end} />
       <Box px={2} width='100%'>
         <IvaoStatus user={user} />
+        <Typography variant='h4' align='center' paragraph>
+          Flights can only be selected from active ATC`s
+        </Typography>
         <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
           {start && (
             <Box textAlign='center'>
@@ -80,15 +86,40 @@ const IvaoView = ({ user }: Props) => {
           )}
         </Stack>
         {cargo && (
-          <Stack direction='column' width='100%' alignItems='center' justifyContent='center'>
-            <Typography align='center'>Distance: {cargo.distance}</Typography>
-            <Typography align='center'>Prize: {cargo.prize}</Typography>
-            <Typography align='center'>Name: {cargo.details.name}</Typography>
-            <Typography width={300} align='justify'>
-              Description: {cargo.details.description}
+          <Stack direction='column' width='100%' alignItems='center' justifyContent='center' mt={2}>
+            <Typography variant='h6'>{cargo.details.name}</Typography>
+
+            <Stack direction='row' justifyContent='space-between' minWidth={300}>
+              <Typography align='center'>Distance:</Typography>
+              <Typography align='center' variant='body2'>
+                {formatNumber(cargo.distance)} Km
+              </Typography>
+            </Stack>
+
+            <Stack direction='row' justifyContent='space-between' minWidth={300}>
+              <Typography align='center'>Prize:</Typography>
+              <Typography align='center' variant='body2'>
+                {formatNumber(cargo.prize)} AIRL
+              </Typography>
+            </Stack>
+
+            <Stack direction='row' justifyContent='space-between' minWidth={300}>
+              <Typography align='center'>Rewards: </Typography>
+              <Typography align='center' variant='body2'>
+                {cargo.rewards ?? '-'}
+              </Typography>
+            </Stack>
+
+            <Stack direction='row' justifyContent='space-between' minWidth={300}>
+              <Typography align='center'>Score: </Typography>
+              <Typography align='center' variant='body2'>
+                {cargo.score ?? '-'}
+              </Typography>
+            </Stack>
+
+            <Typography width={300} align='justify' variant='caption'>
+              {cargo.details.description}
             </Typography>
-            <Typography align='center'>Rewards: {cargo.rewards}</Typography>
-            <Typography align='center'>Score: {cargo.score}</Typography>
           </Stack>
         )}
         {/* <IvaoPilots /> */}

@@ -33,15 +33,15 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     if (balance.value.lte(amount)) {
       throw new Error('Missing funds in main account')
     }
-    // sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
-    // await Wallet.create({
-    //   id: req.body.id,
-    //   email: req.user,
-    //   smartAccountAddress: req.body.smartAccountAddress,
-    //   signerAddress: req.body.signerAddress,
-    //   amount,
-    //   starterGift: true
-    // })
+    sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
+    await Wallet.create({
+      id: req.body.id,
+      email: req.user,
+      smartAccountAddress: req.body.smartAccountAddress,
+      signerAddress: req.body.signerAddress,
+      amount,
+      starterGift: true
+    })
 
     res.status(201).end()
   } catch (error) {
