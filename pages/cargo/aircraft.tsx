@@ -4,25 +4,27 @@ import { Alert, AlertTitle, Box, Link as MuiLink, Container, Typography, Button 
 import Image from 'next/image'
 import image from 'public/img/real_replica_cessna_172.png'
 import styles from 'styles/Home.module.css'
-import { ConnectWallet, useAddress, useContract, useNFTBalance } from '@thirdweb-dev/react'
+import { useContract, useNFTBalance } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import Link from 'next/link'
-import axios from 'config/axios'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import Disconnected from 'components/Disconnected'
 
 const CargoItem = () => {
   const router = useRouter()
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract } = useContract(nftAircraftTokenAddress)
-
   const { data } = useNFTBalance(contract, address, 1)
 
   const handleClick = useCallback(() => {
-    axios.post('/api/flight/new', { cargoId: router.query.id })
-  }, [router.query.id])
+    console.log('HANDLE CLICK ADD CARGO?')
+  }, [])
 
-  return !address ? (
-    <ConnectWallet />
-  ) : (
+  if (!address) {
+    return <Disconnected />
+  }
+
+  return (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} style={{ opacity: 0.4 }} src={image} alt='banner' fill />
       <Container>

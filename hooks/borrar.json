@@ -1,0 +1,6 @@
+{
+  "proof": ["0x0000000000000000000000000000000000000000000000000000000000000000"],
+  "quantityLimitPerWallet": 0,
+  "pricePerToken": 1000000000000000000,
+  "currency": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+}

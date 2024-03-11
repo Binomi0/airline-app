@@ -1,105 +1,110 @@
 import React, { FC, useCallback, useEffect, useReducer } from 'react'
 import vaProviderReducer from './VaProvider.reducer'
-import { IVAOClients, VaReducerState } from './VaProvider.types'
+import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
-import axios from 'axios'
-import type { Atc, FRoute, Flight, IvaoPilot } from 'types'
+import axios from 'config/axios'
+import type { Atc, Flight, IvaoPilot } from 'types'
+import useAuth from 'hooks/useAuth'
 
+const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
   pilots: [],
   atcs: [],
+  towers: [],
   active: undefined,
   flights: {},
   origins: [],
   // filter: [""],
-  filter: ['LE', 'GC']
+  filter: ['L', 'G']
 }
 
-const reduceOthers = (origin: string, others: Atc[]): FRoute[] =>
-  others.reduce((acc: FRoute[], curr: Atc) => {
-    if (acc.some((ac) => ac.destination === curr.callsign.split('_')[0])) {
-      return acc
-    }
-    return [
-      ...acc,
-      {
-        origin,
-        destination: curr.callsign.split('_')[0]
-      }
-    ]
-  }, [] as FRoute[])
-
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth()
   const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE })
   const { Provider } = VaProviderContext
 
-  const setFlights = useCallback(
-    (atcs: Readonly<Atc[]>) => {
-      const towers = atcs.filter(
-        (a) => a.callsign.includes('TWR') && state.filter.some((i) => a.callsign.startsWith(i))
-      )
-
-      const flights: Flight = towers.reduce((acc: Flight, curr: Atc) => {
-        const others: Atc[] = towers.filter((t) => {
-          return t.id !== curr.id && t.callsign.split('_')[0] !== curr.callsign.split('_')[0]
-        })
-
-        const origin = curr.callsign.split('_')[0]
-        if (acc[origin]) {
-          return acc
-        }
-        return {
-          ...acc,
-          [origin]: reduceOthers(origin, others)
-        }
-      }, {})
-
-      dispatch({ type: 'SET_FLIGHTS', payload: flights })
-    },
-    [state.filter]
-  )
-
-  const setClients = useCallback((clients: Readonly<IVAOClients>) => {
-    dispatch({ type: 'SET_CLIENTS', payload: clients })
+  const setPilots = useCallback((pilots: IvaoPilot[]) => {
+    dispatch({ type: 'SET_PILOTS', payload: pilots })
   }, [])
 
-  const setCurrentPilot = useCallback(
-    (pilot?: Readonly<IvaoPilot>) => dispatch({ type: 'SET_CURRENT_PILOT', payload: pilot }),
-    []
-  )
+  const setAtcs = useCallback((atcs: Atc[]) => {
+    dispatch({ type: 'SET_ATCS', payload: atcs })
+  }, [])
+
+  const setTowers = useCallback((towers: Readonly<Atc[]>) => {
+    dispatch({ type: 'SET_TOWERS', payload: towers })
+  }, [])
+
+  const setFlights = useCallback((flights: Readonly<Flight>) => {
+    dispatch({ type: 'SET_FLIGHTS', payload: flights })
+  }, [])
 
   const setFilter = useCallback((value: string) => {
     dispatch({ type: 'SET_FILTER', payload: value })
   }, [])
 
-  const getClients = useCallback(async () => {
-    const response = await axios.get('/api/ivao/whazzup')
+  const getAtcs = useCallback(async () => {
+    const responseAtcs = await axios.get<Atc[]>('/api/ivao/atcs')
 
-    setClients(response.data)
-    setFlights(response.data.atcs as Readonly<Atc[]>)
-  }, [setClients, setFlights])
+    setAtcs(responseAtcs.data)
+  }, [setAtcs])
 
-  // useEffect(() => {
-  //   const timer = setInterval(getClients, 15000);
-  //   return () => clearInterval(timer);
-  // }, [getClients]);
+  const getPilots = useCallback(async () => {
+    const response = await axios.get<IvaoPilot[]>('/api/ivao/pilots')
+
+    setPilots(response.data)
+  }, [setPilots])
+
+  const getTowers = useCallback(async () => {
+    const response = await axios.get<Atc[]>('/api/ivao/towers')
+
+    setTowers(response.data)
+  }, [setTowers])
+
+  const getFlights = useCallback(async () => {
+    const response = await axios.get<Flight>('/api/ivao/flights')
+
+    setFlights(response.data)
+  }, [setFlights])
+
+  const getIVAOData = useCallback(async () => {
+    try {
+      await axios.get('/api/ivao/whazzup')
+    } catch (err) {
+      console.error('getIVAOData', err)
+    }
+  }, [])
 
   useEffect(() => {
-    getClients()
-  }, [getClients])
+    if (!user) return
+    const timer = setInterval(getIVAOData, MIN_IVAO_REQ_DELAY)
+    return () => clearInterval(timer)
+  }, [getIVAOData, user])
+
+  useEffect(() => {
+    if (!user) return
+    const timer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
+    return () => clearInterval(timer)
+  }, [getPilots, user])
+
+  useEffect(() => {
+    if (!user) return
+    getAtcs()
+    getTowers()
+    getFlights()
+  }, [getAtcs, getFlights, getTowers, user])
+
   return (
     <Provider
       value={{
         pilots: state.pilots,
         atcs: state.atcs,
+        towers: state.towers,
         active: state.active,
         flights: state.flights,
         filter: state.filter,
         origins: state.origins,
-        setFlights,
-        setFilter,
-        setCurrentPilot,
-        setClients
+        setFilter
       }}
     >
       {children}

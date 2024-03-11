@@ -1,20 +1,17 @@
-import { ConnectWallet, useUser } from '@thirdweb-dev/react'
 import type { NextPage } from 'next'
 import { Box, Container, LinearProgress, Typography } from '@mui/material'
-import AircraftMarketPlace from 'components/AircraftMarketPlace'
 import styles from 'styles/Hangar.module.css'
 import Image from 'next/image'
 import image from 'public/img/airplanes3.png'
 import serverSidePropsHandler from 'components/ServerSideHandler'
+import HangarView from 'routes/hangar/HangarView'
 
 interface HangarProps {
   loading: boolean
 }
 
 const Hangar: NextPage<HangarProps> = ({ loading }) => {
-  const { isLoading, isLoggedIn } = useUser()
-
-  if (loading || isLoading) {
+  if (loading) {
     return <LinearProgress />
   }
 
@@ -24,10 +21,9 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
       <Container>
         <Box my={5} textAlign='center'>
           <Typography variant='h1'>Main Hangar</Typography>
-          {!isLoggedIn && <ConnectWallet />}
         </Box>
 
-        <AircraftMarketPlace />
+        <HangarView />
 
         {/* {address && <MyAircrafts />} */}
       </Container>

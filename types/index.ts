@@ -1,6 +1,9 @@
+/* eslint-disable no-unused-vars */
 import { NFT } from '@thirdweb-dev/sdk'
 import { atc } from 'mocks'
 import ivaoPilot from 'mocks/ivaoPilot'
+import { VaUser } from 'models/User'
+import { ObjectId } from 'mongodb'
 
 export interface AircraftAttributes {
   deposit: number
@@ -17,14 +20,15 @@ export interface AirlineNFT {
   }
 }
 
-export type LastTrackState =
-  | 'En Route'
-  | 'Boarding'
-  | 'Approach'
-  | 'Departing'
-  | 'On Blocks'
-  | 'Initial Climb'
-  | 'Landed'
+export type LastTrackState = keyof typeof LastTrackStateEnum
+
+// | 'En_Route'
+// | 'Boarding'
+// | 'Approach'
+// | 'Departing'
+// | 'On_Blocks'
+// | 'Initial_Climb'
+// | 'Landed'
 
 export type IvaoPilot = typeof ivaoPilot
 
@@ -33,23 +37,45 @@ export interface FRoute {
   destination: string
 }
 
+export enum CargoStatus {
+  STARTED = 'STARTED',
+  COMPLETED = 'COMPLETED',
+  ABORTED = 'ABORTED'
+}
 export type Flight = Record<string, FRoute[]>
 export type Atc = typeof atc
 export interface Cargo {
+  // where it starts
   origin: string
+  // where it finish
   destination: string
+  // total distance in NM
   distance: number
-  details: CargoDetails
+  // Detailed info about cargo
+  details: CargoDetail
+  // selected aircraft nft data
   aircraft: NFT
+  // selected aircraft id
   aircraftId: string
-  weight: number
+  // pilot callsign
   callsign: string
+  weight: number
   prize: number
+  status: CargoStatus
+  remote: boolean
+  rewards?: number
+  isRewarded: boolean
+  score?: number
 }
 
-export interface CargoDetails {
+export interface CargoDetail {
   name: string
   description: string
+}
+
+export interface CargoStep {
+  name: string
+  value: string
 }
 
 export enum Aircraft {
@@ -60,10 +86,10 @@ export enum Aircraft {
 }
 
 export enum AircraftName {
-  'C700',
-  'B737',
-  'C172',
-  'AN225'
+  C700 = 'C700',
+  B737 = 'B737',
+  C172 = 'C172',
+  AN225 = 'AN225'
 }
 
 export enum License {
@@ -81,12 +107,59 @@ export type AttributeType = {
 }
 
 export enum DB {
-  develop = 'develop'
+  develop = 'develop',
+  production = 'production'
 }
 
 export enum Collection {
   user = 'user',
   cargo = 'cargo',
   live = 'live',
-  wallet = 'wallet'
+  wallet = 'wallet',
+  webauthn = 'webauthn',
+  transaction = 'transaction'
+}
+
+export interface User {
+  id?: string
+  email?: string
+  address?: string
+  vaUser?: VaUser
+}
+
+export interface Authenticator {
+  credentialID: string
+  credentialPublicKey: string
+  counter: number
+  transports?: string
+}
+
+export interface WebAuthnUser {
+  email: string
+  challenge: string
+  authenticators: Authenticator[]
+}
+
+export enum WebAuthnUri {
+  REQUEST_REGISTER = '/api/webauthn/request-register',
+  REGISTER = '/api/webauthn/register',
+  LOGIN = '/api/webauthn/login',
+  LOGIN_CHALLENGE = '/api/webauthn/login-challenge'
+}
+
+export type AccountSignerStatus = 'loading' | 'error' | 'success' | 'missingKey' | undefined
+
+export enum LastTrackStateEnum {
+  En_Route = 'En Route',
+  Boarding = 'Boarding',
+  Approach = 'Approach',
+  Departing = 'Departing',
+  On_Blocks = 'On Blocks',
+  Initial_Climb = 'Initial Climb',
+  Landed = 'Landed'
+}
+
+export interface FlightState {
+  name: LastTrackStateEnum
+  value: Date
 }

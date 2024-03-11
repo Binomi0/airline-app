@@ -9,21 +9,27 @@ import LocalAirportIcon from '@mui/icons-material/LocalAirport'
 import { useMainProviderContext } from 'context/MainProvider'
 import SidebarItem from './SidebarItem'
 import { useRouter } from 'next/router'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 
 const Sidebar: React.FC = () => {
   const router = useRouter()
   const { sidebarOpen: open, toggleSidebar } = useMainProviderContext()
+  const { live } = useLiveFlightProviderContext()
 
   const handleClick = useCallback(
     (route: string) => () => {
       router.push(route)
-      toggleSidebar()
+      toggleSidebar('left')
     },
     [router, toggleSidebar]
   )
 
   return (
-    <Drawer open={open} onClose={toggleSidebar} PaperProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.9)' } }}>
+    <Drawer
+      open={open}
+      onClose={() => toggleSidebar('left')}
+      PaperProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.9)' } }}
+    >
       <Box p={2} color='white'>
         <Typography color={'primary'} variant='h2'>
           AIRLINE
@@ -62,6 +68,14 @@ const Sidebar: React.FC = () => {
           Icon={LocalAirportIcon}
           selected={router.pathname === '/ivao'}
         />
+        {live && (
+          <SidebarItem
+            onLink={handleClick('/live')}
+            text='LIVE FLIGHT'
+            Icon={LocalAirportIcon}
+            selected={router.pathname === '/live'}
+          />
+        )}
       </List>
     </Drawer>
   )

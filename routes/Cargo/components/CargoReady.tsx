@@ -1,5 +1,5 @@
 import { Fade, Grid, Stack, Box, Typography, Alert, AlertTitle } from '@mui/material'
-import { useAddress } from '@thirdweb-dev/react'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import React from 'react'
 import CargoAircraft from 'routes/Cargo/components/CargoAircraft'
 import { Cargo } from 'types'
@@ -8,7 +8,7 @@ const CargoReady: React.FC<{
   cargo?: Cargo
   onCancel: () => void
 }> = ({ cargo, onCancel }) => {
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
 
   return (
     <Fade in={!!cargo && !!address} unmountOnExit>

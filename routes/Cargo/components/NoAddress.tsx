@@ -1,9 +1,9 @@
 import { Box, Fade, Typography } from '@mui/material'
-import { useAddress } from '@thirdweb-dev/react'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import React from 'react'
 
 const NoAddress = () => {
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
 
   return (
     <Fade in={!address} unmountOnExit>

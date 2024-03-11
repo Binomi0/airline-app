@@ -1,27 +1,40 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { getUser } from '../auth/[...thirdweb]'
-import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import Cargo from 'models/Cargo'
+import { NextApiResponse } from 'next'
+import { CargoStatus } from 'types'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method !== 'GET') return res.status(405).end()
-  const user = await getUser(req)
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
+  if (req.method === 'GET') {
+    try {
+      const cargo = await Cargo.findOne({ userId: req.id, status: CargoStatus.STARTED })
 
-  if (!user) {
-    return res.status(401).json({
-      message: 'Not authorized.'
-    })
+      if (!cargo) {
+        res.status(204).end()
+        return
+      }
+
+      res.status(200).send(cargo)
+    } catch (err) {
+      console.error('GET /api/cargp error =>', err)
+      res.status(400).send(err)
+    }
+  } else if (req.method === 'DELETE') {
+    try {
+      const current = await Cargo.findOneAndDelete({ userId: req.id, status: CargoStatus.STARTED })
+      if (current) {
+        res.status(202).end()
+        return
+      }
+      res.status(204).end()
+      return
+    } catch (err) {
+      console.error('post /api/cargp error =>', err)
+      res.status(400).send(err)
+      return
+    }
   }
-  try {
-    const client = await clientPromise
-    const db = client.db(DB.develop).collection(Collection.live)
-    const cargo = await db.findOne({ address: user.address })
 
-    return res.json(cargo)
-  } catch (e) {
-    console.error(e)
-    return res.status(500).end('ERROR')
-  }
+  res.status(405).end()
 }
 
-export default handler
+export default withAuth(handler)

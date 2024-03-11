@@ -1,28 +1,15 @@
-import { useAddress, useContract, useNFTBalance } from '@thirdweb-dev/react'
+import { useContract, useNFTBalance } from '@thirdweb-dev/react'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { nftLicenseTokenAddress } from 'contracts/address'
-import { useEffect, useRef } from 'react'
 
-const useLicense = () => {
-  const address = useAddress()
-  const { contract: licenseContract } = useContract(nftLicenseTokenAddress)
-  const licenses = useRef<Map<string, boolean>>(new Map())
+const useLicense = (id?: string) => {
+  const { smartAccountAddress } = useAlchemyProviderContext()
+  const { contract } = useContract(nftLicenseTokenAddress)
+  const { data, refetch } = useNFTBalance(contract, smartAccountAddress, id)
 
-  const licenseD = useNFTBalance(licenseContract, address, 0)
-  const licenseC = useNFTBalance(licenseContract, address, 1)
-  const licenseB = useNFTBalance(licenseContract, address, 2)
-  const licenseA = useNFTBalance(licenseContract, address, 3)
+  const hasLicense = smartAccountAddress && data ? !data.isZero() : false
 
-  useEffect(() => {
-    if (!licenseA || !licenseB || !licenseC || !licenseD) return
-    if (licenses.current.size === 0) {
-      licenses.current.set('0', !licenseD.data?.isZero())
-      licenses.current.set('1', !licenseC.data?.isZero())
-      licenses.current.set('2', !licenseB.data?.isZero())
-      licenses.current.set('3', !licenseA.data?.isZero())
-    }
-  }, [licenseA, licenseB, licenseC, licenseD])
-
-  return licenses
+  return { hasLicense, refetch }
 }
 
 export default useLicense

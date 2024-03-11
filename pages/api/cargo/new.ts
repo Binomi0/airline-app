@@ -1,43 +1,43 @@
-import { NextApiHandler } from 'next'
-import { getUser } from '../auth/[...thirdweb]'
-import clientPromise from 'lib/mongodb'
-import { Collection, DB } from 'types'
+import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import Cargo from 'models/Cargo'
+import CargoDetails from 'models/Cargo/CargoDetails'
+import { NextApiResponse } from 'next'
+import { CargoStatus } from 'types'
 
-const handler: NextApiHandler = async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).end()
-  }
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
+  if (req.method === 'POST') {
+    const cargo = req.body
 
-  const user = await getUser(req)
+    try {
+      const current = await Cargo.findOne({ userId: req.id, status: CargoStatus.STARTED })
 
-  if (!user) {
-    return res.status(401).json({
-      message: 'Not authorized.'
-    })
-  }
+      if (current) {
+        res.status(202).send(current)
+        return
+      }
 
-  const cargo = req.body
+      // TODO: Remove when al cargo details are inserted in db
+      let details = await CargoDetails.findOne({ name: cargo.details.name })
+      if (!details) {
+        details = await CargoDetails.create(cargo.details)
+      }
 
-  if (cargo.address !== user.address) {
-    return res.status(400).end()
-  }
+      const newCargo = await Cargo.create({
+        ...cargo,
+        userId: req.id,
+        details: details._id
+      })
 
-  try {
-    const client = await clientPromise
-    const db = client.db(DB.develop).collection(Collection.live)
-    const current = await db.findOne({ address: user.address })
-
-    if (current) {
-      return res.status(202).json(current)
+      res.status(201).send(newCargo)
+      return
+    } catch (error) {
+      console.error('New Cargo ERROR =>', error)
+      res.status(500).end()
+      return
     }
-
-    const newCargo = await db.insertOne(cargo)
-
-    return res.status(201).send(newCargo)
-  } catch (error) {
-    console.log('New Cargo ERROR =>', error)
-    return res.status(500).end()
   }
+
+  res.status(405).end()
 }
 
-export default handler
+export default withAuth(handler)

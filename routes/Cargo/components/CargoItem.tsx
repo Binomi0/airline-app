@@ -19,6 +19,7 @@ const CargoItem: React.FC<{
   flights: FRoute[]
   delay: number
   origin: string
+  // eslint-disable-next-line no-unused-vars
   onSelect: (origin: string, destination: string) => void
 }> = ({ flights, delay, origin, onSelect }) => {
   const handleChange = useCallback(

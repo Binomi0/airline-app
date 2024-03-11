@@ -12,17 +12,18 @@ import {
 } from '@mui/material'
 import {
   MediaRenderer,
-  useAddress,
   useClaimNFT,
   useContract,
   useLazyMint,
   useNFT,
   useSetClaimConditions
 } from '@thirdweb-dev/react'
-import axios from 'axios'
-import { flightNftAddress, nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
+import axios from 'config/axios'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { flightNftAddress, nftLicenseTokenAddress } from 'contracts/address'
 import { useRouter } from 'next/router'
 import React, { useCallback, useMemo } from 'react'
+import Swal from 'sweetalert2'
 import { Cargo } from 'types'
 import { getNFTAttributes } from 'utils'
 
@@ -34,7 +35,7 @@ interface Aircraft {
 
 const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ cargo, onCancel }) => {
   const router = useRouter()
-  const address = useAddress()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { contract: flightContract } = useContract(flightNftAddress)
   const { contract: licenseContract } = useContract(nftLicenseTokenAddress)
   const { mutateAsync: lazyMint, isLoading: isMinting } = useLazyMint(flightContract)
@@ -90,8 +91,24 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
   // }, [claimNFT, address]);
 
   const handleRequestFlight = useCallback(async () => {
-    await axios.post('/api/cargo/new', cargo)
-    router.push('/live')
+    if (!cargo) return
+    try {
+      const { aircraft: _, ...newCargo } = cargo
+
+      const { isConfirmed } = await Swal.fire({
+        title: `Callsign ${newCargo.callsign}`,
+        text: 'Are you ready for this flight? Remember to set required callsign before start',
+        icon: 'question',
+        showCancelButton: true
+      })
+      if (isConfirmed) {
+        const { data: cargo } = await axios.post('/api/cargo/new', newCargo)
+        await axios.post('/api/live/new', { cargo })
+        router.push('/live')
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }, [cargo, router])
 
   if (!cargo) {
@@ -123,13 +140,13 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
             <Stack>
               <LinearProgress color='success' variant='determinate' value={progressBar} />
               <Typography textAlign='center' variant='caption'>
-                Cargo weight: <b>{Intl.NumberFormat('en').format(cargo.weight)} Kg</b>
+                Cargo weight: <b>{Intl.NumberFormat('en').format(cargo.weight || 0)} Kg</b>
               </Typography>
               <Typography textAlign='center' variant='caption'>
                 Max Capacity: <b>{getNFTAttributes(cargo.aircraft).find((a) => a.trait_type === 'cargo')?.value} Kg</b>
               </Typography>
               <Typography>
-                Callsign: <b>{cargo?.callsign}</b>
+                Callsign: <b>{cargo.callsign}</b>
               </Typography>
               <Typography>
                 Prize:{' '}
@@ -137,7 +154,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
                   {Intl.NumberFormat('en', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
-                  }).format(cargo?.prize || 0)}{' '}
+                  }).format(cargo.prize || 0)}{' '}
                   AIRL
                 </b>
               </Typography>

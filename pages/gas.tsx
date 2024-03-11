@@ -1,41 +1,37 @@
-import { ConnectWallet, useAddress, useBalance, useUser } from '@thirdweb-dev/react'
 import type { NextPage } from 'next'
 import { Box, Container, LinearProgress, Stack, Typography } from '@mui/material'
 import GasStationView from 'routes/gas/GasStationView'
 import styles from 'styles/Gas.module.css'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
-import { rewardTokenAddress } from 'contracts/address'
 import Image from 'next/image'
 import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import serverSidePropsHandler from 'components/ServerSideHandler'
-import GppGoodIcon from '@mui/icons-material/GppGood'
+import Disconnected from 'components/Disconnected'
+import { useTokenProviderContext } from 'context/TokenProvider'
+import useAuth from 'hooks/useAuth'
+import { useContract, useContractRead } from '@thirdweb-dev/react'
+import { stakingAddress } from 'contracts/address'
+import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 
-const Gas: NextPage = () => {
-  const { data } = useBalance(rewardTokenAddress)
-  const address = useAddress()
-  const { isLoading, isLoggedIn } = useUser()
+interface Props {
+  loading: boolean
+}
 
-  if (isLoading) {
+const Gas: NextPage<Props> = ({ loading }) => {
+  const { user } = useAuth()
+  const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const { airg, airl, getAirlBalance, getAirgBalance } = useTokenProviderContext()
+  const { contract } = useContract(stakingAddress)
+  const { data: staking, refetch: getStakingInfo } = useContractRead(contract, 'stakers', [address])
+
+  if (loading) {
     return <LinearProgress />
   }
 
-  if (!isLoggedIn) {
-    return (
-      <Box mt={10} textAlign='center'>
-        <GppGoodIcon sx={{ fontSize: 72 }} color='primary' />
-        <Typography variant='h2' paragraph>
-          Sign in
-        </Typography>
-        <Typography variant='h4' paragraph>
-          Sign in with your wallet to checkout gas station.
-        </Typography>
-        <ConnectWallet />
-      </Box>
-    )
+  if (!user) {
+    return <Disconnected />
   }
-
-  if (!data) return null
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -45,16 +41,20 @@ const Gas: NextPage = () => {
         <Stack direction='row-reverse'>
           <Stack direction='row' alignItems='center' spacing={1}>
             <LocalGasStationIcon />
-            <Typography variant='h2'>{formatNumber(Number(data.displayValue))}</Typography>
-            <Typography variant='h6'>{data.symbol}</Typography>
+            <Typography variant='h2'>{formatNumber(airg?.toNumber())}</Typography>
+            <Typography variant='h6'>AIRG</Typography>
           </Stack>
         </Stack>
         <Box my={2} textAlign='center'>
           <Typography variant='h1'>Gas Station</Typography>
-          {!address && <ConnectWallet />}
         </Box>
-
-        <GasStationView />
+        <GasStationView
+          staking={staking}
+          airl={airl}
+          getAirlBalance={getAirlBalance}
+          getAirgBalance={getAirgBalance}
+          getStakingInfo={getStakingInfo}
+        />
       </Container>
     </Box>
   )

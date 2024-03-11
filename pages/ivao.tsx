@@ -1,21 +1,23 @@
 import React from 'react'
-import { Box, Container, Typography } from '@mui/material'
-import { VaProvider } from '../context/VaProvider'
+import { LinearProgress } from '@mui/material'
+import Disconnected from 'components/Disconnected'
+import serverSidePropsHandler from 'components/ServerSideHandler'
+import useAuth from 'hooks/useAuth'
 import IvaoView from 'routes/Ivao/IvaoView'
 
-const IVAOPage = () => {
-  return (
-    <VaProvider>
-      <Container>
-        <Box mt={10}>
-          <Typography paragraph textAlign='center' variant='h1'>
-            IVAO ES Active Flights
-          </Typography>
-          <IvaoView />
-        </Box>
-      </Container>
-    </VaProvider>
-  )
+interface Props {
+  loading: boolean
 }
+
+const IVAOPage = ({ loading }: Props) => {
+  const { user } = useAuth()
+
+  if (loading) return <LinearProgress />
+  if (!user) return <Disconnected />
+
+  return <IvaoView user={user} />
+}
+
+export const getServerSideProps = serverSidePropsHandler
 
 export default IVAOPage
