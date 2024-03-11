@@ -11,27 +11,33 @@ export interface CustomNextApiRequest extends NextApiRequest {
 
 const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, res: NextApiResponse) => {
   try {
-    const cookieToken = getCookie('token', { req, res })
+    await connectDB()
 
+    const cookieToken = getCookie('token', { req, res })
     if (cookieToken) {
       const decoded = jwt.verify(cookieToken as string, process.env.JWT_SECRET) as JwtPayload
       if (decoded.data.email) {
-        await connectDB()
         const user = await User.findOne({ email: decoded.data.email }, { _id: 1 })
+        if (!user?._id) {
+          throw new Error('Missing _id in user?')
+        }
         req.user = decoded.data.email
         req.id = user._id
         return handler(req, res)
       }
-    }
-    const headerToken = req.headers.authorization?.split(' ')[1]
-    if (headerToken) {
-      const decoded = jwt.verify(headerToken as string, process.env.JWT_SECRET) as JwtPayload
-      if (decoded.data.email) {
-        await connectDB()
-        const user = await User.findOne({ email: decoded.data.email }, { _id: 1 })
-        req.user = decoded.data.email
-        req.id = user._id
-        return handler(req, res)
+    } else {
+      const headerToken = req.headers.authorization?.split(' ')[1]
+      if (headerToken) {
+        const decoded = jwt.verify(headerToken as string, process.env.JWT_SECRET) as JwtPayload
+        if (decoded.data.email) {
+          const user = await User.findOne({ email: decoded.data.email }, { _id: 1 })
+          if (!user?._id) {
+            throw new Error('Missing _id in user?')
+          }
+          req.user = decoded.data.email
+          req.id = user._id
+          return handler(req, res)
+        }
       }
     }
   } catch (err) {
