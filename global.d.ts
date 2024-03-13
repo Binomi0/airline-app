@@ -1,3 +1,6 @@
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
 /* eslint-disable no-unused-vars */
 namespace NodeJS {
   interface ProcessEnv {
@@ -10,6 +13,7 @@ namespace NodeJS {
     NEXT_PUBLIC_CALLSIGN: string
     NEXT_PUBLIC_TW_CLIENT_ID: string
     NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN: string
+    NEXT_PUBLIC_API_SERVER: string
     DOMAIN: string
     ORIGIN: string
     EMAIL_SERVER_USER: string

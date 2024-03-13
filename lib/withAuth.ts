@@ -18,8 +18,12 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
       const decoded = jwt.verify(cookieToken as string, process.env.JWT_SECRET) as JwtPayload
       if (decoded.data.email) {
         const user = await User.findOne({ email: decoded.data.email }, { _id: 1 })
+        if (!user) {
+          res.status(401).end()
+          return
+        }
         if (!user?._id) {
-          throw new Error('Missing _id in user?')
+          throw new Error('[cookieToken] Missing _id in user?')
         }
         req.user = decoded.data.email
         req.id = user._id
@@ -31,8 +35,12 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
         const decoded = jwt.verify(headerToken as string, process.env.JWT_SECRET) as JwtPayload
         if (decoded.data.email) {
           const user = await User.findOne({ email: decoded.data.email }, { _id: 1 })
+          if (!user) {
+            res.status(401).end()
+            return
+          }
           if (!user?._id) {
-            throw new Error('Missing _id in user?')
+            throw new Error('[headerToken] Missing _id in user?')
           }
           req.user = decoded.data.email
           req.id = user._id

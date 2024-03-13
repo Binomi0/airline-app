@@ -20,11 +20,11 @@ const sendVerifyEmail = async (email: string, code: string) => {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!req.body.email) {
-    res.status(400).end()
-    return
-  }
   if (req.method === 'POST') {
+    if (!req.body.email) {
+      res.status(400).end()
+      return
+    }
     try {
       await connectDB()
 
