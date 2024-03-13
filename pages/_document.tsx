@@ -16,6 +16,23 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
       <Head>
         {/* PWA primary color */}
         <meta name='theme-color' content={theme.palette.primary.main} />
+        <link rel='canonical' href='https://weifly.com/' />
+        <meta
+          name='description'
+          content='WeiFly es una aerolínea virtual descentralizada basada en la red Ethereum, compatible con los últimos simuladores de vuelo y tecnología web3'
+        />
+        <meta property='og:type' content='weyfly.com' />
+
+        <meta property='og:title' content='WeiFly Decentralized Ethereum Virtual Airline' />
+
+        <meta
+          property='og:description'
+          content='WeiFly es una aerolínea virtual descentralizada basada en la red Ethereum, compatible con los últimos simuladores de vuelo y tecnología web3'
+        />
+
+        <meta property='og:image' content='img/logo.png' />
+        <meta property='og:url' content='https://weifly.com' />
+
         <link rel='shortcut icon' href='/favicon.ico' />
         <meta name='emotion-insertion-point' content='' />
         {emotionStyleTags}

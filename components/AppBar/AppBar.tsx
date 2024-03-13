@@ -8,6 +8,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { AppBarSnack, UserActionStatus } from 'components/AppBar'
 import AppBarAuth from './components/AppBarAuth'
+import Image from 'next/image'
 
 const copyToClipboard = (msg: string) => {
   navigator.clipboard.writeText(msg)
@@ -59,9 +60,16 @@ const CustomAppBar: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
-            {matches ? 'DCA Decentral Airline' : 'DCA'}
-          </Typography>
+          <Image src='/logo64x64-white.png' alt='logo' width={32} height={32} />
+          {matches ? (
+            <Typography ml={2} variant='h6' component='div' sx={{ flexGrow: 1 }}>
+              WeiFly (Alpha)
+            </Typography>
+          ) : (
+            <Typography ml={2} variant='h6' component='div' sx={{ flexGrow: 1 }}>
+              {' '}
+            </Typography>
+          )}
           {smartAccountAddress && (
             <Box
               onClick={() => copyToClipboard(smartAccountAddress)}

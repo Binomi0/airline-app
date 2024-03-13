@@ -53,6 +53,7 @@ export default function MyApp(props: MyAppProps) {
           <CustomWeb3Provider>
             <Head>
               <meta name='viewport' content='initial-scale=1, width=device-width' />
+              <title>Weifly a decentralized virtual airline based on Ethereum</title>
             </Head>
             <ThemeProvider theme={theme}>
               <CssBaseline />

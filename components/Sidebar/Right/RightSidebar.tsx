@@ -27,7 +27,7 @@ import { downloadFile } from 'utils'
 import { useRouter } from 'next/router'
 
 const RightSidebar: React.FC = () => {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const theme = useTheme()
   const router = useRouter()
   const { rightSidebarOpen: open, toggleSidebar } = useMainProviderContext()
@@ -129,6 +129,16 @@ const RightSidebar: React.FC = () => {
               <Stack direction='row' spacing={5}>
                 <ExitToApp color='error' />
                 <Typography>Log Out</Typography>
+              </Stack>
+            </ListItemButton>
+            <ListItemButton
+              onClick={() => {
+                window.open(`weifly://${token}`)
+              }}
+            >
+              <Stack direction='row' spacing={5}>
+                <ExitToApp color='error' />
+                <Typography>Abrir App</Typography>
               </Stack>
             </ListItemButton>
           </Box>

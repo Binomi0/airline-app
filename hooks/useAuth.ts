@@ -1,9 +1,9 @@
 import { useAuthProviderContext } from 'context/AuthProvider'
 
 const useAuth = () => {
-  const { user } = useAuthProviderContext()
+  const { user, token } = useAuthProviderContext()
 
-  return { user }
+  return { user, token }
 }
 
 export default useAuth

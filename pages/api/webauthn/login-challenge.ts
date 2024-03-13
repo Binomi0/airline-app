@@ -38,6 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
+    console.log('EMAIL =>', req.body.email)
     const user = await User.findOne({ email: req.body.email })
     if (!user) {
       throw new Error(`Missing user ${user.email}`)
