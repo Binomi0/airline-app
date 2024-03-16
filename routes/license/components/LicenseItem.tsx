@@ -1,4 +1,3 @@
-import { Grid, Card, CardContent, Stack, Typography, CardActions, Button, CircularProgress, Box } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
 import React, { useCallback, useState } from 'react'
 import { getNFTAttributes } from 'utils'
@@ -7,6 +6,14 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useLicense from 'hooks/useLicense'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import GradientCard from 'components/GradientCard'
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
+import CardContent from '@mui/material/CardContent'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import CardActions from '@mui/material/CardActions'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 
 interface Props {
   nft: NFT

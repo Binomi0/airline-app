@@ -1,4 +1,7 @@
-import { CardActions, Button, LinearProgress, CircularProgress } from '@mui/material'
+import Button from '@mui/material/Button'
+import CardActions from '@mui/material/CardActions'
+import CircularProgress from '@mui/material/CircularProgress'
+import LinearProgress from '@mui/material/LinearProgress'
 import { useRouter } from 'next/router'
 import React, { useCallback } from 'react'
 

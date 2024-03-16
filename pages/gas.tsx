@@ -1,5 +1,4 @@
 import type { NextPage } from 'next'
-import { Box, Container, LinearProgress, Stack, Typography } from '@mui/material'
 import GasStationView from 'routes/gas/GasStationView'
 import styles from 'styles/Gas.module.css'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
@@ -13,6 +12,11 @@ import useAuth from 'hooks/useAuth'
 import { useContract, useContractRead } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import LinearProgress from '@mui/material/LinearProgress'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 interface Props {
   loading: boolean

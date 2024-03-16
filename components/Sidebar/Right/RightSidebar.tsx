@@ -1,15 +1,3 @@
-import {
-  Avatar,
-  Box,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemButton,
-  Stack,
-  Typography
-} from '@mui/material'
 import React, { useCallback } from 'react'
 import AirlinesIcon from '@mui/icons-material/Airlines'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
@@ -25,7 +13,17 @@ import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { downloadFile } from 'utils'
 import { useRouter } from 'next/router'
-import { Login } from '@mui/icons-material'
+import Login from '@mui/icons-material/Login'
+import Drawer from '@mui/material/Drawer'
+import Box from '@mui/material/Box'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import Avatar from '@mui/material/Avatar'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
+import ListItemButton from '@mui/material/ListItemButton'
+import Stack from '@mui/material/Stack'
 
 const RightSidebar: React.FC = () => {
   const { user, token } = useAuth()

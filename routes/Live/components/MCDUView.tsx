@@ -1,8 +1,11 @@
-import { Box, Button, LinearProgress, Stack, Typography } from '@mui/material'
 import React, { useRef } from 'react'
 import { IvaoPilot } from 'types'
 import image from '../../../public/img/cockpit_view.jpg'
 import Image from 'next/image'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 // import MiniMap from './MiniMap'
 
 interface Props {

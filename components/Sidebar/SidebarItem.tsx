@@ -1,6 +1,10 @@
 import React from 'react'
 import HomeIcon from '@mui/icons-material/Home'
-import { ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material'
+import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import Typography from '@mui/material/Typography'
+import ListItemText from '@mui/material/ListItemText'
 
 const LinkItem: React.FC<{
   onLink: () => void

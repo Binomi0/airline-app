@@ -1,11 +1,12 @@
 import React from 'react'
-import { Container, LinearProgress } from '@mui/material'
 import LiveView from 'routes/Live/LiveView'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
 import useAuth from 'hooks/useAuth'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
+import LinearProgress from '@mui/material/LinearProgress'
+import Container from '@mui/material/Container'
 
 interface Props {
   loading: boolean

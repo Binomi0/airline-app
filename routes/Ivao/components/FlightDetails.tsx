@@ -1,8 +1,12 @@
-import { CardContent, Stack, Typography, LinearProgress, Box } from '@mui/material'
 import moment from 'moment'
 import React from 'react'
 import type { IvaoPilot, LastTrackStateEnum } from 'types'
 import { stateColors } from '../constants'
+import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
+import Stack from '@mui/material/Stack'
+import LinearProgress from '@mui/material/LinearProgress'
+import Box from '@mui/material/Box'
 
 interface Props {
   pilot: IvaoPilot

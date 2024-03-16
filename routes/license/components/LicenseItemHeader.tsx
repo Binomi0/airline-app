@@ -1,8 +1,12 @@
-import { CardHeader, Avatar, Collapse, Box, IconButton } from '@mui/material'
 import { MediaRenderer } from '@thirdweb-dev/react'
 import React, { useState } from 'react'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import CardHeader from '@mui/material/CardHeader'
+import Avatar from '@mui/material/Avatar'
+import IconButton from '@mui/material/IconButton'
+import Collapse from '@mui/material/Collapse'
+import Box from '@mui/material/Box'
 
 const LicenseItemHeader: React.FC<{
   name: string

@@ -1,4 +1,3 @@
-import { Grid, Box, Typography } from '@mui/material'
 import React, { useCallback, useState } from 'react'
 import { useContract } from '@thirdweb-dev/react'
 import { ethers } from 'ethers'
@@ -10,6 +9,9 @@ import useERC20 from 'hooks/useERC20'
 import GradientCard from 'components/GradientCard'
 import { amountExceedBalanceSwal, handleStakeSwal, stakedSwal } from 'lib/swal'
 import BigNumber from 'bignumber.js'
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 interface Props {
   airl?: Readonly<BigNumber>

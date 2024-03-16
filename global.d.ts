@@ -25,5 +25,7 @@ namespace NodeJS {
     JWT_SECRET: string
     PRIVATE_API_KEY: string
     NEXT_PUBLIC_MAPS_API_KEY: string
+    IVAO_SECRET: string
+    IVAO_ID: string
   }
 }

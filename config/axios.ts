@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+export const ivaoInstance = axios.create({ baseURL: 'https://api.ivao.aero/' })
+
 axios.interceptors.request.use(
   function (config) {
     return config

@@ -1,4 +1,3 @@
-import { Box, LinearProgress, Stack, Typography } from '@mui/material'
 import React, { memo, useCallback, useState } from 'react'
 import { User } from 'types'
 // import { filterLEOrigins } from 'utils'
@@ -13,6 +12,11 @@ import { useContract, useNFTs } from '@thirdweb-dev/react'
 // import IvaoPilots from './components/IvaoPilots'
 import SportsScoreIcon from '@mui/icons-material/SportsScore'
 import FlagIcon from '@mui/icons-material/Flag'
+import axios from 'config/axios'
+import Stack from '@mui/material/Stack'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import LinearProgress from '@mui/material/LinearProgress'
 
 interface Props {
   user: User
@@ -55,6 +59,12 @@ const IvaoView = ({ user }: Props) => {
       router.push('/live')
     }
   }, [live, router])
+
+  React.useEffect(() => {
+    axios.get('/api/ivao/oauth').then((response) => {
+      console.log('IVAO VIEW', response.data)
+    })
+  }, [])
 
   return (
     <Stack direction='row'>

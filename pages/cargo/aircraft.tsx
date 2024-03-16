@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useRouter } from 'next/router'
-import { Alert, AlertTitle, Box, Link as MuiLink, Container, Typography, Button } from '@mui/material'
+import MuiLink from '@mui/material/Link'
 import Image from 'next/image'
 import image from 'public/img/real_replica_cessna_172.png'
 import styles from 'styles/Home.module.css'
@@ -9,6 +9,12 @@ import { nftAircraftTokenAddress } from 'contracts/address'
 import Link from 'next/link'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import Disconnected from 'components/Disconnected'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Button from '@mui/material/Button'
 
 const CargoItem = () => {
   const router = useRouter()

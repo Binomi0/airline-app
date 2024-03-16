@@ -1,8 +1,13 @@
 import Close from '@mui/icons-material/Close'
-import { CardHeader, Stack, Button, IconButton, Avatar, useTheme } from '@mui/material'
 import React from 'react'
 import { IvaoPilot, LastTrackStateEnum } from 'types'
 import { stateColors, stateIcons } from '../constants'
+import CardHeader from '@mui/material/CardHeader'
+import Stack from '@mui/material/Stack'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import { useTheme } from '@mui/material/styles'
+import Avatar from '@mui/material/Avatar'
 
 interface Props {
   selected: boolean

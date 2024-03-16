@@ -1,5 +1,4 @@
 import { useEffect, useCallback, useState } from 'react'
-import { Fade, Box, Typography, Button, CircularProgress, Stack } from '@mui/material'
 import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
 import axios from 'config/axios'
@@ -8,6 +7,12 @@ import MCDUView from './components/MCDUView'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/router'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
+import Fade from '@mui/material/Fade'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
 
 interface Props {}
 

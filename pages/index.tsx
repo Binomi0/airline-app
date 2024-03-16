@@ -1,10 +1,13 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import { Box, Container, Grid, Typography } from '@mui/material'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import HomeGridItem from 'components/HomeGridItem'
 import image from 'public/img/Cyb3rYoga.png'
 import styles from '../styles/Home.module.css'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
 
 const Home: NextPage = () => (
   <Box position='relative'>

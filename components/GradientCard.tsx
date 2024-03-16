@@ -1,4 +1,6 @@
-import { MenuItemProps, Paper, useTheme } from '@mui/material'
+import { MenuItemProps } from '@mui/material'
+import Paper from '@mui/material/Paper'
+import { useTheme } from '@mui/material'
 import React, { ReactNode } from 'react'
 
 interface Props extends MenuItemProps {

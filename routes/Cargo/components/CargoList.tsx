@@ -1,4 +1,3 @@
-import { Box, Fade, Grid } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
 import CargoItem from './CargoItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
@@ -6,6 +5,8 @@ import { FRoute } from 'types'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { getCallsign } from 'utils'
 import { FixedSizeList, ListChildComponentProps } from 'react-window'
+import Fade from '@mui/material/Fade'
+import Box from '@mui/material/Box'
 
 const renderRow = (
   flightList: [string, FRoute[]][],

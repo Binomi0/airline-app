@@ -1,4 +1,3 @@
-import { Grid, CardContent, Stack, Typography } from '@mui/material'
 import { NFT } from '@thirdweb-dev/react'
 import React, { useCallback } from 'react'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
@@ -8,6 +7,10 @@ import useAircraft from 'hooks/useAircraft'
 import useAuth from 'hooks/useAuth'
 import useLicense from 'hooks/useLicense'
 import GradientCard from 'components/GradientCard'
+import Grid from '@mui/material/Grid'
+import CardContent from '@mui/material/CardContent'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 interface Props {
   nft: NFT

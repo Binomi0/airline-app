@@ -1,4 +1,3 @@
-import { Box, Divider, Drawer, List, Typography } from '@mui/material'
 import React, { useCallback } from 'react'
 import ConstructionIcon from '@mui/icons-material/Construction'
 import HomeIcon from '@mui/icons-material/Home'
@@ -10,6 +9,11 @@ import { useMainProviderContext } from 'context/MainProvider'
 import SidebarItem from './SidebarItem'
 import { useRouter } from 'next/router'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
+import Drawer from '@mui/material/Drawer'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
+import List from '@mui/material/List'
 
 const Sidebar: React.FC = () => {
   const router = useRouter()

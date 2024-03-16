@@ -1,4 +1,3 @@
-import { Grid, useTheme } from '@mui/material'
 import React from 'react'
 import type { Cargo, FRoute, IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
@@ -10,6 +9,8 @@ import FlightDetailsCargo from './FlightDetailsCargo'
 import FlightDetails from './FlightDetails'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import GradientCard from 'components/GradientCard'
+import Grid from '@mui/material/Grid'
+import { useTheme } from '@mui/material/styles'
 
 interface Props {
   onRemove: () => void

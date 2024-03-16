@@ -1,17 +1,3 @@
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Container,
-  Grid,
-  Stack,
-  Typography
-} from '@mui/material'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { MediaRenderer, useClaimNFT, useContract, useNFT, useNFTBalance } from '@thirdweb-dev/react'
@@ -19,6 +5,18 @@ import { getNFTAttributes } from 'utils'
 import { NextPage } from 'next'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import CardContent from '@mui/material/CardContent'
+import Stack from '@mui/material/Stack'
+import CardActions from '@mui/material/CardActions'
+import Button from '@mui/material/Button'
 
 const maps: Record<string, string> = {
   0: '0',

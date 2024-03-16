@@ -1,10 +1,13 @@
 import type { NextPage } from 'next'
-import { Box, Container, LinearProgress, Typography } from '@mui/material'
 import styles from 'styles/Hangar.module.css'
 import Image from 'next/image'
 import image from 'public/img/airplanes3.png'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import HangarView from 'routes/hangar/HangarView'
+import LinearProgress from '@mui/material/LinearProgress'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
 
 interface HangarProps {
   loading: boolean

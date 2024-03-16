@@ -1,7 +1,8 @@
-import { Stack, Typography } from '@mui/material'
 import React from 'react'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
 import { useTokenProviderContext } from 'context/TokenProvider'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 interface Props {
   show: boolean

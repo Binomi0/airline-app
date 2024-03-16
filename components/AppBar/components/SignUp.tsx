@@ -5,7 +5,7 @@ import { validateEmail } from 'utils'
 import EmailInput from './EmailInput'
 import CodeInput from './CodeInput'
 import { UserActionStatus } from 'components/AppBar'
-import { CircularProgress } from '@mui/material'
+import CircularProgress from '@mui/material/CircularProgress'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars

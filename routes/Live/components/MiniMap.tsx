@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import Box from '@mui/material/Box'
 import { GoogleMap, Marker, useJsApiLoader, Polyline } from '@react-google-maps/api'
 import { useVaProviderContext } from 'context/VaProvider'
 import React from 'react'

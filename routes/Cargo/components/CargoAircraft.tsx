@@ -1,15 +1,13 @@
-import {
-  Avatar,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Grid,
-  LinearProgress,
-  Stack,
-  Typography
-} from '@mui/material'
+import Avatar from '@mui/material/Avatar'
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
+import Grid from '@mui/material/Grid'
+import LinearProgress from '@mui/material/LinearProgress'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import {
   MediaRenderer,
   useClaimNFT,

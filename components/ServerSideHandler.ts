@@ -33,7 +33,6 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
           await connectDB()
           const user = await User.findOne({ email }).populate('vaUser', 'pilotId type -_id')
 
-          console.log({ user })
           if (user) {
             return {
               props: {

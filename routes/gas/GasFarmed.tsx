@@ -1,4 +1,3 @@
-import { Grid, Box, Typography, Stack, Button } from '@mui/material'
 import React, { useCallback, useEffect } from 'react'
 import { useContract, useContractRead } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
@@ -7,6 +6,11 @@ import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import useStaking from 'hooks/useStaking'
 import Swal from 'sweetalert2'
 import GradientCard from 'components/GradientCard'
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Stack from '@mui/material/Stack'
+import Button from '@mui/material/Button'
 
 const MIN_REWARDS_CLAIM = '100000000000000000000'
 

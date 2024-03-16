@@ -1,5 +1,5 @@
 import React from 'react'
-import { LinearProgress } from '@mui/material'
+import LinearProgress from '@mui/material/LinearProgress'
 import Disconnected from 'components/Disconnected'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import useAuth from 'hooks/useAuth'

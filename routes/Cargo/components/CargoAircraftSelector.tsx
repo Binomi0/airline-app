@@ -1,14 +1,12 @@
-import {
-  Container,
-  Box,
-  Typography,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListSubheader,
-  Avatar,
-  Stack
-} from '@mui/material'
+import Avatar from '@mui/material/Avatar'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListSubheader from '@mui/material/ListSubheader'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { MediaRenderer } from '@thirdweb-dev/react'
 import { NFT } from '@thirdweb-dev/sdk'
 import { useRouter } from 'next/router'

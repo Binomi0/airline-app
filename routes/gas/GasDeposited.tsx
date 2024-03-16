@@ -1,13 +1,15 @@
-import { Grid, Box, Typography } from '@mui/material'
 import React, { useCallback } from 'react'
 import { formatNumber } from 'utils'
-import { useContract, useContractRead } from '@thirdweb-dev/react'
+import { useContract } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import { ethers } from 'ethers'
 import useStaking from 'hooks/useStaking'
 import GradientCard from 'components/GradientCard'
 import { handleUnStakeSwal, maxWithdrawExceeded, unstakedSwal } from 'lib/swal'
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 interface Props {
   getAirlBalance: () => void

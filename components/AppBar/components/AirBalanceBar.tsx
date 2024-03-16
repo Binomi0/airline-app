@@ -1,7 +1,8 @@
 import React from 'react'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
-import { Stack, Typography } from '@mui/material'
 import { useTokenProviderContext } from 'context/TokenProvider'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 interface Props {
   show: boolean

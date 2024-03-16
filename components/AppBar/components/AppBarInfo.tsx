@@ -1,4 +1,4 @@
-import { IconButton } from '@mui/material'
+import IconButton from '@mui/material/IconButton'
 import React from 'react'
 import SummarizeIcon from '@mui/icons-material/Summarize'
 import AirBalanceBar from './AirBalanceBar'

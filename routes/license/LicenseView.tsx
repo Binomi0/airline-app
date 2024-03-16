@@ -1,4 +1,3 @@
-import { Box, Typography, Grid, LinearProgress } from '@mui/material'
 import React, { useCallback } from 'react'
 import { NFT, useContract } from '@thirdweb-dev/react'
 import { nftLicenseTokenAddress } from 'contracts/address'
@@ -8,6 +7,10 @@ import { useLicenseProviderContext } from 'context/LicenseProvider/LicenseProvid
 import { useTokenProviderContext } from 'context/TokenProvider'
 import Swal from 'sweetalert2'
 import { getNFTAttributes } from 'utils'
+import LinearProgress from '@mui/material/LinearProgress'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
 
 const LicenseView: React.FC = () => {
   const { contract } = useContract(nftLicenseTokenAddress)

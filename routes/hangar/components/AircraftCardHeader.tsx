@@ -1,10 +1,13 @@
 import React, { startTransition, useState } from 'react'
 import router from 'next/router'
 import { MediaRenderer, NFT } from '@thirdweb-dev/react'
-import { CardHeader, Avatar, Collapse, IconButton } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { nftAircraftTokenAddress } from 'contracts/address'
+import CardHeader from '@mui/material/CardHeader'
+import Avatar from '@mui/material/Avatar'
+import IconButton from '@mui/material/IconButton'
+import Collapse from '@mui/material/Collapse'
 
 const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
   const [open, setOpen] = useState(false)
