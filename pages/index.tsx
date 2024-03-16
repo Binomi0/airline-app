@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import serverSidePropsHandler from 'components/ServerSideHandler'
+// import serverSidePropsHandler from 'components/ServerSideHandler'
 import HomeGridItem from 'components/HomeGridItem'
 import image from 'public/img/Cyb3rYoga.png'
 import styles from '../styles/Home.module.css'
@@ -51,6 +51,6 @@ const Home: NextPage = () => (
   </Box>
 )
 
-export const getServerSideProps = serverSidePropsHandler
+// export const getServerSideProps = serverSidePropsHandler
 
 export default Home
