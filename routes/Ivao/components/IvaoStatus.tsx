@@ -28,7 +28,7 @@ const IvaoStatus = ({ user }: Props) => {
         vaUser: { type: 'IVAO', pilotId: inputRef.current.value }
       })
 
-      signIn({ ...user, vaUser: { type: 'IVAO', pilotId: inputRef.current.value } })
+      signIn({ user: { ...user, vaUser: { type: 'IVAO', pilotId: inputRef.current.value } } })
     } catch (err) {
       console.error(err)
     }
