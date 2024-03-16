@@ -16,6 +16,7 @@ namespace NodeJS {
     NEXT_PUBLIC_API_SERVER: string
     DOMAIN: string
     ORIGIN: string
+    ORIGIN_MAIN: string
     EMAIL_SERVER_USER: string
     EMAIL_SERVER_PASSWORD: string
     EMAIL_SERVER_HOST: string

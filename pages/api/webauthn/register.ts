@@ -9,7 +9,7 @@ import Webauthn from 'models/Webauthn'
 // A unique identifier for your website
 const rpID = process.env.DOMAIN
 // The URL at which registrations and authentications should occur
-const origin = process.env.ORIGIN as string
+const origin = [process.env.ORIGIN, process.env.ORIGIN_MAIN]
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body } = req
