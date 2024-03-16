@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Alert, AppBar, Box, IconButton, Snackbar, Toolbar, Typography, useScrollTrigger } from '@mui/material'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Alert, AppBar, Box, IconButton, Snackbar, Toolbar, Tooltip, Typography, useScrollTrigger } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useMainProviderContext } from 'context/MainProvider'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
@@ -9,6 +9,7 @@ import useAccountSigner from 'hooks/useAccountSigner'
 import { AppBarSnack, UserActionStatus } from 'components/AppBar'
 import AppBarAuth from './components/AppBarAuth'
 import Image from 'next/image'
+import { Download } from '@mui/icons-material'
 
 const copyToClipboard = (msg: string) => {
   navigator.clipboard.writeText(msg)
@@ -27,6 +28,8 @@ const CustomAppBar: React.FC = () => {
   const { user } = useAuthProviderContext()
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
+
+  const handleDownloadApp = useCallback(() => {}, [])
 
   useEffect(() => {
     setSnack({ open: status === 'missingKey', message: 'Missing Key', status: 'error' })
@@ -69,6 +72,13 @@ const CustomAppBar: React.FC = () => {
             <Typography ml={2} variant='h6' component='div' sx={{ flexGrow: 1 }}>
               {' '}
             </Typography>
+          )}
+          {user && (
+            <Tooltip title='Download App'>
+              <IconButton color='inherit' onClick={handleDownloadApp}>
+                <Download color='inherit' />
+              </IconButton>
+            </Tooltip>
           )}
           {smartAccountAddress && (
             <Box

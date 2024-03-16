@@ -48,7 +48,7 @@ export default function MyApp(props: MyAppProps) {
 
   return (
     <CacheProvider value={emotionCache}>
-      <AuthProvider user={props.pageProps.user}>
+      <AuthProvider user={props.pageProps.user} token={props.pageProps.token}>
         <AlchemyProvider>
           <CustomWeb3Provider>
             <Head>

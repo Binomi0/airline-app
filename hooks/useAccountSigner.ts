@@ -42,10 +42,10 @@ const useAccountSigner = () => {
       const request = await startAuthentication(responseChallenge.data)
       const responseValidation = await axios.post(WebAuthnUri.LOGIN_CHALLENGE, { data: request, email })
 
-      const { verified } = responseValidation.data
+      const { verified, token } = responseValidation.data
       setStatus(verified ? 'success' : 'error')
 
-      return { verified }
+      return { verified, token }
     } catch (err) {
       console.error(err)
       setStatus('error')
@@ -53,32 +53,35 @@ const useAccountSigner = () => {
     }
   }, [])
 
-  const loadAccount = useCallback(async () => {
-    try {
-      const { data } = await axios.get<{ user: User }>('/api/user/get')
+  const loadAccount = useCallback(
+    async (token?: string) => {
+      try {
+        const { data } = await axios.get<{ user: User }>('/api/user/get')
 
-      await initWallet(data.user)
-      signIn(data.user)
-      setStatus('success')
-    } catch (err) {
-      setStatus('error')
-      signOut()
-      throw new Error('While loading account')
-    }
-  }, [initWallet, signIn, signOut])
+        await initWallet(data.user)
+        signIn({ user: data.user, ...(token ? { token } : {}) })
+        setStatus('success')
+      } catch (err) {
+        setStatus('error')
+        signOut()
+        throw new Error('While loading account')
+      }
+    },
+    [initWallet, signIn, signOut]
+  )
 
   const handleSignIn = useCallback(
     async (email: string) => {
       setStatus('loading')
       try {
-        const { verified } = await verifyCredential(email)
+        const { verified, token } = await verifyCredential(email)
         if (!verified) {
           // User cancelled challenge or timeout
           setStatus('error')
           throw new Error('while verify user credentials')
         }
 
-        await loadAccount()
+        await loadAccount(token)
         loginSuccessSwal()
       } catch (err) {
         const error = err as Error

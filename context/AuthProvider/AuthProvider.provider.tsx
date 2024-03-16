@@ -12,17 +12,19 @@ export const INITIAL_STATE: AuthReducerState = {
 interface Props {
   children: React.ReactNode
   user?: User
+  token?: string
 }
 
-export const AuthProvider = ({ children, user }: Props) => {
+export const AuthProvider = ({ children, user, token }: Props) => {
   const [state, dispatch] = useReducer(authProviderReducer, {
     ...INITIAL_STATE,
-    user
+    user,
+    token
   })
   const { Provider } = AuthProviderContext
 
-  const signIn = useCallback((user: User) => {
-    dispatch({ type: 'SIGN_IN', payload: user })
+  const signIn = useCallback((auth: AuthReducerState) => {
+    dispatch({ type: 'SIGN_IN', payload: auth })
   }, [])
 
   const signOut = useCallback(() => {
@@ -32,6 +34,7 @@ export const AuthProvider = ({ children, user }: Props) => {
   return (
     <Provider
       value={{
+        token,
         user: state.user,
         signIn,
         signOut

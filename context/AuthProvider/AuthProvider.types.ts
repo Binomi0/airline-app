@@ -1,7 +1,7 @@
 import { User } from 'types'
 
 type Actions = SignIn | SignOut
-type SignIn = Readonly<{ type: 'SIGN_IN'; payload: User }>
+type SignIn = Readonly<{ type: 'SIGN_IN'; payload: AuthReducerState }>
 type SignOut = Readonly<{ type: 'SIGN_OUT' }>
 
 export type AuthReducerState = {
@@ -10,7 +10,7 @@ export type AuthReducerState = {
 }
 
 export type AuthContextProps = AuthReducerState & {
-  signIn: (user: Readonly<User>) => void
+  signIn: (auth: AuthReducerState) => void
   signOut: () => void
 }
 

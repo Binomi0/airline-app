@@ -25,6 +25,7 @@ import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { downloadFile } from 'utils'
 import { useRouter } from 'next/router'
+import { Login } from '@mui/icons-material'
 
 const RightSidebar: React.FC = () => {
   const { user, token } = useAuth()
@@ -100,6 +101,20 @@ const RightSidebar: React.FC = () => {
             </Typography>
           </ListItem>
           <Divider />
+          <List>
+            <ListItemButton
+              onClick={() => {
+                // window.open(`weifly://token=${token}`, '_blank')
+                window.open(`weifly://${token}`)
+              }}
+            >
+              <Stack direction='row' spacing={5}>
+                <Login color='success' />
+                <Typography>Abrir App</Typography>
+              </Stack>
+            </ListItemButton>
+          </List>
+          <Divider />
           <Box my={10}>
             <ListItemButton onClick={handleAddBackup}>
               <Stack direction='row' spacing={5}>
@@ -129,16 +144,6 @@ const RightSidebar: React.FC = () => {
               <Stack direction='row' spacing={5}>
                 <ExitToApp color='error' />
                 <Typography>Log Out</Typography>
-              </Stack>
-            </ListItemButton>
-            <ListItemButton
-              onClick={() => {
-                window.open(`weifly://${token}`)
-              }}
-            >
-              <Stack direction='row' spacing={5}>
-                <ExitToApp color='error' />
-                <Typography>Abrir App</Typography>
               </Stack>
             </ListItemButton>
           </Box>
