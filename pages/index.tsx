@@ -52,7 +52,7 @@ const Home: NextPage = () => (
 
 export const getServerSideProps = serverSidePropsHandler
 export const config = {
-  runtime: 'edge' // or "edge"
+  runtime: 'experimental-edge' // or "nojdejs"
 }
 
 export default Home
