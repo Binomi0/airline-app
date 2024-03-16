@@ -12,6 +12,12 @@ interface Props {
 }
 
 const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<Props> => {
+  return {
+    props: {
+      user: null,
+      token: null
+    }
+  }
   try {
     const token = getCookie('token', { req: ctx.req, res: ctx.res }) as string
     if (token) {
@@ -63,9 +69,6 @@ const serverSidePropsHandler = async (ctx: GetServerSidePropsContext): Promise<P
   } catch (err) {
     console.error(new Date(), '[serverSidePropsHandler] ERROR WHILE GETTING COOKIE TOKEN =>', err)
   }
-
-  console.log(new Date(), '[serverSidePropsHandler] end no token received.')
-  // deleteCookie('token', { req: ctx.req, res: ctx.res })
 
   return {
     props: {
