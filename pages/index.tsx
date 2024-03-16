@@ -1,13 +1,13 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
-// import serverSidePropsHandler from 'components/ServerSideHandler'
-import HomeGridItem from 'components/HomeGridItem'
-import image from 'public/img/Cyb3rYoga.png'
-import styles from '../styles/Home.module.css'
+import serverSidePropsHandler from 'components/ServerSideHandler'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
+import image from 'public/img/Cyb3rYoga.png'
+import HomeGridItem from 'components/HomeGridItem'
+import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => (
   <Box position='relative'>
@@ -37,8 +37,7 @@ const Home: NextPage = () => (
           delay={2000}
           link='/cargo'
           title='Cargo &rarr;'
-          text='Realiza alguno de los vuelos pendientes y gana tokens
-                      AIRL.'
+          text='Realiza alguno de los vuelos pendientes y gana tokens AIRL.'
         />
         <HomeGridItem
           delay={2500}
@@ -51,6 +50,9 @@ const Home: NextPage = () => (
   </Box>
 )
 
-// export const getServerSideProps = serverSidePropsHandler
+export const getServerSideProps = serverSidePropsHandler
+export const config = {
+  runtime: 'edge' // or "edge"
+}
 
 export default Home
