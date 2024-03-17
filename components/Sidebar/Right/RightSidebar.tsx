@@ -8,6 +8,7 @@ import ExitToApp from '@mui/icons-material/ExitToApp'
 import ImportExport from '@mui/icons-material/ImportExport'
 import VerifiedUser from '@mui/icons-material/VerifiedUser'
 import { accountBackupSwal, askExportKeySwal, missingExportKeySwal, signedOutSwal } from 'lib/swal'
+import customProtocolCheck from 'custom-protocol-check'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { downloadFile } from 'utils'
@@ -78,6 +79,25 @@ const RightSidebar: React.FC = () => {
     if (confirm.isConfirmed) handleSignOut()
   }, [handleSignOut, toggleSidebar])
 
+  const handleOpenApp = React.useCallback(() => {
+    console.log({ token })
+    if (!token) {
+      throw new Error('Missing token to open app')
+    }
+    // window.open(`weifly4://token=${token}`)
+    customProtocolCheck(
+      `weifly://token=${token}`,
+      () => {
+        console.log('App is not installed in user system')
+      },
+      () => {
+        console.log('App ready to open in user system')
+        window.open(`weifly://token=${token}`)
+      },
+      5000
+    )
+  }, [token])
+
   if (!user) {
     return null
   }
@@ -103,12 +123,7 @@ const RightSidebar: React.FC = () => {
           </ListItem>
           <Divider />
           <List>
-            <ListItemButton
-              onClick={() => {
-                // window.open(`weifly://token=${token}`, '_blank')
-                window.open(`weifly://${token}`)
-              }}
-            >
+            <ListItemButton onClick={handleOpenApp}>
               <Stack direction='row' spacing={5}>
                 <Login color='success' />
                 <Typography>Abrir App</Typography>

@@ -8,14 +8,14 @@ import { backupDoneSwal, loginSuccessSwal } from 'lib/swal'
 import { AccountSignerStatus, User, WebAuthnUri } from 'types'
 import useWallet from './useWallet'
 import { useRouter } from 'next/router'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
 import { authState } from 'store/auth.atom'
 
 const useAccountSigner = () => {
   const { setBaseSigner, setSmartAccountAddress, setSmartSigner } = useAlchemyProviderContext()
   const [user, setUser] = useRecoilState(userState)
-  const [token, setToken] = useRecoilState(authState)
+  const setToken = useSetRecoilState(authState)
   const [status, setStatus] = useState<AccountSignerStatus>()
   const { initWallet } = useWallet()
   const router = useRouter()
@@ -59,10 +59,10 @@ const useAccountSigner = () => {
   const loadAccount = useCallback(
     async (token?: string) => {
       try {
-        const { data } = await axios.get<{ user: User }>('/api/user/get')
+        const { data } = await axios.get<User>('/api/user/get')
 
-        await initWallet(data.user)
-        setUser(data.user)
+        await initWallet(data)
+        setUser(data)
         setToken(token)
         setStatus('success')
       } catch (err) {

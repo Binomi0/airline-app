@@ -34,4 +34,6 @@ const Hangar: NextPage<HangarProps> = ({ loading }) => {
   )
 }
 
+export const getServerSideProps = serverSidePropsHandler
+
 export default Hangar
