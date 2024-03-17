@@ -1,6 +1,5 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import serverSidePropsHandler from 'components/ServerSideHandler'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
@@ -8,10 +7,13 @@ import Grid from '@mui/material/Grid'
 import image from 'public/img/Cyb3rYoga.png'
 import HomeGridItem from 'components/HomeGridItem'
 import styles from '../styles/Home.module.css'
+import { PageProps } from 'types'
+import { LinearProgress } from '@mui/material'
 
-const Home: NextPage = () => (
+const Home: NextPage<PageProps> = ({ loading }) => (
   <Box position='relative'>
     <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />
+    {loading && <LinearProgress />}
 
     <Container>
       <Box my={5} textAlign='center'>
@@ -50,7 +52,6 @@ const Home: NextPage = () => (
   </Box>
 )
 
-export const getServerSideProps = serverSidePropsHandler
 // export const config = {
 //   runtime: 'experimental-edge' // or "nojdejs"
 // }

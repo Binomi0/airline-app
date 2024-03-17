@@ -46,13 +46,11 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
     getCargo()
   }, [getCargo])
 
-  if (loading || !flights) {
-    return <LinearProgress />
-  }
-
   return (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} src={image} alt='banner' fill />
+      {(loading || !flights) && <LinearProgress />}
+
       <Container>
         <NoAddress />
 

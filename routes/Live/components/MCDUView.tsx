@@ -16,12 +16,12 @@ interface Props {
 const MCDUView = ({ pilot, onDisconnect }: Props) => {
   const boxRef = useRef<HTMLDivElement>(null)
 
-  if (!pilot) return <LinearProgress />
-
   return (
     <Box ref={boxRef}>
       {/* <MiniMap pilot={pilot} /> */}
       <Image src={image} fill objectFit='none' alt='flight' style={{ opacity: 0.4, filter: 'blur(0.2rem)' }} />
+      {!pilot && <LinearProgress />}
+
       <Stack direction='row' justifyContent='center' sx={{ fontFamily: 'B612 Mono', zIndex: 10 }}>
         <Stack justifyContent='space-between' sx={{ zIndex: 1 }}>
           <Box width={640} height={480} bgcolor='secondary.dark' p={2} sx={{ boxShadow: '0 0 100px inset #000' }}>

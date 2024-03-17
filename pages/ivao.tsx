@@ -1,16 +1,12 @@
 import React from 'react'
 import LinearProgress from '@mui/material/LinearProgress'
 import Disconnected from 'components/Disconnected'
-import serverSidePropsHandler from 'components/ServerSideHandler'
 import IvaoView from 'routes/Ivao/IvaoView'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
+import type { PageProps } from 'types'
 
-interface Props {
-  loading: boolean
-}
-
-const IVAOPage = ({ loading }: Props) => {
+const IVAOPage = ({ loading }: PageProps) => {
   const user = useRecoilValue(userState)
 
   if (loading) return <LinearProgress />
@@ -18,7 +14,5 @@ const IVAOPage = ({ loading }: Props) => {
 
   return <IvaoView user={user} />
 }
-
-export const getServerSideProps = serverSidePropsHandler
 
 export default IVAOPage

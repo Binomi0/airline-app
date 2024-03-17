@@ -50,7 +50,7 @@ export default function MyApp(props: MyAppProps) {
   return (
     <CacheProvider value={emotionCache}>
       <RecoilRoot>
-        <AuthProvider token={props.pageProps.token}>
+        <AuthProvider>
           <AlchemyProvider>
             <CustomWeb3Provider>
               <Head>

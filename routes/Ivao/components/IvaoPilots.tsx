@@ -56,6 +56,7 @@ const IvaoPilots = () => {
       handleSelect(selected)
     }
   }, [handleSelect, pilots, selected])
+
   if (!pilots.length) {
     return <LinearProgress />
   }

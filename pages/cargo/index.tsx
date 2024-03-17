@@ -1,9 +1,7 @@
 import React, { useState } from 'react'
-import { NextPage } from 'next'
 import { NFT } from '@thirdweb-dev/react'
 import CargoView from 'routes/Cargo/CargoView'
 import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector'
-import serverSidePropsHandler from 'components/ServerSideHandler'
 import { VaProvider } from 'context/VaProvider'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
@@ -16,8 +14,9 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
+import type { PageProps } from 'types'
 
-const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
+const CargoPage = ({ loading }: PageProps) => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const [aircraft, setAircraft] = useState<NFT>()
@@ -59,7 +58,5 @@ const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
     </VaProvider>
   )
 }
-
-export const getServerSideProps = serverSidePropsHandler
 
 export default CargoPage

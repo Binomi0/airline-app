@@ -163,3 +163,7 @@ export interface FlightState {
   name: LastTrackStateEnum
   value: Date
 }
+
+export interface PageProps {
+  loading: boolean
+}

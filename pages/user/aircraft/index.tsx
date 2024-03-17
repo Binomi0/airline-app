@@ -1,6 +1,4 @@
 import type { NextPage } from 'next'
-
-import serverSidePropsHandler from 'components/ServerSideHandler'
 import GradientCard from 'components/GradientCard'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
@@ -112,7 +110,5 @@ const UserAircrafts: NextPage = () => {
     </Box>
   )
 }
-
-export const getServerSideProps = serverSidePropsHandler
 
 export default UserAircrafts

@@ -1,6 +1,5 @@
 import React from 'react'
 import LiveView from 'routes/Live/LiveView'
-import serverSidePropsHandler from 'components/ServerSideHandler'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
@@ -8,12 +7,9 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Container from '@mui/material/Container'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
+import type { PageProps } from 'types'
 
-interface Props {
-  loading: boolean
-}
-
-const LivePage = ({ loading }: Props) => {
+const LivePage = ({ loading }: PageProps) => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const { live } = useLiveFlightProviderContext()
@@ -38,7 +34,5 @@ const LivePage = ({ loading }: Props) => {
     </Container>
   ) : null
 }
-
-export const getServerSideProps = serverSidePropsHandler
 
 export default LivePage

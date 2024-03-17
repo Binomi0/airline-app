@@ -1,8 +1,6 @@
 import { useContract, useNFT } from '@thirdweb-dev/react'
-import serverSidePropsHandler from 'components/ServerSideHandler'
 import { VaProvider } from 'context/VaProvider'
 import { nftAircraftTokenAddress } from 'contracts/address'
-import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import React from 'react'
 import CargoView from 'routes/Cargo/CargoView'
@@ -14,8 +12,9 @@ import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
+import type { PageProps } from 'types'
 
-const CargoAircraft: NextPage<{ loading: boolean; NoAddress: React.ReactNode }> = ({ loading }) => {
+const CargoAircraft = ({ loading }: PageProps) => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const { contract } = useContract(nftAircraftTokenAddress)
@@ -61,7 +60,5 @@ const CargoAircraft: NextPage<{ loading: boolean; NoAddress: React.ReactNode }> 
     </VaProvider>
   )
 }
-
-export const getServerSideProps = serverSidePropsHandler
 
 export default CargoAircraft
