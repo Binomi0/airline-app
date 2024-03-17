@@ -7,7 +7,8 @@ import axios from 'config/axios'
 import { User } from 'types'
 import { missingKeySwal } from 'lib/swal'
 import alchemy from 'lib/alchemy'
-import useAuth from './useAuth'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 // const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -20,7 +21,7 @@ interface UseWallet {
 
 const useWallet = (): UseWallet => {
   const [isLoaded, setIsLoaded] = useState(false)
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const { setSmartAccountAddress, setSmartSigner, setBaseSigner } = useAlchemyProviderContext()
 
   const initialize = useCallback(

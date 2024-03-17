@@ -7,12 +7,15 @@ import { deleteCookie } from 'cookies-next'
 import { backupDoneSwal, loginSuccessSwal } from 'lib/swal'
 import { AccountSignerStatus, User, WebAuthnUri } from 'types'
 import useWallet from './useWallet'
-import { useAuthProviderContext } from 'context/AuthProvider'
 import { useRouter } from 'next/router'
+import { useRecoilState } from 'recoil'
+import { userState } from 'store/user.atom'
+import { authState } from 'store/auth.atom'
 
 const useAccountSigner = () => {
   const { setBaseSigner, setSmartAccountAddress, setSmartSigner } = useAlchemyProviderContext()
-  const { signIn, signOut, user } = useAuthProviderContext()
+  const [user, setUser] = useRecoilState(userState)
+  const [token, setToken] = useRecoilState(authState)
   const [status, setStatus] = useState<AccountSignerStatus>()
   const { initWallet } = useWallet()
   const router = useRouter()
@@ -59,15 +62,17 @@ const useAccountSigner = () => {
         const { data } = await axios.get<{ user: User }>('/api/user/get')
 
         await initWallet(data.user)
-        signIn({ user: data.user, ...(token ? { token } : {}) })
+        setUser(data.user)
+        setToken(token)
         setStatus('success')
       } catch (err) {
         setStatus('error')
-        signOut()
+        setUser(undefined)
+        setToken(undefined)
         throw new Error('While loading account')
       }
     },
-    [initWallet, signIn, signOut]
+    [initWallet, setToken, setUser]
   )
 
   const handleSignIn = useCallback(
@@ -113,9 +118,10 @@ const useAccountSigner = () => {
     setSmartAccountAddress(undefined)
     setSmartSigner(undefined)
     deleteCookie('token')
-    signOut()
+    setUser(undefined)
+    setToken(undefined)
     router.asPath !== '/' && router.push('/')
-  }, [router, setBaseSigner, setSmartAccountAddress, setSmartSigner, signOut])
+  }, [router, setBaseSigner, setSmartAccountAddress, setSmartSigner, setToken, setUser])
 
   const addBackup = useCallback(async () => {
     if (!user?.email || !user?.id) {

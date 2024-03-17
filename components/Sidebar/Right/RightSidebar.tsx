@@ -3,7 +3,6 @@ import AirlinesIcon from '@mui/icons-material/Airlines'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import { useMainProviderContext } from 'context/MainProvider'
 import { useTheme } from '@mui/system'
-import useAuth from 'hooks/useAuth'
 import Backup from '@mui/icons-material/Backup'
 import ExitToApp from '@mui/icons-material/ExitToApp'
 import ImportExport from '@mui/icons-material/ImportExport'
@@ -24,9 +23,13 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import ListItemButton from '@mui/material/ListItemButton'
 import Stack from '@mui/material/Stack'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
+import { authState } from 'store/auth.atom'
 
 const RightSidebar: React.FC = () => {
-  const { user, token } = useAuth()
+  const user = useRecoilValue(userState)
+  const token = useRecoilValue(authState)
   const theme = useTheme()
   const router = useRouter()
   const { rightSidebarOpen: open, toggleSidebar } = useMainProviderContext()

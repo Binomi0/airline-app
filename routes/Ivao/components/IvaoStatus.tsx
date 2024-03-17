@@ -7,9 +7,10 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { darken } from '@mui/material/styles'
 import axios from 'config/axios'
-import { useAuthProviderContext } from 'context/AuthProvider'
 import { useVaProviderContext } from 'context/VaProvider'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSetRecoilState } from 'recoil'
+import { userState } from 'store/user.atom'
 import { User } from 'types'
 
 interface Props {
@@ -17,7 +18,7 @@ interface Props {
 }
 
 const IvaoStatus = ({ user }: Props) => {
-  const { signIn } = useAuthProviderContext()
+  const setUser = useSetRecoilState(userState)
   const [color, setColor] = useState('#fff')
   const { pilots } = useVaProviderContext()
   const inputRef = useRef<HTMLInputElement>()
@@ -35,11 +36,11 @@ const IvaoStatus = ({ user }: Props) => {
         vaUser: { type: 'IVAO', pilotId: inputRef.current.value }
       })
 
-      signIn({ user: { ...user, vaUser: { type: 'IVAO', pilotId: inputRef.current.value } } })
+      setUser({ ...user, vaUser: { type: 'IVAO', pilotId: inputRef.current.value } })
     } catch (err) {
       console.error(err)
     }
-  }, [signIn, user])
+  }, [setUser, user])
 
   useEffect(() => {
     setColor(isFlying ? '#00FF00' : '#FFF000')

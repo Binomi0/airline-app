@@ -5,7 +5,8 @@ import { AircraftReducerState } from './AircraftProvider.types'
 import { NFT } from '@thirdweb-dev/sdk'
 import { useContract, useNFTs, useOwnedNFTs } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
-import useAuth from 'hooks/useAuth'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 export const INITIAL_STATE: AircraftReducerState = {
   aircrafts: [],
@@ -14,7 +15,7 @@ export const INITIAL_STATE: AircraftReducerState = {
 }
 
 export const AircraftProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data: aircrafts = [], isLoading, isFetched, refetch: refetchAircrafts } = useNFTs(contract)
   const { data: ownedAircrafts = [], isFetched: isOwnedFetched } = useOwnedNFTs(contract, user?.address)

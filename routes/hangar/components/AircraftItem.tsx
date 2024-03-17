@@ -4,13 +4,14 @@ import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
 import AircraftCardHeader from './AircraftCardHeader'
 import AircraftActions from './AircraftActions'
 import useAircraft from 'hooks/useAircraft'
-import useAuth from 'hooks/useAuth'
 import useLicense from 'hooks/useLicense'
 import GradientCard from 'components/GradientCard'
 import Grid from '@mui/material/Grid'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 interface Props {
   nft: NFT
@@ -20,7 +21,7 @@ interface Props {
 }
 
 const AircraftItem = ({ nft, isClaiming, onClaim }: Props) => {
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const { hasAircraft, refetch: refetchAircraft } = useAircraft(nft.metadata.id)
   const { hasLicense, refetch: refetchLicense } = useLicense(getLicenseIdFromAttributes(getNFTAttributes(nft)))
 
