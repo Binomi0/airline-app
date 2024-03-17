@@ -1,5 +1,4 @@
 import { MongoClient } from 'mongodb'
-import { DB } from 'types'
 
 const uri = process.env.MONGODB_URI || ''
 const options = {}
@@ -31,5 +30,3 @@ if (process.env.NODE_ENV === 'development') {
 // Export a module-scoped MongoClient promise. By doing this in a
 // separate module, the client can be shared across functions.
 export default clientPromise as Promise<MongoClient>
-
-export const db = process.env.NODE_ENV === 'development' ? DB.develop : DB.production

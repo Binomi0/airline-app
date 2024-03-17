@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import { DB } from 'types'
 
 // MongoDB connection URL
 const mongoURI = process.env.MONGODB_URI
@@ -9,7 +8,7 @@ const connectDB = async () => {
     if (mongoose.connection.readyState === 0) {
       console.info('MongoDB Connecting...')
       await mongoose.connect(mongoURI, {
-        dbName: process.env.NODE_ENV === 'development' ? DB.develop : DB.production
+        dbName: process.env.MONGODB_NAME
       })
       console.info('New MongoDB Connected')
     }
