@@ -10,7 +10,7 @@ interface Props {
 }
 
 const serverSidePropsHandler = ({ req, res }: GetServerSidePropsContext): Props => ({
-  props: { user: null, token: getCookie('token', { req, res }) as string }
+  props: { user: null, token: (getCookie('token', { req, res }) as string) || null }
 })
 
 export default serverSidePropsHandler

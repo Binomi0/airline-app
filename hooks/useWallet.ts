@@ -5,10 +5,11 @@ import { alchemyEnhancedApiActions, createModularAccountAlchemyClient } from '@a
 import { Hex, LocalAccountSigner, sepolia } from '@alchemy/aa-core'
 import axios from 'config/axios'
 import { User } from 'types'
-import { missingKeySwal } from 'lib/swal'
+import { accountImportErrorSwal, missingKeySwal } from 'lib/swal'
 import alchemy from 'lib/alchemy'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
+import { IWallet } from 'models/Wallet'
 
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 // const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -71,12 +72,66 @@ const useWallet = (): UseWallet => {
     [setBaseSigner, setSmartAccountAddress, setSmartSigner, user]
   )
 
+  const checkSigner = useCallback(async (signer: Wallet) => {
+    const response = await axios.get<IWallet>('/api/wallet')
+    const wallet = response.data
+
+    if (!wallet) {
+      throw new Error('An error has occoured while getting user wallet')
+    }
+
+    if (wallet.signerAddress !== signer.address) {
+      return false
+    }
+    return true
+  }, [])
+
+  /**
+   * Get this out of this file, pure function
+   */
+  const handleImportFile = useCallback(
+    // eslint-disable-next-line no-unused-vars
+    async (userId: string) => {
+      const { value: file } = await missingKeySwal()
+      if (!file) {
+        throw new Error('Missing file')
+      }
+
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = async (e) => {
+          if (!e.target?.result) {
+            throw new Error('Missing content file')
+          }
+
+          const base64Key = (e.target.result as string).split('base64,')[1]
+
+          const key = Buffer.from(base64Key, 'base64').toString()
+          const baseSigner = new Wallet(key.slice(0, 66))
+          const isValidWallet = await checkSigner(baseSigner)
+
+          if (isValidWallet) {
+            localStorage.setItem(userId, base64Key)
+            await initialize(baseSigner, userId)
+            resolve(true)
+          } else {
+            reject(new Error('Invalid wallet'))
+          }
+        }
+        reader.readAsDataURL(file)
+      })
+    },
+    [checkSigner, initialize]
+  )
+
   const initWallet = useCallback(
     async (user: User) => {
       if (!user || !user.id) throw new Error('Missing user while initializing wallet')
 
       try {
+        // This is where the wallet is created for the first time?
         if (!user.address) {
+          console.log('initWallet user has no address')
           const random = Wallet.createRandom()
           const base64Key = Buffer.from(random.privateKey).toString('base64')
 
@@ -89,35 +144,26 @@ const useWallet = (): UseWallet => {
         const walletId = localStorage.getItem(user.id)
         if (walletId) {
           const signer = new Wallet(Buffer.from(walletId, 'base64').toString().slice(0, 66))
-          await initialize(signer, user.id)
+          if (await checkSigner(signer)) {
+            await initialize(signer, user.id)
+          }
           return
         } else {
-          const { value: file } = await missingKeySwal()
-          if (!file) {
-            throw new Error('Missing file')
-          }
-
-          const reader = new FileReader()
-          reader.onload = async (e) => {
-            if (!e.target?.result) {
-              throw new Error('Missing content file')
-            }
-
-            const base64Key = (e.target.result as string).split('base64,')[1]
-            localStorage.setItem(user.id as string, base64Key)
-
-            const key = Buffer.from(base64Key, 'base64').toString()
-            initialize(new Wallet(key.slice(0, 66)), user.id)
-            return
-          }
-          reader.readAsDataURL(file)
+          console.log('initWallet user has no walletid in storage')
+          await handleImportFile(user.id)
         }
-      } catch (err) {
+      } catch (error) {
+        const err = error as Error
         console.error(err)
+        if (err.message === 'Invalid wallet') {
+          await accountImportErrorSwal()
+          await handleImportFile(user.id)
+          return
+        }
         throw new Error('While initialize wallet')
       }
     },
-    [initialize]
+    [checkSigner, handleImportFile, initialize]
   )
 
   return { initWallet, isLoaded }

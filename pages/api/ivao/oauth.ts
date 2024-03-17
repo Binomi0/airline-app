@@ -21,7 +21,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     try {
       const response = await ivaoInstance.post('v2/oauth/token', request)
-      console.log(response.data.access_token)
 
       ivaoInstance.defaults.headers.common.Authorization = `Bearer ${response.data.access_token}`
       const another = await ivaoInstance.get('v2/users/me/sessions/now', {

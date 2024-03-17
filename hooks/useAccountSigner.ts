@@ -137,6 +137,7 @@ const useAccountSigner = () => {
       if (credential.verified) {
         const walletId = localStorage.getItem(user.id)
         if (!walletId) {
+          console.log('ARE WE SURE THAT WE SHOULD CREATE A NEW WALLET FOR THE USER AT THIS TIME?')
           // Create a new random one if he already has an account but not a wallet in this device
           const random = Wallet.createRandom()
 

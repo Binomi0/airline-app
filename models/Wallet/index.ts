@@ -12,15 +12,18 @@ const walletSchema: mongoose.Schema = new mongoose.Schema<IWallet>(
     email: {
       type: String,
       required: true,
+      unique: true,
       index: true
     },
     signerAddress: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     smartAccountAddress: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     id: {
       type: String,

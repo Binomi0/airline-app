@@ -15,6 +15,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   } else if (req.method === 'POST') {
     try {
+      // TODO: Continue here
       const response = await axios.get('https://api.ivao.aero/v2/tracker/now/pilots')
       console.log(response.data)
     } catch (err) {

@@ -52,6 +52,13 @@ export const signedOutSwal = async () =>
     showConfirmButton: true
   })
 
+export const accountImportErrorSwal = async () =>
+  Swal.fire({
+    title: 'Invalid file',
+    text: 'Double check that imported the right file.',
+    icon: 'error'
+  })
+
 export const askExportKeySwal = async (qrcode: string) =>
   Swal.fire({
     // title: 'Export Walley KEY',

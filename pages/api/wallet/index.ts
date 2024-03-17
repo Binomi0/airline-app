@@ -26,7 +26,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   } else if (req.method === 'GET') {
     const wallet = await Wallet.findOne({ email: req.user })
     if (!wallet) {
-      res.status(404).end()
+      res.status(204).end()
       return
     }
     res.status(200).send(wallet)

@@ -80,7 +80,6 @@ const RightSidebar: React.FC = () => {
   }, [handleSignOut, toggleSidebar])
 
   const handleOpenApp = React.useCallback(() => {
-    console.log({ token })
     if (!token) {
       throw new Error('Missing token to open app')
     }
@@ -88,10 +87,10 @@ const RightSidebar: React.FC = () => {
     customProtocolCheck(
       `weifly://token=${token}`,
       () => {
-        console.log('App is not installed in user system')
+        console.debug('App is not installed in user system')
       },
       () => {
-        console.log('App ready to open in user system')
+        console.debug('App ready to open in user system')
         window.open(`weifly://token=${token}`)
       },
       5000
