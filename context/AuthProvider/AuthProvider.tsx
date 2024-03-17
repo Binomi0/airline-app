@@ -1,16 +1,15 @@
 import React, { useEffect } from 'react'
-import { SetterOrUpdater, useRecoilState, useSetRecoilState } from 'recoil'
+import { SetterOrUpdater, useSetRecoilState } from 'recoil'
 import axios from 'config/axios'
 import { AxiosResponse } from 'axios'
 import { authState } from 'store/auth.atom'
 import { userState } from 'store/user.atom'
 import { User } from 'types'
-import { AuthReducerState } from './AuthProvider.types'
 
 const mapResponse = (setter: SetterOrUpdater<User | undefined>) => (response: AxiosResponse<User>) =>
   setter(response.data)
 
-export const INITIAL_STATE: AuthReducerState = {
+export const INITIAL_STATE = {
   user: undefined,
   token: undefined
 }
@@ -38,5 +37,5 @@ export const AuthProvider = ({ children, token }: Props) => {
     }
   }, [setAuthToken, setUser, token])
 
-  return children
+  return <div>{children}</div>
 }
