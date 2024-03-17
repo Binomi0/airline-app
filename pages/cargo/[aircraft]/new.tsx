@@ -7,16 +7,17 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import CargoView from 'routes/Cargo/CargoView'
 import Disconnected from 'components/Disconnected'
-import useAuth from 'hooks/useAuth'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import Fade from '@mui/material/Fade'
 import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 const CargoAircraft: NextPage<{ loading: boolean; NoAddress: React.ReactNode }> = ({ loading }) => {
   const router = useRouter()
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data, isLoading } = useNFT(contract, router.query.aircraft as string)
   const { ownedAircrafts: owned, isLoading: isLoadingOwn } = useAircraftProviderContext()

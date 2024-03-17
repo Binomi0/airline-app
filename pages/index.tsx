@@ -51,8 +51,8 @@ const Home: NextPage = () => (
 )
 
 export const getServerSideProps = serverSidePropsHandler
-export const config = {
-  runtime: 'experimental-edge' // or "nojdejs"
-}
+// export const config = {
+//   runtime: 'experimental-edge' // or "nojdejs"
+// }
 
 export default Home

@@ -1,2 +1,1 @@
-export * from './AuthProvider.context'
-export * from './AuthProvider.provider'
+export * from './AuthProvider'

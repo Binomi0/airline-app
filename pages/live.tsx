@@ -3,10 +3,11 @@ import LiveView from 'routes/Live/LiveView'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
-import useAuth from 'hooks/useAuth'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import LinearProgress from '@mui/material/LinearProgress'
 import Container from '@mui/material/Container'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 interface Props {
   loading: boolean
@@ -14,7 +15,7 @@ interface Props {
 
 const LivePage = ({ loading }: Props) => {
   const router = useRouter()
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const { live } = useLiveFlightProviderContext()
 
   React.useEffect(() => {

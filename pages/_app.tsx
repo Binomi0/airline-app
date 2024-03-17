@@ -9,9 +9,6 @@ import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
 import ErrorBoundary from 'components/ErrorBoundary'
 import { MainProvider } from 'context/MainProvider'
-import createEmotionCache from '../src/createEmotionCache'
-import theme from '../src/theme'
-import '../styles/globals.css'
 import { AlchemyProvider } from 'context/AlchemyProvider'
 import { AuthProvider } from 'context/AuthProvider'
 import CustomWeb3Provider from 'components/CustomWeb3Provider'
@@ -22,6 +19,10 @@ import { TokenProvider } from 'context/TokenProvider'
 import { VaProvider } from 'context/VaProvider'
 import { LiveFlightsProvider } from 'context/LiveFlightProvider'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { RecoilRoot } from 'recoil'
+import createEmotionCache from '../src/createEmotionCache'
+import theme from '../src/theme'
+import '../styles/globals.css'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -48,38 +49,40 @@ export default function MyApp(props: MyAppProps) {
 
   return (
     <CacheProvider value={emotionCache}>
-      <AuthProvider user={props.pageProps.user} token={props.pageProps.token}>
-        <AlchemyProvider>
-          <CustomWeb3Provider>
-            <Head>
-              <meta name='viewport' content='initial-scale=1, width=device-width' />
-              <title>Weifly a decentralized virtual airline based on Ethereum</title>
-            </Head>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <ErrorBoundary>
-                <AircraftProvider>
-                  <LicenseProvider>
-                    <TokenProvider>
-                      <VaProvider>
-                        <LiveFlightsProvider>
-                          <MainProvider>
-                            <AppBar />
-                            <Sidebar />
-                            <RightSidebar />
-                          </MainProvider>
-                          <Component loading={loading} />
-                          <SpeedInsights />
-                        </LiveFlightsProvider>
-                      </VaProvider>
-                    </TokenProvider>
-                  </LicenseProvider>
-                </AircraftProvider>
-              </ErrorBoundary>
-            </ThemeProvider>
-          </CustomWeb3Provider>
-        </AlchemyProvider>
-      </AuthProvider>
+      <RecoilRoot>
+        <AuthProvider token={props.pageProps.token}>
+          <AlchemyProvider>
+            <CustomWeb3Provider>
+              <Head>
+                <meta name='viewport' content='initial-scale=1, width=device-width' />
+                <title>Weifly a decentralized virtual airline based on Ethereum</title>
+              </Head>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <ErrorBoundary>
+                  <AircraftProvider>
+                    <LicenseProvider>
+                      <TokenProvider>
+                        <VaProvider>
+                          <LiveFlightsProvider>
+                            <MainProvider>
+                              <AppBar />
+                              <Sidebar />
+                              <RightSidebar />
+                            </MainProvider>
+                            <Component loading={loading} />
+                            <SpeedInsights />
+                          </LiveFlightsProvider>
+                        </VaProvider>
+                      </TokenProvider>
+                    </LicenseProvider>
+                  </AircraftProvider>
+                </ErrorBoundary>
+              </ThemeProvider>
+            </CustomWeb3Provider>
+          </AlchemyProvider>
+        </AuthProvider>
+      </RecoilRoot>
     </CacheProvider>
   )
 }

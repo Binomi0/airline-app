@@ -8,7 +8,6 @@ import { formatNumber } from 'utils'
 import serverSidePropsHandler from 'components/ServerSideHandler'
 import Disconnected from 'components/Disconnected'
 import { useTokenProviderContext } from 'context/TokenProvider'
-import useAuth from 'hooks/useAuth'
 import { useContract, useContractRead } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
@@ -17,13 +16,15 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 interface Props {
   loading: boolean
 }
 
 const Gas: NextPage<Props> = ({ loading }) => {
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const { smartAccountAddress: address } = useAlchemyProviderContext()
   const { airg, airl, getAirlBalance, getAirgBalance } = useTokenProviderContext()
   const { contract } = useContract(stakingAddress)

@@ -3,7 +3,8 @@ import { LicenseProviderContext } from './LicenseProvider.context'
 import { LicenseReducerState } from './LicenseProvider.types'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import { useContract, useNFTs, useOwnedNFTs } from '@thirdweb-dev/react'
-import useAuth from 'hooks/useAuth'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 export const INITIAL_STATE: LicenseReducerState = {
   ownedLicenses: [],
@@ -12,7 +13,7 @@ export const INITIAL_STATE: LicenseReducerState = {
 }
 
 export const LicenseProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const { contract } = useContract(nftLicenseTokenAddress)
   const { data: licenses = [], isLoading } = useNFTs(contract)
   const { data: owned = [], refetch } = useOwnedNFTs(contract, user?.address)

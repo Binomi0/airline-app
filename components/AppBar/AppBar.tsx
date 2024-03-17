@@ -13,11 +13,12 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Snackbar from '@mui/material/Snackbar'
 import { useMainProviderContext } from 'context/MainProvider'
 import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import { useAuthProviderContext } from 'context/AuthProvider'
 import useAccountSigner from 'hooks/useAccountSigner'
 import { AppBarSnack, UserActionStatus } from 'components/AppBar'
 import AppBarAuth from './components/AppBarAuth'
 import Image from 'next/image'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 const copyToClipboard = (msg: string) => {
   navigator.clipboard.writeText(msg)
@@ -33,7 +34,8 @@ const CustomAppBar: React.FC = () => {
   const trigger = useScrollTrigger()
   const { status } = useAccountSigner()
   const { smartAccountAddress } = useAlchemyProviderContext()
-  const { user } = useAuthProviderContext()
+  const user = useRecoilValue(userState)
+
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
 

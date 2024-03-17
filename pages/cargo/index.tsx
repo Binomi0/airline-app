@@ -7,7 +7,6 @@ import serverSidePropsHandler from 'components/ServerSideHandler'
 import { VaProvider } from 'context/VaProvider'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
-import useAuth from 'hooks/useAuth'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import LinearProgress from '@mui/material/LinearProgress'
@@ -15,10 +14,12 @@ import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 const CargoPage: NextPage<{ loading: boolean }> = ({ loading }) => {
   const router = useRouter()
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const [aircraft, setAircraft] = useState<NFT>()
   const { ownedAircrafts, isLoading } = useAircraftProviderContext()
   const { live } = useLiveFlightProviderContext()

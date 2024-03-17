@@ -4,7 +4,8 @@ import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
 import axios from 'config/axios'
 import type { Atc, Flight, IvaoPilot } from 'types'
-import useAuth from 'hooks/useAuth'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
@@ -19,7 +20,7 @@ export const INITIAL_STATE: IVAOClients = {
 }
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE })
   const { Provider } = VaProviderContext
 

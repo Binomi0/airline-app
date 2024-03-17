@@ -1,7 +1,8 @@
 import axios from 'config/axios'
 import { ILive } from 'models/Live'
 import React from 'react'
-import useAuth from './useAuth'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 interface UseLiveReturnType {
   live?: ILive | null
@@ -9,7 +10,7 @@ interface UseLiveReturnType {
 }
 
 const useLive = (): UseLiveReturnType => {
-  const { user } = useAuth()
+  const user = useRecoilValue(userState)
   const [live, setLive] = React.useState<ILive | undefined | null>(undefined)
 
   const getLive = React.useCallback(async () => {
