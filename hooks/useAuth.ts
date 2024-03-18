@@ -7,7 +7,7 @@ import { AccountSignerStatus } from 'types'
 import { useSetRecoilState } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 import { userState } from 'store/user.atom'
-import { authState } from 'store/auth.atom'
+import { authStore } from 'store/auth.atom'
 
 interface UseAuthReturnType {
   // eslint-disable-next-line no-unused-vars
@@ -24,7 +24,7 @@ const useAuth = (): UseAuthReturnType => {
   const router = useRouter()
   const setWallet = useSetRecoilState(walletStore)
   const setUser = useSetRecoilState(userState)
-  const setToken = useSetRecoilState(authState)
+  const setToken = useSetRecoilState(authStore)
 
   const handleSignIn = useCallback(
     async (email: string) => {

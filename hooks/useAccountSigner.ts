@@ -68,13 +68,17 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
     async (token?: string) => {
       if (!wallet.isLoaded) {
         try {
-          const { data } = await axios.get<User>('/api/user/get')
+          if (!user) {
+            const { data } = await axios.get<User>('/api/user/get')
 
-          console.log('load account')
-          await initWallet(data)
-          setUser(data)
-          setToken(token)
-          setStatus('success')
+            await initWallet(data)
+            setUser(data)
+            setToken(token)
+            setStatus('success')
+          } else {
+            await initWallet(user)
+            setStatus('success')
+          }
         } catch (err) {
           setStatus('error')
           setUser(undefined)
@@ -83,7 +87,7 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
         }
       }
     },
-    [initWallet, setToken, setUser, wallet.isLoaded]
+    [initWallet, setToken, setUser, user, wallet.isLoaded]
   )
 
   const addBackup = useCallback(async () => {

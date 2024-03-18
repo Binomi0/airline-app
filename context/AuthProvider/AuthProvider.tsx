@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const token = getCookie('token') as string
+    // axios.defaults.headers.common.Authorization = `Bearer ${token}`
     if (token) {
       console.log('Refrescando sessión')
       axios

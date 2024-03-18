@@ -8,33 +8,27 @@ import Typography from '@mui/material/Typography'
 import Link from '@mui/material/Link'
 import Image from 'next/image'
 import Lock from '@mui/icons-material/Lock'
-import useAccountSigner from 'hooks/useAccountSigner'
+import useAuth from 'hooks/useAuth'
+import { CircularProgress } from '@mui/material'
 
-interface Props {
-  onCreate: () => void
-}
-
-const SignInView: FC<Props> = ({ onCreate }) => {
+const SignInView: FC = () => {
   const [loading, setLoading] = React.useState(false)
-  const { onSignIn } = useAccountSigner()
+  const { handleSignIn } = useAuth()
 
   const handleAccess = React.useCallback(
     async (email: string) => {
       setLoading(true)
       try {
-        await onSignIn(email)
+        await handleSignIn(email)
 
-        setTimeout(() => {
-          setLoading(false)
-        }, 1000)
+        setLoading(false)
       } catch (error) {
         console.error(error)
       }
     },
-    [onSignIn]
+    [handleSignIn]
   )
 
-  console.count('SignInView')
   return (
     <Container>
       <Stack className={classes.wrapper} justifyContent='center' alignItems='center'>
@@ -49,20 +43,32 @@ const SignInView: FC<Props> = ({ onCreate }) => {
         <Typography align='center' variant='h1'>
           Welcome to WeiFly
         </Typography>
-        <Typography variant='h4' paragraph>
-          Insert your email to join
-        </Typography>
-        <Box className={classes.form}>
-          <EmailInput color='primary' onCancel={() => {}} onSubmit={handleAccess} loading={loading} />
-          <Box component={Link} href='/signup'>
-            <Typography align='right'>or create a new account here.</Typography>
-          </Box>
-          <Stack direction='row' alignItems='center' spacing={1} mt={2}>
-            <Lock fontSize='small' />
-            <Typography variant='caption'>
-              By entering you agree with terms and conditions, privacy policy and cookies.
-            </Typography>
-          </Stack>
+        <Box>
+          {loading ? (
+            <Stack direction='row' justifyContent='center'>
+              <CircularProgress />
+            </Stack>
+          ) : (
+            <>
+              <Typography variant='h4' align='center' paragraph>
+                Insert your email to join
+              </Typography>
+              <Box className={classes.form}>
+                <EmailInput color='primary' onCancel={() => {}} onSubmit={handleAccess} loading={false} />
+                <Box component={Link} href='/signup'>
+                  <Typography color='primary.light' align='right'>
+                    or create a new account here.
+                  </Typography>
+                </Box>
+                <Stack direction='row' alignItems='center' spacing={1} mt={2}>
+                  <Lock fontSize='small' />
+                  <Typography variant='caption'>
+                    By entering you agree with terms and conditions, privacy policy and cookies.
+                  </Typography>
+                </Stack>
+              </Box>
+            </>
+          )}
         </Box>
       </Stack>
     </Container>

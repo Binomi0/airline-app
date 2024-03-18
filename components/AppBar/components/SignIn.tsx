@@ -4,6 +4,7 @@ import { validateEmail } from 'utils'
 import EmailInput from './EmailInput'
 import axios from 'config/axios'
 import { UserActionStatus } from 'components/AppBar'
+import useAuth from 'hooks/useAuth'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars
@@ -11,28 +12,26 @@ interface Props {
 }
 
 const SignIn = ({ onInteraction }: Props) => {
-  const { onSignIn, handleSignUp, status } = useAccountSigner()
+  const { status } = useAccountSigner()
+  const { handleSignIn, handleSignUp } = useAuth()
   const [loading, setLoading] = React.useState(false)
-
-  const handleSignIn = React.useCallback(
-    async (email: string) => validateEmail(email) && (await onSignIn(email)),
-    [onSignIn]
-  )
 
   const handleAccess = React.useCallback(
     async (value: string) => {
       setLoading(true)
       try {
-        const { data: auth } = await axios.post('/api/webauthn/check', { email: value })
-        if (auth.success) {
-          await handleSignIn(value)
-        } else {
-          await handleSignUp(value)
-          console.debug('Crendential not set, maybe ask for passkey process')
-        }
+        if (validateEmail(value)) {
+          const { data: auth } = await axios.post('/api/webauthn/check', { email: value })
+          if (auth.success) {
+            await handleSignIn(value)
+          } else {
+            await handleSignUp(value)
+            console.debug('Crendential not set, maybe ask for passkey process')
+          }
 
-        onInteraction()
-        setLoading(false)
+          onInteraction()
+          setLoading(false)
+        }
       } catch (error) {
         console.error(error)
       }
