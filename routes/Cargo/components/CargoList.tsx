@@ -2,11 +2,12 @@ import { NFT } from '@thirdweb-dev/react'
 import CargoItem from './CargoItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
 import { FRoute } from 'types'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { getCallsign } from 'utils'
 import { FixedSizeList, ListChildComponentProps } from 'react-window'
 import Fade from '@mui/material/Fade'
 import Box from '@mui/material/Box'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const renderRow = (
   flightList: [string, FRoute[]][],
@@ -26,7 +27,7 @@ const CargoList: React.FC<{
   flights: [string, FRoute[]][]
   aircraft?: NFT
 }> = ({ newCargo, setSelected, flights, aircraft }) => {
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const address = useRecoilValue(smartAccountAddressStore)
 
   const handleSelect = useCallback(
     async (origin: string, destination: string) => {

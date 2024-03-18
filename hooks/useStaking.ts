@@ -1,13 +1,14 @@
 import { SmartContract } from '@thirdweb-dev/sdk'
 import axios from 'config/axios'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { stakingAddress as target } from 'contracts/address'
 import { BigNumber, ethers } from 'ethers'
 import { useCallback, useState } from 'react'
+import { useRecoilValue } from 'recoil'
+import { smartAccountSignerStore } from 'store/wallet.atom'
 
 const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) => {
   const [isLoading, setIsLoading] = useState(false)
-  const { smartSigner } = useAlchemyProviderContext()
+  const smartSigner = useRecoilValue(smartAccountSignerStore)
 
   const stake = useCallback(
     async (amount: BigNumber) => {

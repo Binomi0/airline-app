@@ -1,14 +1,15 @@
 import { useContract, useNFTBalance } from '@thirdweb-dev/react'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { nftAircraftTokenAddress } from 'contracts/address'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 interface UseAircraftReturnType {
-  hasAircraft: boolean,
+  hasAircraft: boolean
   refetch: () => void
 }
 
 const useAircraft = (id?: string): UseAircraftReturnType => {
-  const { smartAccountAddress } = useAlchemyProviderContext()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data, refetch } = useNFTBalance(contract, smartAccountAddress, id)
 

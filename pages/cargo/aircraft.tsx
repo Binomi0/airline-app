@@ -7,7 +7,6 @@ import styles from 'styles/Home.module.css'
 import { useContract, useNFTBalance } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import Link from 'next/link'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import Disconnected from 'components/Disconnected'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
@@ -15,10 +14,12 @@ import Typography from '@mui/material/Typography'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Button from '@mui/material/Button'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const CargoItem = () => {
   const router = useRouter()
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const address = useRecoilValue(smartAccountAddressStore)
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data } = useNFTBalance(contract, address, 1)
 

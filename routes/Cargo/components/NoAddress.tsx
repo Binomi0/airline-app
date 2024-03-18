@@ -1,11 +1,12 @@
 import Box from '@mui/material/Box'
 import Fade from '@mui/material/Fade'
 import Typography from '@mui/material/Typography'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import React from 'react'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const NoAddress = () => {
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const address = useRecoilValue(smartAccountAddressStore)
 
   return (
     <Fade in={!address} unmountOnExit>

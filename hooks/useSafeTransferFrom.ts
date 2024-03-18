@@ -1,13 +1,14 @@
 import { Hex } from '@alchemy/aa-core'
 import { SmartContract } from '@thirdweb-dev/sdk'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import { BaseContract, ethers } from 'ethers'
 import { useCallback, useState } from 'react'
+import { useRecoilValue } from 'recoil'
+import { smartAccountSignerStore } from 'store/wallet.atom'
 
 const useSafeTransferFrom = (contract: SmartContract<BaseContract>) => {
   const [loading, setLoading] = useState(false)
-  const { smartSigner } = useAlchemyProviderContext()
+  const smartSigner = useRecoilValue(smartAccountSignerStore)
 
   const safeTransferFrom = useCallback(async () => {
     if (!smartSigner) return

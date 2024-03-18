@@ -1,10 +1,11 @@
 import { Hex } from '@alchemy/aa-core'
 import { useContract } from '@thirdweb-dev/react'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { Contract } from 'ethers'
 import { useCallback, useState } from 'react'
 import AirlineCoin from 'contracts/abi/AirlineCoin.json'
 import BigNumber from 'bignumber.js'
+import { useRecoilState } from 'recoil'
+import { walletStore } from 'store/wallet.atom'
 
 const MAX_INT_ETH = '0x8000000000000000000000000000000000000000000000000000000000000000'
 
@@ -19,15 +20,15 @@ interface UseERC20ReturnType {
 const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
   const [isLoading, setIsLoading] = useState(false)
   const { contract } = useContract(tokenAddress, 'token')
-  const { smartSigner, smartAccountAddress } = useAlchemyProviderContext()
+  const [wallet] = useRecoilState(walletStore)
 
   const getAllowance = useCallback(
     async (spender: string): Promise<BigNumber> => {
-      if (!smartAccountAddress || !contract) return new BigNumber(0)
+      if (!wallet.smartAccountAddress || !contract) return new BigNumber(0)
       setIsLoading(true)
 
       try {
-        const allowance = await contract.erc20.allowanceOf(smartAccountAddress, spender)
+        const allowance = await contract.erc20.allowanceOf(wallet.smartAccountAddress, spender)
 
         setIsLoading(false)
         return new BigNumber(allowance.displayValue)
@@ -37,22 +38,22 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         return new BigNumber(0)
       }
     },
-    [smartAccountAddress, contract]
+    [wallet.smartAccountAddress, contract]
   )
 
   const setAllowance = useCallback(
     async (to: string) => {
-      if (!smartSigner) return false
+      if (!wallet.smartSigner) return false
       try {
         setIsLoading(true)
 
         const erc20Contract = new Contract(tokenAddress, AirlineCoin.abi)
         const encodedCallData = erc20Contract.interface.encodeFunctionData('approve', [to, MAX_INT_ETH])
 
-        const uo = await smartSigner.sendUserOperation({
+        const uo = await wallet.smartSigner.sendUserOperation({
           uo: { target: tokenAddress, data: encodedCallData as Hex }
         })
-        const txHash = await smartSigner.waitForUserOperationTransaction(uo)
+        const txHash = await wallet.smartSigner.waitForUserOperationTransaction(uo)
         console.log({ txHash })
         setIsLoading(false)
         return true
@@ -62,7 +63,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         throw new Error('Error while setAllowance')
       }
     },
-    [smartSigner, tokenAddress]
+    [wallet.smartSigner, tokenAddress]
   )
   return { setAllowance, getAllowance, isLoading }
 }
