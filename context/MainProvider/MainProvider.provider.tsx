@@ -2,6 +2,7 @@ import React, { FC, useCallback, useReducer } from 'react'
 import mainProviderReducer from './MainProvider.reducer'
 import { MainProviderContext } from './MainProvider.context'
 import { MainReducerState } from './MainProvider.types'
+import { useRouter } from 'next/router'
 
 export const INITIAL_STATE: MainReducerState = {
   sidebarOpen: false,
@@ -9,6 +10,7 @@ export const INITIAL_STATE: MainReducerState = {
 }
 
 export const MainProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const router = useRouter()
   const [state, dispatch] = useReducer(mainProviderReducer, {
     ...INITIAL_STATE
   })
@@ -18,6 +20,8 @@ export const MainProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
     dispatch({ type: 'TOGGLE_SIDEBAR', payload: side })
   }, [])
 
+  const hasMainProvider = ['/signin', '/signup'].includes(router.asPath)
+
   return (
     <Provider
       value={{
@@ -26,7 +30,7 @@ export const MainProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
         toggleSidebar
       }}
     >
-      {children}
+      {!hasMainProvider ? children : null}
     </Provider>
   )
 }

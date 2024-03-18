@@ -10,12 +10,12 @@ import useWallet from './useWallet'
 import { useRouter } from 'next/router'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
-import { authState } from 'store/auth.atom'
+import { authStore } from 'store/auth.atom'
 
 const useAccountSigner = () => {
   const { setBaseSigner, setSmartAccountAddress, setSmartSigner } = useAlchemyProviderContext()
   const [user, setUser] = useRecoilState(userState)
-  const setToken = useSetRecoilState(authState)
+  const setToken = useSetRecoilState(authStore)
   const [status, setStatus] = useState<AccountSignerStatus>()
   const { initWallet } = useWallet()
   const router = useRouter()
