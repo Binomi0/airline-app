@@ -22,6 +22,8 @@ import { RecoilRoot } from 'recoil'
 import createEmotionCache from '../src/createEmotionCache'
 import theme from '../src/theme'
 import '../styles/globals.css'
+import { authStore } from 'store/auth.atom'
+import { getCookie } from 'cookies-next'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -35,20 +37,22 @@ export default function MyApp(props: MyAppProps) {
   const [loading, setLoading] = React.useState(false)
 
   React.useEffect(() => {
-    const toggleLoading = (status: boolean) => () => setLoading(status)
-
-    Router.events.on('routeChangeStart', toggleLoading(true))
-    Router.events.on('routeChangeComplete', toggleLoading(false))
+    Router.events.on('routeChangeStart', () => setLoading(true))
+    Router.events.on('routeChangeComplete', () => setLoading(false))
 
     return () => {
-      Router.events.off('routeChangeStart', toggleLoading(true))
-      Router.events.off('routeChangeComplete', toggleLoading(false))
+      Router.events.off('routeChangeStart', () => setLoading(true))
+      Router.events.off('routeChangeComplete', () => setLoading(false))
     }
   }, [])
 
   return (
     <CacheProvider value={emotionCache}>
-      <RecoilRoot>
+      <RecoilRoot
+        initializeState={({ set }) => {
+          set(authStore, getCookie('token') as string)
+        }}
+      >
         <AuthProvider>
           <CustomWeb3Provider>
             <Head>
