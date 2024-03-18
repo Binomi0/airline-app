@@ -4,7 +4,8 @@ import { MediaRenderer, useClaimNFT, useContract, useNFT, useNFTBalance } from '
 import { getNFTAttributes } from 'utils'
 import { NextPage } from 'next'
 import { nftLicenseTokenAddress } from 'contracts/address'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Alert from '@mui/material/Alert'
@@ -28,7 +29,7 @@ const maps: Record<string, string> = {
 
 const AircraftView: NextPage = () => {
   const router = useRouter()
-  const { smartAccountAddress } = useAlchemyProviderContext()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { contract } = useContract(router.query.tokenAddress as string)
   const { contract: license } = useContract(nftLicenseTokenAddress)
   const { mutateAsync: claimNFT, isLoading } = useClaimNFT(contract)

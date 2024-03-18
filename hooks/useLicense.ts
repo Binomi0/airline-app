@@ -1,9 +1,10 @@
 import { useContract, useNFTBalance } from '@thirdweb-dev/react'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { nftLicenseTokenAddress } from 'contracts/address'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const useLicense = (id?: string) => {
-  const { smartAccountAddress } = useAlchemyProviderContext()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { contract } = useContract(nftLicenseTokenAddress)
   const { data, refetch } = useNFTBalance(contract, smartAccountAddress, id)
 

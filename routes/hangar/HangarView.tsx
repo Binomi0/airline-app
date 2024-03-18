@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react'
 import { NFT, useContract } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 import useClaimNFT from 'hooks/useClaimNFT'
 import Swal from 'sweetalert2'
 import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
@@ -13,7 +14,7 @@ import Fade from '@mui/material/Fade'
 import Grid from '@mui/material/Grid'
 
 const HangarView: React.FC = () => {
-  const { smartAccountAddress } = useAlchemyProviderContext()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { getAirlBalance } = useTokenProviderContext()
   const { aircrafts, isLoading } = useAircraftProviderContext()
   const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)

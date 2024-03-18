@@ -10,7 +10,6 @@ import { NFT } from '@thirdweb-dev/react'
 import NoAddress from 'routes/Cargo/components/NoAddress'
 import CargoReady from 'routes/Cargo/components/CargoReady'
 import CargoList from 'routes/Cargo/components/CargoList'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { useRouter } from 'next/router'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
@@ -20,6 +19,8 @@ import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Button from '@mui/material/Button'
 import LinearProgress from '@mui/material/LinearProgress'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const initialState: FRoute = {
   origin: '',
@@ -28,7 +29,7 @@ const initialState: FRoute = {
 
 const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, aircraft }) => {
   const router = useRouter()
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const address = useRecoilValue(smartAccountAddressStore)
   const { newCargo, cargo, completed, getCargo } = useCargo()
   const { flights } = useVaProviderContext()
   const [selected, setSelected] = useState(initialState)

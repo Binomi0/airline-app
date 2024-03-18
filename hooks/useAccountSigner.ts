@@ -2,23 +2,31 @@ import axios from 'config/axios'
 import { Wallet } from 'ethers'
 import { useCallback, useState } from 'react'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import { deleteCookie } from 'cookies-next'
-import { backupDoneSwal, loginSuccessSwal } from 'lib/swal'
+import { backupDoneSwal } from 'lib/swal'
 import { AccountSignerStatus, User, WebAuthnUri } from 'types'
-import useWallet from './useWallet'
-import { useRouter } from 'next/router'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
-import { authState } from 'store/auth.atom'
+import { walletStore } from 'store/wallet.atom'
+import useWallet from './useWallet'
+import { authStore } from 'store/auth.atom'
 
-const useAccountSigner = () => {
-  const { setBaseSigner, setSmartAccountAddress, setSmartSigner } = useAlchemyProviderContext()
+interface UseAccountSignerReturnType {
+  addBackup: () => Promise<void>
+  // eslint-disable-next-line no-unused-vars
+  loadAccount: (token?: string) => Promise<void>
+  // eslint-disable-next-line no-unused-vars
+  createCredential: (email: string) => Promise<{ verified: boolean }>
+  // eslint-disable-next-line no-unused-vars
+  verifyCredential: (email: string) => Promise<{ verified: boolean; token?: string }>
+  status: AccountSignerStatus
+}
+
+const useAccountSigner = (): UseAccountSignerReturnType => {
   const [user, setUser] = useRecoilState(userState)
-  const setToken = useSetRecoilState(authState)
+  const setToken = useSetRecoilState(authStore)
   const [status, setStatus] = useState<AccountSignerStatus>()
+  const [wallet, setWallet] = useRecoilState(walletStore)
   const { initWallet } = useWallet()
-  const router = useRouter()
 
   const createCredential = useCallback(async (email: string) => {
     try {
@@ -58,70 +66,29 @@ const useAccountSigner = () => {
 
   const loadAccount = useCallback(
     async (token?: string) => {
-      try {
-        const { data } = await axios.get<User>('/api/user/get')
+      if (!wallet.isLoaded) {
+        try {
+          if (!user) {
+            const { data } = await axios.get<User>('/api/user/get')
 
-        await initWallet(data)
-        setUser(data)
-        setToken(token)
-        setStatus('success')
-      } catch (err) {
-        setStatus('error')
-        setUser(undefined)
-        setToken(undefined)
-        throw new Error('While loading account')
-      }
-    },
-    [initWallet, setToken, setUser]
-  )
-
-  const handleSignIn = useCallback(
-    async (email: string) => {
-      setStatus('loading')
-      try {
-        const { verified, token } = await verifyCredential(email)
-        if (!verified) {
-          // User cancelled challenge or timeout
+            await initWallet(data)
+            setUser(data)
+            setToken(token)
+            setStatus('success')
+          } else {
+            await initWallet(user)
+            setStatus('success')
+          }
+        } catch (err) {
           setStatus('error')
-          throw new Error('while verify user credentials')
+          setUser(undefined)
+          setToken(undefined)
+          throw new Error('While loading account')
         }
-
-        await loadAccount(token)
-        loginSuccessSwal()
-      } catch (err) {
-        const error = err as Error
-        console.error('err =>', error)
-        setStatus(error.message === 'Missing wallet key' ? 'missingKey' : 'error')
       }
     },
-    [loadAccount, verifyCredential]
+    [initWallet, setToken, setUser, user, wallet.isLoaded]
   )
-
-  const handleSignUp = useCallback(
-    async (email: string) => {
-      setStatus('loading')
-      try {
-        const { verified } = await createCredential(email)
-        if (verified) {
-          await loadAccount()
-        }
-      } catch (err) {
-        console.error('[handleSignUp] Error =>', err)
-        setStatus('error')
-      }
-    },
-    [createCredential, loadAccount]
-  )
-
-  const handleSignOut = useCallback(() => {
-    setBaseSigner(undefined)
-    setSmartAccountAddress(undefined)
-    setSmartSigner(undefined)
-    deleteCookie('token')
-    setUser(undefined)
-    setToken(undefined)
-    router.asPath !== '/' && router.push('/')
-  }, [router, setBaseSigner, setSmartAccountAddress, setSmartSigner, setToken, setUser])
 
   const addBackup = useCallback(async () => {
     if (!user?.email || !user?.id) {
@@ -144,12 +111,12 @@ const useAccountSigner = () => {
           backupDoneSwal()
           localStorage.setItem(user.id, Buffer.from(random.privateKey).toString('base64'))
 
-          setBaseSigner(random)
+          setWallet({ baseSigner: random })
           setStatus('missingKey')
           return
         }
         const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
-        setBaseSigner(signer)
+        setWallet({ baseSigner: signer })
         setStatus('success')
       }
     } catch (err) {
@@ -157,14 +124,12 @@ const useAccountSigner = () => {
       console.error('[handleSignUp] Error =>', err)
       setStatus(error.message === 'Missing private key' ? 'missingKey' : 'error')
     }
-  }, [createCredential, setBaseSigner, user?.email, user?.id])
+  }, [createCredential, setWallet, user?.email, user?.id])
 
   return {
     addBackup,
-    handleSignUp,
     loadAccount,
-    onSignIn: handleSignIn,
-    handleSignOut,
+    createCredential,
     verifyCredential,
     status
   }

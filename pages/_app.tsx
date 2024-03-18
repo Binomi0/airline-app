@@ -9,7 +9,6 @@ import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
 import ErrorBoundary from 'components/ErrorBoundary'
 import { MainProvider } from 'context/MainProvider'
-import { AlchemyProvider } from 'context/AlchemyProvider'
 import { AuthProvider } from 'context/AuthProvider'
 import CustomWeb3Provider from 'components/CustomWeb3Provider'
 import RightSidebar from 'components/Sidebar/Right'
@@ -51,36 +50,34 @@ export default function MyApp(props: MyAppProps) {
     <CacheProvider value={emotionCache}>
       <RecoilRoot>
         <AuthProvider>
-          <AlchemyProvider>
-            <CustomWeb3Provider>
-              <Head>
-                <meta name='viewport' content='initial-scale=1, width=device-width' />
-                <title>Weifly a decentralized virtual airline based on Ethereum</title>
-              </Head>
-              <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <ErrorBoundary>
-                  <AircraftProvider>
-                    <LicenseProvider>
-                      <TokenProvider>
-                        <VaProvider>
-                          <LiveFlightsProvider>
-                            <MainProvider>
-                              <AppBar />
-                              <Sidebar />
-                              <RightSidebar />
-                            </MainProvider>
-                            <Component loading={loading} />
-                            <SpeedInsights />
-                          </LiveFlightsProvider>
-                        </VaProvider>
-                      </TokenProvider>
-                    </LicenseProvider>
-                  </AircraftProvider>
-                </ErrorBoundary>
-              </ThemeProvider>
-            </CustomWeb3Provider>
-          </AlchemyProvider>
+          <CustomWeb3Provider>
+            <Head>
+              <meta name='viewport' content='initial-scale=1, width=device-width' />
+              <title>Weifly a decentralized virtual airline based on Ethereum</title>
+            </Head>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <ErrorBoundary>
+                <AircraftProvider>
+                  <LicenseProvider>
+                    <TokenProvider>
+                      <VaProvider>
+                        <LiveFlightsProvider>
+                          <MainProvider>
+                            <AppBar />
+                            <Sidebar />
+                            <RightSidebar />
+                          </MainProvider>
+                          <Component loading={loading} />
+                          <SpeedInsights />
+                        </LiveFlightsProvider>
+                      </VaProvider>
+                    </TokenProvider>
+                  </LicenseProvider>
+                </AircraftProvider>
+              </ErrorBoundary>
+            </ThemeProvider>
+          </CustomWeb3Provider>
         </AuthProvider>
       </RecoilRoot>
     </CacheProvider>

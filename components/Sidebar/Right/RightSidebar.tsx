@@ -10,7 +10,6 @@ import VerifiedUser from '@mui/icons-material/VerifiedUser'
 import { accountBackupSwal, askExportKeySwal, missingExportKeySwal, signedOutSwal } from 'lib/swal'
 import customProtocolCheck from 'custom-protocol-check'
 import useAccountSigner from 'hooks/useAccountSigner'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { downloadFile } from 'utils'
 import { useRouter } from 'next/router'
 import Login from '@mui/icons-material/Login'
@@ -24,18 +23,21 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import ListItemButton from '@mui/material/ListItemButton'
 import Stack from '@mui/material/Stack'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import { authState } from 'store/auth.atom'
+import { walletStore } from 'store/wallet.atom'
+import useAuth from 'hooks/useAuth'
+import { authStore } from 'store/auth.atom'
 
 const RightSidebar: React.FC = () => {
   const user = useRecoilValue(userState)
-  const token = useRecoilValue(authState)
+  const token = useRecoilValue(authStore)
   const theme = useTheme()
   const router = useRouter()
   const { rightSidebarOpen: open, toggleSidebar } = useMainProviderContext()
-  const { addBackup, handleSignOut } = useAccountSigner()
-  const { smartAccountAddress, baseSigner } = useAlchemyProviderContext()
+  const { addBackup } = useAccountSigner()
+  const { handleSignOut } = useAuth()
+  const [wallet] = useRecoilState(walletStore)
 
   const handleClick = useCallback(
     (route: string) => () => {
@@ -57,21 +59,21 @@ const RightSidebar: React.FC = () => {
     toggleSidebar('right')
     const base64Key = localStorage.getItem(user.id)
     if (!base64Key) {
-      if (baseSigner?.privateKey) {
-        const { isConfirmed } = await askExportKeySwal(baseSigner.privateKey)
-        if (isConfirmed) downloadFile(Buffer.from(baseSigner.privateKey).toString(), baseSigner.address)
+      if (wallet.baseSigner?.privateKey) {
+        const { isConfirmed } = await askExportKeySwal(wallet.baseSigner.privateKey)
+        if (isConfirmed) downloadFile(Buffer.from(wallet.baseSigner.privateKey).toString(), wallet.baseSigner.address)
       } else {
         return missingExportKeySwal()
       }
     } else {
-      if (smartAccountAddress) {
-        if (baseSigner?.privateKey) {
-          const { isConfirmed } = await askExportKeySwal(baseSigner.privateKey)
-          if (isConfirmed) downloadFile(base64Key, smartAccountAddress)
+      if (wallet.smartAccountAddress) {
+        if (wallet.baseSigner?.privateKey) {
+          const { isConfirmed } = await askExportKeySwal(wallet.baseSigner.privateKey)
+          if (isConfirmed) downloadFile(base64Key, wallet.smartAccountAddress)
         }
       }
     }
-  }, [baseSigner?.address, baseSigner?.privateKey, smartAccountAddress, toggleSidebar, user?.id])
+  }, [toggleSidebar, user?.id, wallet.baseSigner?.address, wallet.baseSigner?.privateKey, wallet.smartAccountAddress])
 
   const onSignOut = React.useCallback(async () => {
     toggleSidebar('right')
