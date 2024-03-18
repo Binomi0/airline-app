@@ -9,12 +9,11 @@ import { User } from 'types'
 interface Props {
   user?: User
   matches: boolean
-  smartAccountAddress?: string
   // eslint-disable-next-line no-unused-vars
   toggleSidebar: (side: 'left' | 'right') => void
 }
 
-const AppBarInfo = ({ user, matches, smartAccountAddress, toggleSidebar }: Props) => {
+const AppBarInfo = ({ user, matches, toggleSidebar }: Props) => {
   return (
     !user && (
       <div>
