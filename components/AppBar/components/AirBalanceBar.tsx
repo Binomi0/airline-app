@@ -3,14 +3,16 @@ import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { smartAccountAddressStore } from 'store/wallet.atom'
+import { useRecoilValue } from 'recoil'
 
 interface Props {
   show: boolean
-  smartAccountAddress?: string
 }
 
-const AirBalanceBar = ({ show, smartAccountAddress }: Props) => {
+const AirBalanceBar = ({ show }: Props) => {
   const { airl } = useTokenProviderContext()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
 
   return show && smartAccountAddress ? (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useReducer } from 'react'
+import React, { FC, useCallback, useReducer } from 'react'
 import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
@@ -76,24 +76,25 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   }, [])
 
-  useEffect(() => {
-    if (!user) return
-    const timer = setInterval(getIVAOData, MIN_IVAO_REQ_DELAY)
-    return () => clearInterval(timer)
-  }, [getIVAOData, user])
+  const startTimers = useCallback(() => {
+    const ivaoTimer = setInterval(getIVAOData, MIN_IVAO_REQ_DELAY)
+    const pilotsTimer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
 
-  useEffect(() => {
-    if (!user) return
-    const timer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
-    return () => clearInterval(timer)
-  }, [getPilots, user])
+    return () => {
+      clearInterval(ivaoTimer)
+      clearInterval(pilotsTimer)
+    }
+  }, [getIVAOData, getPilots])
 
-  useEffect(() => {
+  const initIvaoData = useCallback(() => {
     if (!user) return
     getAtcs()
     getTowers()
+    getPilots()
     getFlights()
-  }, [getAtcs, getFlights, getTowers, user])
+    getIVAOData()
+    startTimers()
+  }, [user, getAtcs, getTowers, getPilots, getFlights, getIVAOData, startTimers])
 
   return (
     <Provider
@@ -105,7 +106,8 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
         flights: state.flights,
         filter: state.filter,
         origins: state.origins,
-        setFilter
+        setFilter,
+        initIvaoData
       }}
     >
       {children}

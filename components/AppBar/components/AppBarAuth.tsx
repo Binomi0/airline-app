@@ -16,19 +16,11 @@ interface Props {
   userActionStarted: UserActionStatus
   setUserActionStarted: React.Dispatch<React.SetStateAction<UserActionStatus>>
   matches: boolean
-  smartAccountAddress?: string
   // eslint-disable-next-line no-unused-vars
   toggleSidebar: (side: 'left' | 'right') => void
 }
 
-const AppBarAuth = ({
-  smartAccountAddress,
-  user,
-  matches,
-  userActionStarted,
-  setUserActionStarted,
-  toggleSidebar
-}: Props) => {
+const AppBarAuth = ({ user, matches, userActionStarted, setUserActionStarted, toggleSidebar }: Props) => {
   return (
     <Stack direction='row' alignItems='center' height={50} spacing={1}>
       {!user && (
@@ -62,9 +54,9 @@ const AppBarAuth = ({
       )}
       {user && (
         <>
-          <LicenseBar smartAccountAddress={smartAccountAddress} />
-          <GasBalanceBar show={matches} smartAccountAddress={smartAccountAddress} />
-          <AirBalanceBar show={matches} smartAccountAddress={smartAccountAddress} />
+          <LicenseBar />
+          <GasBalanceBar show={matches} />
+          <AirBalanceBar show={matches} />
           <IconButton
             onClick={() => toggleSidebar('right')}
             size='large'

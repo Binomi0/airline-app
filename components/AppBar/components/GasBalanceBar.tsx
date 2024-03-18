@@ -3,14 +3,16 @@ import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 interface Props {
   show: boolean
-  smartAccountAddress?: string
 }
 
-const GasBalanceBar = ({ show, smartAccountAddress }: Props) => {
+const GasBalanceBar = ({ show }: Props) => {
   const { airg } = useTokenProviderContext()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
 
   return show && smartAccountAddress ? (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>

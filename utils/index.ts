@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js'
 
 // A unique identifier for your website
 const rpID = process.env.DOMAIN
-console.log({ rpID })
 // The URL at which registrations and authentications should occur
 const origin = [process.env.ORIGIN, process.env.ORIGIN_MAIN]
 

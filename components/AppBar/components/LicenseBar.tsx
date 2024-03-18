@@ -5,13 +5,12 @@ import Tooltip from '@mui/material/Tooltip'
 import { MediaRenderer } from '@thirdweb-dev/react'
 import { useLicenseProviderContext } from 'context/LicenseProvider/LicenseProvider.context'
 import React from 'react'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
-interface Props {
-  smartAccountAddress?: string
-}
-
-const LicenseBar = ({ smartAccountAddress }: Props) => {
+const LicenseBar = () => {
   const { ownedLicenses, isLoading } = useLicenseProviderContext()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
 
   return (
     <div>

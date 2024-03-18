@@ -35,7 +35,6 @@ const CustomAppBar: React.FC = () => {
   const { status } = useAccountSigner()
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const user = useRecoilValue(userState)
-
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
 
@@ -105,7 +104,6 @@ const CustomAppBar: React.FC = () => {
           )}
           <AppBarAuth
             toggleSidebar={toggleSidebar}
-            smartAccountAddress={smartAccountAddress}
             matches={matches}
             setUserActionStarted={setUserActionStarted}
             userActionStarted={userActionStarted}

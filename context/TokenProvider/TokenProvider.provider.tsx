@@ -27,6 +27,7 @@ export const TokenProvider: FC<{ children: React.ReactNode }> = ({ children }) =
       coinTokenAddress,
       rewardTokenAddress
     ])
+
     setBalance({
       airl: new BigNumber(tokenBalances[0].tokenBalance || '0').div(1e18),
       airg: new BigNumber(tokenBalances[1].tokenBalance || '0').div(1e18)
@@ -35,12 +36,10 @@ export const TokenProvider: FC<{ children: React.ReactNode }> = ({ children }) =
     setIsFetched(true)
   }, [setBalance, smartAccountAddress])
 
-  const getBalances = useCallback(async () => {
-    await getBalance()
-  }, [getBalance])
-
   return (
-    <Provider value={{ getAirlBalance: getBalance, getAirgBalance: getBalance, getBalances, isLoading: !isFetched }}>
+    <Provider
+      value={{ getAirlBalance: getBalance, getAirgBalance: getBalance, getBalances: getBalance, isLoading: !isFetched }}
+    >
       {children}
     </Provider>
   )

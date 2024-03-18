@@ -12,6 +12,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     try {
       const wallet = await Wallet.findOne({ email: req.user })
       await User.findOneAndUpdate({ email: req.user }, { address: req.body.smartAccountAddress })
+      // FIXME: Remember to change initialization of startGift to true if wallet is funded
       if (!wallet?.starterGift) {
         res.redirect('/api/request-funds')
         return

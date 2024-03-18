@@ -11,7 +11,9 @@ export type VaReducerState = {
 }
 
 export type VaContextProps = VaReducerState & {
+  // eslint-disable-next-line no-unused-vars
   setFilter: (value: string) => void
+  initIvaoData: () => void
 }
 
 export type IVAOClients = VaReducerState
@@ -39,4 +41,5 @@ type SetTowers = Readonly<{
 
 type Actions = SetPilots | SetFlights | SetFilter | SetAtcs | SetTowers
 
+// eslint-disable-next-line no-unused-vars
 export type VaReducerHandler = (state: VaReducerState, action: Actions) => VaReducerState
