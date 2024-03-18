@@ -17,10 +17,11 @@ import {
   useSetClaimConditions
 } from '@thirdweb-dev/react'
 import axios from 'config/axios'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import { flightNftAddress, nftLicenseTokenAddress } from 'contracts/address'
 import { useRouter } from 'next/router'
 import React, { useCallback, useMemo } from 'react'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 import Swal from 'sweetalert2'
 import { Cargo } from 'types'
 import { getNFTAttributes } from 'utils'
@@ -33,7 +34,7 @@ interface Aircraft {
 
 const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ cargo, onCancel }) => {
   const router = useRouter()
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const address = useRecoilValue(smartAccountAddressStore)
   const { contract: flightContract } = useContract(flightNftAddress)
   const { contract: licenseContract } = useContract(nftLicenseTokenAddress)
   const { mutateAsync: lazyMint, isLoading: isMinting } = useLazyMint(flightContract)

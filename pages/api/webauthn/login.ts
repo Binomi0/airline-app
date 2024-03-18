@@ -8,67 +8,78 @@ import Webauthn from 'models/Webauthn'
 const rpName = 'WEIFLY'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  try {
-    await connectDB()
-    const user = await Webauthn.findOne({ email: req.body.email })
-
-    if (!user) {
-      res.status(404).end()
+  if (req.method === 'POST') {
+    if (!req.body.email) {
+      res.status(400).end()
       return
     }
+    console.log(req.body.email)
+    try {
+      await connectDB()
+      const user = await Webauthn.findOne({ email: 'foo@bar.com' })
 
-    const options = generateAuthenticationOptions({
-      // Require users to use a previously-registered authenticator
-      allowCredentials: user.authenticators.map((authenticator: Authenticator) => {
-        const bufferFromBase64 = Buffer.from(authenticator.credentialID, 'base64')
+      console.log({ user })
+      if (!user) {
+        res.status(204).end()
+        return
+      }
 
-        return {
-          id: new Uint8Array(
-            bufferFromBase64.buffer,
-            bufferFromBase64.byteOffset,
-            bufferFromBase64.byteLength / Uint8Array.BYTES_PER_ELEMENT
-          ),
-          type: 'public-key',
-          // Optional
-          transports: authenticator.transports
-        }
-      }),
-      userVerification: 'discouraged'
-    })
+      const options = generateAuthenticationOptions({
+        // Require users to use a previously-registered authenticator
+        allowCredentials: user.authenticators.map((authenticator: Authenticator) => {
+          const bufferFromBase64 = Buffer.from(authenticator.credentialID, 'base64')
 
-    await Webauthn.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })
+          return {
+            id: new Uint8Array(
+              bufferFromBase64.buffer,
+              bufferFromBase64.byteOffset,
+              bufferFromBase64.byteLength / Uint8Array.BYTES_PER_ELEMENT
+            ),
+            type: 'public-key',
+            // Optional
+            transports: authenticator.transports
+          }
+        }),
+        userVerification: 'discouraged'
+      })
 
-    const challenge = {
-      ...options,
-      user: {
-        id: user.id,
-        name: user.name || user.email,
-        displayName: user.displayName || user.email
-      },
-      rp: {
-        name: rpName
-      },
-      pubKeyCredParams: [
-        {
-          alg: -7,
-          type: 'public-key'
+      await Webauthn.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })
+
+      const challenge = {
+        ...options,
+        user: {
+          id: user.id,
+          name: user.name || user.email,
+          displayName: user.displayName || user.email
         },
-        {
-          alg: -8,
-          type: 'public-key'
+        rp: {
+          name: rpName
         },
-        {
-          alg: -257,
-          type: 'public-key'
-        }
-      ]
+        pubKeyCredParams: [
+          {
+            alg: -7,
+            type: 'public-key'
+          },
+          {
+            alg: -8,
+            type: 'public-key'
+          },
+          {
+            alg: -257,
+            type: 'public-key'
+          }
+        ]
+      }
+
+      res.status(200).json(challenge)
+      return
+    } catch (err) {
+      console.error('Login Error', err)
+      res.status(500).send(err)
+      return
     }
-
-    res.status(200).json(challenge)
-  } catch (err) {
-    console.error('Login Error', err)
-    res.status(500).send(err)
   }
+  res.status(405).end()
 }
 
 export default handler

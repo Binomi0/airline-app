@@ -5,7 +5,8 @@ import Fade from '@mui/material/Fade'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 import React from 'react'
 import CargoAircraft from 'routes/Cargo/components/CargoAircraft'
 import { Cargo } from 'types'
@@ -14,7 +15,7 @@ const CargoReady: React.FC<{
   cargo?: Cargo
   onCancel: () => void
 }> = ({ cargo, onCancel }) => {
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const address = useRecoilValue(smartAccountAddressStore)
 
   return (
     <Fade in={!!cargo && !!address} unmountOnExit>

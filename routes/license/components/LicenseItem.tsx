@@ -2,7 +2,8 @@ import { NFT } from '@thirdweb-dev/react'
 import React, { useCallback, useState } from 'react'
 import { getNFTAttributes } from 'utils'
 import LicenseItemHeader from './LicenseItemHeader'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 import useLicense from 'hooks/useLicense'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import GradientCard from 'components/GradientCard'
@@ -24,7 +25,7 @@ interface Props {
 }
 
 const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming }) => {
-  const { smartAccountAddress } = useAlchemyProviderContext()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { airl } = useTokenProviderContext()
   const { hasLicense, refetch } = useLicense(nft.metadata.id)
   const [claimingNFT, setClaimingNFT] = useState(-1)

@@ -1,14 +1,10 @@
-import React, { useEffect } from 'react'
-import { SetterOrUpdater, useSetRecoilState } from 'recoil'
+import React, { startTransition, useEffect } from 'react'
+import { useSetRecoilState } from 'recoil'
 import axios from 'config/axios'
-import { authState } from 'store/auth.atom'
+import { authStore } from 'store/auth.atom'
 import { userState } from 'store/user.atom'
 import { getCookie } from 'cookies-next'
-import type { AxiosResponse } from 'axios'
-import type { User } from 'types'
-
-const mapResponse = (setter: SetterOrUpdater<User | undefined>) => (response: AxiosResponse<User>) =>
-  setter(response.data)
+import useWallet from 'hooks/useWallet'
 
 export const INITIAL_STATE = {
   user: undefined,
@@ -20,15 +16,24 @@ interface Props {
 }
 
 export const AuthProvider = ({ children }: Props) => {
-  const setAuthToken = useSetRecoilState(authState)
+  const setAuthToken = useSetRecoilState(authStore)
   const setUser = useSetRecoilState(userState)
+  const { initWallet } = useWallet()
 
   useEffect(() => {
     const token = getCookie('token') as string
+    // axios.defaults.headers.common.Authorization = `Bearer ${token}`
     if (token) {
+      console.log('Refrescando sessión')
       axios
         .get('/api/user/get')
-        .then(mapResponse(setUser))
+        .then((response) => {
+          startTransition(() => {
+            setUser(response.data)
+            initWallet(response.data)
+          })
+        })
+
         .catch((err) => {
           console.error('AuthProvider error =>', err)
         })
@@ -36,7 +41,7 @@ export const AuthProvider = ({ children }: Props) => {
           setAuthToken(token)
         })
     }
-  }, [setAuthToken, setUser])
+  }, [initWallet, setAuthToken, setUser])
 
   return <div>{children}</div>
 }

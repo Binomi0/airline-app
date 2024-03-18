@@ -8,7 +8,6 @@ import Disconnected from 'components/Disconnected'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import { useContract, useContractRead } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
@@ -17,10 +16,11 @@ import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import type { PageProps } from 'types'
 import LinearProgress from '@mui/material/LinearProgress'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const Gas = ({ loading }: PageProps) => {
   const user = useRecoilValue(userState)
-  const { smartAccountAddress: address } = useAlchemyProviderContext()
+  const address = useRecoilValue(smartAccountAddressStore)
   const { airg, airl, getAirlBalance, getAirgBalance } = useTokenProviderContext()
   const { contract } = useContract(stakingAddress)
   const { data: staking, refetch: getStakingInfo } = useContractRead(contract, 'stakers', [address])

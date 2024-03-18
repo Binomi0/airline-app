@@ -2,7 +2,8 @@ import React, { useCallback, useEffect } from 'react'
 import { useContract, useContractRead } from '@thirdweb-dev/react'
 import { stakingAddress } from 'contracts/address'
 import { formatNumber } from 'utils'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 import useStaking from 'hooks/useStaking'
 import Swal from 'sweetalert2'
 import GradientCard from 'components/GradientCard'
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const GasFarmed = ({ getAirgBalance }: Props) => {
-  const { smartAccountAddress } = useAlchemyProviderContext()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { contract } = useContract(stakingAddress)
   const { data: stakeInfo, refetch: getStakeInfo } = useContractRead(contract, 'getStakeInfo', [smartAccountAddress])
   const { claimRewards, isLoading: isClaiming } = useStaking(contract)

@@ -1,15 +1,15 @@
 import { Wallet } from 'ethers'
-import { useAlchemyProviderContext } from 'context/AlchemyProvider'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { alchemyEnhancedApiActions, createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
 import { Hex, LocalAccountSigner, sepolia } from '@alchemy/aa-core'
 import axios from 'config/axios'
 import { User } from 'types'
 import { accountImportErrorSwal, missingKeySwal } from 'lib/swal'
 import alchemy from 'lib/alchemy'
-import { useRecoilValue } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
 import { IWallet } from 'models/Wallet'
+import { walletStore } from 'store/wallet.atom'
 
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 // const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -17,16 +17,14 @@ import { IWallet } from 'models/Wallet'
 interface UseWallet {
   // eslint-disable-next-line no-unused-vars
   initWallet: (user: User) => Promise<void>
-  isLoaded: boolean
 }
 
 const useWallet = (): UseWallet => {
-  const [isLoaded, setIsLoaded] = useState(false)
   const user = useRecoilValue(userState)
-  const { setSmartAccountAddress, setSmartSigner, setBaseSigner } = useAlchemyProviderContext()
+  const setWallet = useSetRecoilState(walletStore)
 
   const initialize = useCallback(
-    async (_signer: Wallet, userId?: string) => {
+    async (_signer: Wallet, userId: string) => {
       if (!_signer || !userId) return
 
       const signer = LocalAccountSigner.privateKeyToAccountSigner(_signer.privateKey as Hex)
@@ -50,26 +48,26 @@ const useWallet = (): UseWallet => {
         })
 
         await Promise.all([updateUser, updateWallet])
-        setSmartAccountAddress(smartAccountAddress)
+        setWallet({ baseSigner: _signer, smartSigner: extendedSmartAccountClient, smartAccountAddress, isLoaded: true })
       } else {
         try {
           await axios.get('/api/wallet')
         } catch (error) {
           await axios.post('/api/wallet', {
-            id: user.id,
+            id: userId,
             smartAccountAddress: user.address,
             signerAddress: _signer.address
           })
         }
-
-        setSmartAccountAddress(user.address as Hex)
+        setWallet({
+          baseSigner: _signer,
+          smartSigner: extendedSmartAccountClient,
+          smartAccountAddress: user.address,
+          isLoaded: true
+        })
       }
-
-      setBaseSigner(_signer)
-      setSmartSigner<typeof extendedSmartAccountClient>(extendedSmartAccountClient)
-      setIsLoaded(true)
     },
-    [setBaseSigner, setSmartAccountAddress, setSmartSigner, user]
+    [setWallet, user?.address]
   )
 
   const checkSigner = useCallback(async (signer: Wallet) => {
@@ -166,7 +164,7 @@ const useWallet = (): UseWallet => {
     [checkSigner, handleImportFile, initialize]
   )
 
-  return { initWallet, isLoaded }
+  return { initWallet }
 }
 
 export default useWallet

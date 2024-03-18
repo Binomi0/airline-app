@@ -1,11 +1,11 @@
 import axios from 'config/axios'
-import useAccountSigner from 'hooks/useAccountSigner'
 import React, { useCallback } from 'react'
 import { validateEmail } from 'utils'
 import EmailInput from './EmailInput'
 import CodeInput from './CodeInput'
 import { UserActionStatus } from 'components/AppBar'
 import CircularProgress from '@mui/material/CircularProgress'
+import useAuth from 'hooks/useAuth'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const SignUp = ({ onInteraction }: Props) => {
-  const { handleSignUp, status } = useAccountSigner()
+  const { handleSignUp } = useAuth()
   const [requestCode, setRequestCode] = React.useState(false)
   const [email, setEmail] = React.useState('')
   const [loading, setLoading] = React.useState(false)
@@ -72,7 +72,7 @@ const SignUp = ({ onInteraction }: Props) => {
 
   return (
     <>
-      {loading || (status === 'loading' && <CircularProgress />)}
+      {loading && <CircularProgress />}
       {requestCode ? (
         <CodeInput
           onCancel={() => {
@@ -80,7 +80,7 @@ const SignUp = ({ onInteraction }: Props) => {
             onInteraction()
           }}
           onSubmit={handleValidateCode}
-          loading={status === 'loading' || loading}
+          loading={loading}
         />
       ) : (
         <EmailInput
@@ -90,7 +90,7 @@ const SignUp = ({ onInteraction }: Props) => {
             onInteraction()
           }}
           onSubmit={handleAccess}
-          loading={status === 'loading' || loading}
+          loading={loading}
         />
       )}
     </>
