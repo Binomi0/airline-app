@@ -19,8 +19,8 @@ const AppBarInfo = ({ user, matches, smartAccountAddress, toggleSidebar }: Props
     !user && (
       <div>
         <LicenseBar />
-        <GasBalanceBar show={matches} smartAccountAddress={smartAccountAddress} />
-        <AirBalanceBar show={matches} smartAccountAddress={smartAccountAddress} />
+        <GasBalanceBar show={matches} />
+        <AirBalanceBar show={matches} />
         <IconButton
           onClick={() => toggleSidebar('right')}
           size='large'
