@@ -25,13 +25,13 @@ import ListItemButton from '@mui/material/ListItemButton'
 import Stack from '@mui/material/Stack'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import { authState } from 'store/auth.atom'
 import { walletStore } from 'store/wallet.atom'
 import useAuth from 'hooks/useAuth'
+import { authStore } from 'store/auth.atom'
 
 const RightSidebar: React.FC = () => {
   const user = useRecoilValue(userState)
-  const token = useRecoilValue(authState)
+  const token = useRecoilValue(authStore)
   const theme = useTheme()
   const router = useRouter()
   const { rightSidebarOpen: open, toggleSidebar } = useMainProviderContext()

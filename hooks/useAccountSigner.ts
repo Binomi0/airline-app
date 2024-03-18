@@ -6,9 +6,9 @@ import { backupDoneSwal } from 'lib/swal'
 import { AccountSignerStatus, User, WebAuthnUri } from 'types'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
-import { authState } from 'store/auth.atom'
 import { walletStore } from 'store/wallet.atom'
 import useWallet from './useWallet'
+import { authStore } from 'store/auth.atom'
 
 interface UseAccountSignerReturnType {
   addBackup: () => Promise<void>
@@ -23,7 +23,7 @@ interface UseAccountSignerReturnType {
 
 const useAccountSigner = (): UseAccountSignerReturnType => {
   const [user, setUser] = useRecoilState(userState)
-  const setToken = useSetRecoilState(authState)
+  const setToken = useSetRecoilState(authStore)
   const [status, setStatus] = useState<AccountSignerStatus>()
   const [wallet, setWallet] = useRecoilState(walletStore)
   const { initWallet } = useWallet()

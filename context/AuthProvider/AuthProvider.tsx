@@ -1,7 +1,7 @@
 import React, { startTransition, useEffect } from 'react'
 import { useSetRecoilState } from 'recoil'
 import axios from 'config/axios'
-import { authState } from 'store/auth.atom'
+import { authStore } from 'store/auth.atom'
 import { userState } from 'store/user.atom'
 import { getCookie } from 'cookies-next'
 import useWallet from 'hooks/useWallet'
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const AuthProvider = ({ children }: Props) => {
-  const setAuthToken = useSetRecoilState(authState)
+  const setAuthToken = useSetRecoilState(authStore)
   const setUser = useSetRecoilState(userState)
   const { initWallet } = useWallet()
 
