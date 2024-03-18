@@ -17,11 +17,13 @@ import { userState } from 'store/user.atom'
 import type { PageProps } from 'types'
 import LinearProgress from '@mui/material/LinearProgress'
 import { smartAccountAddressStore } from 'store/wallet.atom'
+import { tokenBalanceStore } from 'store/balance.atom'
 
 const Gas = ({ loading }: PageProps) => {
   const user = useRecoilValue(userState)
   const address = useRecoilValue(smartAccountAddressStore)
-  const { airg, airl, getAirlBalance, getAirgBalance } = useTokenProviderContext()
+  const balance = useRecoilValue(tokenBalanceStore)
+  const { getAirlBalance, getAirgBalance } = useTokenProviderContext()
   const { contract } = useContract(stakingAddress)
   const { data: staking, refetch: getStakingInfo } = useContractRead(contract, 'stakers', [address])
 
@@ -38,7 +40,7 @@ const Gas = ({ loading }: PageProps) => {
         <Stack direction='row-reverse'>
           <Stack direction='row' alignItems='center' spacing={1}>
             <LocalGasStationIcon />
-            <Typography variant='h2'>{formatNumber(airg?.toNumber())}</Typography>
+            <Typography variant='h2'>{formatNumber(balance.airg?.toNumber())}</Typography>
             <Typography variant='h6'>AIRG</Typography>
           </Stack>
         </Stack>
@@ -47,7 +49,7 @@ const Gas = ({ loading }: PageProps) => {
         </Box>
         <GasStationView
           staking={staking}
-          airl={airl}
+          airl={balance.airl}
           getAirlBalance={getAirlBalance}
           getAirgBalance={getAirgBalance}
           getStakingInfo={getStakingInfo}

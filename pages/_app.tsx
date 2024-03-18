@@ -24,6 +24,7 @@ import theme from '../src/theme'
 import '../styles/globals.css'
 import { authStore } from 'store/auth.atom'
 import { getCookie } from 'cookies-next'
+import 'lib/alchemy'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()

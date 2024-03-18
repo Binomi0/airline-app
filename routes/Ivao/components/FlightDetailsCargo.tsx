@@ -5,9 +5,10 @@ import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Typography from '@mui/material/Typography'
 import BigNumber from 'bignumber.js'
-import { useTokenProviderContext } from 'context/TokenProvider'
 import router from 'next/router'
 import React from 'react'
+import { useRecoilValue } from 'recoil'
+import { tokenBalanceStore } from 'store/balance.atom'
 import { Cargo, IvaoPilot } from 'types'
 import { getFuelForFlight } from 'utils'
 
@@ -20,7 +21,7 @@ interface Props {
 }
 
 const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
-  const { airg } = useTokenProviderContext()
+  const balance = useRecoilValue(tokenBalanceStore)
 
   const requiredGas = React.useMemo(() => {
     const { arrivalDistance, departureDistance } = pilot.lastTrack
@@ -35,8 +36,8 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
   }, [cargo, requiredGas])
 
   const handleSelectFlight = React.useCallback(() => {
-    if (airg?.isGreaterThanOrEqualTo(finalGas)) onSelectFlight()
-  }, [airg, finalGas, onSelectFlight])
+    if (balance.airg?.isGreaterThanOrEqualTo(finalGas)) onSelectFlight()
+  }, [balance.airg, finalGas, onSelectFlight])
 
   return (
     <Card>
@@ -49,13 +50,13 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
         <Typography>{cargo?.details?.description}</Typography>
       </CardContent>
       <CardActions sx={{ justifyContent: 'flex-end' }}>
-        {airg?.isLessThan(requiredGas) ? (
+        {balance.airg?.isLessThan(requiredGas) ? (
           <Button size='large' variant='contained' onClick={() => router.push('/gas')}>
             Go to Gas Station
           </Button>
         ) : (
           <Button
-            disabled={airg?.isLessThan(finalGas)}
+            disabled={balance.airg?.isLessThan(finalGas)}
             color='success'
             size='large'
             variant='contained'

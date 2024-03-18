@@ -19,6 +19,7 @@ import Image from 'next/image'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import { smartAccountAddressStore } from 'store/wallet.atom'
+import { useTokenProviderContext } from 'context/TokenProvider'
 
 const copyToClipboard = (msg: string) => {
   navigator.clipboard.writeText(msg)
@@ -31,6 +32,7 @@ const initialSnackState: AppBarSnack = { open: false, message: '', status: 'succ
 const CustomAppBar: React.FC = () => {
   const matches = useMediaQuery('(min-width:768px)')
   const { toggleSidebar } = useMainProviderContext()
+  const { getBalances } = useTokenProviderContext()
   const trigger = useScrollTrigger()
   const { status } = useAccountSigner()
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
@@ -48,6 +50,9 @@ const CustomAppBar: React.FC = () => {
     }
   }, [status])
 
+  useEffect(() => {
+    getBalances()
+  }, [getBalances])
   return (
     <>
       <Snackbar

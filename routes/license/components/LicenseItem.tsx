@@ -5,7 +5,6 @@ import LicenseItemHeader from './LicenseItemHeader'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import useLicense from 'hooks/useLicense'
-import { useTokenProviderContext } from 'context/TokenProvider'
 import GradientCard from 'components/GradientCard'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
@@ -15,6 +14,7 @@ import Typography from '@mui/material/Typography'
 import CardActions from '@mui/material/CardActions'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
+import { tokenBalanceStore } from 'store/balance.atom'
 
 interface Props {
   nft: NFT
@@ -26,7 +26,7 @@ interface Props {
 
 const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming }) => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
-  const { airl } = useTokenProviderContext()
+  const balance = useRecoilValue(tokenBalanceStore)
   const { hasLicense, refetch } = useLicense(nft.metadata.id)
   const [claimingNFT, setClaimingNFT] = useState(-1)
 
@@ -89,7 +89,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
         {smartAccountAddress && !hasLicense && (
           <CardActions>
             <Button
-              color={airl?.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'}
+              color={balance.airl?.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'}
               disabled={isClaiming || !smartAccountAddress}
               variant='contained'
               onClick={handleClaimLicense}

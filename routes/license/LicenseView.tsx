@@ -11,21 +11,24 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
+import { useRecoilValue } from 'recoil'
+import { tokenBalanceStore } from 'store/balance.atom'
 
 const LicenseView: React.FC = () => {
   const { contract } = useContract(nftLicenseTokenAddress)
   const { licenses, ownedLicenses: owned, refetchLicenses, isLoading } = useLicenseProviderContext()
   const { claimLicenseNFT, isClaiming } = useClaimNFT(contract)
-  const { airl, getAirlBalance } = useTokenProviderContext()
+  const { getAirlBalance } = useTokenProviderContext()
+  const balance = useRecoilValue(tokenBalanceStore)
 
   const handleClaim = useCallback(
     (nft: NFT) => async (refetch: () => void) => {
-      if (!airl) return
+      if (!balance.airl) return
 
       const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
       const { name } = nft.metadata
 
-      const hasEnough = airl.isGreaterThanOrEqualTo(attribute?.value || 0)
+      const hasEnough = balance.airl.isGreaterThanOrEqualTo(attribute?.value || 0)
       if (hasEnough) {
         const { isConfirmed } = await Swal.fire({
           title: name as string,
@@ -55,7 +58,7 @@ const LicenseView: React.FC = () => {
         })
       }
     },
-    [airl, claimLicenseNFT, getAirlBalance, refetchLicenses]
+    [balance.airl, claimLicenseNFT, getAirlBalance, refetchLicenses]
   )
 
   if (isLoading) return <LinearProgress />

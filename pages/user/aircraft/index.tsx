@@ -3,7 +3,6 @@ import GradientCard from 'components/GradientCard'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
 import { useCallback, useState } from 'react'
-import { useTokenProviderContext } from 'context/TokenProvider'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
@@ -18,11 +17,13 @@ import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
 import { darken, useTheme } from '@mui/material/styles'
 import Paper from '@mui/material/Paper'
+import { useRecoilValue } from 'recoil'
+import { tokenBalanceStore } from 'store/balance.atom'
 
 const UserAircrafts: NextPage = () => {
   const theme = useTheme()
   const { data, isLoading, error } = useOwnedNfts(nftAircraftTokenAddress)
-  const { airg } = useTokenProviderContext()
+  const balance = useRecoilValue(tokenBalanceStore)
   const [isRefueling, setIsRefueling] = useState(false)
 
   const handleRefuelAircraft = useCallback(() => {
@@ -50,7 +51,7 @@ const UserAircrafts: NextPage = () => {
         <Typography>
           Fuel Available:{' '}
           {Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-            airg?.toNumber() || 0
+            balance.airg?.toNumber() || 0
           )}{' '}
           Liters
         </Typography>

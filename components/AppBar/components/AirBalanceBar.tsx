@@ -1,17 +1,17 @@
 import React from 'react'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
-import { useTokenProviderContext } from 'context/TokenProvider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { useRecoilValue } from 'recoil'
+import { tokenBalanceStore } from 'store/balance.atom'
 
 interface Props {
   show: boolean
 }
 
 const AirBalanceBar = ({ show }: Props) => {
-  const { airl } = useTokenProviderContext()
+  const balance = useRecoilValue(tokenBalanceStore)
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
 
   return show && smartAccountAddress ? (
@@ -21,7 +21,7 @@ const AirBalanceBar = ({ show }: Props) => {
         {Intl.NumberFormat('en', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
-        }).format(airl?.toNumber() || 0)}{' '}
+        }).format(balance.airl?.toNumber() || 0)}{' '}
         AIRL
       </Typography>
     </Stack>

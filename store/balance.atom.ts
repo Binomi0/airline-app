@@ -6,7 +6,7 @@ type TokenBalanceStore = {
   airg?: BigNumber
 }
 
-export const tokenBalanceStore = atom<TokenBalanceStore | undefined>({
+export const tokenBalanceStore = atom<TokenBalanceStore>({
   key: 'tokenBalance',
   default: {
     airl: undefined,

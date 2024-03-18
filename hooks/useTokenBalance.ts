@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
@@ -15,6 +15,7 @@ const useTokenBalance = (contract?: Hex) => {
 
     console.log({ smartAccountAddress })
     const { tokenBalances } = await alchemy.core.getTokenBalances(smartAccountAddress, [contract])
+    console.log({ tokenBalances })
     const result = new BigNumber(tokenBalances[0].tokenBalance || '0').div(1e18)
 
     setBalance(result)
@@ -23,11 +24,11 @@ const useTokenBalance = (contract?: Hex) => {
     return result
   }, [contract, smartAccountAddress])
 
-  useEffect(() => {
-    getBalance()
-  }, [getBalance])
+  // useEffect(() => {
+  //   getBalance()
+  // }, [getBalance])
 
-  return { balance, refetch: getBalance, isFetched }
+  return { balance, refetch: getBalance, getBalance, isFetched }
 }
 
 export default useTokenBalance
