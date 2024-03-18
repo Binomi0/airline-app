@@ -8,8 +8,8 @@ import Webauthn from 'models/Webauthn'
 // Human-readable title for your website
 const rpName = 'WEIFLY'
 // A unique identifier for your website
-const rpID = process.env.DOMAIN as string
-
+const rpID = process.env.VERCEL_URL || process.env.DOMAIN
+console.log({ rpID })
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email } = req.body
   await connectDB()

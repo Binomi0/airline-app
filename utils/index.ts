@@ -4,9 +4,10 @@ import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 import BigNumber from 'bignumber.js'
 
 // A unique identifier for your website
-const rpID = process.env.DOMAIN as string
+const rpID = process.env.VERCEL_URL || process.env.DOMAIN
+console.log({ rpID })
 // The URL at which registrations and authentications should occur
-const origin = process.env.ORIGIN as string
+const origin = [process.env.ORIGIN, process.env.ORIGIN_MAIN]
 
 // @ts-ignore
 export const verifySignature = async function (authenticator, response, expectedChallenge) {
