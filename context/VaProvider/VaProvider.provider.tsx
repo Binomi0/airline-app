@@ -3,13 +3,17 @@ import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
 import axios from 'config/axios'
-import type { Atc, Flight, IvaoPilot } from 'types'
+import type {
+  Atc,
+  Flight
+  // IvaoPilot
+} from 'types'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 
 const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
-  pilots: [],
+  // pilots: [],
   atcs: [],
   towers: [],
   active: undefined,
@@ -24,9 +28,9 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE })
   const { Provider } = VaProviderContext
 
-  const setPilots = useCallback((pilots: IvaoPilot[]) => {
-    dispatch({ type: 'SET_PILOTS', payload: pilots })
-  }, [])
+  // const setPilots = useCallback((pilots: IvaoPilot[]) => {
+  //   dispatch({ type: 'SET_PILOTS', payload: pilots })
+  // }, [])
 
   const setAtcs = useCallback((atcs: Atc[]) => {
     dispatch({ type: 'SET_ATCS', payload: atcs })
@@ -50,11 +54,11 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     setAtcs(responseAtcs.data)
   }, [setAtcs])
 
-  const getPilots = useCallback(async () => {
-    const response = await axios.get<IvaoPilot[]>('/api/ivao/pilots')
+  // const getPilots = useCallback(async () => {
+  //   const response = await axios.get<IvaoPilot[]>('/api/ivao/pilots')
 
-    setPilots(response.data)
-  }, [setPilots])
+  //   setPilots(response.data)
+  // }, [setPilots])
 
   const getTowers = useCallback(async () => {
     const response = await axios.get<Atc[]>('/api/ivao/towers')
@@ -78,28 +82,39 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const startTimers = useCallback(() => {
     const ivaoTimer = setInterval(getIVAOData, MIN_IVAO_REQ_DELAY)
-    const pilotsTimer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
+    // const pilotsTimer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
 
     return () => {
       clearInterval(ivaoTimer)
-      clearInterval(pilotsTimer)
+      // clearInterval(pilotsTimer)
     }
-  }, [getIVAOData, getPilots])
+  }, [
+    getIVAOData
+    //  getPilots
+  ])
 
   const initIvaoData = useCallback(() => {
     if (!user) return
     getAtcs()
     getTowers()
-    getPilots()
+    // getPilots()
     getFlights()
     getIVAOData()
     startTimers()
-  }, [user, getAtcs, getTowers, getPilots, getFlights, getIVAOData, startTimers])
+  }, [
+    user,
+    getAtcs,
+    getTowers,
+    //  getPilots,
+    getFlights,
+    getIVAOData,
+    startTimers
+  ])
 
   return (
     <Provider
       value={{
-        pilots: state.pilots,
+        // pilots: state.pilots,
         atcs: state.atcs,
         towers: state.towers,
         active: state.active,

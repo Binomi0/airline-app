@@ -9,6 +9,7 @@ import Webauthn from 'models/Webauthn'
 const rpName = 'WEIFLY'
 // A unique identifier for your website
 const rpID = process.env.DOMAIN
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email } = req.body
   await connectDB()

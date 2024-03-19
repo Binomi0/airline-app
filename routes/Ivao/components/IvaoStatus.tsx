@@ -7,9 +7,9 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { darken } from '@mui/material/styles'
 import axios from 'config/axios'
-import { useVaProviderContext } from 'context/VaProvider'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSetRecoilState } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { pilotsStore } from 'store/pilots.atom'
 import { userState } from 'store/user.atom'
 import { User } from 'types'
 
@@ -20,11 +20,13 @@ interface Props {
 const IvaoStatus = ({ user }: Props) => {
   const setUser = useSetRecoilState(userState)
   const [color, setColor] = useState('#fff')
-  const { pilots } = useVaProviderContext()
+  const pilots = useRecoilValue(pilotsStore)
+  console.log({ pilots })
+
   const inputRef = useRef<HTMLInputElement>()
 
   const isFlying = useMemo(
-    () => pilots.some((pilot) => pilot.userId.toString() === user.vaUser?.pilotId),
+    () => pilots.some((pilot) => pilot?.userId.toString() === user.vaUser?.pilotId),
     [pilots, user.vaUser?.pilotId]
   )
 
@@ -51,10 +53,12 @@ const IvaoStatus = ({ user }: Props) => {
       {!user?.vaUser ? (
         <Alert severity='info'>
           <AlertTitle>Conecta tu cuenta de IVAO para continuar</AlertTitle>
-          <TextField inputRef={inputRef} />
-          <Button onClick={handleAddIVAOUser} variant='contained'>
-            Add IVAO identification
-          </Button>
+          <Stack direction='row' justifyContent='center' alignItems='center' spacing={2}>
+            <TextField size='small' inputRef={inputRef} />
+            <Button onClick={handleAddIVAOUser} variant='contained'>
+              Add IVAO identification
+            </Button>
+          </Stack>
         </Alert>
       ) : (
         <Stack direction='row' spacing={2} alignItems='center'>

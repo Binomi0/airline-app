@@ -2,7 +2,7 @@ import withAuth from 'lib/withAuth'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { PilotModel } from 'models'
 import { Pilot } from 'models/Pilot'
-import axios from 'axios'
+import { ivaoInstance } from 'config/axios'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
@@ -16,7 +16,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   } else if (req.method === 'POST') {
     try {
       // TODO: Continue here
-      const response = await axios.get('https://api.ivao.aero/v2/tracker/now/pilots')
+      const response = await ivaoInstance.get('v2/tracker/now/pilots')
       console.log(response.data)
     } catch (err) {
       res.status(400).send(err)

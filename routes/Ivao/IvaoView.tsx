@@ -9,14 +9,13 @@ import useCargo from 'hooks/useCargo'
 import { formatNumber, getCallsign } from 'utils'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useContract, useNFTs } from '@thirdweb-dev/react'
-// import IvaoPilots from './components/IvaoPilots'
 import SportsScoreIcon from '@mui/icons-material/SportsScore'
 import FlagIcon from '@mui/icons-material/Flag'
-import axios from 'config/axios'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import LinearProgress from '@mui/material/LinearProgress'
+import usePilots from 'hooks/usePilots'
 
 interface Props {
   user: User
@@ -29,7 +28,13 @@ const IvaoView = ({ user }: Props) => {
   const [end, setEnd] = useState('')
   const { cargo, newCargo, setCargo } = useCargo()
   const { contract } = useContract(nftAircraftTokenAddress)
-  const { data: aircrafts = [], isLoading, isFetched, refetch: refetchAircrafts } = useNFTs(contract)
+  const {
+    data: aircrafts = []
+    //  isLoading,
+    //   isFetched,
+    //    refetch: refetchAircrafts
+  } = useNFTs(contract)
+  const { getPilots } = usePilots()
 
   const handleSelectAtc = useCallback(
     (callsign: string, side: 'start' | 'end') => {
@@ -60,11 +65,7 @@ const IvaoView = ({ user }: Props) => {
     }
   }, [live, router])
 
-  React.useEffect(() => {
-    axios.get('/api/ivao/oauth').then((response) => {
-      console.log('IVAO VIEW', response.data)
-    })
-  }, [])
+  React.useEffect(getPilots, [getPilots])
 
   return (
     <Stack direction='row'>
@@ -132,6 +133,7 @@ const IvaoView = ({ user }: Props) => {
             </Typography>
           </Stack>
         )}
+
         {/* <IvaoPilots /> */}
       </Box>
     </Stack>

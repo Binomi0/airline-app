@@ -1,7 +1,7 @@
 import { Atc, Flight, IvaoPilot } from 'types'
 
 export type VaReducerState = {
-  pilots: Readonly<IvaoPilot[]>
+  // pilots: Readonly<IvaoPilot[]>
   atcs: Readonly<Atc[]>
   towers: Readonly<Atc[]>
   active?: IvaoPilot
@@ -18,10 +18,10 @@ export type VaContextProps = VaReducerState & {
 
 export type IVAOClients = VaReducerState
 
-type SetPilots = Readonly<{
-  type: 'SET_PILOTS'
-  payload: Readonly<IvaoPilot[]>
-}>
+// type SetPilots = Readonly<{
+//   type: 'SET_PILOTS'
+//   payload: Readonly<IvaoPilot[]>
+// }>
 type SetFlights = Readonly<{
   type: 'SET_FLIGHTS'
   payload?: Readonly<Flight>
@@ -39,7 +39,9 @@ type SetTowers = Readonly<{
   payload: Readonly<Atc[]>
 }>
 
-type Actions = SetPilots | SetFlights | SetFilter | SetAtcs | SetTowers
+type Actions =
+  //  SetPilots |
+  SetFlights | SetFilter | SetAtcs | SetTowers
 
 // eslint-disable-next-line no-unused-vars
 export type VaReducerHandler = (state: VaReducerState, action: Actions) => VaReducerState

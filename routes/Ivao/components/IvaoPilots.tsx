@@ -9,6 +9,8 @@ import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
+import { useRecoilValue } from 'recoil'
+import { pilotsStore } from 'store/pilots.atom'
 
 const STEP = 12
 
@@ -18,7 +20,7 @@ const IvaoPilots = () => {
   const [page, setPage] = React.useState(0)
   const { ownedAircrafts } = useAircraftProviderContext()
   const { cargo, newCargo } = useCargo()
-  const { pilots } = useVaProviderContext()
+  const pilots = useRecoilValue(pilotsStore)
 
   const handleSelect = React.useCallback(
     (callsign: string) => {
@@ -31,25 +33,26 @@ const IvaoPilots = () => {
     [pilots]
   )
 
-  const renderPilots = React.useMemo(
-    () =>
-      current
-        // .filter(filterLEOrigins)
-        .slice(0, page + STEP)
-        .map((pilot, index) => (
-          <Flights
-            cargo={cargo}
-            newCargo={newCargo}
-            selected={pilot.callsign === selected && index === 0}
-            aircraft={ownedAircrafts[0]}
-            pilot={pilot}
-            key={pilot.id}
-            onSelect={() => setSelected(pilot.callsign)}
-            onRemove={() => setSelected('')}
-          />
-        )),
-    [cargo, current, newCargo, ownedAircrafts, page, selected]
-  )
+  // const renderPilots = React.useMemo(
+  //   () =>
+  //     current
+  //       // .filter(filterLEOrigins)
+  //       .slice(0, page + STEP)
+  //       .map((pilot, index) => (
+  //         <Flights
+  //           cargo={cargo}
+  //           newCargo={newCargo}
+  //           selected={pilot.callsign === selected && index === 0}
+  //           aircraft={ownedAircrafts[0]}
+  //           pilot={pilot}
+  //           key={pilot.id}
+  //           onSelect={() => setSelected(pilot.callsign)}
+  //           onRemove={() => setSelected('')}
+  //         />
+  //       )),
+  //   [cargo, current, newCargo, ownedAircrafts, page, selected]
+  // )
+
   React.useEffect(() => {
     setCurrent(pilots)
     if (selected) {
@@ -63,7 +66,7 @@ const IvaoPilots = () => {
   return ownedAircrafts ? (
     <>
       <Grid container spacing={2}>
-        {renderPilots}
+        {/* {renderPilots} */}
       </Grid>
       <Box textAlign='center' my={10}>
         <Button variant='contained' onClick={() => setPage((s) => s + STEP)}>
