@@ -18,30 +18,24 @@ const SignUp = ({ onInteraction }: Props) => {
   const [email, setEmail] = React.useState('')
   const [loading, setLoading] = React.useState(false)
 
-  const onSignUp = useCallback(
-    async (email: string) => validateEmail(email) && (await handleSignUp(email)),
-    [handleSignUp]
-  )
-
   const handleAccess = React.useCallback(
     async (value: string) => {
+      if (!validateEmail(value)) return
+
       try {
         setLoading(true)
-        const { data: user } = await axios.post('/api/user/check', { email: value })
-        if (user.success) {
-          if (!user.emailVerified) {
-            await axios.post('/api/user/create', { email: value })
-            setRequestCode(true)
-          } else {
-            onInteraction('signIn')
-          }
+        const { data: user } = await axios.post<{ success: boolean; emailVerified?: boolean }>('/api/user/check', {
+          email: value
+        })
+        if (user.success && user.emailVerified) {
+          onInteraction('signIn')
+          return
+        }
+        // No existe usuario en la DB con este email
+        const { data } = await axios.post<{ success: boolean }>('/api/user/create', { email: value })
+        if (data.success) {
           setEmail(value)
-        } else {
-          const { data } = await axios.post('/api/user/create', { email: value })
-          if (data.success) {
-            setEmail(value)
-            setRequestCode(true)
-          }
+          setRequestCode(true)
         }
         setLoading(false)
       } catch (error) {
@@ -59,7 +53,7 @@ const SignUp = ({ onInteraction }: Props) => {
 
       try {
         await axios.post('/api/user/validate', { code, email })
-        await onSignUp(email)
+        await handleSignUp(email)
         setLoading(false)
         onInteraction()
       } catch (err) {
@@ -67,7 +61,7 @@ const SignUp = ({ onInteraction }: Props) => {
         console.error('[handleValidateCode] ERROR =>', err)
       }
     },
-    [email, onSignUp, onInteraction]
+    [email, handleSignUp, onInteraction]
   )
 
   return (

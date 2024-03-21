@@ -20,10 +20,9 @@ const SignInView: FC = () => {
       setLoading(true)
       try {
         await handleSignIn(email)
-
         setLoading(false)
       } catch (error) {
-        console.error(error)
+        console.error('handleAccess()', error)
       }
     },
     [handleSignIn]

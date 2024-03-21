@@ -14,11 +14,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const user = await User.findOne({ email: req.body.email }, { id: 1, emailVerified: 1 })
 
       if (!user) {
-        res.status(200).send({ success: false })
+        res.status(201).send({ success: false })
         return
       }
 
-      res.status(200).send({ success: true, emailVerified: user.emailVerified })
+      res.status(202).send({ success: true, emailVerified: user.emailVerified })
       return
     } catch (err) {
       res.status(500).send(err)

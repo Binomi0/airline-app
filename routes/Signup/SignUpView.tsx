@@ -12,37 +12,42 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { validateEmail } from 'utils'
 import axios from 'config/axios'
 import CodeInput from 'components/AppBar/components/CodeInput'
+import { useRouter } from 'next/router'
 
 const SignUpView: FC = () => {
   const [loading, setLoading] = React.useState(false)
   const { handleSignUp } = useAuth()
+  const router = useRouter()
   const [email, setEmail] = React.useState('')
   const [requestCode, setRequestCode] = React.useState(false)
 
-  const handleAccess = React.useCallback(async (value: string) => {
-    if (!validateEmail(value)) return
-    try {
-      setLoading(true)
-      const { data: user } = await axios.post('/api/user/check', { email: value })
-      if (user.success) {
-        if (!user.emailVerified) {
-          await axios.post('/api/user/create', { email: value })
-          setRequestCode(true)
+  const handleAccess = React.useCallback(
+    async (value: string) => {
+      if (!validateEmail(value)) return
+
+      try {
+        setLoading(true)
+        const { data: user } = await axios.post<{ success: boolean; emailVerified?: boolean }>('/api/user/check', {
+          email: value
+        })
+        if (user.success && user.emailVerified) {
+          router.push('/signin')
+          return
         }
-        setEmail(value)
-      } else {
-        const { data } = await axios.post('/api/user/create', { email: value })
+        // No existe usuario en la DB con este email
+        const { data } = await axios.post<{ success: boolean }>('/api/user/create', { email: value })
         if (data.success) {
           setEmail(value)
           setRequestCode(true)
         }
+        setLoading(false)
+      } catch (error) {
+        setLoading(false)
+        console.error(error)
       }
-      setLoading(false)
-    } catch (error) {
-      setLoading(false)
-      console.error(error)
-    }
-  }, [])
+    },
+    [router]
+  )
 
   const handleValidateCode = useCallback(
     async (code: string) => {

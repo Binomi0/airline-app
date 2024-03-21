@@ -38,7 +38,11 @@ const EmailInput: FC<Props> = ({ onSubmit, onCancel, loading, color }: Props) =>
           if (isCMA) {
             // Call WebAuthn authentication
             await onSubmit(emailRef.current?.value)
+          } else {
+            // TODO: handle if no CMA is available
           }
+        } else {
+          // TODO: handle if no webauthn is available
         }
       } else {
         setError('Insert a valid email please.')
