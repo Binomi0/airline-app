@@ -4,7 +4,7 @@ import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import React, { FC, FormEventHandler, KeyboardEvent } from 'react'
+import React, { FC, KeyboardEvent } from 'react'
 import { validateEmail } from 'utils'
 
 interface Props {
@@ -76,7 +76,7 @@ const EmailInput: FC<Props> = ({ onSubmit, onCancel, loading, color }: Props) =>
         label='EMAIL'
         error={!!error}
         helperText={error}
-        placeholder='Insert your email'
+        placeholder='Type here...'
         onKeyDown={handleKeyDown}
         InputProps={{
           endAdornment: (

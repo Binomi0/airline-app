@@ -50,19 +50,26 @@ const SignInView: FC = () => {
             </Stack>
           ) : (
             <>
-              <Typography variant='h4' align='center' paragraph>
+              <Typography variant='h4' align='center' paragraph color='primary.light'>
                 Insert your email to join
               </Typography>
               <Box className={classes.form}>
                 <EmailInput color='primary' onCancel={() => {}} onSubmit={handleAccess} loading={false} />
                 <Box component={Link} href='/signup'>
-                  <Typography color='primary.light' align='right'>
+                  <Typography color='primary.light' align='right' sx={{ '&:hover': { color: 'white' } }}>
                     or create a new account here.
                   </Typography>
                 </Box>
-                <Stack direction='row' alignItems='center' spacing={1} mt={2}>
-                  <Lock fontSize='small' />
-                  <Typography variant='caption'>
+                <Stack
+                  direction='row'
+                  alignItems='center'
+                  spacing={1}
+                  mt={2}
+                  color='#555555'
+                  sx={{ '&:hover': { color: 'white' }, cursor: 'default' }}
+                >
+                  <Lock fontSize='small' color='inherit' />
+                  <Typography variant='caption' color='inherit'>
                     By entering you agree with terms and conditions, privacy policy and cookies.
                   </Typography>
                 </Stack>
