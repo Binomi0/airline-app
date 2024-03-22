@@ -17,7 +17,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const token = jwt.sign({ data: { email: req.body.email, id: user?.id } }, process.env.JWT_SECRET, {
-      expiresIn: '7d'
+      expiresIn: '1d'
     })
     setCookie('token', token, { req, res })
     res.status(200).end()

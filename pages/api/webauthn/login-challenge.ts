@@ -44,7 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       throw new Error(`Missing user ${user.email}`)
     }
     const token = jwt.sign({ data: { email: req.body.email, id: user.id } }, process.env.JWT_SECRET, {
-      expiresIn: '7d'
+      expiresIn: '1d'
     })
     setCookie('token', token, { req, res })
     res.send({ verified: verification.verified, id: user?.id, emailVerified: user?.emailVerified, token })
