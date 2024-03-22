@@ -1,11 +1,10 @@
 import { Wallet } from 'ethers'
 import { useCallback } from 'react'
-import { alchemyEnhancedApiActions, createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
+import { createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
 import { Hex, LocalAccountSigner, sepolia } from '@alchemy/aa-core'
 import axios from 'config/axios'
 import { User } from 'types'
 import { accountImportErrorSwal, missingKeySwal } from 'lib/swal'
-import alchemy from 'lib/alchemy'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
 import { IWallet } from 'models/Wallet'
@@ -28,7 +27,7 @@ const useWallet = (): UseWallet => {
       if (!_signer || !userId) return
 
       const signer = LocalAccountSigner.privateKeyToAccountSigner(_signer.privateKey as Hex)
-      const smartAccountClient = await createModularAccountAlchemyClient({
+      const modularAccountAlchemyClient = await createModularAccountAlchemyClient({
         apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY_ETH_SEPOLIA,
         chain: sepolia,
         signer,
@@ -36,9 +35,9 @@ const useWallet = (): UseWallet => {
           policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID_ETH_SEPOLIA
         }
       })
-      const extendedSmartAccountClient = smartAccountClient.extend(alchemyEnhancedApiActions(alchemy))
+
       if (!user?.address) {
-        const smartAccountAddress = smartAccountClient.getAddress()
+        const smartAccountAddress = modularAccountAlchemyClient.getAddress()
 
         const updateUser = axios.post('/api/user/update', { address: smartAccountAddress })
         const updateWallet = axios.post('/api/wallet', {
@@ -48,7 +47,12 @@ const useWallet = (): UseWallet => {
         })
 
         await Promise.all([updateUser, updateWallet])
-        setWallet({ baseSigner: _signer, smartSigner: extendedSmartAccountClient, smartAccountAddress, isLoaded: true })
+        setWallet({
+          baseSigner: _signer,
+          smartSigner: modularAccountAlchemyClient,
+          smartAccountAddress,
+          isLoaded: true
+        })
       } else {
         try {
           await axios.get('/api/wallet')
@@ -61,7 +65,7 @@ const useWallet = (): UseWallet => {
         }
         setWallet({
           baseSigner: _signer,
-          smartSigner: extendedSmartAccountClient,
+          smartSigner: modularAccountAlchemyClient,
           smartAccountAddress: user.address,
           isLoaded: true
         })

@@ -15,10 +15,11 @@ export const INITIAL_STATE: TokenReducerState = {
 }
 
 export const TokenProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { Provider } = TokenProviderContext
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const setBalance = useSetRecoilState(tokenBalanceStore)
   const [isFetched, setIsFetched] = useState<boolean>(false)
+
+  const { Provider } = TokenProviderContext
 
   const getBalance = useCallback(async () => {
     if (!smartAccountAddress) return
