@@ -44,7 +44,7 @@ const IvaoStatus = ({ user, ivaoUser }: Props) => {
             <Typography
               variant='button'
               component='a'
-              href={`https://sso.ivao.aero/authorize?response_type=code&client_id=9e4df654-df2c-4726-a1d3-875f6ec6ac64&state=${user.id}&scope=openid profile location flight_plans:read configuration bookings:read tracker training email birthday&code_challenge_method=${challengeMethod}&code_challenge=${challenge}&redirectUrl=http://localhost:3000/authorize`}
+              href={`https://sso.ivao.aero/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_IVAO_ID}&state=${user.id}&scope=openid profile location flight_plans:read configuration bookings:read tracker training email birthday&code_challenge_method=${challengeMethod}&code_challenge=${challenge}`}
             >
               Connect Your Account
             </Typography>

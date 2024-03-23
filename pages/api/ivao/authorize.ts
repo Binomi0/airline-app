@@ -14,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const body = {
       grant_type: 'client_credentials',
       scope: 'openid profile location flight_plans:read configuration bookings:read tracker training email birthday',
-      client_id: process.env.IVAO_ID,
+      client_id: process.env.NEXT_PUBLIC_IVAO_ID,
       client_secret: process.env.IVAO_SECRET,
       // TODO: Receive redirect URL from env?
       redirect_url: `${process.env.NEXT_PUBLIC_ORIGIN}/ivao/authorize`

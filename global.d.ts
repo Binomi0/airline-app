@@ -27,6 +27,6 @@ namespace NodeJS {
     PRIVATE_API_KEY: string
     NEXT_PUBLIC_MAPS_API_KEY: string
     IVAO_SECRET: string
-    IVAO_ID: string
+    NEXT_PUBLIC_IVAO_ID: string
   }
 }
