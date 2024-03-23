@@ -24,7 +24,6 @@ interface Props {
 const IvaoStatus = ({ user, ivaoUser }: Props) => {
   const [color, setColor] = useState('#fff')
   const pilots = useRecoilValue(pilotsStore)
-  console.log({ pilots })
 
   const isFlying = useMemo(
     () => pilots.some((pilot) => pilot?.userId.toString() === user.vaUser?.pilotId),

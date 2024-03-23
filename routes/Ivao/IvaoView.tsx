@@ -31,7 +31,6 @@ const IvaoView = ({ user }: Props) => {
   const { cargo, newCargo, setCargo } = useCargo()
   const { contract } = useContract(nftAircraftTokenAddress)
   const { isLoading, ivaoUser } = useIvao()
-  console.log({ ivaoUser })
 
   const {
     data: aircrafts = []

@@ -17,7 +17,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       client_id: process.env.IVAO_ID,
       client_secret: process.env.IVAO_SECRET,
       // TODO: Receive redirect URL from env?
-      redirect_url: 'http://localhost:3000/api/ivao/success'
+      redirect_url: `${process.env.NEXT_PUBLIC_ORIGIN}/api/ivao/authorize`
     }
 
     const response = await ivaoInstance.post<{ access_token?: string }>('/v2/oauth/token', body, {
