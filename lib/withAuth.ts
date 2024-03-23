@@ -7,6 +7,7 @@ import User from 'models/User'
 export interface CustomNextApiRequest extends NextApiRequest {
   user?: string
   id?: string
+  userId?: string
 }
 
 const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, res: NextApiResponse) => {
@@ -17,7 +18,7 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
     if (cookieToken) {
       const decoded = jwt.verify(cookieToken as string, process.env.JWT_SECRET) as JwtPayload
       if (decoded.data.email) {
-        const user = await User.findOne({ email: decoded.data.email }, { _id: 1 })
+        const user = await User.findOne({ email: decoded.data.email }, { _id: 1, id: 1 })
         if (!user) {
           res.status(401).end()
           return
@@ -27,6 +28,7 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
         }
         req.user = decoded.data.email
         req.id = user._id
+        req.userId = user.id
         return handler(req, res)
       }
     } else {
@@ -34,7 +36,7 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
       if (headerToken) {
         const decoded = jwt.verify(headerToken as string, process.env.JWT_SECRET) as JwtPayload
         if (decoded.data.email) {
-          const user = await User.findOne({ email: decoded.data.email }, { _id: 1 })
+          const user = await User.findOne({ email: decoded.data.email }, { _id: 1, id: 1 })
           if (!user) {
             res.status(401).end()
             return
@@ -42,8 +44,10 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
           if (!user?._id) {
             throw new Error('[headerToken] Missing _id in user?')
           }
+
           req.user = decoded.data.email
           req.id = user._id
+          req.userId = user.id
           return handler(req, res)
         }
       }

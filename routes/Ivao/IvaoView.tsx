@@ -16,6 +16,8 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import LinearProgress from '@mui/material/LinearProgress'
 import usePilots from 'hooks/usePilots'
+import useIvao from 'hooks/useIvao'
+import { CircularProgress } from '@mui/material'
 
 interface Props {
   user: User
@@ -28,6 +30,9 @@ const IvaoView = ({ user }: Props) => {
   const [end, setEnd] = useState('')
   const { cargo, newCargo, setCargo } = useCargo()
   const { contract } = useContract(nftAircraftTokenAddress)
+  const { isLoading, ivaoUser } = useIvao()
+  console.log({ ivaoUser })
+
   const {
     data: aircrafts = []
     //  isLoading,
@@ -70,72 +75,76 @@ const IvaoView = ({ user }: Props) => {
   return (
     <Stack direction='row'>
       <IvaoAtcs onSelect={handleSelectAtc} start={start} end={end} />
-      <Box px={2} width='100%'>
-        <IvaoStatus user={user} />
-        <Typography variant='h4' align='center' paragraph>
-          Flights can only be selected from active ATC`s
-        </Typography>
-        <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
-          {start && (
-            <Box textAlign='center'>
-              <FlagIcon color='success' fontSize='large' />
-              <Typography variant='h3'>Start</Typography>
-              <Typography>{start}</Typography>
-            </Box>
-          )}
-          {start && end && (
-            <Stack height={100} width='100%' justifyContent='center'>
-              <LinearProgress variant='determinate' value={0} />
-            </Stack>
-          )}
-          {start && end && (
-            <Box textAlign='center'>
-              <SportsScoreIcon fontSize='large' />
-              <Typography variant='h3'>End</Typography>
-              <Typography>{end}</Typography>
-            </Box>
-          )}
-        </Stack>
-        {cargo && (
-          <Stack direction='column' width='100%' alignItems='center' justifyContent='center' mt={2}>
-            <Typography variant='h6'>{cargo.details.name}</Typography>
-
-            <Stack direction='row' justifyContent='space-between' minWidth={300}>
-              <Typography align='center'>Distance:</Typography>
-              <Typography align='center' variant='body2'>
-                {formatNumber(cargo.distance)} Km
-              </Typography>
-            </Stack>
-
-            <Stack direction='row' justifyContent='space-between' minWidth={300}>
-              <Typography align='center'>Prize:</Typography>
-              <Typography align='center' variant='body2'>
-                {formatNumber(cargo.prize)} AIRL
-              </Typography>
-            </Stack>
-
-            <Stack direction='row' justifyContent='space-between' minWidth={300}>
-              <Typography align='center'>Rewards: </Typography>
-              <Typography align='center' variant='body2'>
-                {cargo.rewards ?? '-'}
-              </Typography>
-            </Stack>
-
-            <Stack direction='row' justifyContent='space-between' minWidth={300}>
-              <Typography align='center'>Score: </Typography>
-              <Typography align='center' variant='body2'>
-                {cargo.score ?? '-'}
-              </Typography>
-            </Stack>
-
-            <Typography width={300} align='justify' variant='caption'>
-              {cargo.details.description}
-            </Typography>
+      {isLoading ? (
+        <CircularProgress size={64} />
+      ) : (
+        <Box px={2} width='100%'>
+          <IvaoStatus user={user} ivaoUser={ivaoUser} />
+          <Typography variant='h4' align='center' paragraph>
+            Flights can only be selected from active ATC`s
+          </Typography>
+          <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
+            {start && (
+              <Box textAlign='center'>
+                <FlagIcon color='success' fontSize='large' />
+                <Typography variant='h3'>Start</Typography>
+                <Typography>{start}</Typography>
+              </Box>
+            )}
+            {start && end && (
+              <Stack height={100} width='100%' justifyContent='center'>
+                <LinearProgress variant='determinate' value={0} />
+              </Stack>
+            )}
+            {start && end && (
+              <Box textAlign='center'>
+                <SportsScoreIcon fontSize='large' />
+                <Typography variant='h3'>End</Typography>
+                <Typography>{end}</Typography>
+              </Box>
+            )}
           </Stack>
-        )}
+          {cargo && (
+            <Stack direction='column' width='100%' alignItems='center' justifyContent='center' mt={2}>
+              <Typography variant='h6'>{cargo.details.name}</Typography>
 
-        {/* <IvaoPilots /> */}
-      </Box>
+              <Stack direction='row' justifyContent='space-between' minWidth={300}>
+                <Typography align='center'>Distance:</Typography>
+                <Typography align='center' variant='body2'>
+                  {formatNumber(cargo.distance)} Km
+                </Typography>
+              </Stack>
+
+              <Stack direction='row' justifyContent='space-between' minWidth={300}>
+                <Typography align='center'>Prize:</Typography>
+                <Typography align='center' variant='body2'>
+                  {formatNumber(cargo.prize)} AIRL
+                </Typography>
+              </Stack>
+
+              <Stack direction='row' justifyContent='space-between' minWidth={300}>
+                <Typography align='center'>Rewards: </Typography>
+                <Typography align='center' variant='body2'>
+                  {cargo.rewards ?? '-'}
+                </Typography>
+              </Stack>
+
+              <Stack direction='row' justifyContent='space-between' minWidth={300}>
+                <Typography align='center'>Score: </Typography>
+                <Typography align='center' variant='body2'>
+                  {cargo.score ?? '-'}
+                </Typography>
+              </Stack>
+
+              <Typography width={300} align='justify' variant='caption'>
+                {cargo.details.description}
+              </Typography>
+            </Stack>
+          )}
+
+          {/* <IvaoPilots /> */}
+        </Box>
+      )}
     </Stack>
   )
 }

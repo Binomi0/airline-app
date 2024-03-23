@@ -53,28 +53,30 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
 
   return (
     <Box minWidth={300} height='calc(100vh - 64px)' sx={{ overflow: 'auto', overflowX: 'hidden' }}>
-      <Box p={1} bgcolor={theme.palette.common.white} className={styles.textFieldBox}>
-        <TextField
-          fullWidth
-          label='Search Active ATC'
-          size='small'
-          color='info'
-          variant='outlined'
-          inputRef={atcSearchRef}
-          InputProps={{
-            endAdornment: (
-              <IconButton onClick={() => setAtcSearch(atcSearchRef.current?.value || '')}>
-                <Search color='info' />
-              </IconButton>
-            )
-          }}
-        />
+      <Box className={styles.textFieldBox}>
+        <Box p={1} bgcolor={theme.palette.common.white}>
+          <TextField
+            fullWidth
+            label='Search Active ATC'
+            size='small'
+            color='info'
+            variant='outlined'
+            inputRef={atcSearchRef}
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={() => setAtcSearch(atcSearchRef.current?.value || '')}>
+                  <Search color='info' />
+                </IconButton>
+              )
+            }}
+          />
+        </Box>
+        <Stack bgcolor='green'>
+          <Typography align='center' fontSize={8}>
+            IVAO ACTIVE TOWER CONTROL
+          </Typography>
+        </Stack>
       </Box>
-      <Stack bgcolor='green'>
-        <Typography align='center' fontSize={8}>
-          IVAO ACTIVE TOWER CONTROL
-        </Typography>
-      </Stack>
       {filteredAtcs.map((atc) => (
         <Paper key={atc.id} className={styles.paper}>
           <Stack direction='row' justifyContent='space-between' p={1}>

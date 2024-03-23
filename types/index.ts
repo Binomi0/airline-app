@@ -166,3 +166,46 @@ export interface FlightState {
 export interface PageProps {
   loading: boolean
 }
+
+export interface IvaoHours {
+  type: string
+  hours: number
+}
+
+export interface IvaoRating {
+  isPilot: boolean
+  isAtc: boolean
+  pilotRating: IvaoPilotRating
+  atcRating: IvaoPilotRating
+  networkRating: IvaoPilotRating
+}
+
+export interface IvaoPilotRating {
+  id: number
+  name: string
+  shortName: string
+  description: string
+}
+
+export interface IvaoUser {
+  id: number
+  centerId: number
+  countryId: string
+  createdAt: string
+  divisionId: string
+  isStaff: boolean
+  languageId: string
+  email: string
+  firstName: string
+  lastName: string
+  rating: IvaoRating
+  hours: IvaoHours[]
+  profile: string
+  userStaffPositions: number[]
+  ownedVirtualAirlines: number[]
+  sub: 704763
+  given_name: string
+  family_name: string
+  nickname: string
+  publicNickname: string
+}

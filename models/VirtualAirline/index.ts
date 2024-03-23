@@ -7,12 +7,20 @@ export enum VirtualAirlineType {
   VATSIM = 'VATSIM'
 }
 export interface IVirtualAirline extends Document {
+  userId: string
   pilotId: string
+  isVerified: boolean
   type: VirtualAirlineType
 }
 
 const virtualAirlineSchema: mongoose.Schema = new mongoose.Schema<IVirtualAirline>(
   {
+    userId: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    isVerified: { type: Boolean, default: false },
     pilotId: {
       type: String,
       required: true,

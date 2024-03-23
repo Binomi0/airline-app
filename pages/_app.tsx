@@ -61,7 +61,7 @@ export default function MyApp(props: MyAppProps) {
               <title>Weifly a decentralized virtual airline based on Ethereum</title>
             </Head>
             <ThemeProvider theme={theme}>
-              <CssBaseline />
+              <CssBaseline enableColorScheme />
               <ErrorBoundary>
                 <AircraftProvider>
                   <LicenseProvider>

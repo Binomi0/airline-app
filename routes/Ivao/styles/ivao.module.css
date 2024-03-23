@@ -1,11 +1,18 @@
 .paper {
   color: #ededed;
-  background-color: var(--mui-palette-grey-700);
+  background: linear-gradient(to bottom left, #19203f, #303d79);
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-width: none;
   width: 100%;
   border-radius: 0;
   border-bottom: 1px solid #0a0a0a;
+  transition: all 125ms ease-out;
+}
+
+.paper:hover {
+  filter: brightness(80%);
+  background: linear-gradient(to top right, #19203f, #303d79);
 }
 
 /* .paper:hover {
@@ -17,7 +24,6 @@
   position: sticky;
   top: 0;
   left: 0;
-  border-bottom: 1px solid #ededed;
 }
 
 .icon {
