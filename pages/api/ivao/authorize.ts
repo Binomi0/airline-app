@@ -17,7 +17,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       client_id: process.env.IVAO_ID,
       client_secret: process.env.IVAO_SECRET,
       // TODO: Receive redirect URL from env?
-      redirect_url: `${process.env.NEXT_PUBLIC_ORIGIN}/api/ivao/authorize`
+      redirect_url: `${process.env.NEXT_PUBLIC_ORIGIN}/ivao/authorize`
+      // redirectUrl: `${process.env.NEXT_PUBLIC_ORIGIN}/ivao/authorize`
     }
 
     const response = await ivaoInstance.post<{ access_token?: string }>('/v2/oauth/token', body, {
@@ -58,7 +59,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(400).send(error)
       return
     }
-    res.redirect(`/ivao?token=${req.query.code}`)
+    // res.redirect(`/ivao?token=${req.query.code}`)
+    res.status(200).send(req.query.code)
     return
   } else {
     res.status(405).end()

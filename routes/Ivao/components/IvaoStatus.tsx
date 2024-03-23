@@ -13,8 +13,9 @@ function base64URLEncode(str: string) {
   return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 }
 
-const challengeMethod = 'S256'
-const challenge = base64URLEncode('f0e65975ed9a43805b030b5e0d4af83239a652b1ddd7fa26b108424e19f48676')
+const verifier = '123456'
+const challengeMethod = 'plain' // S256
+const challenge = base64URLEncode(verifier)
 
 interface Props {
   user: User
@@ -60,7 +61,7 @@ const IvaoStatus = ({ user, ivaoUser }: Props) => {
               background: `linear-gradient(270deg, ${darken(color, 0.1)}, ${darken(color, 0.7)}`
             }}
           />
-          <Typography>Estás Conectado a IVAO {user.vaUser?.pilotId}</Typography>
+          <Typography>Estás Conectado a IVAO {ivaoUser.firstName}</Typography>
         </Stack>
       )}
     </Box>

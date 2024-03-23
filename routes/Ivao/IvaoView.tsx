@@ -18,6 +18,8 @@ import LinearProgress from '@mui/material/LinearProgress'
 import usePilots from 'hooks/usePilots'
 import useIvao from 'hooks/useIvao'
 import { CircularProgress } from '@mui/material'
+import { useRecoilValue } from 'recoil'
+import { ivaoUserStore } from 'store/ivao-user.atom'
 
 interface Props {
   user: User
@@ -30,7 +32,8 @@ const IvaoView = ({ user }: Props) => {
   const [end, setEnd] = useState('')
   const { cargo, newCargo, setCargo } = useCargo()
   const { contract } = useContract(nftAircraftTokenAddress)
-  const { isLoading, ivaoUser } = useIvao()
+  const { isLoading } = useIvao()
+  const ivaoUser = useRecoilValue(ivaoUserStore)
 
   const {
     data: aircrafts = []
