@@ -138,7 +138,7 @@ async function processBatchPilots(batch: Pilot[], lives: ILive[]) {
 const getCreateAndUpdateAtcs = async (atcs: Atc[]): Promise<{ update: Atc[]; create: Atc[] }> => {
   const current = await AtcModel.find<Atc>({ callsign: { $in: atcs.map((atc) => atc.callsign) } })
 
-  const reducedPilots = atcs.reduce(
+  const reducedAtcs = atcs.reduce(
     (acc, curr) => ({
       create: !current.some((a) => a.callsign === curr.callsign) ? [...acc.create, curr] : acc.create,
       update: current.some((a) => a.callsign === curr.callsign) ? [...acc.update, curr] : acc.update
@@ -146,11 +146,12 @@ const getCreateAndUpdateAtcs = async (atcs: Atc[]): Promise<{ update: Atc[]; cre
     { create: [] as Atc[], update: [] as Atc[] }
   )
 
-  return reducedPilots
+  return reducedAtcs
 }
 
 const getCreateAndUpdatePilots = async (pilots: Pilot[]): Promise<{ update: Pilot[]; create: Pilot[] }> => {
   const current = await PilotModel.find<Pilot>({ userId: { $in: pilots.map((pilot) => pilot.userId) } })
+
   const reducedPilots = pilots.reduce(
     (acc, curr) => ({
       create: !current.some((a) => a.userId === curr.userId) ? [...acc.create, curr] : acc.create,

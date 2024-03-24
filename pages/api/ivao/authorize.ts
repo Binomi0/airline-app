@@ -5,7 +5,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import jwt from 'jsonwebtoken'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log(req.query)
   if (req.method === 'GET') {
     if (!req.query.state || !req.query.code) {
       res.status(400).end()
@@ -30,10 +29,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return
     }
 
-    // Missing state and challenge validation
+    // FIXME: Missing state and challenge validation
+
     ivaoInstance.defaults.headers.common.Authorization = `Bearer ${req.query.code}`
     const decoded = jwt.decode(req.query.code as string, { json: true, complete: true })
-    console.log({ decoded })
     if (!decoded) {
       res.status(403).end()
       return
@@ -48,6 +47,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     try {
       await connectDB()
+      const va = await VirtualAirlineModel.findOne({ userId: req.query.state })
+      if (va) {
+        res.status(202).end()
+        return
+      }
+
       const vaUser = await VirtualAirlineModel.findOneAndUpdate(
         { userId: req.query.state },
         { isVerified: true, pilotId: decoded.payload.sub },
