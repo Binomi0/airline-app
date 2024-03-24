@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
+import Paper from '@mui/material/Paper'
 
 interface Props {
   nft: NFT
@@ -36,7 +37,7 @@ const AircraftItem = ({ nft, isClaiming, onClaim }: Props) => {
 
   return (
     <Grid item xs={12} lg={6}>
-      <GradientCard>
+      <Paper>
         <AircraftCardHeader nft={nft} />
 
         <CardContent>
@@ -57,7 +58,7 @@ const AircraftItem = ({ nft, isClaiming, onClaim }: Props) => {
             onClaim={handleClaim}
           />
         )}
-      </GradientCard>
+      </Paper>
     </Grid>
   )
 }

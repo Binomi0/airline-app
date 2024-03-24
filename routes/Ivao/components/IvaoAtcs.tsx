@@ -13,6 +13,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
 import { useTheme } from '@mui/material/styles'
+import { LinearProgress } from '@mui/material'
 
 const ZERO = 0
 const TWENTY_FIVE = 25
@@ -39,7 +40,7 @@ interface Props {
 }
 
 const IvaoAtcs = ({ start, end, onSelect }: Props) => {
-  const { atcs } = useVaProviderContext()
+  const { atcs, isLoading } = useVaProviderContext()
   const theme = useTheme()
   const atcSearchRef = useRef<HTMLInputElement>()
   const [atcSearch, setAtcSearch] = useState<string>('')
@@ -52,63 +53,74 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
     .sort(sortByCallsign)
 
   return (
-    <Box minWidth={300} height='calc(100vh - 64px)' sx={{ overflow: 'auto', overflowX: 'hidden' }}>
-      <Box className={styles.textFieldBox}>
-        <Box p={1} bgcolor={theme.palette.common.white}>
+    <Box
+      minWidth={300}
+      height='calc(100vh - 64px)'
+      sx={{ overflow: 'auto', overflowX: 'hidden', scrollbarWidth: 'none' }}
+    >
+      <Paper className={styles.textFieldBox}>
+        <Box p={1}>
           <TextField
-            disabled={!atcs}
+            autoFocus={Boolean(atcs.length)}
+            disabled={!atcs.length}
             fullWidth
             label='Search Active ATC'
             size='small'
-            color='info'
+            // color='info'
             variant='outlined'
             inputRef={atcSearchRef}
             InputProps={{
               endAdornment: (
-                <IconButton onClick={() => setAtcSearch(atcSearchRef.current?.value || '')}>
-                  <Search color='info' />
+                <IconButton disabled={!atcs.length} onClick={() => setAtcSearch(atcSearchRef.current?.value || '')}>
+                  <Search color={!atcs.length ? 'disabled' : 'primary'} />
                 </IconButton>
               )
             }}
           />
         </Box>
-        <Stack bgcolor='green'>
-          <Typography align='center' fontSize={8}>
+        <Stack bgcolor={atcs.length ? 'success.main' : 'error.main'}>
+          <Typography align='center' fontSize={8} color={theme.palette.primary.contrastText}>
             IVAO ACTIVE TOWER CONTROL
           </Typography>
         </Stack>
-      </Box>
-      {filteredAtcs.map((atc) => (
-        <Paper key={atc.id} className={styles.paper}>
-          <Stack direction='row' justifyContent='space-between' p={1}>
-            <Box>
-              <Typography variant='subtitle1'>{atc.callsign.split('_')[0]}</Typography>
-              <Stack direction='row' spacing={1} alignItems='center'>
-                <CellTowerIcon fontSize='inherit' />
-                <Typography variant='caption'>
-                  {Intl.NumberFormat('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(
-                    atc.atcSession.frequency
-                  )}
-                </Typography>
+      </Paper>
+      {isLoading ? (
+        <Box>
+          <LinearProgress />
+        </Box>
+      ) : (
+        filteredAtcs.map((atc) => (
+          <Paper key={atc.id} className={styles.paper}>
+            <Stack direction='row' justifyContent='space-between' p={1}>
+              <Box>
+                <Typography variant='subtitle1'>{atc.callsign.split('_')[0]}</Typography>
+                <Stack direction='row' spacing={1} alignItems='center'>
+                  <CellTowerIcon fontSize='inherit' />
+                  <Typography variant='caption'>
+                    {Intl.NumberFormat('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(
+                      atc.atcSession.frequency
+                    )}
+                  </Typography>
+                </Stack>
+              </Box>
+              <Stack direction='column' spacing={1}>
+                <FlightTakeoffIcon
+                  color={start === atc.callsign ? 'success' : 'inherit'}
+                  onClick={() => onSelect(atc.callsign === start ? '' : atc.callsign, 'start')}
+                  className={styles.icon}
+                  fontSize='small'
+                />
+                <FlightLandIcon
+                  color={end === atc.callsign ? 'info' : 'inherit'}
+                  onClick={() => onSelect(atc.callsign === end ? '' : atc.callsign, 'end')}
+                  className={styles.icon}
+                  fontSize='small'
+                />
               </Stack>
-            </Box>
-            <Stack direction='column' spacing={1}>
-              <FlightTakeoffIcon
-                color={start === atc.callsign ? 'success' : 'inherit'}
-                onClick={() => onSelect(atc.callsign === start ? '' : atc.callsign, 'start')}
-                className={styles.icon}
-                fontSize='small'
-              />
-              <FlightLandIcon
-                color={end === atc.callsign ? 'info' : 'inherit'}
-                onClick={() => onSelect(atc.callsign === end ? '' : atc.callsign, 'end')}
-                className={styles.icon}
-                fontSize='small'
-              />
             </Stack>
-          </Stack>
-        </Paper>
-      ))}
+          </Paper>
+        ))
+      )}
     </Box>
   )
 }

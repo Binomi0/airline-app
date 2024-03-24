@@ -1,8 +1,6 @@
 import * as React from 'react'
 import Head from 'next/head'
 import { AppProps } from 'next/app'
-import { ThemeProvider } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
 import { CacheProvider, EmotionCache } from '@emotion/react'
 import { Router } from 'next/router'
 import AppBar from 'components/AppBar'
@@ -20,11 +18,12 @@ import { LiveFlightsProvider } from 'context/LiveFlightProvider'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { RecoilRoot } from 'recoil'
 import createEmotionCache from '../src/createEmotionCache'
-import theme from '../src/theme'
 import '../styles/globals.css'
 import { authStore } from 'store/auth.atom'
 import { getCookie } from 'cookies-next'
 import 'lib/alchemy'
+import { themeStore } from 'store/theme.atom'
+import ThemeWrapper from 'components/ThemeWrapper'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -52,6 +51,7 @@ export default function MyApp(props: MyAppProps) {
       <RecoilRoot
         initializeState={({ set }) => {
           set(authStore, getCookie('token') as string)
+          set(themeStore, 'dark')
         }}
       >
         <AuthProvider>
@@ -60,8 +60,7 @@ export default function MyApp(props: MyAppProps) {
               <meta name='viewport' content='initial-scale=1, width=device-width' />
               <title>Weifly a decentralized virtual airline based on Ethereum</title>
             </Head>
-            <ThemeProvider theme={theme}>
-              <CssBaseline enableColorScheme />
+            <ThemeWrapper>
               <ErrorBoundary>
                 <AircraftProvider>
                   <LicenseProvider>
@@ -81,7 +80,7 @@ export default function MyApp(props: MyAppProps) {
                   </LicenseProvider>
                 </AircraftProvider>
               </ErrorBoundary>
-            </ThemeProvider>
+            </ThemeWrapper>
           </CustomWeb3Provider>
         </AuthProvider>
       </RecoilRoot>

@@ -54,6 +54,7 @@ const EmailInput = ({ onSubmit, onCancel, loading, color }: Props) => {
         inputProps={{
           style: { color: 'white' }
         }}
+        autoComplete='username webauthn'
         color={color}
         autoFocus
         variant='outlined'

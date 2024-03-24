@@ -15,15 +15,9 @@ const LinkItem: React.FC<{
   <ListItem disablePadding>
     <ListItemButton selected={selected} disabled={selected} onClick={onLink}>
       <ListItemIcon>
-        <Icon color={selected ? 'primary' : 'inherit'} />
+        <Icon />
       </ListItemIcon>
-      <ListItemText
-        primary={
-          <Typography fontWeight={selected ? 500 : 400} color={selected ? 'primary' : 'black'}>
-            {text}
-          </Typography>
-        }
-      />
+      <ListItemText primary={<Typography fontWeight={selected ? 500 : 400}>{text}</Typography>} />
     </ListItemButton>
   </ListItem>
 )

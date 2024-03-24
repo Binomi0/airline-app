@@ -14,6 +14,8 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
+import Image from 'next/image'
+import { Stack } from '@mui/material'
 
 const Sidebar: React.FC = () => {
   const router = useRouter()
@@ -29,16 +31,11 @@ const Sidebar: React.FC = () => {
   )
 
   return (
-    <Drawer
-      open={open}
-      onClose={() => toggleSidebar('left')}
-      PaperProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.9)' } }}
-    >
-      <Box p={2} color='white'>
-        <Typography color={'primary'} variant='h2'>
-          AIRLINE
-        </Typography>
-      </Box>
+    <Drawer open={open} onClose={() => toggleSidebar('left')}>
+      <Stack direction='row' p={2} spacing={1}>
+        <Image src='/logo64x64-white.png' alt='logo' width={32} height={32} />
+        <Typography variant='h5'>WeiFly</Typography>
+      </Stack>
       <Divider />
       <List>
         <SidebarItem onLink={handleClick('/')} text='Home' Icon={HomeIcon} selected={router.pathname === '/'} />

@@ -7,20 +7,14 @@
 
 .card {
   text-decoration: none;
-  /* background-color: rgba(31, 17, 5, 0.6); */
-  background: linear-gradient(45deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.75));
   border-radius: 10px;
   cursor: pointer;
-  /* padding: 15px;
-  border: 10px solid transparent;
-  border-image: url(https://i.stack.imgur.com/sjbeu.png) 30 round; */
-  transition: all ease-in 100ms;
+  transition: all 100ms ease-in;
   box-shadow: 0px 0px 0px 0px #556cd6;
 }
 
 .card:hover {
-  background: linear-gradient(45deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.75));
-  box-shadow: 0px 0px 0px 2px #556cd6;
+  box-shadow: 0px 0px 16px 1px #556cd6;
   transform: scale(1.02);
 }
 

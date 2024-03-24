@@ -15,8 +15,47 @@ export const sora = Sora({
   fallback: ['Helvetica', 'Arial', 'sans-serif']
 })
 // Create a theme instance.
-let theme = createTheme({
+const lTheme = createTheme({
   palette: {
+    mode: 'light',
+    primary: {
+      main: '#556cd6'
+    },
+    secondary: {
+      main: '#19857b'
+    },
+    error: {
+      main: red.A400
+    },
+    background: {
+      // default: '#0f1318',
+      // paper: '#0f1318'
+    }
+  },
+  typography: {
+    fontFamily: 'Sora',
+    allVariants: {
+      fontFamily: 'Sora'
+    },
+    h1: {
+      textShadow: '2px 2px 10px grey',
+      fontWeight: 700
+    },
+    h2: {
+      fontWeight: 500
+    },
+    body1: {
+      fontWeight: 300
+    },
+    body2: {
+      fontWeight: 500
+    }
+  }
+})
+
+const dTheme = createTheme({
+  palette: {
+    mode: 'dark',
     primary: {
       main: '#556cd6'
     },
@@ -48,6 +87,7 @@ let theme = createTheme({
   }
 })
 
-theme = responsiveFontSizes(theme)
+export const darkTheme = responsiveFontSizes(dTheme)
+export const lightTheme = responsiveFontSizes(lTheme)
 
-export default theme
+export default darkTheme

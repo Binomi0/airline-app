@@ -10,6 +10,7 @@ import { handleUnStakeSwal, maxWithdrawExceeded, unstakedSwal } from 'lib/swal'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import Paper from '@mui/material/Paper'
 
 interface Props {
   getAirlBalance: () => void
@@ -42,11 +43,11 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
 
   return (
     <Grid item xs={12} md={4}>
-      <GradientCard>
+      <Paper>
         <Box p={1}>
           <Typography variant='subtitle1'>Deposited</Typography>
           <Typography variant='subtitle2' paragraph>
-            {staking ? formatNumber(Number(staking.amountStaked.toString()) / 1e18) : formatNumber()} AIRG
+            {staking ? formatNumber(Number(staking.amountStaked.toString()) / 1e18) : formatNumber()} sAIRL
           </Typography>
           <GasForm
             max={maxAmount}
@@ -56,7 +57,7 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
             buttonText='Remove from Staking'
           />
         </Box>
-      </GradientCard>
+      </Paper>
     </Grid>
   )
 }

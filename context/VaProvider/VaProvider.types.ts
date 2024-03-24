@@ -8,6 +8,7 @@ export type VaReducerState = {
   flights?: Flight
   origins: string[]
   filter: string[]
+  isLoading: boolean
 }
 
 export type VaContextProps = VaReducerState & {

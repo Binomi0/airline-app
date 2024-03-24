@@ -12,6 +12,7 @@ import BigNumber from 'bignumber.js'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import Paper from '@mui/material/Paper'
 
 interface Props {
   airl?: Readonly<BigNumber>
@@ -52,7 +53,7 @@ const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
 
   return (
     <Grid item xs={12} md={4}>
-      <GradientCard>
+      <Paper>
         <Box p={1}>
           <Typography variant='subtitle1'>Available to deposit</Typography>
           <Typography variant='subtitle2' paragraph>
@@ -66,7 +67,7 @@ const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
             buttonText='Add to Staking'
           />
         </Box>
-      </GradientCard>
+      </Paper>
     </Grid>
   )
 }

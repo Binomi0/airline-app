@@ -45,6 +45,7 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
           href='https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=Inter:wght@200;400;600&family=Trispace:wght@200;400;600&display=swap'
           rel='stylesheet'
         />
+        <link rel='stylesheet' href='@sweetalert2/theme-material-ui/material-ui.css'></link>
       </Head>
       <body>
         <Main />

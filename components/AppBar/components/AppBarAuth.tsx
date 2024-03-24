@@ -6,10 +6,15 @@ import GasBalanceBar from './GasBalanceBar'
 import LicenseBar from './LicenseBar'
 import SignIn from './SignIn'
 import SignUp from './SignUp'
-import SummarizeIcon from '@mui/icons-material/Summarize'
 import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import { useTheme } from '@mui/material'
+import { useSetRecoilState } from 'recoil'
+import { themeStore } from 'store/theme.atom'
 
 interface Props {
   user?: User
@@ -21,6 +26,13 @@ interface Props {
 }
 
 const AppBarAuth = ({ user, matches, userActionStarted, setUserActionStarted, toggleSidebar }: Props) => {
+  const theme = useTheme()
+  const setTheme = useSetRecoilState(themeStore)
+
+  const handleToogleTheme = () => {
+    setTheme((state) => (state === 'dark' ? 'light' : 'dark'))
+  }
+
   return (
     <Stack direction='row' alignItems='center' height={50} spacing={1}>
       {!user && (
@@ -57,6 +69,9 @@ const AppBarAuth = ({ user, matches, userActionStarted, setUserActionStarted, to
           <LicenseBar />
           <GasBalanceBar show={matches} />
           <AirBalanceBar show={matches} />
+          <IconButton onClick={handleToogleTheme}>
+            {theme.palette.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+          </IconButton>
           <IconButton
             onClick={() => toggleSidebar('right')}
             size='large'
@@ -65,7 +80,7 @@ const AppBarAuth = ({ user, matches, userActionStarted, setUserActionStarted, to
             aria-label='menu'
             sx={{ mr: 2 }}
           >
-            <SummarizeIcon />
+            <MoreVertIcon />
           </IconButton>
         </>
       )}

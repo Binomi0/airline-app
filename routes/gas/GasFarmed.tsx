@@ -12,6 +12,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
+import Paper from '@mui/material/Paper'
 
 const MIN_REWARDS_CLAIM = '100000000000000000000'
 
@@ -59,7 +60,7 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
 
   return (
     <Grid item xs={12} md={4}>
-      <GradientCard>
+      <Paper>
         <Box p={1}>
           <Typography variant='subtitle1'>Farmed Gasoline (AIRG)</Typography>
           <Typography variant='caption'>
@@ -76,7 +77,7 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
             </Button>
           </Stack>
         </Box>
-      </GradientCard>
+      </Paper>
     </Grid>
   )
 }

@@ -104,18 +104,13 @@ const RightSidebar: React.FC = () => {
   }
 
   return (
-    <Drawer
-      anchor='right'
-      open={open}
-      onClose={() => toggleSidebar('right')}
-      PaperProps={{ sx: { backgroundColor: theme.palette.common.white } }}
-    >
-      <Box px={2} pb={1} color='black' minWidth={250}>
+    <Drawer anchor='right' open={open} onClose={() => toggleSidebar('right')}>
+      <Box>
         <List>
-          <ListItem color={theme.palette.common.white} onClick={() => toggleSidebar('right')}>
-            <ListItemAvatar color={theme.palette.common.white}>
+          <ListItem>
+            <ListItemAvatar>
               <Avatar>
-                <VerifiedUser color='secondary' />
+                <VerifiedUser />
               </Avatar>
             </ListItemAvatar>
             <Typography letterSpacing={-0.5} fontFamily='B612 Mono' fontWeight={600}>
@@ -132,38 +127,41 @@ const RightSidebar: React.FC = () => {
             </ListItemButton>
           </List>
           <Divider />
-          <Box my={10}>
+          <List>
             <ListItemButton onClick={handleAddBackup}>
               <Stack direction='row' spacing={5}>
-                <Backup color='primary' />
+                <Backup />
                 <Typography>Add Account Backup</Typography>
               </Stack>
             </ListItemButton>
             <ListItemButton onClick={handleExportKey}>
               <Stack direction='row' spacing={5}>
-                <ImportExport color='primary' />
+                <ImportExport />
                 <Typography>Export Wallet</Typography>
               </Stack>
             </ListItemButton>
             <ListItemButton onClick={handleClick('/flights')}>
               <Stack direction='row' spacing={5}>
-                <AirplaneTicketIcon color='primary' />
+                <AirplaneTicketIcon />
                 <Typography>My Flights</Typography>
               </Stack>
             </ListItemButton>
             <ListItemButton onClick={handleClick('/user/aircraft')}>
               <Stack direction='row' spacing={5}>
-                <AirlinesIcon color='primary' />
+                <AirlinesIcon />
                 <Typography>My Aircrafts</Typography>
               </Stack>
             </ListItemButton>
+          </List>
+          <Divider />
+          <List>
             <ListItemButton onClick={onSignOut}>
               <Stack direction='row' spacing={5}>
                 <ExitToApp color='error' />
                 <Typography>Log Out</Typography>
               </Stack>
             </ListItemButton>
-          </Box>
+          </List>
         </List>
       </Box>
     </Drawer>

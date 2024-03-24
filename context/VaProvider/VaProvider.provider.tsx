@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useReducer } from 'react'
+import React, { FC, startTransition, useCallback, useReducer, useState } from 'react'
 import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
@@ -21,13 +21,15 @@ export const INITIAL_STATE: IVAOClients = {
   flights: {},
   origins: [],
   // filter: [""],
-  filter: ['L', 'G']
+  filter: ['L', 'G'],
+  isLoading: false
 }
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useRecoilValue(userState)
   const ivaoUser = useRecoilValue(ivaoUserStore)
   const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE })
+  const [isLoading, setIsLoading] = useState(false)
   const { Provider } = VaProviderContext
 
   // const setPilots = useCallback((pilots: IvaoPilot[]) => {
@@ -51,9 +53,13 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [])
 
   const getAtcs = useCallback(async () => {
+    setIsLoading(true)
     const responseAtcs = await axios.get<Atc[]>('/api/ivao/atcs')
 
-    setAtcs(responseAtcs.data)
+    startTransition(() => {
+      setAtcs(responseAtcs.data)
+      setIsLoading(false)
+    })
   }, [setAtcs])
 
   // const getPilots = useCallback(async () => {
@@ -63,15 +69,23 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   // }, [setPilots])
 
   const getTowers = useCallback(async () => {
+    setIsLoading(true)
     const response = await axios.get<Atc[]>('/api/ivao/towers')
 
-    setTowers(response.data)
+    startTransition(() => {
+      setTowers(response.data)
+      setIsLoading(false)
+    })
   }, [setTowers])
 
   const getFlights = useCallback(async () => {
+    setIsLoading(true)
     const response = await axios.get<Flight>('/api/ivao/flights')
 
-    setFlights(response.data)
+    startTransition(() => {
+      setFlights(response.data)
+      setIsLoading(false)
+    })
   }, [setFlights])
 
   const getIVAOData = useCallback(async () => {
@@ -115,6 +129,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
         flights: state.flights,
         filter: state.filter,
         origins: state.origins,
+        isLoading,
         setFilter,
         initIvaoData
       }}
