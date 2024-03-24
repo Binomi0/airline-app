@@ -1,3 +1,4 @@
+import { Button } from '@mui/material'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
@@ -41,13 +42,16 @@ const IvaoStatus = ({ user, ivaoUser }: Props) => {
         <Alert severity='info'>
           <AlertTitle>Conecta tu cuenta de IVAO para continuar</AlertTitle>
           <Stack direction='row' justifyContent='center' alignItems='center' spacing={2}>
-            <Typography
-              variant='button'
-              component='a'
-              href={`https://sso.ivao.aero/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_IVAO_ID}&state=${user.id}&scope=openid profile location flight_plans:read configuration bookings:read tracker training email birthday&code_challenge_method=${challengeMethod}&code_challenge=${challenge}`}
-            >
-              Connect Your Account
-            </Typography>
+            <Button variant='contained'>
+              <Typography
+                color='white'
+                variant='button'
+                component='a'
+                href={`https://sso.ivao.aero/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_IVAO_ID}&state=${user.id}&scope=openid profile location flight_plans:read configuration bookings:read tracker training email birthday&code_challenge_method=${challengeMethod}&code_challenge=${challenge}`}
+              >
+                Log In
+              </Typography>
+            </Button>
           </Stack>
         </Alert>
       ) : (

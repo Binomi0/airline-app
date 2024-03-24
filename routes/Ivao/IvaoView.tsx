@@ -20,6 +20,7 @@ import useIvao from 'hooks/useIvao'
 import { CircularProgress } from '@mui/material'
 import { useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
+import IvaoLogin from './components/IvaoLogin'
 
 interface Props {
   user: User
@@ -81,31 +82,30 @@ const IvaoView = ({ user }: Props) => {
         <CircularProgress size={64} />
       ) : (
         <Box px={2} width='100%'>
-          <IvaoStatus user={user} ivaoUser={ivaoUser} />
-          <Typography variant='h4' align='center' paragraph>
-            Flights can only be selected from active ATC`s
-          </Typography>
-          <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
-            {start && (
-              <Box textAlign='center'>
-                <FlagIcon color='success' fontSize='large' />
-                <Typography variant='h3'>Start</Typography>
-                <Typography>{start}</Typography>
-              </Box>
-            )}
-            {start && end && (
-              <Stack height={100} width='100%' justifyContent='center'>
-                <LinearProgress variant='determinate' value={0} />
-              </Stack>
-            )}
-            {start && end && (
-              <Box textAlign='center'>
-                <SportsScoreIcon fontSize='large' />
-                <Typography variant='h3'>End</Typography>
-                <Typography>{end}</Typography>
-              </Box>
-            )}
-          </Stack>
+          <IvaoLogin user={user} />
+          {ivaoUser && (
+            <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
+              {start && (
+                <Box textAlign='center'>
+                  <FlagIcon color='success' fontSize='large' />
+                  <Typography variant='h3'>Start</Typography>
+                  <Typography>{start}</Typography>
+                </Box>
+              )}
+              {start && end && (
+                <Stack height={100} width='100%' justifyContent='center'>
+                  <LinearProgress variant='determinate' value={0} />
+                </Stack>
+              )}
+              {start && end && (
+                <Box textAlign='center'>
+                  <SportsScoreIcon fontSize='large' />
+                  <Typography variant='h3'>End</Typography>
+                  <Typography>{end}</Typography>
+                </Box>
+              )}
+            </Stack>
+          )}
           {cargo && (
             <Stack direction='column' width='100%' alignItems='center' justifyContent='center' mt={2}>
               <Typography variant='h6'>{cargo.details.name}</Typography>

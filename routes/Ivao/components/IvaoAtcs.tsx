@@ -56,6 +56,7 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
       <Box className={styles.textFieldBox}>
         <Box p={1} bgcolor={theme.palette.common.white}>
           <TextField
+            disabled={!atcs}
             fullWidth
             label='Search Active ATC'
             size='small'

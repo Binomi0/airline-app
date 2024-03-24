@@ -10,6 +10,7 @@ import type {
 } from 'types'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
+import { ivaoUserStore } from 'store/ivao-user.atom'
 
 const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
@@ -25,6 +26,7 @@ export const INITIAL_STATE: IVAOClients = {
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useRecoilValue(userState)
+  const ivaoUser = useRecoilValue(ivaoUserStore)
   const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE })
   const { Provider } = VaProviderContext
 
@@ -94,22 +96,14 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   ])
 
   const initIvaoData = useCallback(() => {
-    if (!user) return
+    if (!ivaoUser) return
     getAtcs()
     getTowers()
     // getPilots()
     getFlights()
     getIVAOData()
     startTimers()
-  }, [
-    user,
-    getAtcs,
-    getTowers,
-    //  getPilots,
-    getFlights,
-    getIVAOData,
-    startTimers
-  ])
+  }, [ivaoUser, getAtcs, getTowers, getFlights, getIVAOData, startTimers])
 
   return (
     <Provider
