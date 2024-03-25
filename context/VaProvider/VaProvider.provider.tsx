@@ -2,15 +2,15 @@ import React, { FC, startTransition, useCallback, useReducer, useState } from 'r
 import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
-import axios from 'config/axios'
 import type {
   Atc,
   Flight
   // IvaoPilot
 } from 'types'
 import { useRecoilValue } from 'recoil'
-import { userState } from 'store/user.atom'
+// import { userState } from 'store/user.atom'
 import { ivaoUserStore } from 'store/ivao-user.atom'
+import { getApi } from 'lib/api'
 
 const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
@@ -26,10 +26,10 @@ export const INITIAL_STATE: IVAOClients = {
 }
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const user = useRecoilValue(userState)
+  // const user = useRecoilValue(userState)
   const ivaoUser = useRecoilValue(ivaoUserStore)
   const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE })
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(0)
   const { Provider } = VaProviderContext
 
   // const setPilots = useCallback((pilots: IvaoPilot[]) => {
@@ -53,12 +53,12 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [])
 
   const getAtcs = useCallback(async () => {
-    setIsLoading(true)
-    const responseAtcs = await axios.get<Atc[]>('/api/ivao/atcs')
+    setIsLoading((s) => s + 1)
+    const atcs = await getApi<Atc[]>('/api/ivao/atcs')
 
     startTransition(() => {
-      setAtcs(responseAtcs.data)
-      setIsLoading(false)
+      setAtcs(atcs ?? [])
+      setIsLoading((s) => s - 1)
     })
   }, [setAtcs])
 
@@ -69,28 +69,28 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   // }, [setPilots])
 
   const getTowers = useCallback(async () => {
-    setIsLoading(true)
-    const response = await axios.get<Atc[]>('/api/ivao/towers')
+    setIsLoading((s) => s + 1)
+    const towers = await getApi<Atc[]>('/api/ivao/towers')
 
     startTransition(() => {
-      setTowers(response.data)
-      setIsLoading(false)
+      setTowers(towers ?? [])
+      setIsLoading((s) => s - 1)
     })
   }, [setTowers])
 
   const getFlights = useCallback(async () => {
-    setIsLoading(true)
-    const response = await axios.get<Flight>('/api/ivao/flights')
+    setIsLoading((s) => s + 1)
+    const flights = await getApi<Flight>('/api/ivao/flights')
 
     startTransition(() => {
-      setFlights(response.data)
-      setIsLoading(false)
+      setFlights(flights ?? {})
+      setIsLoading((s) => s - 1)
     })
   }, [setFlights])
 
   const getIVAOData = useCallback(async () => {
     try {
-      await axios.get('/api/ivao/whazzup')
+      await getApi('/api/ivao/whazzup')
     } catch (err) {
       console.error('getIVAOData', err)
     }
@@ -129,7 +129,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
         flights: state.flights,
         filter: state.filter,
         origins: state.origins,
-        isLoading,
+        isLoading: Boolean(isLoading),
         setFilter,
         initIvaoData
       }}

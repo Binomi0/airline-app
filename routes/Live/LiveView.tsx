@@ -1,7 +1,6 @@
 import { useEffect, useCallback, useState } from 'react'
 import useCargo from 'hooks/useCargo'
 import Link from 'next/link'
-import axios from 'config/axios'
 import { LastTrackState, LastTrackStateEnum } from 'types'
 import MCDUView from './components/MCDUView'
 import Swal from 'sweetalert2'
@@ -13,6 +12,7 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
+import { deleteApi, postApi } from 'lib/api'
 
 interface Props {}
 
@@ -31,13 +31,13 @@ const LiveView = ({}: Props) => {
     })
     if (isConfirmed) {
       setPilot()
-      await Promise.all([axios.delete('/api/live'), axios.delete('/api/cargo')])
+      await Promise.all([deleteApi('/api/live'), deleteApi('/api/cargo')])
       router.push('/')
     }
   }, [router, setPilot])
 
   const handleClaim = useCallback(() => {
-    axios.post('/api/live/state', { state: LastTrackStateEnum.On_Blocks })
+    postApi('/api/live/state', { state: LastTrackStateEnum.On_Blocks })
   }, [])
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const LiveView = ({}: Props) => {
   useEffect(() => {
     if (!pilot || pilot?.lastTrack.state === flightState) return
 
-    axios.post('/api/live/state', { state: pilot.lastTrack.state })
+    postApi('/api/live/state', { state: pilot.lastTrack.state })
     setFlightState(pilot.lastTrack.state as LastTrackState)
   }, [flightState, pilot])
 

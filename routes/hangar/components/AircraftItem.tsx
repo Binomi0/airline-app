@@ -5,7 +5,6 @@ import AircraftCardHeader from './AircraftCardHeader'
 import AircraftActions from './AircraftActions'
 import useAircraft from 'hooks/useAircraft'
 import useLicense from 'hooks/useLicense'
-import GradientCard from 'components/GradientCard'
 import Grid from '@mui/material/Grid'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
@@ -37,7 +36,7 @@ const AircraftItem = ({ nft, isClaiming, onClaim }: Props) => {
 
   return (
     <Grid item xs={12} lg={6}>
-      <Paper>
+      <Paper sx={{ border: hasAircraft ? '3px solid green' : undefined }}>
         <AircraftCardHeader nft={nft} />
 
         <CardContent>

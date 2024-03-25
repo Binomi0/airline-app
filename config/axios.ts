@@ -2,7 +2,9 @@ import axios from 'axios'
 
 export const ivaoInstance = axios.create({ baseURL: 'https://api.ivao.aero/' })
 
-axios.interceptors.request.use(
+const nextApiInstance = axios.create()
+
+nextApiInstance.interceptors.request.use(
   function (config) {
     return config
   },
@@ -11,7 +13,7 @@ axios.interceptors.request.use(
   }
 )
 
-axios.interceptors.response.use(
+nextApiInstance.interceptors.response.use(
   async function (response) {
     return response
   },
@@ -20,4 +22,4 @@ axios.interceptors.response.use(
   }
 )
 
-export default axios
+export default nextApiInstance

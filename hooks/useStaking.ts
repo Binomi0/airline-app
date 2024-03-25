@@ -1,7 +1,7 @@
 import { SmartContract } from '@thirdweb-dev/sdk'
-import axios from 'config/axios'
 import { stakingAddress as target } from 'contracts/address'
 import { BigNumber, ethers } from 'ethers'
+import { postApi } from 'lib/api'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { smartAccountSignerStore } from 'store/wallet.atom'
@@ -21,7 +21,7 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
         const uo = await smartSigner.sendUserOperation({ uo: { target, data } })
 
         const hash = await smartSigner.waitForUserOperationTransaction(uo)
-        await axios.post('/api/transaction/user', { operation: 'stake', amount, hash })
+        await postApi('/api/transaction/user', { operation: 'stake', amount, hash })
 
         const receipt = await smartSigner.getUserOperationReceipt(hash)
         setIsLoading(false)
@@ -45,7 +45,7 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
         const uo = await smartSigner.sendUserOperation({ uo: { target, data } })
 
         const hash = await smartSigner.waitForUserOperationTransaction(uo)
-        await axios.post('/api/transaction/user', { operation: 'withdraw', amount, hash })
+        await postApi('/api/transaction/user', { operation: 'withdraw', amount, hash })
 
         const receipt = await smartSigner.getUserOperationReceipt(hash)
         setIsLoading(false)
@@ -69,7 +69,7 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
         const hash = await smartSigner.sendUserOperation({ uo: { target, data } })
 
         await smartSigner.waitForUserOperationTransaction(hash)
-        await axios.post('/api/transaction/user', { operation: 'claimRewards', amount, hash })
+        await postApi('/api/transaction/user', { operation: 'claimRewards', amount, hash })
 
         const receipt = await smartSigner.getUserOperationReceipt(hash)
         setIsLoading(false)

@@ -2,13 +2,13 @@ import { Wallet } from 'ethers'
 import { useCallback } from 'react'
 import { createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
 import { Hex, LocalAccountSigner, sepolia } from '@alchemy/aa-core'
-import axios from 'config/axios'
 import { User } from 'types'
 import { accountImportErrorSwal, missingKeySwal } from 'lib/swal'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
 import { IWallet } from 'models/Wallet'
 import { walletStore } from 'store/wallet.atom'
+import { getApi, postApi } from 'lib/api'
 
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 // const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -39,8 +39,8 @@ const useWallet = (): UseWallet => {
       if (!user?.address) {
         const smartAccountAddress = modularAccountAlchemyClient.getAddress()
 
-        const updateUser = axios.post('/api/user/update', { address: smartAccountAddress })
-        const updateWallet = axios.post('/api/wallet', {
+        const updateUser = postApi('/api/user/update', { address: smartAccountAddress })
+        const updateWallet = postApi('/api/wallet', {
           id: userId,
           smartAccountAddress: smartAccountAddress,
           signerAddress: _signer.address
@@ -55,9 +55,9 @@ const useWallet = (): UseWallet => {
         })
       } else {
         try {
-          await axios.get('/api/wallet')
+          await getApi('/api/wallet')
         } catch (error) {
-          await axios.post('/api/wallet', {
+          await postApi('/api/wallet', {
             id: userId,
             smartAccountAddress: user.address,
             signerAddress: _signer.address
@@ -75,8 +75,7 @@ const useWallet = (): UseWallet => {
   )
 
   const checkSigner = useCallback(async (signer: Wallet) => {
-    const response = await axios.get<IWallet>('/api/wallet')
-    const wallet = response.data
+    const wallet = await getApi<IWallet>('/api/wallet')
 
     if (!wallet) {
       throw new Error('An error has occoured while getting user wallet')

@@ -9,6 +9,11 @@ import { userState } from 'store/user.atom'
 import { walletStore } from 'store/wallet.atom'
 import useWallet from './useWallet'
 import { authStore } from 'store/auth.atom'
+import { postApi } from 'lib/api'
+import {
+  PublicKeyCredentialRequestOptionsJSON,
+  PublicKeyCredentialCreationOptionsJSON
+} from '@simplewebauthn/typescript-types'
 
 interface UseAccountSignerReturnType {
   addBackup: () => Promise<void>
@@ -30,16 +35,18 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
 
   const createCredential = useCallback(async (email: string) => {
     try {
-      const responseChallenge = await axios.post(WebAuthnUri.REQUEST_REGISTER, { email })
-      const request = await startRegistration(responseChallenge.data)
-      const responseValidation = await axios.post<{ verified: boolean }>(WebAuthnUri.REGISTER, {
+      const challenge = await postApi<PublicKeyCredentialCreationOptionsJSON>(WebAuthnUri.REQUEST_REGISTER, {
+        email
+      })
+      if (!challenge) return { verified: false }
+      const request = await startRegistration(challenge)
+      const validation = await postApi<{ verified: boolean }>(WebAuthnUri.REGISTER, {
         data: request,
         email
       })
-      const { verified } = responseValidation.data
-      setStatus(verified ? 'success' : 'error')
+      setStatus(validation?.verified ? 'success' : 'error')
 
-      return { verified }
+      return { verified: Boolean(validation?.verified) }
     } catch (err) {
       console.error(err)
       setStatus('error')
@@ -49,14 +56,17 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
 
   const verifyCredential = useCallback(async (email: string) => {
     try {
-      const responseChallenge = await axios.post(WebAuthnUri.LOGIN, { email })
-      const request = await startAuthentication(responseChallenge.data)
-      const responseValidation = await axios.post(WebAuthnUri.LOGIN_CHALLENGE, { data: request, email })
+      const challenge = await postApi<PublicKeyCredentialRequestOptionsJSON>(WebAuthnUri.LOGIN, { email })
+      if (!challenge) return { verified: false }
+      const request = await startAuthentication(challenge)
+      const validation = await postApi<{ verified: boolean; token?: string }>(WebAuthnUri.LOGIN_CHALLENGE, {
+        data: request,
+        email
+      })
 
-      const { verified, token } = responseValidation.data
-      setStatus(verified ? 'success' : 'error')
+      setStatus(validation?.verified ? 'success' : 'error')
 
-      return { verified, token }
+      return { verified: Boolean(validation?.verified), token: validation?.token }
     } catch (err) {
       console.error(err)
       setStatus('error')

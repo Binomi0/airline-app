@@ -16,6 +16,7 @@ const IVAOPage = ({ loading }: PageProps) => {
   const { authorize, isLoading } = useIvao()
 
   useEffect(authorize, [authorize])
+
   useEffect(() => {
     if (ivaoUser) {
       router.replace('/ivao')
@@ -23,10 +24,10 @@ const IVAOPage = ({ loading }: PageProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ivaoUser])
 
-  if (loading || isLoading) return <LinearProgress />
+  if (loading) return <LinearProgress />
   if (!user) return <Disconnected />
 
-  return ivaoUser ? <IvaoView user={user} /> : null
+  return ivaoUser ? <IvaoView isLoading={isLoading} user={user} /> : null
 }
 
 export default IVAOPage

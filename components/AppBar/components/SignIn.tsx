@@ -1,9 +1,9 @@
 import useAccountSigner from 'hooks/useAccountSigner'
 import React from 'react'
 import EmailInput from './EmailInput'
-import axios from 'config/axios'
 import { UserActionStatus } from 'components/AppBar'
 import useAuth from 'hooks/useAuth'
+import { postApi } from 'lib/api'
 
 type UserEmail = string
 interface Props {
@@ -20,8 +20,8 @@ const SignIn = ({ onInteraction }: Props) => {
     async (email: UserEmail) => {
       setLoading(true)
       try {
-        const { data: auth } = await axios.post('/api/webauthn/check', { email })
-        if (auth.success) {
+        const auth = await postApi<{ success: boolean }>('/api/webauthn/check', { email })
+        if (auth?.success) {
           await handleSignIn(email)
           onInteraction()
         } else {

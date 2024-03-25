@@ -5,7 +5,6 @@ import LicenseItemHeader from './LicenseItemHeader'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import useLicense from 'hooks/useLicense'
-import GradientCard from 'components/GradientCard'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import CardContent from '@mui/material/CardContent'
@@ -15,6 +14,7 @@ import CardActions from '@mui/material/CardActions'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import { tokenBalanceStore } from 'store/balance.atom'
+import Paper from '@mui/material/Paper'
 
 interface Props {
   nft: NFT
@@ -67,7 +67,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
           />
         </Box>
       )}
-      <GradientCard border={owned ? '3px solid green' : undefined}>
+      <Paper sx={{ border: owned ? '3px solid green' : undefined }}>
         <LicenseItemHeader
           name={name as string}
           description={description as string}
@@ -102,7 +102,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
             </Button>
           </CardActions>
         )}
-      </GradientCard>
+      </Paper>
     </Grid>
   )
 }

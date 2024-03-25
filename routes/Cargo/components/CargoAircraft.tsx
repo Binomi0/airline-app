@@ -18,6 +18,7 @@ import {
 } from '@thirdweb-dev/react'
 import axios from 'config/axios'
 import { flightNftAddress, nftLicenseTokenAddress } from 'contracts/address'
+import { postApi } from 'lib/api'
 import { useRouter } from 'next/router'
 import React, { useCallback, useMemo } from 'react'
 import { useRecoilValue } from 'recoil'
@@ -101,8 +102,9 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
         showCancelButton: true
       })
       if (isConfirmed) {
-        const { data: cargo } = await axios.post('/api/cargo/new', newCargo)
-        await axios.post('/api/live/new', { cargo })
+        const cargo = await postApi('/api/cargo/new', newCargo)
+        if (!cargo) return
+        await postApi('/api/live/new', { cargo })
         router.push('/live')
       }
     } catch (err) {

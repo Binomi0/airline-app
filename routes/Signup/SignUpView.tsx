@@ -10,9 +10,9 @@ import Lock from '@mui/icons-material/Lock'
 import useAuth from 'hooks/useAuth'
 import CircularProgress from '@mui/material/CircularProgress'
 import { validateEmail } from 'utils'
-import axios from 'config/axios'
 import CodeInput from 'components/AppBar/components/CodeInput'
 import { useRouter } from 'next/router'
+import { postApi } from 'lib/api'
 
 const SignUpView: FC = () => {
   const [loading, setLoading] = React.useState(false)
@@ -27,16 +27,16 @@ const SignUpView: FC = () => {
 
       try {
         setLoading(true)
-        const { data: user } = await axios.post<{ success: boolean; emailVerified?: boolean }>('/api/user/check', {
+        const user = await postApi<{ success: boolean; emailVerified?: boolean }>('/api/user/check', {
           email: value
         })
-        if (user.success && user.emailVerified) {
+        if (user?.success && user?.emailVerified) {
           router.push('/signin')
           return
         }
         // No existe usuario en la DB con este email
-        const { data } = await axios.post<{ success: boolean }>('/api/user/create', { email: value })
-        if (data.success) {
+        const data = await postApi<{ success: boolean }>('/api/user/create', { email: value })
+        if (data?.success) {
           setEmail(value)
           setRequestCode(true)
         }
@@ -55,7 +55,7 @@ const SignUpView: FC = () => {
       if (!email) throw new Error('Missing email')
 
       try {
-        await axios.post('/api/user/validate', { code, email })
+        await postApi('/api/user/validate', { code, email })
         await handleSignUp(email)
         setLoading(false)
       } catch (err) {

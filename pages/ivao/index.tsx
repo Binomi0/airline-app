@@ -16,10 +16,10 @@ const IVAOPage = ({ loading }: PageProps) => {
   useEffect(initIvaoData, [initIvaoData])
   useEffect(authorize, [authorize])
 
-  if (loading || isLoading) return <LinearProgress />
+  if (loading) return <LinearProgress />
   if (!user) return <Disconnected />
 
-  return <IvaoView user={user} />
+  return <IvaoView isLoading={isLoading} user={user} />
 }
 
 export default IVAOPage

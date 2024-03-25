@@ -49,7 +49,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       await connectDB()
       const va = await VirtualAirlineModel.findOne({ userId: req.query.state })
       if (va) {
-        res.status(202).end()
+        res.status(202).send(req.query.code)
         return
       }
 

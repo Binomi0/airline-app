@@ -3,7 +3,6 @@ import type { Cargo, FRoute, IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
 import { NFT } from '@thirdweb-dev/react'
 import Swal from 'sweetalert2'
-import axios from 'config/axios'
 import FlightDetailsHeader from './FlightDetailsHeader'
 import FlightDetailsCargo from './FlightDetailsCargo'
 import FlightDetails from './FlightDetails'
@@ -11,6 +10,7 @@ import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import GradientCard from 'components/GradientCard'
 import Grid from '@mui/material/Grid'
 import { useTheme } from '@mui/material/styles'
+import { postApi } from 'lib/api'
 
 interface Props {
   onRemove: () => void
@@ -36,8 +36,8 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, carg
       showCancelButton: true
     })
     if (isConfirmed) {
-      const { data } = await axios.post('/api/cargo/new', { ...cargo })
-      await axios.post('/api/live/new', { cargo: data })
+      const data = await postApi('/api/cargo/new', { ...cargo })
+      await postApi('/api/live/new', { cargo: data })
       await getLive()
       setPilot(pilot)
       router.push('/live')

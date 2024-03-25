@@ -18,13 +18,13 @@ const LicenseBar = () => {
         <CircularProgress size={24} />
       ) : (
         ownedLicenses &&
-        ownedLicenses?.length > 0 && (
+        ownedLicenses.length > 0 && (
           <AvatarGroup>
             {ownedLicenses
               .map((license) => (
-                <Tooltip arrow title={(license?.metadata?.name as string).split(' - ')[1]} key={license?.metadata.id}>
+                <Tooltip arrow title={(license.metadata.name as string).split(' - ')[1]} key={license.metadata.id}>
                   <Avatar>
-                    <MediaRenderer width='50px' height='50px' src={license?.metadata?.image} />
+                    <MediaRenderer width='50px' height='50px' src={license.metadata.image} />
                   </Avatar>
                 </Tooltip>
               ))

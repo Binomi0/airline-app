@@ -1,4 +1,3 @@
-import axios from 'config/axios'
 import React, { useCallback } from 'react'
 import { validateEmail } from 'utils'
 import EmailInput from './EmailInput'
@@ -6,6 +5,7 @@ import CodeInput from './CodeInput'
 import { UserActionStatus } from 'components/AppBar'
 import CircularProgress from '@mui/material/CircularProgress'
 import useAuth from 'hooks/useAuth'
+import { postApi } from 'lib/api'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars
@@ -24,16 +24,16 @@ const SignUp = ({ onInteraction }: Props) => {
 
       try {
         setLoading(true)
-        const { data: user } = await axios.post<{ success: boolean; emailVerified?: boolean }>('/api/user/check', {
+        const user = await postApi<{ success: boolean; emailVerified?: boolean }>('/api/user/check', {
           email: value
         })
-        if (user.success && user.emailVerified) {
+        if (user?.success && user?.emailVerified) {
           onInteraction('signIn')
           return
         }
         // No existe usuario en la DB con este email
-        const { data } = await axios.post<{ success: boolean }>('/api/user/create', { email: value })
-        if (data.success) {
+        const data = await postApi<{ success: boolean }>('/api/user/create', { email: value })
+        if (data?.success) {
           setEmail(value)
           setRequestCode(true)
         }
@@ -52,7 +52,7 @@ const SignUp = ({ onInteraction }: Props) => {
       if (!email) throw new Error('Missing email')
 
       try {
-        await axios.post('/api/user/validate', { code, email })
+        await postApi('/api/user/validate', { code, email })
         await handleSignUp(email)
         setLoading(false)
         onInteraction()
