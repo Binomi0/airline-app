@@ -52,9 +52,9 @@ const EmailInput = ({ onSubmit, onCancel, loading, color }: Props) => {
       <TextField
         disabled={loading}
         inputProps={{
+          autoComplete: 'username webauthn',
           style: { color: 'white' }
         }}
-        autoComplete='username webauthn'
         color={color}
         autoFocus
         variant='outlined'
