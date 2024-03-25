@@ -17,7 +17,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       await connectDB()
       const user = await Webauthn.findOne({ email: req.body.email })
 
-      console.log({ user })
       if (!user) {
         res.status(204).end()
         return

@@ -1,6 +1,5 @@
 import Search from '@mui/icons-material/Search'
 import React, { useRef, useState } from 'react'
-import styles from '../styles/ivao.module.css'
 import FlightLandIcon from '@mui/icons-material/FlightLand'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
 import { Atc } from 'types'
@@ -13,7 +12,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
 import { useTheme } from '@mui/material/styles'
-import { LinearProgress } from '@mui/material'
+import { LinearProgress, styled } from '@mui/material'
+import styles from '../styles/ivao.module.css'
 
 const ZERO = 0
 const TWENTY_FIVE = 25
@@ -56,6 +56,7 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
     <Box
       minWidth={300}
       height='calc(100vh - 64px)'
+      borderRight='1px solid var(--mui-palette-grey-600 )'
       sx={{ overflow: 'auto', overflowX: 'hidden', scrollbarWidth: 'none' }}
     >
       <Paper className={styles.textFieldBox}>
@@ -90,7 +91,7 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
         </Box>
       ) : (
         filteredAtcs.map((atc) => (
-          <Paper key={atc.id} className={styles.paper}>
+          <StyledPaper key={atc.id}>
             <Stack direction='row' justifyContent='space-between' p={1}>
               <Box>
                 <Typography variant='subtitle1'>{atc.callsign.split('_')[0]}</Typography>
@@ -118,7 +119,7 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
                 />
               </Stack>
             </Stack>
-          </Paper>
+          </StyledPaper>
         ))
       )}
     </Box>
@@ -126,3 +127,25 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
 }
 
 export default IvaoAtcs
+
+const StyledPaper = styled(Paper)`
+  background: var(--mui-overlays-24);
+  /* background: ${({ theme }) =>
+    `linear-gradient(to bottom left, ${
+      theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
+    }, ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.common.white});`}; */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  width: 100%;
+  border-radius: 0;
+  border-bottom: 1px solid var(--mui-palette-grey-A700);
+  transition: all 125ms ease-out;
+
+  &:hover {
+    filter: brightness(80%);
+    background: var(--mui-overlays-1);
+
+    /* background: linear-gradient(to top right, #19203f, #303d79); */
+  }
+`

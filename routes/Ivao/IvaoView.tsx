@@ -33,7 +33,6 @@ const IvaoView = ({ user, isLoading }: Props) => {
   const { live } = useLiveFlightProviderContext()
   const [start, setStart] = useState('')
   const [end, setEnd] = useState('')
-  const { cargo, newCargo, setCargo } = useCargo()
   const { contract } = useContract(nftAircraftTokenAddress)
   const ivaoUser = useRecoilValue(ivaoUserStore)
 
@@ -59,14 +58,6 @@ const IvaoView = ({ user, isLoading }: Props) => {
     },
     [end, start]
   )
-
-  React.useEffect(() => {
-    if (start && end && aircrafts) {
-      newCargo({ origin: start, destination: end }, aircrafts[0], getCallsign(), false)
-    } else {
-      setCargo()
-    }
-  }, [end, newCargo, setCargo, aircrafts, start])
 
   React.useEffect(() => {
     if (live) {
@@ -114,7 +105,9 @@ const IvaoView = ({ user, isLoading }: Props) => {
               )}
             </Stack>
           )}
-          <Box mt={4}>{cargo && <Cargo cargo={cargo} aircrafts={aircrafts} />}</Box>
+          <Box mt={4}>
+            <Cargo aircrafts={aircrafts} origin={start} destination={end} />
+          </Box>
 
           {loading && (
             <Stack justifyContent='center' alignItems='center' mt={10}>

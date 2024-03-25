@@ -5,6 +5,7 @@ import { AppType } from 'next/app'
 import theme, { roboto } from '../src/theme'
 import createEmotionCache from '../src/createEmotionCache'
 import { MyAppProps } from './_app'
+import { getInitColorSchemeScript } from '@mui/material/styles'
 
 interface MyDocumentProps extends DocumentProps {
   emotionStyleTags: JSX.Element[]
@@ -12,7 +13,7 @@ interface MyDocumentProps extends DocumentProps {
 
 export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
   return (
-    <Html lang='en' className={roboto.className}>
+    <Html lang='en' data-color-scheme='dark' className={roboto.className}>
       <Head>
         {/* PWA primary color */}
         <meta name='theme-color' content={theme.palette.primary.main} />
@@ -45,9 +46,9 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
           href='https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=Inter:wght@200;400;600&family=Trispace:wght@200;400;600&display=swap'
           rel='stylesheet'
         />
-        <link rel='stylesheet' href='@sweetalert2/theme-material-ui/material-ui.css'></link>
       </Head>
       <body>
+        {getInitColorSchemeScript()}
         <Main />
         <NextScript />
       </body>

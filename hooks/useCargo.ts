@@ -3,6 +3,8 @@ import axios from 'config/axios'
 import { useVaProviderContext } from 'context/VaProvider'
 import { cargos } from 'mocks/cargos'
 import { useCallback, useEffect, useState } from 'react'
+import { useRecoilState } from 'recoil'
+import { cargoStore } from 'store/cargo.atom'
 import { Cargo, CargoStatus, FRoute } from 'types'
 import { getCargoWeight, getDistanceByCoords, getRandomInt, getCargoPrize } from 'utils'
 
@@ -19,7 +21,7 @@ interface UseCargo {
 
 const useCargo = (): UseCargo => {
   const { atcs } = useVaProviderContext()
-  const [cargo, setCargo] = useState<Cargo>()
+  const [cargo, setCargo] = useRecoilState(cargoStore)
   const [isLoading, setIsLoading] = useState(false)
   const [completed, setCompleted] = useState(0)
 
@@ -33,7 +35,7 @@ const useCargo = (): UseCargo => {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [setCargo])
 
   const newCargo = useCallback(
     async (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => {
@@ -68,7 +70,7 @@ const useCargo = (): UseCargo => {
         throw new Error(error.message)
       }
     },
-    [atcs]
+    [atcs, setCargo]
   )
 
   const getCompletedCount = useCallback(async () => {

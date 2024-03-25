@@ -1,18 +1,20 @@
 .paper {
-  color: #ededed;
-  background: linear-gradient(to bottom left, #19203f, #303d79);
+  /* background: var(--mui-palette-gradient); */
+  background: linear-gradient(to bottom left, var(--mui-palette-grey-500), var(--mui-palette-grey-900));
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
   width: 100%;
   border-radius: 0;
-  border-bottom: 1px solid #0a0a0a;
+  border-bottom: 1px solid var(--mui-palette-grey-A700);
   transition: all 125ms ease-out;
 }
 
 .paper:hover {
   filter: brightness(80%);
-  background: linear-gradient(to top right, #19203f, #303d79);
+  /* background: var(--mui-overlays-24); */
+
+  /* background: linear-gradient(to top right, #19203f, #303d79); */
 }
 
 /* .paper:hover {

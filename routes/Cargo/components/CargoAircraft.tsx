@@ -141,7 +141,13 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
             <Stack>
               <LinearProgress color='success' variant='determinate' value={progressBar} />
               <Typography textAlign='center' variant='caption'>
-                Cargo weight: <b>{Intl.NumberFormat('en').format(cargo.weight || 0)} Kg</b>
+                Cargo weight:{' '}
+                <b>
+                  {Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+                    cargo.weight || 0
+                  )}{' '}
+                  Kg
+                </b>
               </Typography>
               <Typography textAlign='center' variant='caption'>
                 Max Capacity: <b>{getNFTAttributes(cargo.aircraft).find((a) => a.trait_type === 'cargo')?.value} Kg</b>
@@ -150,7 +156,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
                 Callsign: <b>{cargo.callsign}</b>
               </Typography>
               <Typography>
-                Prize:{' '}
+                Rewards:{' '}
                 <b>
                   {Intl.NumberFormat('en', {
                     minimumFractionDigits: 2,

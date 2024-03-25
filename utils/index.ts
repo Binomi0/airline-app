@@ -1,5 +1,5 @@
 import { NFT } from '@thirdweb-dev/sdk'
-import { Atc, AttributeType, Cargo, IvaoPilot } from 'types'
+import { Atc, AttributeType, Cargo, IcaoCode, IvaoPilot } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 import BigNumber from 'bignumber.js'
 
@@ -115,16 +115,16 @@ export function getCargoWeight(aircraft: NFT) {
 export function getCargoPrize(distance: number, aircraft: NFT) {
   const attribute = getNFTAttributes(aircraft).find((attr) => attr.trait_type === 'license')
   if (attribute) {
-    const base = Math.floor(distance / 100)
+    const base = Math.floor(distance / 100) / 5
     switch (attribute.value) {
-      case 'D':
+      case '0': // 'D'
         return base * (1 + randomIntFromInterval(35, 75))
-      case 'C':
-        return base * (1 + randomIntFromInterval(35, 75) * 10)
-      case 'B':
-        return base * (1 + randomIntFromInterval(35, 75) * 100)
-      case 'A':
-        return base * (1 + randomIntFromInterval(35, 75) * 1000)
+      case '1': // 'C
+        return base * (1 + randomIntFromInterval(55, 65) * 1.2)
+      case '2': // 'B'
+        return base * (1 + randomIntFromInterval(65, 75) * 1.3)
+      case '3': // 'A'
+        return base * (1 + randomIntFromInterval(75, 95) * 1.5)
       default:
         return base * (1 + randomIntFromInterval(35, 75))
     }
@@ -163,7 +163,7 @@ export const validateEmail = (email?: string) => {
   return expression.test(email)
 }
 
-export const getFuelForFlight = (distance: BigNumber, aircraftType: string, passengers: number = 2) => {
+export const getFuelForFlight = (distance: BigNumber, aircraftType: IcaoCode, passengers: number = 2) => {
   switch (aircraftType) {
     case 'AN225': {
       return distance.multipliedBy(9.99)

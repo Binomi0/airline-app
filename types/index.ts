@@ -209,3 +209,23 @@ export interface IvaoUser {
   nickname: string
   publicNickname: string
 }
+
+export type IcaoCode =
+  | 'AN225'
+  | 'A20N'
+  | 'A21N'
+  | 'A319'
+  | 'A320'
+  | 'A321'
+  | 'A339'
+  | 'B350'
+  | 'B748'
+  | 'B738'
+  | 'B739'
+  | 'B737'
+  | 'B763'
+  | 'B77W'
+  | 'B788'
+  | 'C172'
+  | 'C700'
+  | 'BE20'
