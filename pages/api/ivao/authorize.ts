@@ -14,9 +14,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       grant_type: 'client_credentials',
       scope: 'openid profile location flight_plans:read configuration bookings:read tracker training email birthday',
       client_id: process.env.NEXT_PUBLIC_IVAO_ID,
-      client_secret: process.env.IVAO_SECRET,
+      client_secret: process.env.IVAO_SECRET
       // TODO: Receive redirect URL from env?
-      redirect_url: `${process.env.NEXT_PUBLIC_ORIGIN}/ivao/authorize`
+      // redirect_url: `${process.env.NEXT_PUBLIC_ORIGIN}/ivao/authorize`
       // redirectUrl: `${process.env.NEXT_PUBLIC_ORIGIN}/ivao/authorize`
     }
 
@@ -56,9 +56,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const vaUser = await VirtualAirlineModel.findOneAndUpdate(
         { userId: req.query.state },
         { isVerified: true, pilotId: decoded.payload.sub },
-        { upsert: true }
+        { upsert: true, new: true }
       )
-      await UserModel.findOneAndUpdate({ userId: req.query.state }, { vaUser: vaUser._id })
+      console.log({ vaUser })
+      try {
+        await UserModel.findOneAndUpdate({ userId: req.query.state }, { vaUser: vaUser._id })
+        console.log('User updated vaUser')
+      } catch (err) {
+        console.error('Updating user', vaUser._id)
+        console.log('Error al actualizar el usuario', req.query.state)
+        res.status(406).end()
+        return
+      }
     } catch (error: any) {
       console.log('Error updating virtual airline user')
       res.status(400).send(error)
