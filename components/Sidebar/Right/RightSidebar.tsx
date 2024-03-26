@@ -2,7 +2,6 @@ import React, { useCallback } from 'react'
 import AirlinesIcon from '@mui/icons-material/Airlines'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import { useMainProviderContext } from 'context/MainProvider'
-import { useTheme } from '@mui/system'
 import Backup from '@mui/icons-material/Backup'
 import ExitToApp from '@mui/icons-material/ExitToApp'
 import ImportExport from '@mui/icons-material/ImportExport'
@@ -32,7 +31,6 @@ import { authStore } from 'store/auth.atom'
 const RightSidebar: React.FC = () => {
   const user = useRecoilValue(userState)
   const token = useRecoilValue(authStore)
-  const theme = useTheme()
   const router = useRouter()
   const { rightSidebarOpen: open, toggleSidebar } = useMainProviderContext()
   const { addBackup } = useAccountSigner()

@@ -9,7 +9,7 @@ import router from 'next/router'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { tokenBalanceStore } from 'store/balance.atom'
-import { Cargo, IvaoPilot } from 'types'
+import { Cargo, IcaoCode, IvaoPilot } from 'types'
 import { getFuelForFlight } from 'utils'
 
 const DIGITS = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
@@ -26,7 +26,10 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
   const requiredGas = React.useMemo(() => {
     const { arrivalDistance, departureDistance } = pilot.lastTrack
 
-    return getFuelForFlight(new BigNumber(arrivalDistance).plus(departureDistance), pilot.flightPlan.aircraft.icaoCode)
+    return getFuelForFlight(
+      new BigNumber(arrivalDistance).plus(departureDistance),
+      pilot.flightPlan.aircraft.icaoCode as IcaoCode
+    )
   }, [pilot.flightPlan.aircraft.icaoCode, pilot.lastTrack])
 
   const finalGas = React.useMemo(() => {
