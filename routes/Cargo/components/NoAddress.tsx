@@ -1,9 +1,12 @@
-import { Box, Fade, Typography } from '@mui/material'
-import { useAddress } from '@thirdweb-dev/react'
+import Box from '@mui/material/Box'
+import Fade from '@mui/material/Fade'
+import Typography from '@mui/material/Typography'
 import React from 'react'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const NoAddress = () => {
-  const address = useAddress()
+  const address = useRecoilValue(smartAccountAddressStore)
 
   return (
     <Fade in={!address} unmountOnExit>

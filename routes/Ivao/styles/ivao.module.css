@@ -1,0 +1,36 @@
+.paper {
+  /* background: var(--mui-palette-gradient); */
+  background: linear-gradient(to bottom left, var(--mui-palette-grey-500), var(--mui-palette-grey-900));
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  width: 100%;
+  border-radius: 0;
+  border-bottom: 1px solid var(--mui-palette-grey-A700);
+  transition: all 125ms ease-out;
+}
+
+.paper:hover {
+  filter: brightness(80%);
+  /* background: var(--mui-overlays-24); */
+
+  /* background: linear-gradient(to top right, #19203f, #303d79); */
+}
+
+/* .paper:hover {
+  background-color: #2b2b2b;
+  color: var(--mui-palette-grey-50);
+} */
+
+.textFieldBox {
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+.icon {
+  cursor: pointer;
+}
+.icon:hover {
+  color: #d6b455;
+}

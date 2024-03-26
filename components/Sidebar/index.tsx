@@ -1,4 +1,3 @@
-import { Box, Divider, Drawer, List, Typography } from '@mui/material'
 import React, { useCallback } from 'react'
 import ConstructionIcon from '@mui/icons-material/Construction'
 import HomeIcon from '@mui/icons-material/Home'
@@ -9,26 +8,33 @@ import LocalAirportIcon from '@mui/icons-material/LocalAirport'
 import { useMainProviderContext } from 'context/MainProvider'
 import SidebarItem from './SidebarItem'
 import { useRouter } from 'next/router'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
+import Drawer from '@mui/material/Drawer'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
+import List from '@mui/material/List'
+import Image from 'next/image'
+import { Stack } from '@mui/material'
 
 const Sidebar: React.FC = () => {
   const router = useRouter()
   const { sidebarOpen: open, toggleSidebar } = useMainProviderContext()
+  const { live } = useLiveFlightProviderContext()
 
   const handleClick = useCallback(
     (route: string) => () => {
       router.push(route)
-      toggleSidebar()
+      toggleSidebar('left')
     },
     [router, toggleSidebar]
   )
 
   return (
-    <Drawer open={open} onClose={toggleSidebar} PaperProps={{ sx: { backgroundColor: 'rgba(255,255,255,0.9)' } }}>
-      <Box p={2} color='white'>
-        <Typography color={'primary'} variant='h2'>
-          AIRLINE
-        </Typography>
-      </Box>
+    <Drawer open={open} onClose={() => toggleSidebar('left')}>
+      <Stack direction='row' p={2} spacing={1}>
+        <Image src='/logo64x64-white.png' alt='logo' width={32} height={32} />
+        <Typography variant='h5'>WeiFly</Typography>
+      </Stack>
       <Divider />
       <List>
         <SidebarItem onLink={handleClick('/')} text='Home' Icon={HomeIcon} selected={router.pathname === '/'} />
@@ -62,6 +68,14 @@ const Sidebar: React.FC = () => {
           Icon={LocalAirportIcon}
           selected={router.pathname === '/ivao'}
         />
+        {live && (
+          <SidebarItem
+            onLink={handleClick('/live')}
+            text='LIVE FLIGHT'
+            Icon={LocalAirportIcon}
+            selected={router.pathname === '/live'}
+          />
+        )}
       </List>
     </Drawer>
   )

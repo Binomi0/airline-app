@@ -1,28 +1,37 @@
 import React, { useCallback } from 'react'
 import { useRouter } from 'next/router'
-import { Alert, AlertTitle, Box, Link as MuiLink, Container, Typography, Button } from '@mui/material'
+import MuiLink from '@mui/material/Link'
 import Image from 'next/image'
 import image from 'public/img/real_replica_cessna_172.png'
 import styles from 'styles/Home.module.css'
-import { ConnectWallet, useAddress, useContract, useNFTBalance } from '@thirdweb-dev/react'
+import { useContract, useNFTBalance } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import Link from 'next/link'
-import axios from 'config/axios'
+import Disconnected from 'components/Disconnected'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Button from '@mui/material/Button'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const CargoItem = () => {
   const router = useRouter()
-  const address = useAddress()
+  const address = useRecoilValue(smartAccountAddressStore)
   const { contract } = useContract(nftAircraftTokenAddress)
-
   const { data } = useNFTBalance(contract, address, 1)
 
   const handleClick = useCallback(() => {
-    axios.post('/api/flight/new', { cargoId: router.query.id })
-  }, [router.query.id])
+    console.log('HANDLE CLICK ADD CARGO?')
+  }, [])
 
-  return !address ? (
-    <ConnectWallet />
-  ) : (
+  if (!address) {
+    return <Disconnected />
+  }
+
+  return (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} style={{ opacity: 0.4 }} src={image} alt='banner' fill />
       <Container>

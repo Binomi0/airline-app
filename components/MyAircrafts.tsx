@@ -1,24 +1,23 @@
-import { Box, Typography, Grid, Card, CardHeader, CardContent, Stack, Alert, AlertTitle } from '@mui/material'
-import { MediaRenderer, useUser, useContract, useOwnedNFTs } from '@thirdweb-dev/react'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import CardContent from '@mui/material/CardContent'
+import Stack from '@mui/material/Stack'
+import { MediaRenderer } from '@thirdweb-dev/react'
 import React from 'react'
-import { nftAircraftTokenAddress } from 'contracts/address'
 import { getNFTAttributes } from 'utils'
+import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 
 const MyAircrafts = () => {
-  const { user } = useUser()
-  const { contract } = useContract(nftAircraftTokenAddress)
-  const { data: nfts = [], error } = useOwnedNFTs(contract, user?.address)
+  const { ownedAircrafts } = useAircraftProviderContext()
 
-  return nfts && nfts.length > 0 ? (
+  return ownedAircrafts.length > 0 ? (
     <Box my={4}>
-      {!!error && (
-        <Alert severity='error'>
-          <AlertTitle>Ha ocurrido un error</AlertTitle>
-        </Alert>
-      )}
       <Typography variant='h2'>My Aircrafts</Typography>
       <Grid container spacing={2}>
-        {nfts?.map((nft) => (
+        {ownedAircrafts?.map((nft) => (
           <Grid item xs={12} lg={4} key={nft.metadata.id}>
             <Card>
               <MediaRenderer height='100%' width='100%' src={nft.metadata.image} />

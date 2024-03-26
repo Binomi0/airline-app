@@ -1,23 +1,23 @@
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Container,
-  Grid,
-  Stack,
-  Typography
-} from '@mui/material'
 import { useRouter } from 'next/router'
 import React from 'react'
-import { MediaRenderer, useClaimNFT, useContract, useNFT, useNFTBalance, useUser } from '@thirdweb-dev/react'
+import { MediaRenderer, useClaimNFT, useContract, useNFT, useNFTBalance } from '@thirdweb-dev/react'
 import { getNFTAttributes } from 'utils'
 import { NextPage } from 'next'
 import { nftLicenseTokenAddress } from 'contracts/address'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import CardContent from '@mui/material/CardContent'
+import Stack from '@mui/material/Stack'
+import CardActions from '@mui/material/CardActions'
+import Button from '@mui/material/Button'
 
 const maps: Record<string, string> = {
   0: '0',
@@ -29,13 +29,13 @@ const maps: Record<string, string> = {
 
 const AircraftView: NextPage = () => {
   const router = useRouter()
-  const { user } = useUser()
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { contract } = useContract(router.query.tokenAddress as string)
   const { contract: license } = useContract(nftLicenseTokenAddress)
   const { mutateAsync: claimNFT, isLoading } = useClaimNFT(contract)
   const { data: nft, error } = useNFT(contract, router.query.tokenId as string)
-  const { data } = useNFTBalance(contract, user?.address, router.query.tokenId as string)
-  const { data: licenseBalance } = useNFTBalance(license, user?.address, maps[router.query.tokenId as string])
+  const { data } = useNFTBalance(contract, smartAccountAddress, router.query.tokenId as string)
+  const { data: licenseBalance } = useNFTBalance(license, smartAccountAddress, maps[router.query.tokenId as string])
 
   if (!nft) return <>Loading...</>
 
@@ -95,7 +95,7 @@ const AircraftView: NextPage = () => {
                 variant='contained'
                 onClick={() =>
                   claimNFT({
-                    to: user?.address,
+                    to: smartAccountAddress,
                     quantity: 1,
                     tokenId: nft.metadata.id
                   })

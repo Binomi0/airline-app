@@ -1,23 +1,40 @@
-import { Fade, Grid } from '@mui/material'
-import { NFT, useAddress } from '@thirdweb-dev/react'
+import { NFT } from '@thirdweb-dev/react'
 import CargoItem from './CargoItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
 import { FRoute } from 'types'
+import { getCallsign } from 'utils'
+import { FixedSizeList, ListChildComponentProps } from 'react-window'
+import Fade from '@mui/material/Fade'
+import Box from '@mui/material/Box'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
+
+const renderRow = (
+  flightList: [string, FRoute[]][],
+  origin: string,
+  handleSelect: (origin: string, destination: string) => Promise<void>
+) =>
+  function renderCustomRow(props: ListChildComponentProps) {
+    const { index } = props
+
+    return <CargoItem onSelect={handleSelect} origin={origin} flights={flightList[index][1]} delay={10 * (index + 1)} />
+  }
 
 const CargoList: React.FC<{
-  newCargo: (route: FRoute, aircraft: NFT) => void
+  // eslint-disable-next-line no-unused-vars
+  newCargo: (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => void
   setSelected: Dispatch<SetStateAction<FRoute>>
   flights: [string, FRoute[]][]
   aircraft?: NFT
 }> = ({ newCargo, setSelected, flights, aircraft }) => {
-  const address = useAddress()
+  const address = useRecoilValue(smartAccountAddressStore)
 
   const handleSelect = useCallback(
     async (origin: string, destination: string) => {
       if (!aircraft) {
         throw new Error('Missing aircraft')
       }
-      newCargo({ origin, destination }, aircraft)
+      newCargo({ origin, destination }, aircraft, getCallsign(), false)
       setSelected({ origin, destination })
     },
     [newCargo, setSelected, aircraft]
@@ -25,11 +42,16 @@ const CargoList: React.FC<{
 
   return (
     <Fade in={flights.length > 0 && !!address} unmountOnExit>
-      <Grid container spacing={2}>
-        {flights.map(([key, value], index) => (
+      <Box sx={{ width: '100%', height: 400, maxWidth: 360, bgcolor: 'background.paper' }}>
+        <FixedSizeList height={968} width='100vw' itemSize={46} itemCount={flights.length} overscanCount={5}>
+          {renderRow(flights, origin, handleSelect)}
+        </FixedSizeList>
+      </Box>
+      {/* <Grid container spacing={2}>
+        {flights.slice(0, 12).map(([key, value], index) => (
           <CargoItem onSelect={handleSelect} key={key} origin={key} flights={value} delay={500 * (index + 1)} />
         ))}
-      </Grid>
+      </Grid> */}
     </Fade>
   )
 }

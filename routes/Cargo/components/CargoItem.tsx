@@ -1,24 +1,22 @@
-import {
-  SelectChangeEvent,
-  Grow,
-  Grid,
-  Card,
-  CardHeader,
-  Typography,
-  CardContent,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from '@mui/material'
 import { useCallback } from 'react'
 import { FRoute } from 'types'
 import styles from 'styles/Home.module.css'
+import Grow from '@mui/material/Grow'
+import Grid from '@mui/material/Grid'
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import Typography from '@mui/material/Typography'
+import CardContent from '@mui/material/CardContent'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 
 const CargoItem: React.FC<{
   flights: FRoute[]
   delay: number
   origin: string
+  // eslint-disable-next-line no-unused-vars
   onSelect: (origin: string, destination: string) => void
 }> = ({ flights, delay, origin, onSelect }) => {
   const handleChange = useCallback(

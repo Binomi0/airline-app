@@ -1,16 +1,26 @@
-import { createRef, useState } from 'react'
+import React, { useState } from 'react'
 import type { NextPage } from 'next'
-import { Alert, AlertTitle, Box, Button, Container, Fade, LinearProgress, Typography } from '@mui/material'
 import Image from 'next/image'
 import styles from 'styles/Home.module.css'
 import image from 'public/img/airplanes9.png'
 import { useVaProviderContext } from 'context/VaProvider'
 import { FRoute, Flight } from 'types'
 import useCargo from 'hooks/useCargo'
-import { ConnectWallet, NFT, useAddress, useUser } from '@thirdweb-dev/react'
+import { NFT } from '@thirdweb-dev/react'
 import NoAddress from 'routes/Cargo/components/NoAddress'
 import CargoReady from 'routes/Cargo/components/CargoReady'
 import CargoList from 'routes/Cargo/components/CargoList'
+import { useRouter } from 'next/router'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Fade from '@mui/material/Fade'
+import Typography from '@mui/material/Typography'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Button from '@mui/material/Button'
+import LinearProgress from '@mui/material/LinearProgress'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const initialState: FRoute = {
   origin: '',
@@ -18,33 +28,40 @@ const initialState: FRoute = {
 }
 
 const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, aircraft }) => {
-  const address = useAddress()
-  const { isLoggedIn } = useUser()
-  const { newCargo, cargo } = useCargo()
+  const router = useRouter()
+  const address = useRecoilValue(smartAccountAddressStore)
+  const { newCargo, cargo, completed, getCargo } = useCargo()
   const { flights } = useVaProviderContext()
   const [selected, setSelected] = useState(initialState)
   const flightList = Object.entries(flights as Flight)
 
-  if (loading || !flights) {
-    return <LinearProgress />
-  }
+  React.useEffect(() => {
+    const { origin, destination, callsign } = router.query
+    if (origin && destination && callsign && aircraft) {
+      setSelected({ origin: origin as string, destination: destination as string })
+      newCargo({ origin: origin as string, destination: destination as string }, aircraft, callsign as string, true)
+    }
+  }, [aircraft, newCargo, router.query])
+
+  React.useEffect(() => {
+    getCargo()
+  }, [getCargo])
 
   return (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} src={image} alt='banner' fill />
-      <Container>
-        <Box my={6} textAlign='center'>
-          {!address && <ConnectWallet />}
-        </Box>
+      {(loading || !flights) && <LinearProgress />}
 
+      <Container>
         <NoAddress />
 
-        <Fade in={isLoggedIn && !!address && !!selected.origin} unmountOnExit>
+        <Fade in={!!address && !!selected.origin} unmountOnExit>
           <Box>
+            <Typography>Completed Cargos: {completed}</Typography>
             <CargoReady cargo={cargo} onCancel={() => setSelected(initialState)} />
           </Box>
         </Fade>
-        <Fade in={isLoggedIn && !!address && !selected.origin} unmountOnExit>
+        <Fade in={!!address && !selected.origin} unmountOnExit>
           <Box>
             <CargoList aircraft={aircraft} flights={flightList} newCargo={newCargo} setSelected={setSelected} />
           </Box>
@@ -63,7 +80,7 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
             </Alert>
           </Box>
         </Fade>
-        <Fade in={!address || !isLoggedIn} unmountOnExit>
+        <Fade in={!address} unmountOnExit>
           <Box maxWidth={500} m='auto'>
             <Alert severity='warning'>
               <AlertTitle>ACCESO NO PERMITIDO</AlertTitle>
@@ -76,7 +93,6 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
                   estás intentando conectar.
                 </Typography>
               )}
-              <ConnectWallet />
             </Alert>
           </Box>
         </Fade>

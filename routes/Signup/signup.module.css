@@ -1,0 +1,8 @@
+.wrapper {
+  height: 100vh;
+}
+.form {
+  border: 1px solid #aaaaaa;
+  padding: 16px;
+  border-radius: 8px;
+}

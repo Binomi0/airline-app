@@ -1,5 +1,12 @@
-import { Fade, Grid, Stack, Box, Typography, Alert, AlertTitle } from '@mui/material'
-import { useAddress } from '@thirdweb-dev/react'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Box from '@mui/material/Box'
+import Fade from '@mui/material/Fade'
+import Grid from '@mui/material/Grid'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { useRecoilValue } from 'recoil'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 import React from 'react'
 import CargoAircraft from 'routes/Cargo/components/CargoAircraft'
 import { Cargo } from 'types'
@@ -8,7 +15,7 @@ const CargoReady: React.FC<{
   cargo?: Cargo
   onCancel: () => void
 }> = ({ cargo, onCancel }) => {
-  const address = useAddress()
+  const address = useRecoilValue(smartAccountAddressStore)
 
   return (
     <Fade in={!!cargo && !!address} unmountOnExit>

@@ -1,23 +1,24 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import { Box, Container, Grid, Typography } from '@mui/material'
-import { ConnectWallet, useUser } from '@thirdweb-dev/react'
-import serverSidePropsHandler from 'components/ServerSideHandler'
-import HomeGridItem from 'components/HomeGridItem'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
 import image from 'public/img/Cyb3rYoga.png'
+import HomeGridItem from 'components/HomeGridItem'
 import styles from '../styles/Home.module.css'
+import { PageProps } from 'types'
+import { LinearProgress } from '@mui/material'
 
-const Home: NextPage = () => {
-  const { user } = useUser()
-
+const Home: NextPage<PageProps> = ({ loading }) => {
   return (
     <Box position='relative'>
       <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />
+      {loading && <LinearProgress />}
 
       <Container>
         <Box my={5} textAlign='center'>
           <Typography variant='h1'>Virtual Airline</Typography>
-          {!user?.address && <ConnectWallet />}
         </Box>
 
         <Grid container spacing={8}>
@@ -44,8 +45,7 @@ const Home: NextPage = () => {
             delay={2000}
             link='/cargo'
             title='Cargo &rarr;'
-            text='Realiza alguno de los vuelos pendientes y gana tokens
-                      AIRL.'
+            text='Realiza alguno de los vuelos pendientes y gana tokens AIRL.'
           />
           <HomeGridItem
             delay={2500}
@@ -58,7 +58,8 @@ const Home: NextPage = () => {
     </Box>
   )
 }
-
-export const getServerSideProps = serverSidePropsHandler
+// export const config = {
+//   runtime: 'experimental-edge' // or "nojdejs"
+// }
 
 export default Home

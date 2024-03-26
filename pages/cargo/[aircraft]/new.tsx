@@ -1,36 +1,51 @@
-import { Box, Fade, LinearProgress } from '@mui/material'
-import { useAddress, useContract, useNFT, useOwnedNFTs } from '@thirdweb-dev/react'
-import serverSidePropsHandler from 'components/ServerSideHandler'
+import { useContract, useNFT } from '@thirdweb-dev/react'
 import { VaProvider } from 'context/VaProvider'
 import { nftAircraftTokenAddress } from 'contracts/address'
-import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import React, { useEffect, useMemo } from 'react'
+import React from 'react'
 import CargoView from 'routes/Cargo/CargoView'
+import Disconnected from 'components/Disconnected'
+import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
+import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
+import Fade from '@mui/material/Fade'
+import Box from '@mui/material/Box'
+import LinearProgress from '@mui/material/LinearProgress'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
+import type { PageProps } from 'types'
 
-const CargoAircraft: NextPage<{ loading: boolean }> = ({ loading }) => {
+const CargoAircraft = ({ loading }: PageProps) => {
   const router = useRouter()
-  const address = useAddress()
+  const user = useRecoilValue(userState)
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data, isLoading } = useNFT(contract, router.query.aircraft as string)
-  const { data: owned, isLoading: isLoadingOwn } = useOwnedNFTs(contract, address)
+  const { ownedAircrafts: owned, isLoading: isLoadingOwn } = useAircraftProviderContext()
+  const { live } = useLiveFlightProviderContext()
 
-  const hasAircraft = useMemo(() => {
+  const hasAircraft = React.useMemo(() => {
     if (!owned || !data) return false
     return owned.some((nft) => nft.metadata.id === data.metadata.id)
   }, [owned, data])
 
-  useEffect(() => {
-    if (!address) {
+  React.useEffect(() => {
+    if (live) router.push('/live')
+  }, [live, router])
+
+  React.useEffect(() => {
+    if (!user) {
       router.push('/cargo')
     }
-  }, [address, router])
+  }, [user, router])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!!owned && !!data && !isLoading && !isLoadingOwn && !hasAircraft) {
       router.push('/hangar')
     }
   }, [owned, data, isLoading, isLoadingOwn, router, hasAircraft])
+
+  if (!user) {
+    return <Disconnected />
+  }
 
   return (
     <VaProvider>
@@ -45,7 +60,5 @@ const CargoAircraft: NextPage<{ loading: boolean }> = ({ loading }) => {
     </VaProvider>
   )
 }
-
-export const getServerSideProps = serverSidePropsHandler
 
 export default CargoAircraft
