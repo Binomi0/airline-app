@@ -1,5 +1,5 @@
 import Search from '@mui/icons-material/Search'
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import FlightLandIcon from '@mui/icons-material/FlightLand'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
 import { Atc } from 'types'
@@ -14,6 +14,10 @@ import Paper from '@mui/material/Paper'
 import { useTheme } from '@mui/material/styles'
 import { LinearProgress, styled } from '@mui/material'
 import styles from '../styles/ivao.module.css'
+import axios from 'axios'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { authStore } from 'store/auth.atom'
+import { destinationStore } from 'store/destination.atom'
 
 const ZERO = 0
 const TWENTY_FIVE = 25
@@ -24,7 +28,8 @@ const filterActiveAtcs = (atc: Atc) => {
 
   return now - activated > 1000 * 60 * 10
 }
-const filterAtcs = (search: string) => (atc: Atc) => atc.callsign.toLowerCase().includes(search.toLowerCase())
+const filterAtcs = (search?: string) => (atc: Atc) =>
+  search ? atc.callsign.toLowerCase().includes(search.toLowerCase()) : true
 const filterAtcTowers = (atc: Atc) => atc.callsign.includes('_TWR')
 const sortByCallsign = (a: Atc, b: Atc) => {
   if (a.callsign > b.callsign) return 1
@@ -40,17 +45,38 @@ interface Props {
 }
 
 const IvaoAtcs = ({ start, end, onSelect }: Props) => {
+  const token = useRecoilValue(authStore)
   const { atcs, isLoading } = useVaProviderContext()
   const theme = useTheme()
   const atcSearchRef = useRef<HTMLInputElement>()
+  const setDestinations = useSetRecoilState(destinationStore)
   const [atcSearch, setAtcSearch] = useState<string>('')
 
   const filteredAtcs = atcs
     .filter(filterAtcs(atcSearch))
-    .filter(filterActiveAtcs)
+    // .filter(filterActiveAtcs)
     .filter(filterAtcTowers)
     .slice(ZERO, TWENTY_FIVE)
     .sort(sortByCallsign)
+
+  const onSelectTower = useCallback(
+    (callsign: string) => {
+      // axios.get('http://localhost:3001/ivao/init').then(() => {
+      axios
+        .get(`http://localhost:3001/ivao/matrix/${callsign}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        .then((response) => {
+          console.log('destinations =>', response.data)
+          setDestinations(response.data)
+        })
+        .catch(console.error)
+      // })
+    },
+    [token, setDestinations]
+  )
 
   return (
     <Box
@@ -91,7 +117,7 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
         </Box>
       ) : (
         filteredAtcs.map((atc) => (
-          <StyledPaper key={atc.id}>
+          <StyledPaper key={atc.id} onClick={() => onSelectTower(atc.callsign)}>
             <Stack direction='row' justifyContent='space-between' p={1}>
               <Box>
                 <Typography variant='subtitle1'>{atc.callsign.split('_')[0]}</Typography>
@@ -107,13 +133,19 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
               <Stack direction='column' spacing={1}>
                 <FlightTakeoffIcon
                   color={start === atc.callsign ? 'success' : 'inherit'}
-                  onClick={() => onSelect(atc.callsign === start ? '' : atc.callsign, 'start')}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onSelect(atc.callsign === start ? '' : atc.callsign, 'start')
+                  }}
                   className={styles.icon}
                   fontSize='small'
                 />
                 <FlightLandIcon
                   color={end === atc.callsign ? 'info' : 'inherit'}
-                  onClick={() => onSelect(atc.callsign === end ? '' : atc.callsign, 'end')}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onSelect(atc.callsign === end ? '' : atc.callsign, 'end')
+                  }}
                   className={styles.icon}
                   fontSize='small'
                 />

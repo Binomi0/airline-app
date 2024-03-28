@@ -4,8 +4,8 @@ import { User } from 'types'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import { useRouter } from 'next/router'
 import IvaoAtcs from './components/IvaoAtcs'
-import useCargo from 'hooks/useCargo'
-import { getCallsign } from 'utils'
+// import useCargo from 'hooks/useCargo'
+// import { getCallsign } from 'utils'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useContract, useNFTs } from '@thirdweb-dev/react'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
@@ -16,11 +16,17 @@ import Typography from '@mui/material/Typography'
 import LinearProgress from '@mui/material/LinearProgress'
 import usePilots from 'hooks/usePilots'
 import { CircularProgress } from '@mui/material'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import IvaoLogin from './components/IvaoLogin'
 import Cargo from './components/Cargo'
 import { useVaProviderContext } from 'context/VaProvider'
+import { ivaoAuthStore } from 'store/ivaoAuth.atom'
+import { bookingStore } from 'store/booking.atom'
+import { authStore } from 'store/auth.atom'
+import customProtocolCheck from 'custom-protocol-check'
+import { appInstalledStore } from 'store/appInstalled.atom'
+import Destinations from './components/Destinations'
 
 interface Props {
   user: User
@@ -35,6 +41,11 @@ const IvaoView = ({ user, isLoading }: Props) => {
   const [end, setEnd] = useState('')
   const { contract } = useContract(nftAircraftTokenAddress)
   const ivaoUser = useRecoilValue(ivaoUserStore)
+  const ivaoToken = useRecoilValue(ivaoAuthStore)
+  const authToken = useRecoilValue(authStore)
+  const [booking, setBooking] = useRecoilState(bookingStore)
+  const [hasApp, setHasApp] = useRecoilState(appInstalledStore)
+  const { getPilots } = usePilots()
 
   const {
     data: aircrafts = []
@@ -42,7 +53,6 @@ const IvaoView = ({ user, isLoading }: Props) => {
     //   isFetched,
     //    refetch: refetchAircrafts
   } = useNFTs(contract)
-  const { getPilots } = usePilots()
 
   const handleSelectAtc = useCallback(
     (callsign: string, side: 'start' | 'end') => {
@@ -57,6 +67,30 @@ const IvaoView = ({ user, isLoading }: Props) => {
       }
     },
     [end, start]
+  )
+
+  const handleBooking = useCallback(
+    (hasFuel: boolean) => {
+      if (!ivaoToken) return
+      if (hasFuel) {
+        setBooking(true)
+        if (!authToken) throw new Error('Missing auth token')
+        customProtocolCheck(
+          `weifly://`,
+          () => {
+            console.log('App is not installed in user system')
+            // TODO: Show popup to download weifly app
+          },
+          () => {
+            setHasApp(true)
+            console.log('App ready to open in user system')
+            window.open(`weifly://token=${authToken}`)
+          },
+          5000
+        )
+      }
+    },
+    [ivaoToken, authToken, setBooking, setHasApp]
   )
 
   React.useEffect(() => {
@@ -105,15 +139,24 @@ const IvaoView = ({ user, isLoading }: Props) => {
               )}
             </Stack>
           )}
-          <Box mt={4}>
-            <Cargo aircrafts={aircrafts} origin={start} destination={end} />
-          </Box>
 
           {loading && (
             <Stack justifyContent='center' alignItems='center' mt={10}>
               <CircularProgress thickness={1} size={120} />
             </Stack>
           )}
+
+          <Box mt={4}>
+            <Cargo aircrafts={aircrafts} origin={start} destination={end} onBooking={handleBooking} />
+          </Box>
+
+          {booking && (
+            <Box>
+              <Typography>Connect sim and start your flight</Typography>
+            </Box>
+          )}
+
+          <Destinations />
 
           {/* <IvaoPilots /> */}
         </Box>

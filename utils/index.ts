@@ -166,55 +166,55 @@ export const validateEmail = (email?: string) => {
 export const getFuelForFlight = (distance: BigNumber, aircraftType: IcaoCode, passengers: number = 2) => {
   switch (aircraftType) {
     case 'AN225': {
-      return distance.multipliedBy(9.99)
+      return distance.multipliedBy(9.99).plus(10000)
     }
     case 'A20N': {
-      return distance.multipliedBy(0.0225 * Math.min(passengers, 2))
+      return distance.multipliedBy(0.0225 * Math.min(passengers, 2)).plus(1000)
     }
     case 'A21N': {
-      return distance.multipliedBy(2.8)
+      return distance.multipliedBy(2.8).plus(1000)
     }
     case 'A319': {
-      return distance.multipliedBy(2.45)
+      return distance.multipliedBy(2.45).plus(1000)
     }
     case 'A320': {
-      return distance.multipliedBy(3)
+      return distance.multipliedBy(3).plus(1000)
     }
     case 'A321': {
-      return distance.multipliedBy(2.225)
+      return distance.multipliedBy(2.225).plus(1000)
     }
     case 'A339': {
-      return distance.multipliedBy(2.21)
+      return distance.multipliedBy(2.21).plus(1000)
     }
     case 'B350': {
-      return distance.multipliedBy(0.67)
+      return distance.multipliedBy(0.67).plus(3000)
     }
     case 'B748': {
-      return distance.multipliedBy(4)
+      return distance.multipliedBy(4).plus(6000)
     }
     case 'B738': {
-      return distance.multipliedBy(2.5)
+      return distance.multipliedBy(2.5).plus(7000)
     }
     case 'B739': {
-      return distance.multipliedBy(2.45)
+      return distance.multipliedBy(2.45).plus(6000)
     }
     case 'B737': {
-      return distance.multipliedBy(2.75)
+      return distance.multipliedBy(2.75).plus(1000)
     }
     case 'B763': {
-      return distance.multipliedBy(4.8)
+      return distance.multipliedBy(4.8).plus(1000)
     }
     case 'B77W': {
-      return distance.multipliedBy(5.5)
+      return distance.multipliedBy(5.5).plus(4000)
     }
     case 'B788': {
-      return distance.multipliedBy(2.4)
+      return distance.multipliedBy(2.4).plus(3000)
     }
     case 'C172': {
-      return distance.multipliedBy(0.36)
+      return distance.multipliedBy(0.36).plus(15)
     }
     case 'C700':
-      return distance.multipliedBy(5.43)
+      return distance.multipliedBy(5.43).plus(600)
     default:
       return distance.multipliedBy(1.325)
   }

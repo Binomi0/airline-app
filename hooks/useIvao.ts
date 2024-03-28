@@ -4,6 +4,7 @@ import axios from 'config/axios'
 import { AxiosError, AxiosResponse } from 'axios'
 import { useSetRecoilState } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
+import { ivaoAuthStore } from 'store/ivaoAuth.atom'
 
 interface UseIvaoReturnType {
   isLoading: boolean
@@ -13,6 +14,7 @@ interface UseIvaoReturnType {
 const useIvao = (): UseIvaoReturnType => {
   const router = useRouter()
   const setIvaoUser = useSetRecoilState(ivaoUserStore)
+  const setIvaoToken = useSetRecoilState(ivaoAuthStore)
   const [isLoading, setIsLoading] = useState(true)
 
   const requestIvaoUser = useCallback(
@@ -26,6 +28,7 @@ const useIvao = (): UseIvaoReturnType => {
         })
         .then((response: AxiosResponse) => {
           setIvaoUser(response.data)
+          setIvaoToken(token)
         })
         .catch((error: AxiosError) => {
           console.log('IVAO ERROR =>', error)
@@ -35,7 +38,7 @@ const useIvao = (): UseIvaoReturnType => {
           setIsLoading(false)
         })
     },
-    [setIvaoUser]
+    [setIvaoUser, setIvaoToken]
   )
 
   const authorize = useCallback(() => {
