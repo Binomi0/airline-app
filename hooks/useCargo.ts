@@ -44,14 +44,13 @@ const useCargo = (): UseCargo => {
       }
 
       try {
-        const distance = await getDistanceByCoords(atcs, route)
         const details = cargos[getRandomInt(8)]
         const weight = getCargoWeight(aircraft)
-        const prize = getCargoPrize(distance, aircraft)
+        const prize = getCargoPrize(route.distance, aircraft)
         const cargo: Cargo = {
           origin: route.origin,
           destination: route.destination,
-          distance,
+          distance: route.distance,
           details,
           aircraft,
           aircraftId: aircraft.metadata.id,

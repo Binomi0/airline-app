@@ -2,13 +2,12 @@ import { Wallet } from 'ethers'
 import { useCallback } from 'react'
 import { createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
 import { Hex, LocalAccountSigner, sepolia } from '@alchemy/aa-core'
-import { User } from 'types'
 import { accountImportErrorSwal, missingKeySwal } from 'lib/swal'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { userState } from 'store/user.atom'
+import { useSetRecoilState } from 'recoil'
 import { IWallet } from 'models/Wallet'
 import { walletStore } from 'store/wallet.atom'
 import { getApi, postApi } from 'lib/api'
+import { User } from 'types'
 
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 // const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -19,12 +18,11 @@ interface UseWallet {
 }
 
 const useWallet = (): UseWallet => {
-  const user = useRecoilValue(userState)
   const setWallet = useSetRecoilState(walletStore)
 
   const initialize = useCallback(
-    async (_signer: Wallet, userId: string) => {
-      if (!_signer || !userId) return
+    async (_signer: Wallet, _user: User) => {
+      if (!_signer || !_user.id) return
 
       const signer = LocalAccountSigner.privateKeyToAccountSigner(_signer.privateKey as Hex)
       const modularAccountAlchemyClient = await createModularAccountAlchemyClient({
@@ -36,12 +34,12 @@ const useWallet = (): UseWallet => {
         }
       })
 
-      if (!user?.address) {
+      if (!_user?.address) {
         const smartAccountAddress = modularAccountAlchemyClient.getAddress()
 
         const updateUser = postApi('/api/user/update', { address: smartAccountAddress })
         const updateWallet = postApi('/api/wallet', {
-          id: userId,
+          id: _user.id,
           smartAccountAddress: smartAccountAddress,
           signerAddress: _signer.address
         })
@@ -58,20 +56,20 @@ const useWallet = (): UseWallet => {
           await getApi('/api/wallet')
         } catch (error) {
           await postApi('/api/wallet', {
-            id: userId,
-            smartAccountAddress: user.address,
+            id: _user.id,
+            smartAccountAddress: _user.address,
             signerAddress: _signer.address
           })
         }
         setWallet({
           baseSigner: _signer,
           smartSigner: modularAccountAlchemyClient,
-          smartAccountAddress: user.address,
+          smartAccountAddress: _user.address,
           isLoaded: true
         })
       }
     },
-    [setWallet, user?.address]
+    [setWallet]
   )
 
   const checkSigner = useCallback(async (signer: Wallet) => {
@@ -92,7 +90,7 @@ const useWallet = (): UseWallet => {
    */
   const handleImportFile = useCallback(
     // eslint-disable-next-line no-unused-vars
-    async (userId: string) => {
+    async (_user: User) => {
       const { value: file } = await missingKeySwal()
       if (!file) {
         throw new Error('Missing file')
@@ -111,9 +109,9 @@ const useWallet = (): UseWallet => {
           const baseSigner = new Wallet(key.slice(0, 66))
           const isValidWallet = await checkSigner(baseSigner)
 
-          if (isValidWallet) {
-            localStorage.setItem(userId, base64Key)
-            await initialize(baseSigner, userId)
+          if (isValidWallet && _user.id) {
+            localStorage.setItem(_user.id, base64Key)
+            await initialize(baseSigner, _user)
             resolve(true)
           } else {
             reject(new Error('Invalid wallet'))
@@ -126,39 +124,39 @@ const useWallet = (): UseWallet => {
   )
 
   const initWallet = useCallback(
-    async (user: User) => {
-      if (!user || !user.id) throw new Error('Missing user while initializing wallet')
+    async (_user: User) => {
+      if (!_user || !_user.id) throw new Error('Missing user while initializing wallet')
 
       try {
         // This is where the wallet is created for the first time?
-        if (!user.address) {
+        if (!_user.address) {
           console.log('initWallet user has no address')
           const random = Wallet.createRandom()
           const base64Key = Buffer.from(random.privateKey).toString('base64')
 
-          localStorage.setItem(user.id, base64Key)
+          localStorage.setItem(_user.id, base64Key)
 
-          await initialize(random, user.id)
+          await initialize(random, _user)
           return
         }
 
-        const walletId = localStorage.getItem(user.id)
+        const walletId = localStorage.getItem(_user.id)
         if (walletId) {
           const signer = new Wallet(Buffer.from(walletId, 'base64').toString().slice(0, 66))
           if (await checkSigner(signer)) {
-            await initialize(signer, user.id)
+            await initialize(signer, _user)
           }
           return
         } else {
           console.log('initWallet user has no walletid in storage')
-          await handleImportFile(user.id)
+          await handleImportFile(_user)
         }
       } catch (error) {
         const err = error as Error
         console.error(err)
         if (err.message === 'Invalid wallet') {
           await accountImportErrorSwal()
-          await handleImportFile(user.id)
+          await handleImportFile(_user)
           return
         }
         throw new Error('While initialize wallet')

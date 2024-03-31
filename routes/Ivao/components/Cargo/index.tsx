@@ -16,6 +16,8 @@ import BigNumber from 'bignumber.js'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'
 import useCargo from 'hooks/useCargo'
+import { destinationStore } from 'store/destination.atom'
+import { Alert, AlertTitle } from '@mui/material'
 
 enum AircraftRanges {
   'Cessna 172' = '700',
@@ -51,6 +53,7 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
   const [aircraft, setAircraft] = useState<string>('-1')
   const balance = useRecoilValue(tokenBalanceStore)
   const { cargo, newCargo, setCargo } = useCargo()
+  const destinations = useRecoilValue(destinationStore)
 
   const currentAircraft = useMemo(() => aircrafts.find((ac) => ac.metadata.id === aircraft), [aircrafts, aircraft])
 
@@ -87,15 +90,45 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
 
   React.useEffect(() => {
     if (origin && destination && currentAircraft) {
-      newCargo({ origin, destination }, currentAircraft, getCallsign(), false)
+      newCargo(
+        {
+          origin,
+          destination,
+          distance: destinations?.destinations.find((d) => d.callsign === destination)?.distance ?? 0
+        },
+        currentAircraft,
+        getCallsign(),
+        false
+      )
     } else {
       setCargo()
     }
   }, [newCargo, setCargo, currentAircraft, origin, destination])
 
   return (
-    <Paper elevation={3}>
-      <Stack direction='row' justifyContent='space-between'>
+    <Paper elevation={3} sx={{ borderRadius: 1 }}>
+      <Stack
+        direction='row'
+        justifyContent='space-between'
+        spacing={2}
+        sx={{
+          position: 'relative',
+          borderRadius: 1,
+
+          '&::before': {
+            position: 'absolute',
+            content: '""',
+            width: '100%',
+            height: '100%',
+            left: 0,
+            backgroundImage: `url(${aircrafts[Number(aircraft)]?.metadata.image})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.2
+          }
+        }}
+      >
         <Stack direction='row' spacing={2} width='100%' p={2}>
           <Stack justifyContent='space-between' spacing={2}>
             <Box>
@@ -140,11 +173,7 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
                 </Select>
               </FormControl>
             </Box>
-            {aircrafts[Number(aircraft)] && (
-              <Box>
-                <MediaRenderer height='128px' width='128px' src={aircrafts[Number(aircraft)].metadata.image} />
-              </Box>
-            )}
+
             <Box>
               <Typography color={hasEnoughFuel() ? 'success.light' : 'error.main'}>
                 Fuel available: {formatNumber(balance.airg?.toNumber(), 0)}
@@ -153,52 +182,71 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
             </Box>
           </Stack>
         </Stack>
-        <Stack direction='column' alignItems='center' justifyContent='center' spacing={1} p={2}>
-          <Typography variant='h5'>{cargo?.details.name}</Typography>
 
-          <Stack direction='row' justifyContent='space-between' minWidth={300}>
-            <Typography align='center'>Distance:</Typography>
-            <Typography align='center' variant='body2'>
-              {formatNumber(cargo?.distance)} Km
+        {cargo?.callsign && hasEnoughFuel() && hasRequirement(aircraft) && (
+          <Box width='100%'>
+            <Box mt={2}>
+              <Typography fontWeight={600} align='center'>
+                USE THIS CALLSIGN
+              </Typography>
+            </Box>
+            <Paper elevation={12}>
+              <Stack p={2} mt={2} bgcolor={'success.dark'}>
+                <Typography fontSize={32} fontWeight={900} align='center' letterSpacing={3}>
+                  {cargo.callsign}
+                </Typography>
+              </Stack>
+            </Paper>
+          </Box>
+        )}
+        {cargo && hasEnoughFuel() && hasRequirement(aircraft) && (
+          <Stack direction='column' alignItems='center' justifyContent='center' spacing={1} p={2}>
+            <Typography variant='h5'>{cargo?.details.name}</Typography>
+
+            <Stack direction='row' justifyContent='space-between' minWidth={300}>
+              <Typography align='center'>Distance:</Typography>
+              <Typography align='center' variant='body2'>
+                {formatNumber(cargo?.distance)} Km
+              </Typography>
+            </Stack>
+
+            <Stack direction='row' justifyContent='space-between' minWidth={300}>
+              <Typography align='center'>Rewards:</Typography>
+              <Typography align='center' variant='body2'>
+                {formatNumber(cargo?.prize)} AIRL
+              </Typography>
+            </Stack>
+
+            <Stack direction='row' justifyContent='space-between' minWidth={300}>
+              <Typography align='center'>Weight: </Typography>
+              <Typography align='center' variant='body2'>
+                {Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+                  cargo?.weight || 0
+                )}{' '}
+                Kg
+              </Typography>
+            </Stack>
+
+            <Stack direction='row' justifyContent='space-between' minWidth={300}>
+              <Typography align='center'>Airdrop: </Typography>
+              <Typography align='center' variant='body2'>
+                {cargo?.score ?? '-'} Points
+              </Typography>
+            </Stack>
+
+            <Typography width={300} align='justify' variant='caption' fontWeight={300}>
+              {cargo?.details.description}
             </Typography>
+
+            <Button
+              disabled={!hasRequirement(aircraft) || !hasEnoughFuel()}
+              variant='contained'
+              onClick={() => onBooking(hasRequirement(aircraft))}
+            >
+              Book this Flight
+            </Button>
           </Stack>
-
-          <Stack direction='row' justifyContent='space-between' minWidth={300}>
-            <Typography align='center'>Rewards:</Typography>
-            <Typography align='center' variant='body2'>
-              {formatNumber(cargo?.prize)} AIRL
-            </Typography>
-          </Stack>
-
-          <Stack direction='row' justifyContent='space-between' minWidth={300}>
-            <Typography align='center'>Weight: </Typography>
-            <Typography align='center' variant='body2'>
-              {Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-                cargo?.weight || 0
-              )}{' '}
-              Kg
-            </Typography>
-          </Stack>
-
-          <Stack direction='row' justifyContent='space-between' minWidth={300}>
-            <Typography align='center'>Airdrop: </Typography>
-            <Typography align='center' variant='body2'>
-              {cargo?.score ?? '-'} Points
-            </Typography>
-          </Stack>
-
-          <Typography width={300} align='justify' variant='caption' fontWeight={300}>
-            {cargo?.details.description}
-          </Typography>
-
-          <Button
-            disabled={!hasRequirement(aircraft)}
-            variant='outlined'
-            onClick={() => onBooking(hasRequirement(aircraft))}
-          >
-            Book this Flight
-          </Button>
-        </Stack>
+        )}
       </Stack>
     </Paper>
   )

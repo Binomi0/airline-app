@@ -53,7 +53,7 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, carg
     }
 
     if (pilot.callsign !== cargo?.callsign) {
-      await newCargo({ origin, destination }, aircraft, pilot.callsign, true)
+      await newCargo({ origin, destination, distance: 0 }, aircraft, pilot.callsign, true)
     }
   }, [aircraft, cargo?.callsign, newCargo, pilot.callsign, pilot.flightPlan])
 

@@ -3,11 +3,12 @@ import useAccountSigner from './useAccountSigner'
 import { deleteCookie } from 'cookies-next'
 import { loginSuccessSwal } from 'lib/swal'
 import { useRouter } from 'next/router'
-import { AccountSignerStatus } from 'types'
+import { AccountSignerStatus, User } from 'types'
 import { useSetRecoilState } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 import { userState } from 'store/user.atom'
 import { authStore } from 'store/auth.atom'
+import axios from 'config/axios'
 
 interface UseAuthReturnType {
   // eslint-disable-next-line no-unused-vars
@@ -37,31 +38,38 @@ const useAuth = (): UseAuthReturnType => {
           throw new Error('while verify user credentials')
         }
 
-        await loadAccount(token)
+        const { data } = await axios.get<User>('/api/user/get')
+        setUser(data)
+        setToken(token)
         loginSuccessSwal()
+        loadAccount(data)
       } catch (err) {
         const error = err as Error
         console.error('err =>', error)
         setStatus(error.message === 'Missing wallet key' ? 'missingKey' : 'error')
       }
     },
-    [loadAccount, verifyCredential]
+    [loadAccount, setToken, setUser, verifyCredential]
   )
 
   const handleSignUp = useCallback(
     async (email: string) => {
       setStatus('loading')
       try {
-        const { verified } = await createCredential(email)
+        const { verified, token } = await createCredential(email)
         if (verified) {
-          await loadAccount()
+          const { data } = await axios.get<User>('/api/user/get')
+          setUser(data)
+          setToken(token)
+          loadAccount(data)
+          loginSuccessSwal()
         }
       } catch (err) {
         console.error('[handleSignUp] Error =>', err)
         setStatus('error')
       }
     },
-    [createCredential, loadAccount]
+    [createCredential, loadAccount, setToken, setUser]
   )
 
   const handleSignOut = useCallback(() => {

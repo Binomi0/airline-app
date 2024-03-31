@@ -17,7 +17,7 @@ const IvaoLogin = ({ user }: Props) => {
   const pilots = useRecoilValue(pilotsStore)
 
   const isFlying = useMemo(
-    () => pilots.some((pilot) => pilot?.userId.toString() === user.vaUser?.pilotId),
+    () => pilots.some((pilot) => pilot?.userId?.toString() === user.vaUser?.pilotId),
     [pilots, user.vaUser?.pilotId]
   )
 

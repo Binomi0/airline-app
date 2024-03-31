@@ -20,6 +20,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
   } else if (req.method === 'DELETE') {
     try {
+      // TODO: Review if status cargo started should be removed
       const current = await Cargo.findOneAndDelete({ userId: req.id, status: CargoStatus.STARTED })
       if (current) {
         res.status(202).end()

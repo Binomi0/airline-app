@@ -1,6 +1,7 @@
 import withAuth from 'lib/withAuth'
 import Atcs from 'models/Atc'
 import { NextApiRequest, NextApiResponse } from 'next'
+import NextCors from 'nextjs-cors'
 import { Atc, FRoute, Flight } from 'types'
 
 const reduceOthers = (origin: string, others: Atc[]): FRoute[] =>
@@ -12,12 +13,20 @@ const reduceOthers = (origin: string, others: Atc[]): FRoute[] =>
       ...acc,
       {
         origin,
-        destination: curr.callsign.split('_')[0]
+        destination: curr.callsign.split('_')[0],
+        distance: 0
       }
     ]
   }, [] as FRoute[])
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  await NextCors(req, res, {
+    // Options
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    origin: '*',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  })
+
   if (req.method !== 'GET') {
     res.status(405).end()
     return

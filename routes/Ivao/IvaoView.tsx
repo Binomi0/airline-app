@@ -15,7 +15,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import LinearProgress from '@mui/material/LinearProgress'
 import usePilots from 'hooks/usePilots'
-import { CircularProgress } from '@mui/material'
+import { CircularProgress, Container, Paper } from '@mui/material'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import IvaoLogin from './components/IvaoLogin'
@@ -27,6 +27,9 @@ import { authStore } from 'store/auth.atom'
 import customProtocolCheck from 'custom-protocol-check'
 import { appInstalledStore } from 'store/appInstalled.atom'
 import Destinations from './components/Destinations'
+import Swal from 'sweetalert2'
+import { postApi } from 'lib/api'
+import { cargoStore } from 'store/cargo.atom'
 
 interface Props {
   user: User
@@ -46,6 +49,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
   const [booking, setBooking] = useRecoilState(bookingStore)
   const [hasApp, setHasApp] = useRecoilState(appInstalledStore)
   const { getPilots } = usePilots()
+  const cargo = useRecoilValue(cargoStore)
 
   const {
     data: aircrafts = []
@@ -69,28 +73,51 @@ const IvaoView = ({ user, isLoading }: Props) => {
     [end, start]
   )
 
+  const handleRequestFlight = useCallback(async () => {
+    if (!cargo) return
+    try {
+      const { aircraft: _, ...newCargo } = cargo
+
+      const { isConfirmed } = await Swal.fire({
+        title: `Callsign ${newCargo.callsign}`,
+        text: 'Are you ready for this flight? Remember to set required callsign before start',
+        icon: 'question',
+        showCancelButton: true
+      })
+      if (isConfirmed) {
+        const cargo = await postApi('/api/cargo/new', newCargo)
+        if (!cargo) return
+        await postApi('/api/live/new', { cargo })
+        router.push('/live')
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }, [cargo, router])
+
   const handleBooking = useCallback(
     (hasFuel: boolean) => {
       if (!ivaoToken) return
       if (hasFuel) {
         setBooking(true)
         if (!authToken) throw new Error('Missing auth token')
-        customProtocolCheck(
-          `weifly://`,
-          () => {
-            console.log('App is not installed in user system')
-            // TODO: Show popup to download weifly app
-          },
-          () => {
-            setHasApp(true)
-            console.log('App ready to open in user system')
-            window.open(`weifly://token=${authToken}`)
-          },
-          5000
-        )
+        handleRequestFlight()
+        // customProtocolCheck(
+        //   `weifly://`,
+        //   () => {
+        //     console.log('App is not installed in user system')
+        //     // TODO: Show popup to download weifly app
+        //   },
+        //   () => {
+        //     setHasApp(true)
+        //     console.log('App ready to open in user system')
+        //     window.open(`weifly://token=${authToken}`)
+        //   },
+        //   5000
+        // )
       }
     },
-    [ivaoToken, authToken, setBooking, setHasApp]
+    [ivaoToken, setBooking, authToken, handleRequestFlight]
   )
 
   React.useEffect(() => {
@@ -106,11 +133,12 @@ const IvaoView = ({ user, isLoading }: Props) => {
 
   return (
     <Stack direction='row'>
+      {(isLoading || loading) && <LinearProgress />}
+
       <IvaoAtcs onSelect={handleSelectAtc} start={start} end={end} />
-      {isLoading ? (
-        <CircularProgress size={64} />
-      ) : (
-        <Box px={2} width='100%'>
+
+      <Container>
+        <Box px={2} width='100%' maxHeight='100vh'>
           <IvaoLogin user={user} />
           {ivaoUser && (
             <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
@@ -120,7 +148,11 @@ const IvaoView = ({ user, isLoading }: Props) => {
                     <FlightTakeoffIcon color='success' fontSize='inherit' />
                   </Box>
                   <Typography variant='h3'>Start</Typography>
-                  <Typography>{start}</Typography>
+                  <Paper>
+                    <Box p={1} bgcolor='success.main' borderRadius={1}>
+                      <Typography>{start}</Typography>
+                    </Box>
+                  </Paper>
                 </Box>
               )}
               {start && end && (
@@ -134,15 +166,13 @@ const IvaoView = ({ user, isLoading }: Props) => {
                     <FlightLandIcon color='info' fontSize='inherit' />
                   </Box>
                   <Typography variant='h3'>End</Typography>
-                  <Typography>{end}</Typography>
+                  <Paper>
+                    <Box p={1} bgcolor='info.dark' borderRadius={1}>
+                      <Typography>{end}</Typography>
+                    </Box>
+                  </Paper>
                 </Box>
               )}
-            </Stack>
-          )}
-
-          {loading && (
-            <Stack justifyContent='center' alignItems='center' mt={10}>
-              <CircularProgress thickness={1} size={120} />
             </Stack>
           )}
 
@@ -156,11 +186,11 @@ const IvaoView = ({ user, isLoading }: Props) => {
             </Box>
           )}
 
-          <Destinations />
+          <Destinations onSelect={(c) => handleSelectAtc(c, 'end')} selected={end} />
 
           {/* <IvaoPilots /> */}
         </Box>
-      )}
+      </Container>
     </Stack>
   )
 }

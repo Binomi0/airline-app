@@ -41,6 +41,7 @@
     "mongoose-bignumber": "^2.0.0",
     "next": "^13",
     "next-auth": "^4.22.1",
+    "nextjs-cors": "^2.2.0",
     "nodemailer": "^6.9.4",
     "react": "^18.2",
     "react-dom": "^18.2",

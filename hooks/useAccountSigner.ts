@@ -1,14 +1,12 @@
-import axios from 'config/axios'
 import { Wallet } from 'ethers'
 import { useCallback, useState } from 'react'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 import { backupDoneSwal } from 'lib/swal'
 import { AccountSignerStatus, User, WebAuthnUri } from 'types'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import { walletStore } from 'store/wallet.atom'
 import useWallet from './useWallet'
-import { authStore } from 'store/auth.atom'
 import { postApi } from 'lib/api'
 import {
   PublicKeyCredentialRequestOptionsJSON,
@@ -18,17 +16,16 @@ import {
 interface UseAccountSignerReturnType {
   addBackup: () => Promise<void>
   // eslint-disable-next-line no-unused-vars
-  loadAccount: (token?: string) => Promise<void>
+  loadAccount: (user: User) => Promise<void>
   // eslint-disable-next-line no-unused-vars
-  createCredential: (email: string) => Promise<{ verified: boolean }>
+  createCredential: (email: string) => Promise<{ verified: boolean; token?: string }>
   // eslint-disable-next-line no-unused-vars
   verifyCredential: (email: string) => Promise<{ verified: boolean; token?: string }>
   status: AccountSignerStatus
 }
 
 const useAccountSigner = (): UseAccountSignerReturnType => {
-  const [user, setUser] = useRecoilState(userState)
-  const setToken = useSetRecoilState(authStore)
+  const user = useRecoilValue(userState)
   const [status, setStatus] = useState<AccountSignerStatus>()
   const [wallet, setWallet] = useRecoilState(walletStore)
   const { initWallet } = useWallet()
@@ -40,13 +37,13 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       })
       if (!challenge) return { verified: false }
       const request = await startRegistration(challenge)
-      const validation = await postApi<{ verified: boolean }>(WebAuthnUri.REGISTER, {
+      const validation = await postApi<{ verified: boolean; token?: string }>(WebAuthnUri.REGISTER, {
         data: request,
         email
       })
       setStatus(validation?.verified ? 'success' : 'error')
 
-      return { verified: Boolean(validation?.verified) }
+      return { verified: Boolean(validation?.verified), token: validation?.token }
     } catch (err) {
       console.error(err)
       setStatus('error')
@@ -75,29 +72,18 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
   }, [])
 
   const loadAccount = useCallback(
-    async (token?: string) => {
-      if (!wallet.isLoaded) {
-        try {
-          if (!user) {
-            const { data } = await axios.get<User>('/api/user/get')
+    async (_user: User) => {
+      if (wallet.isLoaded) return
 
-            await initWallet(data)
-            setUser(data)
-            setToken(token)
-            setStatus('success')
-          } else {
-            await initWallet(user)
-            setStatus('success')
-          }
-        } catch (err) {
-          setStatus('error')
-          setUser(undefined)
-          setToken(undefined)
-          throw new Error('While loading account')
-        }
+      try {
+        await initWallet(_user)
+        setStatus('success')
+      } catch (err) {
+        setStatus('error')
+        throw new Error('While loading account')
       }
     },
-    [initWallet, setToken, setUser, user, wallet.isLoaded]
+    [initWallet, wallet.isLoaded]
   )
 
   const addBackup = useCallback(async () => {

@@ -24,7 +24,8 @@ import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const initialState: FRoute = {
   origin: '',
-  destination: ''
+  destination: '',
+  distance: 0
 }
 
 const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, aircraft }) => {
@@ -38,8 +39,13 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
   React.useEffect(() => {
     const { origin, destination, callsign } = router.query
     if (origin && destination && callsign && aircraft) {
-      setSelected({ origin: origin as string, destination: destination as string })
-      newCargo({ origin: origin as string, destination: destination as string }, aircraft, callsign as string, true)
+      setSelected({ origin: origin as string, destination: destination as string, distance: 0 })
+      newCargo(
+        { origin: origin as string, destination: destination as string, distance: 0 },
+        aircraft,
+        callsign as string,
+        true
+      )
     }
   }, [aircraft, newCargo, router.query])
 

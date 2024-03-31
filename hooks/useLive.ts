@@ -1,7 +1,8 @@
 import axios from 'config/axios'
 import { ILive } from 'models/Live'
 import React from 'react'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { liveStore } from 'store/live.atom'
 import { userState } from 'store/user.atom'
 
 interface UseLiveReturnType {
@@ -11,7 +12,7 @@ interface UseLiveReturnType {
 
 const useLive = (): UseLiveReturnType => {
   const user = useRecoilValue(userState)
-  const [live, setLive] = React.useState<ILive | undefined | null>(undefined)
+  const [live, setLive] = useRecoilState(liveStore)
 
   const getLive = React.useCallback(async () => {
     if (!user) return
@@ -26,11 +27,11 @@ const useLive = (): UseLiveReturnType => {
       console.error(error)
       return null
     }
-  }, [user])
+  }, [setLive, user])
 
   React.useEffect(() => {
     getLive().then(setLive)
-  }, [getLive])
+  }, [getLive, setLive])
 
   return { live, getLive }
 }

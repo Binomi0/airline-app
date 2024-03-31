@@ -5,6 +5,7 @@ interface Airport {
   distance: number
   name: string
   city: string
+  airportId: string
 }
 
 interface DestinationAirport {

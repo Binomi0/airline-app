@@ -34,6 +34,7 @@ export type IvaoPilot = typeof ivaoPilot
 export interface FRoute {
   origin: string
   destination: string
+  distance: number
 }
 
 export enum CargoStatus {

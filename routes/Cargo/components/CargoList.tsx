@@ -34,8 +34,8 @@ const CargoList: React.FC<{
       if (!aircraft) {
         throw new Error('Missing aircraft')
       }
-      newCargo({ origin, destination }, aircraft, getCallsign(), false)
-      setSelected({ origin, destination })
+      newCargo({ origin, destination, distance: 0 }, aircraft, getCallsign(), false)
+      setSelected({ origin, destination, distance: 0 })
     },
     [newCargo, setSelected, aircraft]
   )
