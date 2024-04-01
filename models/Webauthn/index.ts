@@ -4,6 +4,7 @@ interface Authenticator {
   credentialPublicKey: string
   credentialID: string
   counter: number
+  transports?: string[]
 }
 
 export interface IWebauthn extends Document {
@@ -45,7 +46,8 @@ const webauthSchema: mongoose.Schema = new mongoose.Schema<IWebauthn>(
         },
         counter: {
           type: Number
-        }
+        },
+        transports: [{ type: String }]
       }
     ],
     createdAt: Date,

@@ -22,7 +22,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return
       }
 
-      const options = generateAuthenticationOptions({
+      const options = await generateAuthenticationOptions({
         // Require users to use a previously-registered authenticator
         allowCredentials: user.authenticators.map((authenticator: Authenticator) => {
           const bufferFromBase64 = Buffer.from(authenticator.credentialID, 'base64')

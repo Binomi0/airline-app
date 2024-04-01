@@ -15,7 +15,7 @@ namespace NodeJS {
     NEXT_PUBLIC_TW_CLIENT_ID: string
     NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN: string
     NEXT_PUBLIC_API_SERVER: string
-    DOMAIN: string
+    NEXT_PUBLIC_DOMAIN: string
     ORIGIN: string
     ORIGIN_MAIN: string
     EMAIL_SERVER_USER: string

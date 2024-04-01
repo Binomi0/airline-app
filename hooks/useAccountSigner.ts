@@ -1,17 +1,13 @@
-import { Wallet } from 'ethers'
 import { useCallback, useState } from 'react'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 import { backupDoneSwal } from 'lib/swal'
 import { AccountSignerStatus, User, WebAuthnUri } from 'types'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import { walletStore } from 'store/wallet.atom'
 import useWallet from './useWallet'
 import { postApi } from 'lib/api'
-import {
-  PublicKeyCredentialRequestOptionsJSON,
-  PublicKeyCredentialCreationOptionsJSON
-} from '@simplewebauthn/typescript-types'
+import { PublicKeyCredentialRequestOptionsJSON, PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/types'
 
 interface UseAccountSignerReturnType {
   addBackup: () => Promise<void>
@@ -27,7 +23,7 @@ interface UseAccountSignerReturnType {
 const useAccountSigner = (): UseAccountSignerReturnType => {
   const user = useRecoilValue(userState)
   const [status, setStatus] = useState<AccountSignerStatus>()
-  const [wallet, setWallet] = useRecoilState(walletStore)
+  const wallet = useRecoilValue(walletStore)
   const { initWallet } = useWallet()
 
   const createCredential = useCallback(async (email: string) => {
@@ -41,6 +37,7 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
         data: request,
         email
       })
+      console.log('validation =>', validation)
       setStatus(validation?.verified ? 'success' : 'error')
 
       return { verified: Boolean(validation?.verified), token: validation?.token }
@@ -95,32 +92,16 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       throw new Error('Missing required params email or id')
     }
     try {
-      // Validate again user?
-      const credential = await createCredential(user?.email)
-      if (credential.verified) {
-        const walletId = localStorage.getItem(user.id)
-        if (!walletId) {
-          console.log('ARE WE SURE THAT WE SHOULD CREATE A NEW WALLET FOR THE USER AT THIS TIME?')
-          // Create a new random one if he already has an account but not a wallet in this device
-          const random = Wallet.createRandom()
-
-          backupDoneSwal()
-          localStorage.setItem(user.id, Buffer.from(random.privateKey).toString('base64'))
-
-          setWallet({ baseSigner: random })
-          setStatus('missingKey')
-          return
-        }
-        const signer = new Wallet(Buffer.from(walletId, 'base64').toString())
-        setWallet({ baseSigner: signer })
-        setStatus('success')
-      }
+      const { verified } = await verifyCredential(user.email)
+      if (!verified) return
+      await createCredential(user.email)
+      backupDoneSwal()
     } catch (err) {
       const error = err as Error
       console.error('[handleSignUp] Error =>', err)
       setStatus(error.message === 'Missing private key' ? 'missingKey' : 'error')
     }
-  }, [createCredential, setWallet, user?.email, user?.id])
+  }, [createCredential, user?.email, user?.id, verifyCredential])
 
   return {
     addBackup,

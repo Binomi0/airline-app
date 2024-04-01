@@ -24,7 +24,7 @@ export const missingKeySwal = async () =>
 export const backupDoneSwal = async () =>
   Swal.fire({
     title: 'Backup complete!',
-    text: 'Your wallet has been exported, do not share it, your items will be at risk.',
+    text: 'You can now log into your account with your new added device.',
     icon: 'info'
   })
 
@@ -61,18 +61,19 @@ export const accountImportErrorSwal = async () =>
 
 export const askExportKeySwal = async (qrcode: string) =>
   Swal.fire({
-    // title: 'Export Walley KEY',
+    // title: 'Export Wallet KEY',
     // text: 'Wallet key is going to be download, please keep it safe.',
     // icon: 'warning',
     // showCancelButton: true,
     // showConfirmButton: true,
-    title: 'Export Walley KEY',
+    title: 'Export Wallet KEY',
+    text: 'Do not share this with anyone, is the only way to unlock your funds in weifly',
     imageUrl: 'https://api.qrserver.com/v1/create-qr-code/?data=' + qrcode + '&amp;size=150x150',
-    imageWidth: 200,
-    imageHeight: 200,
+    imageWidth: 250,
+    imageHeight: 250,
     imageAlt: 'QR Code',
     showCancelButton: true,
-    confirmButtonText: 'Download Walley KEY',
+    confirmButtonText: 'Download Wallet KEY',
     showLoaderOnConfirm: true
   })
 

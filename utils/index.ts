@@ -4,7 +4,7 @@ import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 import BigNumber from 'bignumber.js'
 
 // A unique identifier for your website
-const rpID = process.env.DOMAIN
+const rpID = process.env.NEXT_PUBLIC_DOMAIN
 // The URL at which registrations and authentications should occur
 const origin = process.env.ORIGIN
 
@@ -144,7 +144,7 @@ export const downloadFile = (base64Key: string, address: string) => {
 
   const a = document.createElement('a')
   a.href = url
-  a.download = `airline-walley-key-${address.slice(-4)}.pem`
+  a.download = `weifly-private-key-${address.slice(-4)}.pem`
 
   // Append the <a> element to the document and trigger the click event
   document.body.appendChild(a)

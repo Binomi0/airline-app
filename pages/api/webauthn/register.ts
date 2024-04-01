@@ -7,7 +7,7 @@ import { connectDB } from 'lib/mongoose'
 import Webauthn from 'models/Webauthn'
 
 // A unique identifier for your website
-const rpID = process.env.DOMAIN
+const rpID = process.env.NEXT_PUBLIC_DOMAIN
 // The URL at which registrations and authentications should occur
 // const origin = [process.env.ORIGIN, process.env.ORIGIN_MAIN]
 const origin = process.env.ORIGIN
@@ -39,7 +39,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const newAuthenticator: Authenticator = {
     credentialID: Buffer.from(credentialID).toString('base64'),
     credentialPublicKey: Buffer.from(credentialPublicKey).toString('base64'),
-    counter
+    counter,
+    transports: body.data.response.transports
   }
 
   if (!verified) {
