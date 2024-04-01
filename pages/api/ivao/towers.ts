@@ -12,7 +12,9 @@ const reduceOthers = (origin: string, others: Atc[]): FRoute[] =>
       ...acc,
       {
         origin,
-        destination: curr.callsign.split('_')[0]
+        destination: curr.callsign.split('_')[0],
+        // TODO: Review if worth to calculate distance here
+        distance: 0
       }
     ]
   }, [] as FRoute[])
