@@ -9,6 +9,7 @@ import { ivaoAuthStore } from 'store/ivaoAuth.atom'
 interface UseIvaoReturnType {
   isLoading: boolean
   authorize: () => void
+  error: string
 }
 
 const useIvao = (): UseIvaoReturnType => {
@@ -16,6 +17,7 @@ const useIvao = (): UseIvaoReturnType => {
   const setIvaoUser = useSetRecoilState(ivaoUserStore)
   const setIvaoToken = useSetRecoilState(ivaoAuthStore)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const requestIvaoUser = useCallback(
     (token: string) => {
@@ -32,6 +34,7 @@ const useIvao = (): UseIvaoReturnType => {
         })
         .catch((error: AxiosError) => {
           console.log('IVAO ERROR =>', error)
+          setError('Error al conectar con IVAO')
           localStorage.removeItem('ivao-auth-token')
         })
         .finally(() => {
@@ -48,8 +51,12 @@ const useIvao = (): UseIvaoReturnType => {
         .then((response) => {
           requestIvaoUser(response.data)
         })
-        .catch((err: AxiosError) => {
-          console.error('err =>', err.response?.data)
+        .catch((err: AxiosError<{ code: number }>) => {
+          if (err.response?.data.code === 11000) {
+            console.error('this ivaoId is already taken')
+          } else {
+            console.error('err =>', err.response?.data)
+          }
         })
     }
   }, [router.query, requestIvaoUser])
@@ -67,7 +74,7 @@ const useIvao = (): UseIvaoReturnType => {
     }
   }, [requestIvaoUser, router.query.token])
 
-  return { isLoading, authorize }
+  return { isLoading, authorize, error }
 }
 
 export default useIvao

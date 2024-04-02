@@ -18,6 +18,7 @@ import { useRecoilValue } from 'recoil'
 import useCargo from 'hooks/useCargo'
 import { destinationStore } from 'store/destination.atom'
 import { Alert, AlertTitle } from '@mui/material'
+import CargoSelectAircraft from './CargoSelectAircraft'
 
 enum AircraftRanges {
   'Cessna 172' = '700',
@@ -106,8 +107,9 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
   }, [newCargo, setCargo, currentAircraft, origin, destination])
 
   return (
-    <Paper elevation={3} sx={{ borderRadius: 1 }}>
+    <Paper elevation={3} sx={{ borderRadius: 2 }}>
       <Stack
+        borderRadius={2}
         direction='row'
         justifyContent='space-between'
         spacing={2}
@@ -125,64 +127,21 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 0.2
+            opacity: 0.25,
+            borderRadius: 2
           }
         }}
       >
-        <Stack direction='row' spacing={2} width='100%' p={2}>
-          <Stack justifyContent='space-between' spacing={2}>
-            <Box>
-              <FormControl fullWidth>
-                <InputLabel id='select-cargo-aircarft-label'>Select an Aircraft</InputLabel>
-                <Select
-                  error={aircraft !== '-1' && !hasRequirement(aircraft)}
-                  fullWidth
-                  labelId='select-cargo-aircarft-label'
-                  id='select-cargo-aircarft'
-                  value={aircraft}
-                  label='Select an Aircraft'
-                  onChange={handleChange}
-                  autoWidth
-                  sx={{ minWidth: 250 }}
-                >
-                  <MenuItem value='-1'></MenuItem>
-                  <MenuItem disabled={currentAircraft && !hasRequirement('0')} value='0'>
-                    <Stack direction='row' justifyContent='space-between' alignItems='center' width='100%' spacing={2}>
-                      <Typography>Cessna C-172</Typography>{' '}
-                      {currentAircraft && !hasRequirement('0') && <ExploreOffIcon fontSize='small' />}
-                    </Stack>
-                  </MenuItem>
-                  <MenuItem disabled={currentAircraft && !hasRequirement('1')} value='1'>
-                    <Stack direction='row' justifyContent='space-between' alignItems='center' width='100%' spacing={2}>
-                      <Typography>Cessna C-700 Longitude</Typography>{' '}
-                      {currentAircraft && !hasRequirement('1') && <ExploreOffIcon fontSize='small' />}
-                    </Stack>
-                  </MenuItem>
-                  <MenuItem disabled={currentAircraft && !hasRequirement('2')} value='2'>
-                    <Stack direction='row' justifyContent='space-between' alignItems='center' width='100%' spacing={2}>
-                      <Typography>Boeing 737</Typography>{' '}
-                      {currentAircraft && !hasRequirement('2') && <ExploreOffIcon fontSize='small' />}
-                    </Stack>
-                  </MenuItem>
-                  <MenuItem disabled={currentAircraft && !hasRequirement('3')} value='3'>
-                    <Stack direction='row' justifyContent='space-between' alignItems='center' width='100%' spacing={2}>
-                      <Typography>Antonov AN-225</Typography>{' '}
-                      {currentAircraft && !hasRequirement('3') && <ExploreOffIcon fontSize='small' />}
-                    </Stack>
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box>
-              <Typography color={hasEnoughFuel() ? 'success.light' : 'error.main'}>
-                Fuel available: {formatNumber(balance.airg?.toNumber(), 0)}
-              </Typography>
-              <Typography>Fuel required: {formatNumber(requiredGas().toNumber(), 0)}</Typography>
-            </Box>
-          </Stack>
-        </Stack>
-
+        <CargoSelectAircraft
+          aircrafts={aircrafts}
+          gasBalance={balance.airg}
+          requiredGas={requiredGas}
+          handleChange={handleChange}
+          hasEnoughFuel={hasEnoughFuel}
+          aircraft={aircraft}
+          active={!!cargo}
+          currentAircraft={currentAircraft}
+        />
         {cargo?.callsign && hasEnoughFuel() && hasRequirement(aircraft) && (
           <Box width='100%'>
             <Box mt={2}>
@@ -203,48 +162,52 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
           <Stack direction='column' alignItems='center' justifyContent='center' spacing={1} p={2}>
             <Typography variant='h5'>{cargo?.details.name}</Typography>
 
-            <Stack direction='row' justifyContent='space-between' minWidth={300}>
-              <Typography align='center'>Distance:</Typography>
-              <Typography align='center' variant='body2'>
-                {formatNumber(cargo?.distance)} Km
-              </Typography>
-            </Stack>
+            <Box>
+              <Stack direction='row' justifyContent='space-between' minWidth={300}>
+                <Typography align='center'>Distance:</Typography>
+                <Typography align='center' variant='body2'>
+                  {formatNumber(cargo?.distance)} Km
+                </Typography>
+              </Stack>
 
-            <Stack direction='row' justifyContent='space-between' minWidth={300}>
-              <Typography align='center'>Rewards:</Typography>
-              <Typography align='center' variant='body2'>
-                {formatNumber(cargo?.prize)} AIRL
-              </Typography>
-            </Stack>
+              <Stack direction='row' justifyContent='space-between' minWidth={300}>
+                <Typography align='center'>Rewards:</Typography>
+                <Typography align='center' variant='body2'>
+                  {formatNumber(cargo?.prize)} AIRL
+                </Typography>
+              </Stack>
 
-            <Stack direction='row' justifyContent='space-between' minWidth={300}>
-              <Typography align='center'>Weight: </Typography>
-              <Typography align='center' variant='body2'>
-                {Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-                  cargo?.weight || 0
-                )}{' '}
-                Kg
-              </Typography>
-            </Stack>
+              <Stack direction='row' justifyContent='space-between' minWidth={300}>
+                <Typography align='center'>Weight: </Typography>
+                <Typography align='center' variant='body2'>
+                  {Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+                    cargo?.weight || 0
+                  )}{' '}
+                  Kg
+                </Typography>
+              </Stack>
 
-            <Stack direction='row' justifyContent='space-between' minWidth={300}>
-              <Typography align='center'>Airdrop: </Typography>
-              <Typography align='center' variant='body2'>
-                {cargo?.score ?? '-'} Points
-              </Typography>
-            </Stack>
+              <Stack direction='row' justifyContent='space-between' minWidth={300}>
+                <Typography align='center'>Airdrop: </Typography>
+                <Typography align='center' variant='body2'>
+                  {cargo?.score ?? '-'} Points
+                </Typography>
+              </Stack>
+            </Box>
 
-            <Typography width={300} align='justify' variant='caption' fontWeight={300}>
+            <Typography lineHeight={1.2} width={300} align='justify' variant='caption' fontWeight={300}>
               {cargo?.details.description}
             </Typography>
 
-            <Button
-              disabled={!hasRequirement(aircraft) || !hasEnoughFuel()}
-              variant='contained'
-              onClick={() => onBooking(hasRequirement(aircraft))}
-            >
-              Book this Flight
-            </Button>
+            <Box mt={2}>
+              <Button
+                disabled={!hasRequirement(aircraft) || !hasEnoughFuel()}
+                variant='contained'
+                onClick={() => onBooking(hasRequirement(aircraft))}
+              >
+                Book this Flight
+              </Button>
+            </Box>
           </Stack>
         )}
       </Stack>

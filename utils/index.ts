@@ -1,5 +1,5 @@
 import { NFT } from '@thirdweb-dev/sdk'
-import { Atc, AttributeType, Cargo, IcaoCode, IvaoPilot } from 'types'
+import { ActiveAtc, AtcPosition, AttributeType, IcaoCode, IvaoPilot, TowerMatrix, TowerMatrixList } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 import BigNumber from 'bignumber.js'
 
@@ -60,30 +60,14 @@ export const formatNumber = (value: number = 0, decimals: number = 2) =>
     maximumFractionDigits: decimals
   }).format(isNaN(value) ? 0 : value)
 
-export const getDistanceByCoords = async (atcs: Readonly<Atc[]>, cargo: Pick<Cargo, 'origin' | 'destination'>) => {
-  if (!cargo.origin) return 0
+export const getDistanceByCoords = (
+  origin: AtcPosition['atcPosition']['airport'],
+  destination: AtcPosition['atcPosition']['airport']
+) => {
+  if (!origin || !destination) return 0
 
-  const originTower = atcs.find((a) => a.callsign && a.callsign.startsWith(cargo.origin))
-  const arrivalTower = atcs.find((a) => a.callsign && a.callsign.startsWith(cargo.destination))
-
-  if (!originTower) {
-    throw new Error(`Missing tower for ${cargo.origin}`)
-  }
-  if (!arrivalTower) {
-    throw new Error(`Missing tower for ${cargo.origin}`)
-  }
-
-  const originCoords = {
-    latitude: originTower?.lastTrack?.latitude,
-    longitude: originTower?.lastTrack?.longitude
-  }
-  const arrivalCoords = {
-    latitude: arrivalTower?.lastTrack?.latitude,
-    longitude: arrivalTower?.lastTrack?.longitude
-  }
-
-  const horizontal = Math.pow(Number(arrivalCoords.longitude) - Number(originCoords.longitude), 2)
-  const vertical = Math.pow(Number(arrivalCoords.latitude) - Number(originCoords.latitude), 2)
+  const horizontal = Math.pow(Number(destination.longitude) - Number(origin.longitude), 2)
+  const vertical = Math.pow(Number(destination.latitude) - Number(origin.latitude), 2)
   const result = Math.sqrt(horizontal + vertical)
 
   return result * 100
@@ -219,3 +203,27 @@ export const getFuelForFlight = (distance: BigNumber, aircraftType: IcaoCode, pa
       return distance.multipliedBy(1.325)
   }
 }
+
+export const reduceTowerMatrix =
+  (atcs: ActiveAtc[]) =>
+  (acc: TowerMatrixList, curr: ActiveAtc): TowerMatrixList =>
+    [
+      ...acc,
+      {
+        [curr.callsign]: {
+          airport: curr.atcPosition?.airport,
+          destinations: atcs
+            .map((atc: ActiveAtc) =>
+              atc.callsign === curr.callsign
+                ? { distance: 0 }
+                : {
+                    ...(atc.atcPosition ? { ...atc.atcPosition.airport } : {}),
+                    distance: getDistanceByCoords(curr.atcPosition?.airport, atc.atcPosition?.airport) ?? 0,
+                    callsign: atc.callsign
+                  }
+            )
+            .filter((d) => d.distance > 0)
+            .sort((a, b) => a.distance - b.distance)
+        } as TowerMatrix
+      }
+    ] as TowerMatrixList

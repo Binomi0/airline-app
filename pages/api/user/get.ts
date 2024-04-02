@@ -8,7 +8,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     try {
       const user = await User.findOne({ email: req.user }, { projection: { _id: 0 } })
 
-      console.log(user)
       if (!user) {
         res.status(204).end()
         return

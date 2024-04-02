@@ -57,7 +57,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const getAtcs = useCallback(async () => {
     setIsLoading((s) => s + 1)
-    const response = await axios.get<Atc[]>('http://localhost:3001/ivao/atc/tower', {
+    const response = await axios.get<Atc[]>('api/ivao/atc/tower', {
       headers: {
         Authorization: `Bearer ${token}`
       }

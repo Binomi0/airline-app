@@ -18,7 +18,8 @@ const Home: NextPage<PageProps> = ({ loading }) => {
 
       <Container>
         <Box my={5} textAlign='center'>
-          <Typography variant='h1'>Virtual Airline</Typography>
+          <Typography variant='h1'>WeiFly</Typography>
+          <Typography variant='h2'>Decentralized Virtual Airline</Typography>
         </Box>
 
         <Grid container spacing={8}>

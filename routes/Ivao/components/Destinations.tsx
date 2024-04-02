@@ -1,4 +1,4 @@
-import { Paper, Stack, Typography } from '@mui/material'
+import { Box, Paper, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { destinationStore } from 'store/destination.atom'
@@ -7,15 +7,17 @@ interface Props {
   // eslint-disable-next-line no-unused-vars
   onSelect: (callsign: string) => void
   selected: string
+  start: string
 }
 
-const Destinations = ({ selected, onSelect }: Props) => {
+const Destinations = ({ selected, start, onSelect }: Props) => {
   const flights = useRecoilValue(destinationStore)
 
-  console.log(flights?.destinations)
-  return flights && selected ? (
-    <Stack mt={2} spacing={1}>
-      <Typography paragraph>Choose a destination:</Typography>
+  return flights && start ? (
+    <Stack mt={4} spacing={1}>
+      <Box position='sticky' top={0} bgcolor='background.paper'>
+        <Typography>Choose a destination:</Typography>
+      </Box>
       {flights.destinations.map((destination) => (
         <Paper
           key={destination.callsign}

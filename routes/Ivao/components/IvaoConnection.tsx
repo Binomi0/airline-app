@@ -1,14 +1,11 @@
-import { Button } from '@mui/material'
+import React from 'react'
+import Button from '@mui/material/Button'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { darken } from '@mui/material/styles'
-import React, { useEffect, useMemo, useState } from 'react'
-import { useRecoilValue } from 'recoil'
-import { pilotsStore } from 'store/pilots.atom'
-import { IvaoUser, User } from 'types'
+import { User } from 'types'
 
 function base64URLEncode(str: string) {
   return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')

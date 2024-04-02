@@ -51,8 +51,10 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
   const onSelectTower = useCallback(
     (callsign: string) => {
       // axios.get('http://localhost:3001/ivao/init').then(() => {
+      // axios
+      //   .get(`http://localhost:3001/ivao/matrix/${callsign}`, {
       axios
-        .get(`http://localhost:3001/ivao/matrix/${callsign}`, {
+        .get(`api/ivao/atc/matrix/${callsign}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -107,7 +109,12 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
         <StyledPaper key={atc.id} onClick={() => onSelectTower(atc.callsign)} selected={selected === atc.callsign}>
           <Stack direction='row' justifyContent='space-between' p={1}>
             <Box>
-              <Typography variant='subtitle1'>{atc.callsign.split('_')[0]}</Typography>
+              <Typography variant='subtitle1'>
+                {atc.atcPosition.airportId}{' '}
+                <Typography fontWeight={300} variant='caption' color='gray'>
+                  {atc.atcPosition.atcCallsign.split('Tower')[0]}
+                </Typography>
+              </Typography>
               <Stack direction='row' spacing={1} alignItems='center'>
                 <CellTowerIcon fontSize='inherit' />
                 <Typography variant='caption'>

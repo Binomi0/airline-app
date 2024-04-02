@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { ivaoAuthStore } from 'store/ivaoAuth.atom'
-import { pilotsStore } from 'store/pilots.atom'
+import { pilotStore } from 'store/pilot.atom'
 import { IvaoPilot } from 'types'
 import axios from 'config/axios'
 
@@ -12,7 +12,7 @@ interface UsePilotsReturnType {
 let current = 0
 
 const usePilots = (): UsePilotsReturnType => {
-  const setPilots = useSetRecoilState(pilotsStore)
+  const setPilots = useSetRecoilState(pilotStore)
   const workerRef = useRef<Worker>()
   const [ivaoToken, setIvaoToken] = useRecoilState(ivaoAuthStore)
 

@@ -1,8 +1,8 @@
 import React from 'react'
-import Flights from './Flights'
+// import Flights from './Flights'
 import { useAircraftProviderContext } from 'context/AircraftProvider'
-import useCargo from 'hooks/useCargo'
-import { useVaProviderContext } from 'context/VaProvider'
+// import useCargo from 'hooks/useCargo'
+// import { useVaProviderContext } from 'context/VaProvider'
 import { IvaoPilot } from 'types'
 import LinearProgress from '@mui/material/LinearProgress'
 import Grid from '@mui/material/Grid'
@@ -10,17 +10,25 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { useRecoilValue } from 'recoil'
-import { pilotsStore } from 'store/pilots.atom'
+import { pilotStore } from 'store/pilot.atom'
 
 const STEP = 12
 
 const IvaoPilots = () => {
-  const [current, setCurrent] = React.useState<Readonly<IvaoPilot[]>>([])
+  const [
+    ,
+    // current
+    setCurrent
+  ] = React.useState<Readonly<IvaoPilot[]>>([])
   const [selected, setSelected] = React.useState('')
-  const [page, setPage] = React.useState(0)
+  const [
+    ,
+    // page
+    setPage
+  ] = React.useState(0)
   const { ownedAircrafts } = useAircraftProviderContext()
-  const { cargo, newCargo } = useCargo()
-  const pilots = useRecoilValue(pilotsStore)
+  // const { cargo, newCargo } = useCargo()
+  const pilots = useRecoilValue(pilotStore)
 
   const handleSelect = React.useCallback(
     (callsign: string) => {

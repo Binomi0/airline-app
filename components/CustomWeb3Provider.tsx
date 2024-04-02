@@ -43,7 +43,7 @@ const CustomWeb3Provider = ({ children }: Props) => {
       secretKey={process.env['NEXT_PUBLIC_TW_SECRET_KEY']}
       dAppMeta={{
         name: 'WeiFy App',
-        description: 'Decentralized Virtual Airline',
+        description: 'Decentralized Virtual Airline based on Ethereum',
         logoUrl: 'https://weifly.com/logo.png',
         url: 'https://weifly.com',
         isDarkMode: true

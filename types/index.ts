@@ -43,7 +43,14 @@ export enum CargoStatus {
   ABORTED = 'ABORTED'
 }
 export type Flight = Record<string, FRoute[]>
-export type Atc = typeof atc
+export interface AtcPosition {
+  atcPosition: {
+    airportId: string
+    atcCallsign: string
+    airport?: any
+  }
+}
+export type Atc = AtcPosition & typeof atc
 export interface Cargo {
   // where it starts
   origin: string
@@ -230,3 +237,27 @@ export type IcaoCode =
   | 'C172'
   | 'C700'
   | 'BE20'
+
+export interface Coords {
+  latitude: number
+  longitude: number
+}
+export interface ActiveAtc {
+  callsign: string
+  userId: string
+  atcPosition: {
+    airport: Coords
+  }
+}
+
+export interface TowerMatrix {
+  airport: Coords
+  destinations?: MatrixDestination[]
+}
+export interface MatrixDestination {
+  longitude?: number
+  latitude?: number
+  distance: number
+  callsign: string
+}
+export type TowerMatrixList = Record<string, TowerMatrix>[]

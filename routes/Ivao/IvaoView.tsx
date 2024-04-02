@@ -15,7 +15,11 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import LinearProgress from '@mui/material/LinearProgress'
 import usePilots from 'hooks/usePilots'
-import { CircularProgress, Container, Paper } from '@mui/material'
+import {
+  //  CircularProgress,
+  Container,
+  Paper
+} from '@mui/material'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import IvaoLogin from './components/IvaoLogin'
@@ -24,8 +28,8 @@ import { useVaProviderContext } from 'context/VaProvider'
 import { ivaoAuthStore } from 'store/ivaoAuth.atom'
 import { bookingStore } from 'store/booking.atom'
 import { authStore } from 'store/auth.atom'
-import customProtocolCheck from 'custom-protocol-check'
-import { appInstalledStore } from 'store/appInstalled.atom'
+// import customProtocolCheck from 'custom-protocol-check'
+// import { appInstalledStore } from 'store/appInstalled.atom'
 import Destinations from './components/Destinations'
 import Swal from 'sweetalert2'
 import { postApi } from 'lib/api'
@@ -39,7 +43,7 @@ interface Props {
 const IvaoView = ({ user, isLoading }: Props) => {
   const { isLoading: loading } = useVaProviderContext()
   const router = useRouter()
-  const { live } = useLiveFlightProviderContext()
+  const { live, getLive } = useLiveFlightProviderContext()
   const [start, setStart] = useState('')
   const [end, setEnd] = useState('')
   const { contract } = useContract(nftAircraftTokenAddress)
@@ -47,7 +51,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
   const ivaoToken = useRecoilValue(ivaoAuthStore)
   const authToken = useRecoilValue(authStore)
   const [booking, setBooking] = useRecoilState(bookingStore)
-  const [hasApp, setHasApp] = useRecoilState(appInstalledStore)
+  // const [hasApp, setHasApp] = useRecoilState(appInstalledStore)
   const { getPilots } = usePilots()
   const cargo = useRecoilValue(cargoStore)
 
@@ -88,12 +92,13 @@ const IvaoView = ({ user, isLoading }: Props) => {
         const cargo = await postApi('/api/cargo/new', newCargo)
         if (!cargo) return
         await postApi('/api/live/new', { cargo })
+        await getLive()
         router.push('/live')
       }
     } catch (err) {
       console.error(err)
     }
-  }, [cargo, router])
+  }, [cargo, getLive, router])
 
   const handleBooking = useCallback(
     (hasFuel: boolean) => {
@@ -147,10 +152,12 @@ const IvaoView = ({ user, isLoading }: Props) => {
                   <Box width='100%' height={60} fontSize={50}>
                     <FlightTakeoffIcon color='success' fontSize='inherit' />
                   </Box>
-                  <Typography variant='h3'>Start</Typography>
+                  <Typography variant='h4' textTransform='uppercase'>
+                    Start
+                  </Typography>
                   <Paper>
                     <Box p={1} bgcolor='success.main' borderRadius={1}>
-                      <Typography>{start}</Typography>
+                      <Typography fontWeight={600}>{start}</Typography>
                     </Box>
                   </Paper>
                 </Box>
@@ -165,10 +172,12 @@ const IvaoView = ({ user, isLoading }: Props) => {
                   <Box width='100%' height={60} fontSize={50}>
                     <FlightLandIcon color='info' fontSize='inherit' />
                   </Box>
-                  <Typography variant='h3'>End</Typography>
+                  <Typography variant='h4' textTransform='uppercase'>
+                    End
+                  </Typography>
                   <Paper>
                     <Box p={1} bgcolor='info.dark' borderRadius={1}>
-                      <Typography>{end}</Typography>
+                      <Typography fontWeight={600}>{end}</Typography>
                     </Box>
                   </Paper>
                 </Box>
@@ -186,7 +195,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
             </Box>
           )}
 
-          <Destinations onSelect={(c) => handleSelectAtc(c, 'end')} selected={end} />
+          <Destinations onSelect={(c) => handleSelectAtc(c, 'end')} selected={end} start={start} />
 
           {/* <IvaoPilots /> */}
         </Box>

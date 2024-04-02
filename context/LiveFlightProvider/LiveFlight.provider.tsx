@@ -5,7 +5,7 @@ import type { IvaoPilot } from 'types'
 import { LiveFlightReducerState } from './LiveFlight.types'
 import useLive from 'hooks/useLive'
 import { useRecoilValue } from 'recoil'
-import { pilotsStore } from 'store/pilots.atom'
+import { pilotStore } from 'store/pilot.atom'
 
 export const INITIAL_STATE: LiveFlightReducerState = {
   pilot: undefined
@@ -13,7 +13,7 @@ export const INITIAL_STATE: LiveFlightReducerState = {
 
 export const LiveFlightsProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { live, getLive } = useLive()
-  const pilots = useRecoilValue(pilotsStore)
+  const pilots = useRecoilValue(pilotStore)
   const [state, dispatch] = useReducer(liveFlightProviderReducer, { ...INITIAL_STATE })
   const { Provider } = LiveFlightProviderContext
 
@@ -22,8 +22,8 @@ export const LiveFlightsProvider: FC<{ children: React.ReactNode }> = ({ childre
   }, [])
 
   useEffect(() => {
-    if (pilots.length && !!live) {
-      const current = pilots.find((pilot) => pilot.callsign === live.callsign)
+    if (pilots?.length && !!live) {
+      const current = pilots?.find((pilot) => pilot?.callsign === live.callsign)
       if (current) {
         setPilot(current)
       }
