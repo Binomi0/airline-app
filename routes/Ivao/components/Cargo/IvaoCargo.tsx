@@ -1,10 +1,12 @@
+import React, { useCallback, useMemo } from 'react'
 import { SelectChangeEvent } from '@mui/material/Select'
 import Button from '@mui/material/Button'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import React, { useCallback, useMemo } from 'react'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
 import {
   formatNumber,
   gallonsToLiters,
@@ -21,7 +23,8 @@ import useCargo from 'hooks/useCargo'
 import { destinationStore } from 'store/destination.atom'
 import CargoSelectAircraft from './CargoSelectAircraft'
 import { aircraftNameToIcaoCode } from 'types'
-import { Alert, AlertTitle } from '@mui/material'
+import { useAircraftProviderContext } from 'context/AircraftProvider'
+import { useRouter } from 'next/router'
 
 interface Props {
   aircraft: string
@@ -37,9 +40,11 @@ interface Props {
 }
 
 const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, onBooking }: Props) => {
+  const router = useRouter()
   const balance = useRecoilValue(tokenBalanceStore)
   const { cargo, newCargo, setCargo } = useCargo()
   const destinations = useRecoilValue(destinationStore)
+  const { ownedAircrafts } = useAircraftProviderContext()
 
   const currentAircraft = useMemo(() => aircrafts.find((ac) => ac.metadata.id === aircraft), [aircrafts, aircraft])
 
@@ -124,13 +129,28 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
           active={!!cargo}
           currentAircraft={currentAircraft}
         />
+        {ownedAircrafts.length === 0 && (
+          <Box width='100%' p={2}>
+            <Alert
+              severity='error'
+              action={
+                <Button variant='contained' color='error' onClick={() => router.push('/hangar')}>
+                  Go to Hangar
+                </Button>
+              }
+            >
+              <AlertTitle>At least one aircraft is required.</AlertTitle>
+              <Typography>Go to hangar page and get and aircraft to continue.</Typography>
+            </Alert>
+          </Box>
+        )}
         {!isAllowed(cargo?.distance ?? 0) && start && end && !!currentAircraft && (
           <Box width='100%' p={2}>
             <Alert severity='error'>
               <AlertTitle>This selection exceeds aircraft range without refueling</AlertTitle>
               <Typography>
-                Max capacity for this aircraft is {currentAircraft && getCurrentFuelInLiters(currentAircraft)} Liters,
-                required: {formatNumber(requiredGas().toNumber())}
+                Max capacity for this aircraft is <b>{currentAircraft && getCurrentFuelInLiters(currentAircraft)}</b>{' '}
+                Liters, required: <b>{formatNumber(requiredGas().toNumber(), 0)}</b> Liters
               </Typography>
             </Alert>
           </Box>

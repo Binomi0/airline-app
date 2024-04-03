@@ -47,10 +47,15 @@ const CargoSelectAircraft = ({
       <Stack justifyContent='space-between' spacing={2}>
         <Box>
           <FormControl fullWidth>
-            <InputLabel id='select-cargo-aircarft-label'>Select an Aircraft</InputLabel>
+            <InputLabel size={ownedAircrafts.length === 0 ? 'small' : 'normal'} id='select-cargo-aircarft-label'>
+              Select an Aircraft
+            </InputLabel>
             <Select
-              autoFocus
-              error={!hasEnoughFuel()}
+              size={ownedAircrafts.length === 0 ? 'small' : 'medium'}
+              autoFocus={ownedAircrafts.length > 0}
+              disabled={ownedAircrafts.length === 0}
+              error={!hasEnoughFuel() || ownedAircrafts.length === 0}
+              color='primary'
               fullWidth
               autoWidth
               labelId='select-cargo-aircarft-label'

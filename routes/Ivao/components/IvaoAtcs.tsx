@@ -81,14 +81,14 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
         })
       // })
     },
-    [token, setDestinations, onSelect, initIvaoAuth]
+    [start, token, setDestinations, onSelect, initIvaoAuth]
   )
 
   return (
     <Box
       minWidth={300}
       height='calc(100vh - 64px)'
-      borderRight='1px solid var(--mui-palette-grey-600 )'
+      borderRight='1px solid var(--mui-palette-grey-800)'
       sx={{ overflow: 'auto', overflowX: 'hidden', scrollbarWidth: 'none' }}
     >
       <Paper className={styles.textFieldBox}>
