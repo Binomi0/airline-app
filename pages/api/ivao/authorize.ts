@@ -25,7 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     })
 
     if (!response.data) {
-      res.status(404).send(response.data)
+      res.status(404).end()
       return
     }
 

@@ -166,7 +166,7 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
               <Stack direction='row' justifyContent='space-between' minWidth={300}>
                 <Typography align='center'>Distance:</Typography>
                 <Typography align='center' variant='body2'>
-                  {formatNumber(cargo?.distance)} Km
+                  {formatNumber(cargo?.distance, 0)} Km
                 </Typography>
               </Stack>
 

@@ -227,3 +227,11 @@ export const reduceTowerMatrix =
         } as TowerMatrix
       }
     ] as TowerMatrixList
+
+/** Reduce and remove duplicated towers */
+export const reduceAtcTower = (acc: ActiveAtc[], curr: ActiveAtc) =>
+  acc.some((c) => c?.callsign.split('_')[0] === curr.callsign.split('_')[0])
+    ? acc
+    : curr.callsign.includes('_TWR')
+    ? [...acc, curr]
+    : acc

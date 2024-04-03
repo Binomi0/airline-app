@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import axios from 'config/axios'
 import { AxiosError, AxiosResponse } from 'axios'
 import { useSetRecoilState } from 'recoil'
@@ -31,6 +31,7 @@ const useIvao = (): UseIvaoReturnType => {
         .then((response: AxiosResponse) => {
           setIvaoUser(response.data)
           setIvaoToken(token)
+          localStorage.setItem('ivao-auth-token', token)
         })
         .catch((error: AxiosError) => {
           console.log('IVAO ERROR =>', error)
@@ -44,7 +45,16 @@ const useIvao = (): UseIvaoReturnType => {
     [setIvaoUser, setIvaoToken]
   )
 
+  const checkExistingIvaoToken = useCallback(() => {
+    const ivaoToken = localStorage.getItem('ivao-auth-token')
+    if (!ivaoToken) return false
+
+    requestIvaoUser(ivaoToken)
+    return true
+  }, [requestIvaoUser])
+
   const authorize = useCallback(() => {
+    if (checkExistingIvaoToken()) return
     if (router.query.state && router.query.code) {
       axios
         .get('/api/ivao/authorize', { params: router.query })
@@ -58,21 +68,11 @@ const useIvao = (): UseIvaoReturnType => {
             console.error('err =>', err.response?.data)
           }
         })
+        .finally(() => {
+          setIsLoading(false)
+        })
     }
-  }, [router.query, requestIvaoUser])
-
-  useEffect(() => {
-    if (!router.query.token) {
-      const ivaoToken = localStorage.getItem('ivao-auth-token')
-      if (!ivaoToken) {
-        return setIsLoading(false)
-      }
-      requestIvaoUser(ivaoToken)
-    } else {
-      localStorage.setItem('ivao-auth-token', router.query.token as string)
-      requestIvaoUser(router.query.token as string)
-    }
-  }, [requestIvaoUser, router.query.token])
+  }, [checkExistingIvaoToken, router.query, requestIvaoUser])
 
   return { isLoading, authorize, error }
 }

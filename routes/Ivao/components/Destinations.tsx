@@ -2,6 +2,7 @@ import { Box, Paper, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { destinationStore } from 'store/destination.atom'
+import { formatNumber } from 'utils'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars
@@ -31,7 +32,7 @@ const Destinations = ({ selected, start, onSelect }: Props) => {
             <Typography>
               {destination.callsign.split('_')[0]} - {destination.name}
             </Typography>
-            <Typography>{destination.distance} Km</Typography>
+            <Typography>{formatNumber(destination.distance, 0)} Km</Typography>
           </Stack>
         </Paper>
       ))}
