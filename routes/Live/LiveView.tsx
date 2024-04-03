@@ -15,6 +15,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { deleteApi, postApi } from 'lib/api'
 import { useSetRecoilState } from 'recoil'
 import { liveStore } from 'store/live.atom'
+import { bookingStore } from 'store/booking.atom'
 
 interface Props {}
 
@@ -24,6 +25,7 @@ const LiveView = ({}: Props) => {
   const { setPilot, pilot } = useLiveFlightProviderContext()
   const setLive = useSetRecoilState(liveStore)
   const [flightState, setFlightState] = useState<LastTrackState>(LastTrackStateEnum.Boarding)
+  const setBooking = useSetRecoilState(bookingStore)
 
   const handleDisconnect = useCallback(async () => {
     const { isConfirmed } = await Swal.fire({
@@ -33,12 +35,13 @@ const LiveView = ({}: Props) => {
       showCancelButton: true
     })
     if (isConfirmed) {
+      setBooking(false)
       await Promise.all([deleteApi('/api/live'), deleteApi('/api/cargo')])
       setPilot()
       setLive(undefined)
       router.push('/')
     }
-  }, [router, setLive, setPilot])
+  }, [router, setBooking, setLive, setPilot])
 
   const handleClaim = useCallback(() => {
     postApi('/api/live/state', { state: LastTrackStateEnum.On_Blocks })

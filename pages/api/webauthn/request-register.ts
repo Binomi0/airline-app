@@ -25,6 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // Don't prompt users for additional information about the authenticator
     // (Recommended for smoother UX)
     attestationType: 'none',
+    timeout: 120000,
     // Prevent users from re-registering existing authenticators
     excludeCredentials:
       webauthn && webauthn.authenticators

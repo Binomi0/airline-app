@@ -4,21 +4,18 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import IvaoConnection from './IvaoConnection'
-import { User } from 'types'
 import { pilotStore } from 'store/pilot.atom'
+import { userState } from 'store/user.atom'
 
-interface Props {
-  user: User
-}
-
-const IvaoLogin = ({ user }: Props) => {
+const IvaoLogin = () => {
   const ivaoUser = useRecoilValue(ivaoUserStore)
+  const user = useRecoilValue(userState)
   const [color, setColor] = useState('#fff')
   const pilots = useRecoilValue(pilotStore)
 
   const isFlying = useMemo(
-    () => pilots.some((pilot) => pilot?.userId?.toString() === user.vaUser?.pilotId),
-    [pilots, user.vaUser?.pilotId]
+    () => pilots.some((pilot) => pilot?.userId?.toString() === user?.vaUser?.pilotId),
+    [pilots, user?.vaUser?.pilotId]
   )
 
   useEffect(() => {

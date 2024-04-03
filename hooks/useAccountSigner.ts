@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
-import { backupDoneSwal } from 'lib/swal'
+import { backupDoneSwal, backupErrorSwal } from 'lib/swal'
 import { AccountSignerStatus, User, WebAuthnUri } from 'types'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
@@ -94,8 +94,12 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
     try {
       const { verified } = await verifyCredential(user.email)
       if (!verified) return
-      await createCredential(user.email)
-      backupDoneSwal()
+      const { verified: created } = await createCredential(user.email)
+      if (created) {
+        backupDoneSwal()
+      } else {
+        backupErrorSwal()
+      }
     } catch (err) {
       const error = err as Error
       console.error('[handleSignUp] Error =>', err)

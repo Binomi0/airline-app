@@ -14,7 +14,7 @@ import Paper from '@mui/material/Paper'
 import { useTheme } from '@mui/material/styles'
 import { styled } from '@mui/material'
 import styles from '../styles/ivao.module.css'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { authStore } from 'store/auth.atom'
 import { destinationStore } from 'store/destination.atom'
@@ -37,9 +37,10 @@ interface Props {
   end: string
 }
 
+let counter = 0
 const IvaoAtcs = ({ start, end, onSelect }: Props) => {
   const token = useRecoilValue(authStore)
-  const { atcs } = useVaProviderContext()
+  const { atcs, initIvaoAuth } = useVaProviderContext()
   const theme = useTheme()
   const atcSearchRef = useRef<HTMLInputElement>()
   const setDestinations = useSetRecoilState(destinationStore)
@@ -50,6 +51,9 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
 
   const onSelectTower = useCallback(
     (callsign: string) => {
+      if (start === callsign) return
+      if (counter > 0) return
+      counter++
       // axios.get('http://localhost:3001/ivao/init').then(() => {
       // axios
       //   .get(`http://localhost:3001/ivao/matrix/${callsign}`, {
@@ -66,10 +70,18 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
             onSelect(callsign, 'start')
           })
         })
-        .catch(console.error)
+        .catch((err: AxiosError) => {
+          if (err.response?.status === 401) {
+            initIvaoAuth()
+          }
+          console.error(err)
+        })
+        .finally(() => {
+          counter = 0
+        })
       // })
     },
-    [token, setDestinations, onSelect]
+    [token, setDestinations, onSelect, initIvaoAuth]
   )
 
   return (

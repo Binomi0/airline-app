@@ -37,6 +37,13 @@ export const accountBackupSwal = async () =>
     icon: 'question'
   })
 
+export const backupErrorSwal = async () =>
+  Swal.fire({
+    title: 'Backup not complete',
+    text: 'An error occoured while adding a new backup',
+    icon: 'error'
+  })
+
 export const missingExportKeySwal = async () =>
   Swal.fire({
     title: 'Missing local wallet',

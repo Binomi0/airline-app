@@ -20,11 +20,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     try {
-      const response = await ivaoInstance.post('v2/oauth/token', request)
+      const { data } = await ivaoInstance.post('v2/oauth/token', request)
 
-      ivaoInstance.defaults.headers.common.Authorization = `Bearer ${response.data.access_token}`
+      if (!data) {
+        res.status(204).send(data)
+        return
+      }
 
-      res.status(200).send(response.data.access_token)
+      ivaoInstance.defaults.headers.common.Authorization = `Bearer ${data.access_token}`
+
+      res.status(200).send(data.access_token)
       return
     } catch (error) {
       const err = error as AxiosError

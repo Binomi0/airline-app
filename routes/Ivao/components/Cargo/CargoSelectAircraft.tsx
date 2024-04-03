@@ -43,12 +43,13 @@ const CargoSelectAircraft = ({
   )
 
   return (
-    <Stack direction='row' spacing={2} width='100%' p={2}>
+    <Stack direction='row' spacing={2} p={2}>
       <Stack justifyContent='space-between' spacing={2}>
         <Box>
           <FormControl fullWidth>
             <InputLabel id='select-cargo-aircarft-label'>Select an Aircraft</InputLabel>
             <Select
+              autoFocus
               error={!hasEnoughFuel()}
               fullWidth
               autoWidth

@@ -1,17 +1,5 @@
 import { atom } from 'recoil'
-
-interface Airport {
-  callsign: string
-  distance: number
-  name: string
-  city: string
-  airportId: string
-}
-
-interface DestinationAirport {
-  airport: string
-  destinations: Airport[]
-}
+import { DestinationAirport } from 'types'
 
 export const destinationStore = atom<DestinationAirport | undefined>({
   key: 'destinationStore',

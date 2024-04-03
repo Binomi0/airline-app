@@ -13,21 +13,24 @@ import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 const IVAOPage = ({ loading }: PageProps) => {
   const router = useRouter()
   const user = useRecoilValue(userState)
-  const { initIvaoData } = useVaProviderContext()
-  const { authorize, isLoading } = useIvao()
+  const { initIvaoAuth } = useVaProviderContext()
+  // const { authorize, isLoading } = useIvao()
   const { live } = useLiveFlightProviderContext()
 
   React.useEffect(() => {
     if (live) router.push('/live')
   }, [live, router])
 
-  useEffect(initIvaoData, [initIvaoData])
-  useEffect(authorize, [authorize])
+  useEffect(() => {
+    initIvaoAuth()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  // useEffect(authorize, [authorize])
 
   if (loading) return <LinearProgress />
   if (!user) return <Disconnected />
 
-  return <IvaoView isLoading={isLoading} user={user} />
+  return <IvaoView isLoading={false} user={user} />
 }
 
 export default IVAOPage

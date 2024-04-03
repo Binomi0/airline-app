@@ -1,57 +1,42 @@
-import Select, { SelectChangeEvent } from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
+import { SelectChangeEvent } from '@mui/material/Select'
 import Button from '@mui/material/Button'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { formatNumber, getCallsign, getFuelForFlight } from 'utils'
+import React, { useCallback, useMemo } from 'react'
+import {
+  formatNumber,
+  gallonsToLiters,
+  getCallsign,
+  getFuelForFlight,
+  getIcaoCodeFromAircraftNFT,
+  getNFTAttributes
+} from 'utils'
 import { NFT } from '@thirdweb-dev/sdk'
-import ExploreOffIcon from '@mui/icons-material/ExploreOff'
-import { MediaRenderer } from '@thirdweb-dev/react'
 import BigNumber from 'bignumber.js'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'
 import useCargo from 'hooks/useCargo'
 import { destinationStore } from 'store/destination.atom'
-import { Alert, AlertTitle } from '@mui/material'
 import CargoSelectAircraft from './CargoSelectAircraft'
-
-enum AircraftRanges {
-  'Cessna 172' = '700',
-  'Cessna C700 Longitude' = '3000',
-  'Boeing 737-600' = '6000',
-  'Antonov An-225 Mriya' = '14000'
-}
-
-enum IcaoCodes {
-  C172 = 'C172',
-  C700 = 'C700',
-  B737 = 'B737',
-  AN225 = 'AN225'
-}
-
-const aircraftNameToIcaoCode = {
-  'Cessna 172': IcaoCodes.C172,
-  'Cessna C700 Longitude': IcaoCodes.C700,
-  'Boeing 737-600': IcaoCodes.B737,
-  'Antonov An-225 Mriya': IcaoCodes.AN225
-}
-
-const getIcaoCodeFromAircraftNFT = (name: keyof typeof aircraftNameToIcaoCode) => aircraftNameToIcaoCode[name]
+import { aircraftNameToIcaoCode } from 'types'
+import { Alert, AlertTitle } from '@mui/material'
 
 interface Props {
+  aircraft: string
   aircrafts: NFT[]
-  origin: string
-  destination: string
+  end: string
+  start: string
+  // eslint-disable-next-line no-unused-vars
+  isAllowed: (value: number) => boolean
+  // eslint-disable-next-line no-unused-vars
   onBooking: (hasFuel: boolean) => void
+  // eslint-disable-next-line no-unused-vars
+  setAircraft: (value: string) => void
 }
 
-const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
-  const [aircraft, setAircraft] = useState<string>('-1')
+const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, onBooking }: Props) => {
   const balance = useRecoilValue(tokenBalanceStore)
   const { cargo, newCargo, setCargo } = useCargo()
   const destinations = useRecoilValue(destinationStore)
@@ -78,24 +63,21 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
     [balance.airg, requiredGas]
   )
 
-  const hasRequirement = (requirement?: string) => {
-    if (!requirement) return false
-    const aircraft = aircrafts.find((aircraft) => aircraft.metadata.id === requirement)
-    if (!aircraft) return false
+  const getCurrentFuelInLiters = useCallback((currentAircraft: NFT) => {
+    const combustible = getNFTAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value
+    if (!combustible) return 0
 
-    const range = AircraftRanges[aircraft.metadata.name as keyof typeof AircraftRanges]
-    const result = Number(range) >= Number(cargo?.distance)
-
-    return result
-  }
+    return formatNumber(gallonsToLiters(Number(combustible)), 0)
+  }, [])
 
   React.useEffect(() => {
-    if (origin && destination && currentAircraft) {
+    console.log({ start, end, currentAircraft })
+    if (start && end && currentAircraft) {
       newCargo(
         {
-          origin,
-          destination,
-          distance: destinations?.destinations.find((d) => d.callsign === destination)?.distance ?? 0
+          origin: start,
+          destination: end,
+          distance: destinations?.destinations.find((d) => d.callsign === end)?.distance ?? 0
         },
         currentAircraft,
         getCallsign(),
@@ -104,7 +86,7 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
     } else {
       setCargo()
     }
-  }, [newCargo, setCargo, currentAircraft, origin, destination])
+  }, [newCargo, setCargo, currentAircraft, start, end, destinations?.destinations])
 
   return (
     <Paper elevation={3} sx={{ borderRadius: 2 }}>
@@ -142,7 +124,19 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
           active={!!cargo}
           currentAircraft={currentAircraft}
         />
-        {cargo?.callsign && hasEnoughFuel() && hasRequirement(aircraft) && (
+        {!isAllowed(cargo?.distance ?? 0) && start && end && !!currentAircraft && (
+          <Box width='100%' p={2}>
+            <Alert severity='error'>
+              <AlertTitle>This selection exceeds aircraft range without refueling</AlertTitle>
+              <Typography>
+                Max capacity for this aircraft is {currentAircraft && getCurrentFuelInLiters(currentAircraft)} Liters,
+                required: {formatNumber(requiredGas().toNumber())}
+              </Typography>
+            </Alert>
+          </Box>
+        )}
+
+        {cargo?.callsign && hasEnoughFuel() && isAllowed(cargo.distance) && (
           <Box width='100%'>
             <Box mt={2}>
               <Typography fontWeight={600} align='center'>
@@ -158,7 +152,8 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
             </Paper>
           </Box>
         )}
-        {cargo && hasEnoughFuel() && hasRequirement(aircraft) && (
+
+        {cargo && hasEnoughFuel() && isAllowed(cargo.distance) && (
           <Stack direction='column' alignItems='center' justifyContent='center' spacing={1} p={2}>
             <Typography variant='h5'>{cargo?.details.name}</Typography>
 
@@ -201,9 +196,10 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
 
             <Box mt={2}>
               <Button
-                disabled={!hasRequirement(aircraft) || !hasEnoughFuel()}
+                size='large'
+                disabled={!isAllowed(cargo.distance) || !hasEnoughFuel()}
                 variant='contained'
-                onClick={() => onBooking(hasRequirement(aircraft))}
+                onClick={() => onBooking(isAllowed(cargo.distance))}
               >
                 Book this Flight
               </Button>
@@ -215,4 +211,4 @@ const Cargo = ({ aircrafts, origin, destination, onBooking }: Props) => {
   )
 }
 
-export default Cargo
+export default IvaoCargo

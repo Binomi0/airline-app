@@ -16,7 +16,7 @@ const challengeMethod = 'plain' // S256
 const challenge = base64URLEncode(verifier)
 
 interface Props {
-  user: User
+  user?: User
 }
 
 const IvaoConnection = ({ user }: Props) => (
@@ -31,7 +31,7 @@ const IvaoConnection = ({ user }: Props) => (
             color='primary.contrastText'
             variant='button'
             component='a'
-            href={`https://sso.ivao.aero/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_IVAO_ID}&state=${user.id}&scope=openid profile flight_plans:read bookings:read tracker email&code_challenge_method=${challengeMethod}&code_challenge=${challenge}`}
+            href={`https://sso.ivao.aero/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_IVAO_ID}&state=${user?.id}&scope=openid profile flight_plans:read bookings:read tracker email&code_challenge_method=${challengeMethod}&code_challenge=${challenge}`}
           >
             Log In with IVAO
           </Typography>

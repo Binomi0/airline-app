@@ -15,9 +15,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { data } = await ivaoInstance.get<ActiveAtc[]>('/v2/tracker/now/atc')
     const towers = data.reduce(reduceAtcTower, [])
     res.status(200).send(towers)
-  } catch (error) {
-    const err = error as AxiosError
-    res.status(400).send(err.response?.data)
+  } catch (err) {
+    const error = err as AxiosError<{ message: string }>
+    if (error.response?.data.message === 'Unauthorized') {
+      res.status(401).send(error.response.data)
+      return
+    }
+    res.status(400).send(error.response?.data)
   }
 }
 

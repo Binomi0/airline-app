@@ -15,6 +15,7 @@ export type VaContextProps = VaReducerState & {
   // eslint-disable-next-line no-unused-vars
   setFilter: (value: string) => void
   initIvaoData: () => void
+  initIvaoAuth: () => void
 }
 
 export type IVAOClients = VaReducerState

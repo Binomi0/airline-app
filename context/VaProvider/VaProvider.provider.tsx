@@ -7,7 +7,7 @@ import type {
   // Flight
   // IvaoPilot
 } from 'types'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 // import { userState } from 'store/user.atom'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import { getApi } from 'lib/api'
@@ -30,8 +30,8 @@ export const INITIAL_STATE: IVAOClients = {
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   // const user = useRecoilValue(userState)
   const ivaoUser = useRecoilValue(ivaoUserStore)
-  const ivaoToken = useRecoilValue(ivaoAuthStore)
-  const [state, dispatch] = useReducer(vaProviderReducer, { ...INITIAL_STATE })
+  const [ivaoToken, setIvaoToken] = useRecoilState(ivaoAuthStore)
+  const [state, dispatch] = useReducer(vaProviderReducer, INITIAL_STATE)
   const [isLoading, setIsLoading] = useState(0)
   const { Provider } = VaProviderContext
 
@@ -55,19 +55,24 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     dispatch({ type: 'SET_FILTER', payload: value })
   }, [])
 
-  const getAtcs = useCallback(async () => {
-    setIsLoading((s) => s + 1)
-    const response = await axios.get<Atc[]>('api/ivao/atc/tower', {
-      headers: {
-        Authorization: `Bearer ${ivaoToken}`
-      }
-    })
+  const getAtcs = useCallback(
+    async (_token?: string) => {
+      if (!_token && !ivaoToken) return
 
-    startTransition(() => {
-      setAtcs(response.data ?? [])
-      setIsLoading((s) => s - 1)
-    })
-  }, [setAtcs, ivaoToken])
+      setIsLoading((s) => s + 1)
+      const response = await axios.get<Atc[]>('api/ivao/atc/tower', {
+        headers: {
+          Authorization: `Bearer ${_token || ivaoToken}`
+        }
+      })
+
+      startTransition(() => {
+        setAtcs(response.data ?? [])
+        setIsLoading((s) => s - 1)
+      })
+    },
+    [setAtcs, ivaoToken]
+  )
 
   // const getPilots = useCallback(async () => {
   //   const response = await axios.get<IvaoPilot[]>('/api/ivao/pilots')
@@ -136,6 +141,20 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     startTimers
   ])
 
+  const initIvaoAuth = useCallback(() => {
+    axios
+      .get('/api/ivao/oauth')
+      .then((response) => {
+        console.log('initIvaoAuth response', response.data)
+        setIvaoToken(response.data)
+        getAtcs(response.data)
+      })
+      .catch((error) => {
+        setIvaoToken(null)
+        console.log('initIvaoAuth error =>', error)
+      })
+  }, [setIvaoToken, getAtcs])
+
   return (
     <Provider
       value={{
@@ -148,7 +167,8 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
         origins: state.origins,
         isLoading: Boolean(isLoading),
         setFilter,
-        initIvaoData
+        initIvaoData,
+        initIvaoAuth
       }}
     >
       {children}

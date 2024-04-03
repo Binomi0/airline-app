@@ -261,3 +261,37 @@ export interface MatrixDestination {
   callsign: string
 }
 export type TowerMatrixList = Record<string, TowerMatrix>[]
+
+export interface Airport {
+  callsign: string
+  distance: number
+  name: string
+  city: string
+  airportId: string
+}
+
+export interface DestinationAirport {
+  airport: string
+  destinations: Airport[]
+}
+
+export enum AircraftRanges {
+  'Cessna 172' = '700',
+  'Cessna C700 Longitude' = '3000',
+  'Boeing 737-600' = '6000',
+  'Antonov An-225 Mriya' = '14000'
+}
+
+export enum IcaoCodes {
+  C172 = 'C172',
+  C700 = 'C700',
+  B737 = 'B737',
+  AN225 = 'AN225'
+}
+
+export const aircraftNameToIcaoCode = {
+  'Cessna 172': IcaoCodes.C172,
+  'Cessna C700 Longitude': IcaoCodes.C700,
+  'Boeing 737-600': IcaoCodes.B737,
+  'Antonov An-225 Mriya': IcaoCodes.AN225
+}

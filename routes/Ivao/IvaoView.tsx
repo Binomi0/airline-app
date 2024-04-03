@@ -23,7 +23,7 @@ import {
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import IvaoLogin from './components/IvaoLogin'
-import Cargo from './components/Cargo'
+import Cargo from './components/Cargo/IvaoCargo'
 import { useVaProviderContext } from 'context/VaProvider'
 import { ivaoAuthStore } from 'store/ivaoAuth.atom'
 import { bookingStore } from 'store/booking.atom'
@@ -34,6 +34,15 @@ import Destinations from './components/Destinations'
 import Swal from 'sweetalert2'
 import { postApi } from 'lib/api'
 import { cargoStore } from 'store/cargo.atom'
+import { hasRequirement } from 'utils'
+
+function base64URLEncode(str: string) {
+  return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+}
+
+const verifier = '123456'
+const challengeMethod = 'plain' // S256
+const challenge = base64URLEncode(verifier)
 
 interface Props {
   user: User
@@ -52,8 +61,9 @@ const IvaoView = ({ user, isLoading }: Props) => {
   const authToken = useRecoilValue(authStore)
   const [booking, setBooking] = useRecoilState(bookingStore)
   // const [hasApp, setHasApp] = useRecoilState(appInstalledStore)
-  const { getPilots } = usePilots()
+  // const { getPilots } = usePilots()
   const cargo = useRecoilValue(cargoStore)
+  const [aircraft, setAircraft] = useState<string>('-1')
 
   const {
     data: aircrafts = []
@@ -61,6 +71,8 @@ const IvaoView = ({ user, isLoading }: Props) => {
     //   isFetched,
     //    refetch: refetchAircrafts
   } = useNFTs(contract)
+
+  const isAllowed = (distance?: number) => hasRequirement(aircrafts, distance ?? 0, aircraft)
 
   const handleSelectAtc = useCallback(
     (callsign: string, side: 'start' | 'end') => {
@@ -79,6 +91,25 @@ const IvaoView = ({ user, isLoading }: Props) => {
 
   const handleRequestFlight = useCallback(async () => {
     if (!cargo) return
+    if (!ivaoUser) {
+      const clearance = await Swal.fire({
+        title: 'Clearance required',
+        text: 'Connect your IVAO account to continue',
+        imageUrl: 'https://static.ivao.aero/img/logos/logo.svg',
+        confirmButtonText: 'Connect to IVAO'.toUpperCase(),
+        cancelButtonText: 'CANCEL',
+        showCancelButton: true
+      })
+
+      if (clearance.isConfirmed) {
+        window.open(
+          `https://sso.ivao.aero/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_IVAO_ID}&state=${user?.id}&scope=openid profile flight_plans:read bookings:read tracker email&code_challenge_method=${challengeMethod}&code_challenge=${challenge}`,
+          '_self'
+        )
+      }
+      return
+    }
+
     try {
       const { aircraft: _, ...newCargo } = cargo
 
@@ -98,7 +129,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
     } catch (err) {
       console.error(err)
     }
-  }, [cargo, getLive, router])
+  }, [cargo, getLive, ivaoUser, router, user?.id])
 
   const handleBooking = useCallback(
     (hasFuel: boolean) => {
@@ -131,10 +162,14 @@ const IvaoView = ({ user, isLoading }: Props) => {
     }
   }, [live, router])
 
-  React.useEffect(() => {
-    if (!ivaoUser) return
-    getPilots()
-  }, [getPilots, ivaoUser])
+  // React.useEffect(() => {
+  //   if (ivaoToken === undefined) {
+  //     initIvaoAuth()
+  //   } else if (ivaoToken) {
+  //     console.log('IvaoView ivaoToken =>', ivaoToken)
+  //     getPilots()
+  //   }
+  // }, [getPilots, initIvaoAuth, ivaoToken])
 
   return (
     <Stack direction='row'>
@@ -144,49 +179,56 @@ const IvaoView = ({ user, isLoading }: Props) => {
 
       <Container>
         <Box px={2} width='100%' maxHeight='100vh'>
-          <IvaoLogin user={user} />
-          {ivaoUser && (
-            <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
-              {start && (
-                <Box textAlign='center'>
-                  <Box width='100%' height={60} fontSize={50}>
-                    <FlightTakeoffIcon color='success' fontSize='inherit' />
-                  </Box>
-                  <Typography variant='h4' textTransform='uppercase'>
-                    Start
-                  </Typography>
-                  <Paper>
-                    <Box p={1} bgcolor='success.main' borderRadius={1}>
-                      <Typography fontWeight={600}>{start}</Typography>
-                    </Box>
-                  </Paper>
+          <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
+            {start && (
+              <Box textAlign='center'>
+                <Box width='100%' height={60} fontSize={50}>
+                  <FlightTakeoffIcon color='success' fontSize='inherit' />
                 </Box>
-              )}
-              {start && end && (
-                <Stack height={100} width='100%' justifyContent='center'>
-                  <LinearProgress variant='determinate' value={0} />
-                </Stack>
-              )}
-              {start && end && (
-                <Box textAlign='center'>
-                  <Box width='100%' height={60} fontSize={50}>
-                    <FlightLandIcon color='info' fontSize='inherit' />
+                <Typography variant='h4' textTransform='uppercase'>
+                  Start
+                </Typography>
+                <Paper>
+                  <Box p={1} bgcolor='success.main' borderRadius={1}>
+                    <Typography fontWeight={600}>{start}</Typography>
                   </Box>
-                  <Typography variant='h4' textTransform='uppercase'>
-                    End
-                  </Typography>
-                  <Paper>
-                    <Box p={1} bgcolor='info.dark' borderRadius={1}>
-                      <Typography fontWeight={600}>{end}</Typography>
-                    </Box>
-                  </Paper>
+                </Paper>
+              </Box>
+            )}
+            {start && end && (
+              <Stack height={100} width='100%' justifyContent='center'>
+                <LinearProgress variant='determinate' value={0} />
+              </Stack>
+            )}
+            {start && end && (
+              <Box textAlign='center'>
+                <Box width='100%' height={60} fontSize={50}>
+                  <FlightLandIcon color='info' fontSize='inherit' />
                 </Box>
-              )}
-            </Stack>
-          )}
+                <Typography variant='h4' textTransform='uppercase'>
+                  End
+                </Typography>
+                <Paper>
+                  <Box p={1} bgcolor='info.dark' borderRadius={1}>
+                    <Typography fontWeight={600}>{end}</Typography>
+                  </Box>
+                </Paper>
+              </Box>
+            )}
+          </Stack>
+
+          {/* <IvaoLogin /> */}
 
           <Box mt={4}>
-            <Cargo aircrafts={aircrafts} origin={start} destination={end} onBooking={handleBooking} />
+            <Cargo
+              setAircraft={setAircraft}
+              aircraft={aircraft}
+              aircrafts={aircrafts}
+              start={start}
+              end={end}
+              onBooking={handleBooking}
+              isAllowed={isAllowed}
+            />
           </Box>
 
           {booking && (
@@ -195,7 +237,13 @@ const IvaoView = ({ user, isLoading }: Props) => {
             </Box>
           )}
 
-          <Destinations onSelect={(c) => handleSelectAtc(c, 'end')} selected={end} start={start} />
+          <Destinations
+            isAllowed={isAllowed(cargo?.distance)}
+            onSelect={(c) => handleSelectAtc(c, 'end')}
+            selected={end}
+            start={start}
+            end={end}
+          />
 
           {/* <IvaoPilots /> */}
         </Box>

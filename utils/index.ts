@@ -1,5 +1,16 @@
 import { NFT } from '@thirdweb-dev/sdk'
-import { ActiveAtc, AtcPosition, AttributeType, IcaoCode, IvaoPilot, TowerMatrix, TowerMatrixList } from 'types'
+import {
+  ActiveAtc,
+  AircraftRanges,
+  Airport,
+  AtcPosition,
+  AttributeType,
+  IcaoCode,
+  IvaoPilot,
+  TowerMatrix,
+  TowerMatrixList,
+  aircraftNameToIcaoCode
+} from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 import BigNumber from 'bignumber.js'
 
@@ -229,9 +240,36 @@ export const reduceTowerMatrix =
     ] as TowerMatrixList
 
 /** Reduce and remove duplicated towers */
-export const reduceAtcTower = (acc: ActiveAtc[], curr: ActiveAtc) =>
-  acc.some((c) => c?.callsign.split('_')[0] === curr.callsign.split('_')[0])
+export const reduceAtcTower = (acc: ActiveAtc[], curr: ActiveAtc) => {
+  const currentCallsign = curr.callsign.split('_')[0]
+  return acc.some((c) => c?.callsign.split('_')[0] === currentCallsign)
     ? acc
-    : curr.callsign.includes('_TWR')
+    : new RegExp(/[A-Z][A-Z][A-Z][A-Z](_TWR)+/g).test(curr.callsign)
     ? [...acc, curr]
     : acc
+}
+
+export const findByCallsign = (callsign: string) => (f: Airport) => f.callsign === callsign
+export const getIcaoCodeFromAircraftNFT = (name: keyof typeof aircraftNameToIcaoCode) => aircraftNameToIcaoCode[name]
+
+export const hasRequirement = (aircrafts: NFT[], distance: number, requirement?: string) => {
+  if (!requirement) return false
+  const aircraft = aircrafts.find((aircraft) => aircraft.metadata.id === requirement)
+  if (!aircraft) return false
+
+  const icaoCode = getIcaoCodeFromAircraftNFT(aircraft.metadata.name as keyof typeof aircraftNameToIcaoCode)
+  if (!icaoCode) return false
+
+  const fuel = getFuelForFlight(new BigNumber(distance ?? 0), icaoCode)
+
+  const combustible = getNFTAttributes(aircraft).find((a) => a.trait_type === 'combustible')?.value
+  if (!combustible) return false
+
+  return fuel.isLessThan(Number(combustible))
+}
+
+export const gallonsToLiters = (gallons?: number): number => {
+  if (!gallons) return 0
+  const litersPerGallon = 3.78541 // 1 gallon is approximately 3.78541 liters
+  return gallons * litersPerGallon
+}

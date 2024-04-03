@@ -2,9 +2,10 @@ import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import axios from 'config/axios'
 import { AxiosError, AxiosResponse } from 'axios'
-import { useSetRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import { ivaoAuthStore } from 'store/ivaoAuth.atom'
+// import { useVaProviderContext } from 'context/VaProvider'
 
 interface UseIvaoReturnType {
   isLoading: boolean
@@ -15,9 +16,10 @@ interface UseIvaoReturnType {
 const useIvao = (): UseIvaoReturnType => {
   const router = useRouter()
   const setIvaoUser = useSetRecoilState(ivaoUserStore)
-  const setIvaoToken = useSetRecoilState(ivaoAuthStore)
+  const [ivaoToken, setIvaoToken] = useRecoilState(ivaoAuthStore)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  // const { initIvaoAuth } = useVaProviderContext()
 
   const requestIvaoUser = useCallback(
     (token: string) => {
@@ -45,16 +47,22 @@ const useIvao = (): UseIvaoReturnType => {
     [setIvaoUser, setIvaoToken]
   )
 
-  const checkExistingIvaoToken = useCallback(() => {
-    const ivaoToken = localStorage.getItem('ivao-auth-token')
-    if (!ivaoToken) return false
+  // const checkExistingIvaoToken = useCallback(() => {
+  //   if (ivaoToken === undefined) {
+  //     initIvaoAuth()
+  //     return false
+  //   } else if (ivaoToken === null) {
+  //     return false
+  //   }
 
-    requestIvaoUser(ivaoToken)
-    return true
-  }, [requestIvaoUser])
+  //   const _ivaoToken = localStorage.getItem('ivao-auth-token')
+  //   if (!_ivaoToken) return false
+
+  //   requestIvaoUser(_ivaoToken)
+  //   return true
+  // }, [initIvaoAuth, ivaoToken, requestIvaoUser])
 
   const authorize = useCallback(() => {
-    if (checkExistingIvaoToken()) return
     if (router.query.state && router.query.code) {
       axios
         .get('/api/ivao/authorize', { params: router.query })
@@ -72,9 +80,17 @@ const useIvao = (): UseIvaoReturnType => {
           setIsLoading(false)
         })
     }
-  }, [checkExistingIvaoToken, router.query, requestIvaoUser])
+  }, [router.query, requestIvaoUser])
 
-  return { isLoading, authorize, error }
+  // React.useEffect(() => {
+
+  // }, [getPilots, initIvaoAuth, ivaoToken])
+
+  return {
+    isLoading,
+    authorize,
+    error
+  }
 }
 
 export default useIvao
