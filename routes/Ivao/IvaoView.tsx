@@ -14,15 +14,10 @@ import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import LinearProgress from '@mui/material/LinearProgress'
-import usePilots from 'hooks/usePilots'
-import {
-  //  CircularProgress,
-  Container,
-  Paper
-} from '@mui/material'
+import Paper from '@mui/material/Paper'
+import Container from '@mui/material/Container'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
-import IvaoLogin from './components/IvaoLogin'
 import Cargo from './components/Cargo/IvaoCargo'
 import { useVaProviderContext } from 'context/VaProvider'
 import { ivaoAuthStore } from 'store/ivaoAuth.atom'
@@ -35,6 +30,7 @@ import Swal from 'sweetalert2'
 import { postApi } from 'lib/api'
 import { cargoStore } from 'store/cargo.atom'
 import { hasRequirement } from 'utils'
+import { useAircraftProviderContext } from 'context/AircraftProvider'
 
 function base64URLEncode(str: string) {
   return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
@@ -53,8 +49,8 @@ const IvaoView = ({ user, isLoading }: Props) => {
   const { isLoading: loading } = useVaProviderContext()
   const router = useRouter()
   const { live, getLive } = useLiveFlightProviderContext()
-  const [start, setStart] = useState('')
-  const [end, setEnd] = useState('')
+  const [start, setStart] = useState((router.query.start as string) ?? '')
+  const [end, setEnd] = useState((router.query.end as string) ?? '')
   const { contract } = useContract(nftAircraftTokenAddress)
   const ivaoUser = useRecoilValue(ivaoUserStore)
   const ivaoToken = useRecoilValue(ivaoAuthStore)
@@ -64,6 +60,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
   // const { getPilots } = usePilots()
   const cargo = useRecoilValue(cargoStore)
   const [aircraft, setAircraft] = useState<string>('-1')
+  const { ownedAircrafts } = useAircraftProviderContext()
 
   const {
     data: aircrafts = []
@@ -111,6 +108,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
     }
 
     try {
+      // eslint-disable-next-line no-unused-vars
       const { aircraft: _, ...newCargo } = cargo
 
       const { isConfirmed } = await Swal.fire({
@@ -170,6 +168,21 @@ const IvaoView = ({ user, isLoading }: Props) => {
   //     getPilots()
   //   }
   // }, [getPilots, initIvaoAuth, ivaoToken])
+
+  React.useEffect(() => {
+    if (router.query.start) {
+      setStart(router.query.start as string)
+    }
+    if (router.query.end) {
+      setEnd(router.query.end as string)
+    }
+  }, [router])
+
+  React.useEffect(() => {
+    if (ownedAircrafts.length > 0) {
+      setAircraft('0')
+    }
+  }, [ownedAircrafts])
 
   return (
     <Stack direction='row'>

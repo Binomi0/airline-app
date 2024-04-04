@@ -6,7 +6,6 @@ import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import type { PageProps } from 'types'
 import { useVaProviderContext } from 'context/VaProvider'
-import useIvao from 'hooks/useIvao'
 import { useRouter } from 'next/router'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 

@@ -265,7 +265,7 @@ export const hasRequirement = (aircrafts: NFT[], distance: number, requirement?:
   const combustible = getNFTAttributes(aircraft).find((a) => a.trait_type === 'combustible')?.value
   if (!combustible) return false
 
-  return fuel.isLessThan(Number(combustible))
+  return fuel.isLessThan(gallonsToLiters(Number(combustible)))
 }
 
 export const gallonsToLiters = (gallons?: number): number => {

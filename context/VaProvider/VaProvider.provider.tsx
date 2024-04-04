@@ -145,7 +145,6 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     axios
       .get('/api/ivao/oauth')
       .then((response) => {
-        console.log('initIvaoAuth response', response.data)
         setIvaoToken(response.data)
         getAtcs(response.data)
       })
