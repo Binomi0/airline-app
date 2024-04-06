@@ -20,7 +20,6 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import Cargo from './components/Cargo/IvaoCargo'
 import { useVaProviderContext } from 'context/VaProvider'
-import { ivaoAuthStore } from 'store/ivaoAuth.atom'
 import { bookingStore } from 'store/booking.atom'
 import { authStore } from 'store/auth.atom'
 // import customProtocolCheck from 'custom-protocol-check'
@@ -31,6 +30,10 @@ import { postApi } from 'lib/api'
 import { cargoStore } from 'store/cargo.atom'
 import { hasRequirement } from 'utils'
 import { useAircraftProviderContext } from 'context/AircraftProvider'
+import axios from 'config/axios'
+
+const getMetar = async (callsign: string) =>
+  axios.get(`api/ivao/airports/${callsign}/metar`).then((response) => response.data)
 
 function base64URLEncode(str: string) {
   return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
@@ -53,13 +56,13 @@ const IvaoView = ({ user, isLoading }: Props) => {
   const [end, setEnd] = useState((router.query.end as string) ?? '')
   const { contract } = useContract(nftAircraftTokenAddress)
   const ivaoUser = useRecoilValue(ivaoUserStore)
-  const ivaoToken = useRecoilValue(ivaoAuthStore)
   const authToken = useRecoilValue(authStore)
   const [booking, setBooking] = useRecoilState(bookingStore)
   // const [hasApp, setHasApp] = useRecoilState(appInstalledStore)
   // const { getPilots } = usePilots()
   const cargo = useRecoilValue(cargoStore)
   const [aircraft, setAircraft] = useState<string>('-1')
+  const [metar, setMetar] = useState<string>('')
   const { ownedAircrafts } = useAircraftProviderContext()
 
   const {
@@ -76,6 +79,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
       if (side === 'start') {
         if (end === callsign) return
         setStart(callsign)
+        getMetar(callsign.split('_')[0]).then(setMetar)
       } else if (side === 'end') {
         if (start === callsign) return
         setEnd(callsign)
@@ -88,24 +92,6 @@ const IvaoView = ({ user, isLoading }: Props) => {
 
   const handleRequestFlight = useCallback(async () => {
     if (!cargo) return
-    if (!ivaoUser) {
-      const clearance = await Swal.fire({
-        title: 'Clearance required',
-        text: 'Connect your IVAO account to continue',
-        imageUrl: 'https://static.ivao.aero/img/logos/logo.svg',
-        confirmButtonText: 'Connect to IVAO'.toUpperCase(),
-        cancelButtonText: 'CANCEL',
-        showCancelButton: true
-      })
-
-      if (clearance.isConfirmed) {
-        window.open(
-          `https://sso.ivao.aero/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_IVAO_ID}&state=${user?.id}&scope=openid profile flight_plans:read bookings:read tracker email&code_challenge_method=${challengeMethod}&code_challenge=${challenge}`,
-          '_self'
-        )
-      }
-      return
-    }
 
     try {
       // eslint-disable-next-line no-unused-vars
@@ -122,16 +108,34 @@ const IvaoView = ({ user, isLoading }: Props) => {
         if (!cargo) return
         await postApi('/api/live/new', { cargo })
         await getLive()
+        if (!ivaoUser) {
+          const clearance = await Swal.fire({
+            title: 'Clearance required',
+            text: 'Connect your IVAO account to continue',
+            imageUrl: 'https://static.ivao.aero/img/logos/logo.svg',
+            confirmButtonText: 'Connect to IVAO'.toUpperCase(),
+            cancelButtonText: 'CANCEL',
+            showCancelButton: true
+          })
+
+          if (clearance.isConfirmed) {
+            window.open(
+              `https://sso.ivao.aero/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_IVAO_ID}&state=${authToken}&scope=openid profile flight_plans:read bookings:read tracker email&code_challenge_method=${challengeMethod}&code_challenge=${challenge}`,
+              '_self'
+            )
+          }
+          router.push('/live')
+          return
+        }
         router.push('/live')
       }
     } catch (err) {
       console.error(err)
     }
-  }, [cargo, getLive, ivaoUser, router, user?.id])
+  }, [authToken, cargo, getLive, ivaoUser, router])
 
   const handleBooking = useCallback(
     (hasFuel: boolean) => {
-      if (!ivaoToken) return
       if (hasFuel) {
         setBooking(true)
         if (!authToken) throw new Error('Missing auth token')
@@ -151,7 +155,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
         // )
       }
     },
-    [ivaoToken, setBooking, authToken, handleRequestFlight]
+    [setBooking, authToken, handleRequestFlight]
   )
 
   React.useEffect(() => {
@@ -206,6 +210,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
                     <Typography fontWeight={600}>{start}</Typography>
                   </Box>
                 </Paper>
+                <Typography variant='caption'>{metar}</Typography>
               </Box>
             )}
             {start && end && (

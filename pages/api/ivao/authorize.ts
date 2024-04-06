@@ -49,7 +49,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       await connectDB()
       const va = await VirtualAirlineModel.findOne({ userId: req.query.state })
       if (va) {
-        res.status(202).send(req.query.code)
+        res.status(202).end()
         return
       }
 
@@ -58,7 +58,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         { isVerified: true, pilotId: decoded.payload.sub },
         { upsert: true, new: true }
       )
-      console.log({ vaUser })
       try {
         await UserModel.findOneAndUpdate({ userId: req.query.state }, { vaUser: vaUser._id })
         console.log('User updated vaUser')
@@ -74,7 +73,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return
     }
     // res.redirect(`/ivao?token=${req.query.code}`)
-    res.status(200).send(req.query.code)
+    res.status(202).end()
     return
   } else {
     res.status(405).end()

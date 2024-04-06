@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { ivaoAuthStore } from 'store/ivaoAuth.atom'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { authStore } from 'store/auth.atom'
 import { pilotStore } from 'store/pilot.atom'
 import { IvaoPilot } from 'types'
 
@@ -10,13 +10,12 @@ interface UsePilotsReturnType {
 
 const usePilots = (): UsePilotsReturnType => {
   const workerRef = useRef<Worker>()
+  const token = useRecoilValue(authStore)
   const setPilots = useSetRecoilState(pilotStore)
-  const ivaoToken = useRecoilValue(ivaoAuthStore)
 
   const getPilots = useCallback(() => {
-    if (!ivaoToken) return
-    workerRef.current?.postMessage([ivaoToken])
-  }, [ivaoToken])
+    workerRef.current?.postMessage([token])
+  }, [token])
 
   useEffect(() => {
     workerRef.current = new Worker(new URL('../workers/pilots.worker.ts', import.meta.url))

@@ -39,6 +39,13 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
   React.useEffect(() => {
     const { origin, destination, callsign } = router.query
     if (origin && destination && callsign && aircraft) {
+      if (
+        origin === cargo?.origin &&
+        destination === cargo?.destination &&
+        aircraft.metadata.id === cargo?.aircraftId
+      ) {
+        return
+      }
       setSelected({ origin: origin as string, destination: destination as string, distance: 0 })
       newCargo(
         { origin: origin as string, destination: destination as string, distance: 0 },
@@ -47,7 +54,7 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
         true
       )
     }
-  }, [aircraft, newCargo, router.query])
+  }, [aircraft, cargo?.aircraftId, cargo?.destination, cargo?.origin, newCargo, router.query])
 
   React.useEffect(() => {
     getCargo()

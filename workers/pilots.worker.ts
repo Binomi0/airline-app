@@ -5,7 +5,6 @@ onmessage = async function (e) {
   if (!token) {
     postMessage('UnAuthorized request')
   } else {
-    axios.defaults.headers.common.Authorization = `Bearer ${token}`
     axios
       .get('/api/ivao/pilots')
       .then((response) => {

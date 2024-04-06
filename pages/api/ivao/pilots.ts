@@ -4,6 +4,7 @@ import { PilotModel, VirtualAirlineModel } from 'models'
 import { Pilot } from 'models/Pilot'
 import { ivaoInstance } from 'config/axios'
 import { IVirtualAirline } from 'models/VirtualAirline'
+import { AxiosError } from 'axios'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
@@ -22,13 +23,18 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   } else if (req.method === 'POST') {
     try {
       // TODO: Continue here
-      await ivaoInstance.get('v2/tracker/now/pilots')
+      const response = await ivaoInstance.get('v2/tracker/now/pilots', {
+        headers: { Authorization: req.headers.authorization }
+      })
+      res.status(200).send(response.data)
+      return
     } catch (err) {
-      res.status(400).send(err)
+      const error = err as AxiosError
+      res.status(error.response?.status ?? 400).send(err)
       return
     }
   }
   res.status(405).end()
 }
 
-export default withAuth(handler)
+export default handler

@@ -76,7 +76,6 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
   }, [])
 
   React.useEffect(() => {
-    console.log({ start, end, currentAircraft })
     if (start && end && currentAircraft) {
       newCargo(
         {

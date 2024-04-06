@@ -2,9 +2,8 @@ import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import axios from 'config/axios'
 import { AxiosError, AxiosResponse } from 'axios'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useSetRecoilState } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
-import { ivaoAuthStore } from 'store/ivaoAuth.atom'
 // import { useVaProviderContext } from 'context/VaProvider'
 
 interface UseIvaoReturnType {
@@ -16,7 +15,6 @@ interface UseIvaoReturnType {
 const useIvao = (): UseIvaoReturnType => {
   const router = useRouter()
   const setIvaoUser = useSetRecoilState(ivaoUserStore)
-  const [ivaoToken, setIvaoToken] = useRecoilState(ivaoAuthStore)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   // const { initIvaoAuth } = useVaProviderContext()
@@ -32,7 +30,6 @@ const useIvao = (): UseIvaoReturnType => {
         })
         .then((response: AxiosResponse) => {
           setIvaoUser(response.data)
-          setIvaoToken(token)
           localStorage.setItem('ivao-auth-token', token)
         })
         .catch((error: AxiosError) => {
@@ -44,7 +41,7 @@ const useIvao = (): UseIvaoReturnType => {
           setIsLoading(false)
         })
     },
-    [setIvaoUser, setIvaoToken]
+    [setIvaoUser]
   )
 
   // const checkExistingIvaoToken = useCallback(() => {

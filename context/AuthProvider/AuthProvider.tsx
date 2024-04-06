@@ -24,9 +24,7 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     if (counter > 0) return
     counter++
-    // axios.defaults.headers.common.Authorization = `Bearer ${token}`
     if (token) {
-      console.log('Refrescando sessión')
       axios
         .get('/api/user/get')
         .then((response) => {

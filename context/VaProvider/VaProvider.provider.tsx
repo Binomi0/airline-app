@@ -2,17 +2,11 @@ import React, { FC, startTransition, useCallback, useReducer, useState } from 'r
 import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
-import type {
-  Atc
-  // Flight
-  // IvaoPilot
-} from 'types'
-import { useRecoilState, useRecoilValue } from 'recoil'
-// import { userState } from 'store/user.atom'
+import type { Atc } from 'types'
+import { useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import { getApi } from 'lib/api'
 import axios from 'axios'
-import { ivaoAuthStore } from 'store/ivaoAuth.atom'
 
 const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
@@ -30,7 +24,6 @@ export const INITIAL_STATE: IVAOClients = {
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   // const user = useRecoilValue(userState)
   const ivaoUser = useRecoilValue(ivaoUserStore)
-  const [ivaoToken, setIvaoToken] = useRecoilState(ivaoAuthStore)
   const [state, dispatch] = useReducer(vaProviderReducer, INITIAL_STATE)
   const [isLoading, setIsLoading] = useState(0)
   const { Provider } = VaProviderContext
@@ -57,12 +50,12 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const getAtcs = useCallback(
     async (_token?: string) => {
-      if (!_token && !ivaoToken) return
+      if (!_token) return
 
       setIsLoading((s) => s + 1)
       const response = await axios.get<Atc[]>('api/ivao/atc/tower', {
         headers: {
-          Authorization: `Bearer ${_token || ivaoToken}`
+          Authorization: `Bearer ${_token}`
         }
       })
 
@@ -71,7 +64,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
         setIsLoading((s) => s - 1)
       })
     },
-    [setAtcs, ivaoToken]
+    [setAtcs]
   )
 
   // const getPilots = useCallback(async () => {
@@ -145,14 +138,12 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     axios
       .get('/api/ivao/oauth')
       .then((response) => {
-        setIvaoToken(response.data)
         getAtcs(response.data)
       })
       .catch((error) => {
-        setIvaoToken(null)
         console.log('initIvaoAuth error =>', error)
       })
-  }, [setIvaoToken, getAtcs])
+  }, [getAtcs])
 
   return (
     <Provider
