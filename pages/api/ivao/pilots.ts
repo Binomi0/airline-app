@@ -24,7 +24,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     try {
       // TODO: Continue here
       const response = await ivaoInstance.get('v2/tracker/now/pilots', {
-        headers: { Authorization: req.headers.authorization }
+        headers: { Authorization: req.headers['x-ivao-auth'] }
       })
       res.status(200).send(response.data)
       return
@@ -37,4 +37,4 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   res.status(405).end()
 }
 
-export default handler
+export default withAuth(handler)

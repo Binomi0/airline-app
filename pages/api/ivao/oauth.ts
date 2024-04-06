@@ -23,7 +23,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const { data } = await ivaoInstance.post('v2/oauth/token', request)
 
       if (!data) {
-        res.status(204).send(data)
+        res.status(403).send(data)
         return
       }
 
