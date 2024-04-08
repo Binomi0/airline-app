@@ -38,7 +38,7 @@ const CargoSelectAircraft = ({
   const theme = useTheme()
   const { ownedAircrafts } = useAircraftProviderContext()
   const missingAircrafts = useMemo(
-    () => aircrafts.filter((a) => ownedAircrafts.some((o) => o.metadata.id !== a.metadata.id)),
+    () => aircrafts.filter((a) => !ownedAircrafts.some((o) => o.metadata.id === a.metadata.id)),
     [aircrafts, ownedAircrafts]
   )
 
