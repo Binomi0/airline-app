@@ -6,7 +6,7 @@ import Toolbar from '@mui/material/Toolbar'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
-import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
 import useScrollTrigger from '@mui/material/useScrollTrigger'
 import Download from '@mui/icons-material/Download'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -20,6 +20,7 @@ import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
+import styles from './appbar.module.css'
 
 const copyToClipboard = (msg: string) => {
   navigator.clipboard.writeText(msg)
@@ -95,17 +96,21 @@ const CustomAppBar: React.FC = () => {
             </Tooltip>
           )}
           {smartAccountAddress && (
-            <Box
+            <Stack
+              direction='row'
               onClick={() => copyToClipboard(smartAccountAddress)}
-              mr={2}
-              bgcolor='secondary.main'
-              borderRadius={5}
+              spacing={1}
+              className={styles.card}
+              maxWidth={150}
               px={2}
+              mr={2}
             >
-              <Typography fontWeight={600} variant='caption'>
+              <Image width={17} height={17} src='/logos/metis.png' alt='Metis logo' />
+              <Image width={10} height={17} src='/logos/eth-diamond-purple.png' alt='Ethereum logo' />
+              <Typography fontWeight={700} fontFamily='Sora' variant='caption'>
                 {maskAddress(smartAccountAddress)}
               </Typography>
-            </Box>
+            </Stack>
           )}
           <AppBarAuth
             toggleSidebar={toggleSidebar}

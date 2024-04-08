@@ -3,10 +3,11 @@ import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
 import type { Atc } from 'types'
-import { useRecoilValue } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import { getApi } from 'lib/api'
 import axios from 'axios'
+import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 
 const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
@@ -24,6 +25,8 @@ export const INITIAL_STATE: IVAOClients = {
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   // const user = useRecoilValue(userState)
   const ivaoUser = useRecoilValue(ivaoUserStore)
+  const setIvaoToken = useSetRecoilState(ivaoUserAuthStore)
+
   const [state, dispatch] = useReducer(vaProviderReducer, INITIAL_STATE)
   const [isLoading, setIsLoading] = useState(0)
   const { Provider } = VaProviderContext
@@ -139,11 +142,13 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       .get('/api/ivao/oauth')
       .then((response) => {
         getAtcs(response.data)
+        axios.defaults.headers['x-ivao-token'] = `Bearer ${response.data}`
+        setIvaoToken(response.data)
       })
       .catch((error) => {
         console.log('initIvaoAuth error =>', error)
       })
-  }, [getAtcs])
+  }, [getAtcs, setIvaoToken])
 
   return (
     <Provider

@@ -31,9 +31,12 @@ import { cargoStore } from 'store/cargo.atom'
 import { hasRequirement } from 'utils'
 import { useAircraftProviderContext } from 'context/AircraftProvider'
 import axios from 'config/axios'
+import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 
-const getMetar = async (callsign: string) =>
-  axios.get(`api/ivao/airports/${callsign}/metar`).then((response) => response.data)
+const getMetar = async (callsign: string, ivaoAuthToken?: string | null) =>
+  axios
+    .get(`api/ivao/airports/${callsign}/metar`, { headers: { 'x-ivao-auth': `Bearer ${ivaoAuthToken}` } })
+    .then((response) => response.data)
 
 function base64URLEncode(str: string) {
   return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
@@ -48,7 +51,7 @@ interface Props {
   isLoading: boolean
 }
 
-const IvaoView = ({ user, isLoading }: Props) => {
+const IvaoView = ({ isLoading }: Props) => {
   const { isLoading: loading } = useVaProviderContext()
   const router = useRouter()
   const { live, getLive } = useLiveFlightProviderContext()
@@ -57,6 +60,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
   const { contract } = useContract(nftAircraftTokenAddress)
   const ivaoUser = useRecoilValue(ivaoUserStore)
   const authToken = useRecoilValue(authStore)
+  const ivaoAuthToken = useRecoilValue(ivaoUserAuthStore)
   const [booking, setBooking] = useRecoilState(bookingStore)
   // const [hasApp, setHasApp] = useRecoilState(appInstalledStore)
   // const { getPilots } = usePilots()
@@ -79,7 +83,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
       if (side === 'start') {
         if (end === callsign) return
         setStart(callsign)
-        getMetar(callsign.split('_')[0]).then(setMetar)
+        getMetar(callsign.split('_')[0], ivaoAuthToken).then(setMetar)
       } else if (side === 'end') {
         if (start === callsign) return
         setEnd(callsign)
@@ -87,7 +91,7 @@ const IvaoView = ({ user, isLoading }: Props) => {
         throw new Error('side should be one of `start` or `end`')
       }
     },
-    [end, start]
+    [end, start, ivaoAuthToken]
   )
 
   const handleRequestFlight = useCallback(async () => {
@@ -198,19 +202,25 @@ const IvaoView = ({ user, isLoading }: Props) => {
         <Box px={2} width='100%' maxHeight='100vh'>
           <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
             {start && (
-              <Box textAlign='center'>
-                <Box width='100%' height={60} fontSize={50}>
-                  <FlightTakeoffIcon color='success' fontSize='inherit' />
-                </Box>
-                <Typography variant='h4' textTransform='uppercase'>
-                  Start
-                </Typography>
-                <Paper>
-                  <Box p={1} bgcolor='success.main' borderRadius={1}>
-                    <Typography fontWeight={600}>{start}</Typography>
+              <Box>
+                <Box textAlign='center'>
+                  <Box width='100%' height={60} fontSize={50}>
+                    <FlightTakeoffIcon color='success' fontSize='inherit' />
                   </Box>
-                </Paper>
-                <Typography variant='caption'>{metar}</Typography>
+                  <Typography variant='h4' textTransform='uppercase'>
+                    Start
+                  </Typography>
+                  <Paper>
+                    <Box p={1} bgcolor='success.main' borderRadius={1}>
+                      <Typography fontWeight={600}>{start}</Typography>
+                    </Box>
+                  </Paper>
+                </Box>
+                <Stack width='100%' mt={1}>
+                  <Typography lineHeight={1.2} variant='caption'>
+                    {metar}
+                  </Typography>
+                </Stack>
               </Box>
             )}
             {start && end && (

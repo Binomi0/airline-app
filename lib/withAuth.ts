@@ -8,6 +8,7 @@ export interface CustomNextApiRequest extends NextApiRequest {
   user?: string
   id?: string
   userId?: string
+  headers: NextApiRequest['headers'] & { 'x-ivao-auth'?: string }
 }
 
 const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, res: NextApiResponse) => {

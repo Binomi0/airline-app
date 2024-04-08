@@ -1,9 +1,9 @@
 import { AxiosError } from 'axios'
 import { ivaoInstance } from 'config/axios'
-import withAuth from 'lib/withAuth'
-import { NextApiRequest, NextApiResponse } from 'next'
+import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import { NextApiResponse } from 'next'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
     res.status(405).end()
     return
@@ -11,7 +11,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const options = {
     headers: {
-      Authorization: req.headers.authorization
+      Authorization: req.headers['x-ivao-auth']
     }
   }
 

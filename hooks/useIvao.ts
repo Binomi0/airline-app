@@ -25,6 +25,7 @@ const useIvao = (): UseIvaoReturnType => {
         .get('/api/ivao/user', {
           // signal: controller.signal,
           headers: {
+            'x-ivao-auth': `Bearer ${token}`,
             Authorization: `Bearer ${token}`
           }
         })
