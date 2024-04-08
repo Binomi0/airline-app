@@ -95,7 +95,7 @@ const CustomAppBar: React.FC = () => {
               </IconButton>
             </Tooltip>
           )}
-          {smartAccountAddress && (
+          {matches && smartAccountAddress && (
             <Stack
               direction='row'
               onClick={() => copyToClipboard(smartAccountAddress)}

@@ -4,6 +4,7 @@ import { atom, selector } from 'recoil'
 export const walletStore = atom<{
   baseSigner?: Wallet
   smartSigner?: any
+  paymasterSigner?: any
   smartAccountAddress?: string
   isLoaded?: boolean
 }>({
@@ -12,6 +13,7 @@ export const walletStore = atom<{
     isLoaded: false,
     baseSigner: undefined,
     smartSigner: undefined,
+    paymasterSigner: undefined,
     smartAccountAddress: ''
   }
 })
@@ -22,6 +24,15 @@ export const baseSignerStore = selector({
     const state = get(walletStore)
 
     return state?.baseSigner
+  }
+})
+
+export const paymasterSignerStore = selector({
+  key: 'paymasterSigner',
+  get: ({ get }) => {
+    const state = get(walletStore)
+
+    return state?.paymasterSigner
   }
 })
 

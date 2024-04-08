@@ -24,7 +24,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
 
   const claimAircraftNFT = useCallback(
     async (aircraftNFT: NFT) => {
-      if (!wallet.smartSigner || !wallet.smartSigner.account || !contract || !wallet.smartAccountAddress) {
+      if (!wallet.paymasterSigner || !wallet.paymasterSigner.account || !contract || !wallet.smartAccountAddress) {
         throw new Error('Missing params')
       }
       setIsClaiming(true)
@@ -66,15 +66,15 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           ethers.utils.hexlify(encodedData)
         ])
 
-        const uo = await wallet.smartSigner.sendUserOperation({
-          account: wallet.smartSigner.account,
+        const uo = await wallet.paymasterSigner.sendUserOperation({
+          account: wallet.paymasterSigner.account,
           uo: {
             target: nftAircraftTokenAddress,
             data: encodedCallData as Hex
           }
         })
 
-        const txHash = await wallet.smartSigner.waitForUserOperationTransaction(uo)
+        const txHash = await wallet.paymasterSigner.waitForUserOperationTransaction(uo)
 
         setIsClaiming(false)
         return txHash
@@ -84,13 +84,14 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         throw new Error((err as Error).message)
       }
     },
-    [contract, getAllowance, setAllowance, wallet.smartAccountAddress, wallet.smartSigner]
+    [contract, getAllowance, setAllowance, wallet.smartAccountAddress, wallet.paymasterSigner]
   )
 
   const claimLicenseNFT = useCallback(
     async (nft: NFT) => {
       try {
-        if (!wallet.smartSigner || !wallet.smartSigner.account || !contract || !wallet.smartAccountAddress) return
+        if (!wallet.paymasterSigner || !wallet.paymasterSigner.account || !contract || !wallet.smartAccountAddress)
+          return
         setIsClaiming(true)
 
         const canClaim = await contract.erc1155.claimConditions.canClaim(nft.metadata.id, 1, wallet.smartAccountAddress)
@@ -123,15 +124,15 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           ethers.utils.hexlify(encodedData)
         ])
 
-        const uo = await wallet.smartSigner.sendUserOperation({
-          account: wallet.smartSigner.account,
+        const uo = await wallet.paymasterSigner.sendUserOperation({
+          account: wallet.paymasterSigner.account,
           uo: {
             target: nftLicenseTokenAddress,
             data: encodedCallData
           }
         })
 
-        const txHash = await wallet.smartSigner.waitForUserOperationTransaction(uo)
+        const txHash = await wallet.paymasterSigner.waitForUserOperationTransaction(uo)
 
         setIsClaiming(false)
         return txHash
@@ -141,7 +142,7 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
         throw new Error('While claiming NFT')
       }
     },
-    [contract, getAllowance, setAllowance, wallet.smartAccountAddress, wallet.smartSigner]
+    [contract, getAllowance, setAllowance, wallet.smartAccountAddress, wallet.paymasterSigner]
   )
 
   return { claimLicenseNFT, claimAircraftNFT, isClaiming }

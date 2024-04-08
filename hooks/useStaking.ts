@@ -4,26 +4,27 @@ import { BigNumber, ethers } from 'ethers'
 import { postApi } from 'lib/api'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
-import { smartAccountSignerStore } from 'store/wallet.atom'
+import { paymasterSignerStore, smartAccountSignerStore } from 'store/wallet.atom'
 
 const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) => {
   const [isLoading, setIsLoading] = useState(false)
   const smartSigner = useRecoilValue(smartAccountSignerStore)
+  const paymasterSigner = useRecoilValue(paymasterSignerStore)
 
   const stake = useCallback(
     async (amount: BigNumber) => {
-      if (!contract || !smartSigner) return
+      if (!contract || !paymasterSigner) return
       setIsLoading(true)
 
       try {
         const erc20Staking = new ethers.Contract(target, contract.abi)
         const data = erc20Staking.interface.encodeFunctionData('stake', [amount])
-        const uo = await smartSigner.sendUserOperation({ uo: { target, data } })
+        const uo = await paymasterSigner.sendUserOperation({ uo: { target, data } })
 
-        const hash = await smartSigner.waitForUserOperationTransaction(uo)
+        const hash = await paymasterSigner.waitForUserOperationTransaction(uo)
         await postApi('/api/transaction/user', { operation: 'stake', amount, hash })
 
-        const receipt = await smartSigner.getUserOperationReceipt(hash)
+        const receipt = await paymasterSigner.getUserOperationReceipt(hash)
         setIsLoading(false)
 
         return receipt
@@ -31,23 +32,23 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
         setIsLoading(false)
       }
     },
-    [contract, smartSigner]
+    [contract, paymasterSigner]
   )
 
   const withdraw = useCallback(
     async (amount: BigNumber) => {
-      if (!contract || !smartSigner) return
+      if (!contract || !paymasterSigner) return
       setIsLoading(true)
 
       try {
         const erc20Staking = new ethers.Contract(target, contract.abi)
         const data = erc20Staking.interface.encodeFunctionData('withdraw', [amount])
-        const uo = await smartSigner.sendUserOperation({ uo: { target, data } })
+        const uo = await paymasterSigner.sendUserOperation({ uo: { target, data } })
 
-        const hash = await smartSigner.waitForUserOperationTransaction(uo)
+        const hash = await paymasterSigner.waitForUserOperationTransaction(uo)
         await postApi('/api/transaction/user', { operation: 'withdraw', amount, hash })
 
-        const receipt = await smartSigner.getUserOperationReceipt(hash)
+        const receipt = await paymasterSigner.getUserOperationReceipt(hash)
         setIsLoading(false)
 
         return receipt
@@ -55,7 +56,7 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
         setIsLoading(false)
       }
     },
-    [contract, smartSigner]
+    [contract, paymasterSigner]
   )
 
   const claimRewards = useCallback(
@@ -76,7 +77,12 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
 
         return receipt
       } catch (err) {
-        console.error(err)
+        // @ts-expect-error
+        if (err?.message === `AA21 didn't pay prefund`) {
+          console.log('Paga cabrón xD')
+        } else {
+          console.error(err)
+        }
         setIsLoading(false)
       }
     },

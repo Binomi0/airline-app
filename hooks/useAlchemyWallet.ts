@@ -2,16 +2,16 @@ import { useCallback } from 'react'
 import { ethers } from 'ethers'
 import { coinTokenAddress } from 'contracts/address'
 import AirlineCoin from 'contracts/abi/AirlineCoin.json'
-import { Hex } from '@alchemy/aa-core'
-import { useRecoilState } from 'recoil'
+import { Hex, UserOperationCallData } from '@alchemy/aa-core'
+import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 
 const useAlchemyWallet = () => {
-  const [wallet] = useRecoilState(walletStore)
+  const wallet = useRecoilValue(walletStore)
 
   const sendTransaction = useCallback(
-    async (target: string, value: string) => {
-      if (!wallet.smartAccountAddress || !wallet.smartSigner) return
+    async (target: Hex, value: string) => {
+      if (!wallet.smartAccountAddress || !wallet.paymasterSigner || !wallet.smartSigner) return
 
       const amount = ethers.utils.parseEther(value)
       const erc20Contract = new ethers.Contract(coinTokenAddress, AirlineCoin.abi)
@@ -21,30 +21,44 @@ const useAlchemyWallet = () => {
         wallet.smartAccountAddress,
         amount
       ]) as Hex
-      const { hash: tx1 } = await wallet.smartSigner.sendUserOperation({
+
+      const uoStruct: UserOperationCallData = {
+        target,
+        data: encodedApproveCallData
+      }
+
+      const uoSimResult = await wallet.smartSigner.simulateUserOperation({
+        uo: uoStruct
+      })
+
+      if (uoSimResult.error) {
+        console.error('Simulation error =>', uoSimResult.error.message)
+      }
+
+      const { hash: tx1 } = await wallet.paymasterSigner.sendUserOperation({
         uo: {
           target: coinTokenAddress,
           data: encodedApproveCallData
         }
       })
 
-      await wallet.smartSigner.waitForUserOperationTransaction(tx1)
+      await wallet.paymasterSigner.waitForUserOperationTransaction(tx1)
 
       const encodedCallData = erc20Contract.interface.encodeFunctionData('transferFrom', [
         wallet.smartAccountAddress,
         target,
         amount
       ]) as Hex
-      const { hash } = await wallet.smartSigner.sendUserOperation({
+      const { hash } = await wallet.paymasterSigner.sendUserOperation({
         target: coinTokenAddress,
         data: encodedCallData
       })
 
-      await wallet.smartSigner.waitForUserOperationTransaction(hash)
+      await wallet.paymasterSigner.waitForUserOperationTransaction(hash)
 
       return hash
     },
-    [wallet.smartAccountAddress, wallet.smartSigner]
+    [wallet.smartAccountAddress, wallet.paymasterSigner, wallet.smartSigner]
   )
 
   return { sendTransaction }

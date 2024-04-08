@@ -17,7 +17,7 @@ const AirBalanceBar = ({ show }: Props) => {
   return show && smartAccountAddress ? (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>
       <AirplaneTicketIcon color='inherit' fontSize='medium' />
-      <Typography variant='h6'>
+      <Typography fontWeight={600}>
         {Intl.NumberFormat('en', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2

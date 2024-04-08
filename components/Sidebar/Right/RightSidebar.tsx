@@ -22,11 +22,15 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import ListItemButton from '@mui/material/ListItemButton'
 import Stack from '@mui/material/Stack'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
 import { walletStore } from 'store/wallet.atom'
 import useAuth from 'hooks/useAuth'
 import { authStore } from 'store/auth.atom'
+import { themeStore } from 'store/theme.atom'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import { useTheme } from '@mui/material'
 
 const RightSidebar: React.FC = () => {
   const user = useRecoilValue(userState)
@@ -36,6 +40,12 @@ const RightSidebar: React.FC = () => {
   const { addBackup } = useAccountSigner()
   const { handleSignOut } = useAuth()
   const [wallet] = useRecoilState(walletStore)
+  const theme = useTheme()
+  const setTheme = useSetRecoilState(themeStore)
+
+  const handleToogleTheme = useCallback(() => {
+    setTheme((state) => (state === 'dark' ? 'light' : 'dark'))
+  }, [setTheme])
 
   const handleClick = useCallback(
     (route: string) => () => {
@@ -121,6 +131,16 @@ const RightSidebar: React.FC = () => {
               <Stack direction='row' spacing={5}>
                 <Login color='success' />
                 <Typography>Abrir App</Typography>
+              </Stack>
+            </ListItemButton>
+          </List>
+          <Divider />
+          <List>
+            <ListItemButton onClick={handleToogleTheme}>
+              <Stack direction='row' spacing={5}>
+                <LightModeIcon color={theme.palette.mode === 'dark' ? 'disabled' : 'info'} />
+                <Typography>Dark Mode</Typography>
+                <DarkModeIcon color={theme.palette.mode === 'light' ? 'disabled' : 'warning'} />
               </Stack>
             </ListItemButton>
           </List>

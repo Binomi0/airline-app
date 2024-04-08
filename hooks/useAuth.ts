@@ -73,7 +73,13 @@ const useAuth = (): UseAuthReturnType => {
   )
 
   const handleSignOut = useCallback(() => {
-    setWallet({ baseSigner: undefined, smartSigner: undefined, smartAccountAddress: '', isLoaded: false })
+    setWallet({
+      baseSigner: undefined,
+      paymasterSigner: undefined,
+      smartSigner: undefined,
+      smartAccountAddress: '',
+      isLoaded: false
+    })
     deleteCookie('token')
     setUser(undefined)
     setToken(undefined)

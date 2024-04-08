@@ -16,7 +16,7 @@ interface IGridItem {
 
 const HomeGridItem: React.FC<IGridItem> = ({ link, title, text, delay }) => (
   <Grow in timeout={{ enter: delay }}>
-    <Grid item xs={12} md={6} lg={6} p={2}>
+    <Grid item xs={12} md={6} lg={6}>
       <Link href={link}>
         <Paper className={styles.card}>
           <CardContent className={styles.text}>

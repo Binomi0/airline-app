@@ -11,7 +11,7 @@
   background-image: linear-gradient(
     140deg,
     var(--mui-palette-primary-dark),
-    var(--mui-palette-secondary-main) 20%,
+    var(--mui-palette-secondary-main) 30%,
     var(--mui-palette-primary-dark)
   );
 }

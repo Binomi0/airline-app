@@ -34,6 +34,13 @@ const useWallet = (): UseWallet => {
         }
       })
 
+      const smartAccountClient = await createModularAccountAlchemyClient({
+        apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY_ETH_SEPOLIA,
+        chain: sepolia,
+        signer,
+        useSimulation: true
+      })
+
       if (!_user?.address) {
         const smartAccountAddress = modularAccountAlchemyClient.getAddress()
 
@@ -47,7 +54,8 @@ const useWallet = (): UseWallet => {
         await Promise.all([updateUser, updateWallet])
         setWallet({
           baseSigner: _signer,
-          smartSigner: modularAccountAlchemyClient,
+          smartSigner: smartAccountClient,
+          paymasterSigner: modularAccountAlchemyClient,
           smartAccountAddress,
           isLoaded: true
         })
@@ -63,7 +71,8 @@ const useWallet = (): UseWallet => {
         }
         setWallet({
           baseSigner: _signer,
-          smartSigner: modularAccountAlchemyClient,
+          smartSigner: smartAccountClient,
+          paymasterSigner: modularAccountAlchemyClient,
           smartAccountAddress: _user.address,
           isLoaded: true
         })

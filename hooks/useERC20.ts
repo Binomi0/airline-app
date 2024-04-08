@@ -43,17 +43,17 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
 
   const setAllowance = useCallback(
     async (to: string) => {
-      if (!wallet.smartSigner) return false
+      if (!wallet.paymasterSigner) return false
       try {
         setIsLoading(true)
 
         const erc20Contract = new Contract(tokenAddress, AirlineCoin.abi)
         const encodedCallData = erc20Contract.interface.encodeFunctionData('approve', [to, MAX_INT_ETH])
 
-        const uo = await wallet.smartSigner.sendUserOperation({
+        const uo = await wallet.paymasterSigner.sendUserOperation({
           uo: { target: tokenAddress, data: encodedCallData as Hex }
         })
-        const txHash = await wallet.smartSigner.waitForUserOperationTransaction(uo)
+        const txHash = await wallet.paymasterSigner.waitForUserOperationTransaction(uo)
         console.log({ txHash })
         setIsLoading(false)
         return true
@@ -63,7 +63,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         throw new Error('Error while setAllowance')
       }
     },
-    [wallet.smartSigner, tokenAddress]
+    [wallet.paymasterSigner, tokenAddress]
   )
   return { setAllowance, getAllowance, isLoading }
 }
