@@ -27,10 +27,11 @@ contract FlightController {
   }
 
   function startFlight(string memory _flightId, uint aircraftId) public {
+    require(flightStatus[_flightId] == FlightStatus.CREATED, 'Flight is already started or completed');
+
     ERC1155Drop erc1155Contract = ERC1155Drop(aircraftAddress);
     uint256 balance = erc1155Contract.balanceOf(msg.sender, aircraftId);
     require(balance > 0, 'Do not have required aircraft');
-    require(flightStatus[_flightId] == FlightStatus.CREATED, 'Flight is already started or completed');
 
     flightId[msg.sender] = _flightId;
     flightStatus[_flightId] = FlightStatus.STARTED;
