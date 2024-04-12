@@ -75,7 +75,7 @@ const CustomAppBar: React.FC = () => {
             edge='start'
             color='inherit'
             aria-label='menu'
-            sx={{ mr: 2 }}
+            sx={{ mx: 1 }}
           >
             <MenuIcon />
           </IconButton>

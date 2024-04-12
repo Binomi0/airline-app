@@ -39,7 +39,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const newAuthenticator: Authenticator = {
     credentialID: Buffer.from(credentialID).toString('base64'),
     credentialPublicKey: Buffer.from(credentialPublicKey).toString('base64'),
-    counter,
+    counter: counter + 1,
     transports: body.data.response.transports
   }
 

@@ -14,6 +14,8 @@ import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import { useRouter } from 'next/router'
 import { AxiosResponse } from 'axios'
+import Link from '@mui/material/Link'
+import Breadcrumbs from '@mui/material/Breadcrumbs'
 
 const SettingsPage = ({ loading }: PageProps) => {
   const user = useRecoilValue(userState)
@@ -36,6 +38,12 @@ const SettingsPage = ({ loading }: PageProps) => {
       <Container>
         <Paper>
           <Box p={2}>
+            <Breadcrumbs aria-label='breadcrumb'>
+              <Link underline='hover' color='inherit' href='/'>
+                Home
+              </Link>
+              <Typography color='text.primary'>Settings</Typography>
+            </Breadcrumbs>
             <Typography variant='h2'>Settings</Typography>
           </Box>
 
