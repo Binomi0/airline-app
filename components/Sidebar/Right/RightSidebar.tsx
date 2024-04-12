@@ -2,14 +2,10 @@ import React, { useCallback } from 'react'
 import AirlinesIcon from '@mui/icons-material/Airlines'
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket'
 import { useMainProviderContext } from 'context/MainProvider'
-import Backup from '@mui/icons-material/Backup'
 import ExitToApp from '@mui/icons-material/ExitToApp'
-import ImportExport from '@mui/icons-material/ImportExport'
 import VerifiedUser from '@mui/icons-material/VerifiedUser'
-import { accountBackupSwal, askExportKeySwal, missingExportKeySwal, signedOutSwal } from 'lib/swal'
+import { signedOutSwal } from 'lib/swal'
 import customProtocolCheck from 'custom-protocol-check'
-import useAccountSigner from 'hooks/useAccountSigner'
-import { downloadFile } from 'utils'
 import { useRouter } from 'next/router'
 import Login from '@mui/icons-material/Login'
 import Drawer from '@mui/material/Drawer'
@@ -22,24 +18,22 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import ListItemButton from '@mui/material/ListItemButton'
 import Stack from '@mui/material/Stack'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
-import { walletStore } from 'store/wallet.atom'
 import useAuth from 'hooks/useAuth'
 import { authStore } from 'store/auth.atom'
 import { themeStore } from 'store/theme.atom'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import { useTheme } from '@mui/material'
+import SettingsIcon from '@mui/icons-material/Settings'
 
 const RightSidebar: React.FC = () => {
   const user = useRecoilValue(userState)
   const token = useRecoilValue(authStore)
   const router = useRouter()
   const { rightSidebarOpen: open, toggleSidebar } = useMainProviderContext()
-  const { addBackup } = useAccountSigner()
   const { handleSignOut } = useAuth()
-  const [wallet] = useRecoilState(walletStore)
   const theme = useTheme()
   const setTheme = useSetRecoilState(themeStore)
 
@@ -54,34 +48,6 @@ const RightSidebar: React.FC = () => {
     },
     [router, toggleSidebar]
   )
-
-  const handleAddBackup = useCallback(async () => {
-    toggleSidebar('right')
-    const confirm = await accountBackupSwal()
-    if (confirm.isConfirmed) addBackup()
-  }, [addBackup, toggleSidebar])
-
-  const handleExportKey = useCallback(async () => {
-    if (!user?.id) throw new Error('Missing userId')
-
-    toggleSidebar('right')
-    const base64Key = localStorage.getItem(user.id)
-    if (!base64Key) {
-      if (wallet.baseSigner?.privateKey) {
-        const { isConfirmed } = await askExportKeySwal(wallet.baseSigner.privateKey)
-        if (isConfirmed) downloadFile(Buffer.from(wallet.baseSigner.privateKey).toString(), wallet.baseSigner.address)
-      } else {
-        return missingExportKeySwal()
-      }
-    } else {
-      if (wallet.smartAccountAddress) {
-        if (wallet.baseSigner?.privateKey) {
-          const { isConfirmed } = await askExportKeySwal(wallet.baseSigner.privateKey)
-          if (isConfirmed) downloadFile(base64Key, wallet.smartAccountAddress)
-        }
-      }
-    }
-  }, [toggleSidebar, user?.id, wallet.baseSigner?.address, wallet.baseSigner?.privateKey, wallet.smartAccountAddress])
 
   const onSignOut = React.useCallback(async () => {
     toggleSidebar('right')
@@ -146,16 +112,10 @@ const RightSidebar: React.FC = () => {
           </List>
           <Divider />
           <List>
-            <ListItemButton onClick={handleAddBackup}>
+            <ListItemButton onClick={handleClick('/settings')}>
               <Stack direction='row' spacing={5}>
-                <Backup />
-                <Typography>Add Account Backup</Typography>
-              </Stack>
-            </ListItemButton>
-            <ListItemButton onClick={handleExportKey}>
-              <Stack direction='row' spacing={5}>
-                <ImportExport />
-                <Typography>Export Wallet</Typography>
+                <SettingsIcon />
+                <Typography>Settings</Typography>
               </Stack>
             </ListItemButton>
             <ListItemButton onClick={handleClick('/flights')}>

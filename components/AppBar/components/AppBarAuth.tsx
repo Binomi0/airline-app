@@ -63,7 +63,6 @@ const AppBarAuth = ({ user, matches, userActionStarted, setUserActionStarted, to
             edge='start'
             color='inherit'
             aria-label='menu'
-            sx={{ mr: 2 }}
           >
             <MoreVertIcon />
           </IconButton>

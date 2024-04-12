@@ -21,6 +21,7 @@ import { userState } from 'store/user.atom'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import styles from './appbar.module.css'
+import { AlertTitle, Button, Container } from '@mui/material'
 
 const copyToClipboard = (msg: string) => {
   navigator.clipboard.writeText(msg)
@@ -67,7 +68,7 @@ const CustomAppBar: React.FC = () => {
         </Alert>
       </Snackbar>
       <AppBar position='sticky' color={trigger ? 'primary' : 'transparent'}>
-        <Toolbar>
+        <Toolbar sx={{ m: 0, p: 0 }}>
           <IconButton
             onClick={() => toggleSidebar('left')}
             size='large'
@@ -121,6 +122,20 @@ const CustomAppBar: React.FC = () => {
           />
         </Toolbar>
       </AppBar>
+      {user && !user?.vaUser && (
+        <Container>
+          <Alert
+            severity='warning'
+            action={
+              <Button variant='outlined' color='warning'>
+                Connect IVAO
+              </Button>
+            }
+          >
+            <AlertTitle>Connect your IVAO account</AlertTitle>
+          </Alert>
+        </Container>
+      )}
     </>
   )
 }

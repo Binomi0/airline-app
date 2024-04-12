@@ -15,9 +15,12 @@ import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import Image from 'next/image'
 import { Stack } from '@mui/material'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'store/user.atom'
 
 const Sidebar: React.FC = () => {
   const router = useRouter()
+  const user = useRecoilValue(userState)
   const { sidebarOpen: open, toggleSidebar } = useMainProviderContext()
   const { live } = useLiveFlightProviderContext()
 
@@ -63,6 +66,7 @@ const Sidebar: React.FC = () => {
           selected={router.pathname === '/cargo'}
         />
         <SidebarItem
+          disabled={!user?.vaUser}
           onLink={handleClick('/ivao')}
           text='IVAO'
           Icon={LocalAirportIcon}

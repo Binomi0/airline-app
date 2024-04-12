@@ -11,9 +11,10 @@ const LinkItem: React.FC<{
   text: string
   selected: boolean
   Icon: typeof HomeIcon
-}> = ({ text, selected, Icon, onLink }) => (
+  disabled?: boolean
+}> = ({ disabled, text, selected, Icon, onLink }) => (
   <ListItem disablePadding>
-    <ListItemButton selected={selected} disabled={selected} onClick={onLink}>
+    <ListItemButton disabled={disabled || selected} selected={selected} onClick={onLink}>
       <ListItemIcon>
         <Icon />
       </ListItemIcon>
