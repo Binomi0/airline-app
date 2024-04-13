@@ -1,7 +1,6 @@
 import { NFT } from '@thirdweb-dev/sdk'
 import {
   ActiveAtc,
-  AircraftRanges,
   Airport,
   AtcPosition,
   AttributeType,

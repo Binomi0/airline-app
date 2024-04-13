@@ -31,27 +31,29 @@ const SettingsPage = ({ loading }: PageProps) => {
   }, [user, router])
 
   return user ? (
-    <Box sx={{ position: 'relative' }} my={5}>
-      <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />
+    <Box>
       {loading && <LinearProgress />}
+      <Box sx={{ position: 'relative' }} my={5}>
+        <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />
 
-      <Container>
-        <Paper>
-          <Box p={2}>
-            <Breadcrumbs aria-label='breadcrumb'>
-              <Link underline='hover' color='inherit' href='/'>
-                Home
-              </Link>
-              <Typography color='text.primary'>Settings</Typography>
-            </Breadcrumbs>
-            <Typography variant='h2'>Settings</Typography>
-          </Box>
+        <Container>
+          <Paper>
+            <Box p={2}>
+              <Breadcrumbs aria-label='breadcrumb'>
+                <Link underline='hover' color='inherit' href='/'>
+                  Home
+                </Link>
+                <Typography color='text.primary'>Settings</Typography>
+              </Breadcrumbs>
+              <Typography variant='h2'>Settings</Typography>
+            </Box>
 
-          <SettingsView hasBackup={hasBackup} user={user} />
+            <SettingsView hasBackup={hasBackup} user={user} />
 
-          {/* {address && <MyAircrafts />} */}
-        </Paper>
-      </Container>
+            {/* {address && <MyAircrafts />} */}
+          </Paper>
+        </Container>
+      </Box>
     </Box>
   ) : null
 }
