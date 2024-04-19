@@ -11,7 +11,7 @@ const Home: NextPage<PageProps> = ({ loading }) => {
   return (
     <Box position='relative'>
       <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />
-      {loading && <LinearProgress />}
+      <Box height={1}>{loading && <LinearProgress />}</Box>
 
       <HomeView />
     </Box>

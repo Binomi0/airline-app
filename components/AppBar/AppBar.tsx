@@ -71,11 +71,10 @@ const CustomAppBar: React.FC = () => {
         <Toolbar sx={{ m: 0, p: 0 }}>
           <IconButton
             onClick={() => toggleSidebar('left')}
-            size='large'
             edge='start'
             color='inherit'
             aria-label='menu'
-            sx={{ mx: 1 }}
+            sx={{ mr: 1 }}
           >
             <MenuIcon />
           </IconButton>

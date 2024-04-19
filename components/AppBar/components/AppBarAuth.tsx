@@ -57,13 +57,7 @@ const AppBarAuth = ({ user, matches, userActionStarted, setUserActionStarted, to
           <LicenseBar />
           <GasBalanceBar show={matches} />
           <AirBalanceBar show={matches} />
-          <IconButton
-            onClick={() => toggleSidebar('right')}
-            size='large'
-            edge='start'
-            color='inherit'
-            aria-label='menu'
-          >
+          <IconButton onClick={() => toggleSidebar('right')} edge='start' color='inherit' aria-label='menu'>
             <MoreVertIcon />
           </IconButton>
         </>

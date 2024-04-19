@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { useRecoilValue } from 'recoil'
 import { tokenBalanceStore } from 'store/balance.atom'
+import { formatNumber } from 'utils'
 
 interface Props {
   show: boolean
@@ -17,13 +18,7 @@ const AirBalanceBar = ({ show }: Props) => {
   return show && smartAccountAddress ? (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>
       <AirplaneTicketIcon color='inherit' fontSize='medium' />
-      <Typography fontWeight={600}>
-        {Intl.NumberFormat('en', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }).format(balance.airl?.toNumber() || 0)}{' '}
-        AIRL
-      </Typography>
+      <Typography fontWeight={600}>{formatNumber(balance.airl?.toNumber())} AIRL</Typography>
     </Stack>
   ) : null
 }

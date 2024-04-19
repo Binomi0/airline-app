@@ -1,4 +1,5 @@
 import Swal from 'sweetalert2'
+import { formatNumber } from 'utils'
 
 export const loginSuccessSwal = async () =>
   Swal.fire({
@@ -127,4 +128,26 @@ export const maxWithdrawExceeded = async () =>
     title: 'Maximun exceeded',
     text: 'Cannot withdraw more than deposited :)',
     icon: 'info'
+  })
+
+export const stakingClaimRewardsSwal = async (rewards: number) =>
+  Swal.fire({
+    title: `Claim ${formatNumber(rewards / 1e18)} AIRG?`,
+    text: `You will get ${formatNumber(rewards / 1e18)} AIRG fuel tokens`,
+    icon: 'question',
+    showCancelButton: true
+  })
+
+export const stakingRewardsClaimedSwal = async () =>
+  Swal.fire({
+    title: 'Claimed Rewards!',
+    text: 'Gas already collected',
+    icon: 'success'
+  })
+
+export const stakingInsufficientRewardsSwal = async () =>
+  Swal.fire({
+    title: 'Unsufficient Rewards',
+    text: 'You need to collect at least 100L in order to claim gas',
+    icon: 'warning'
   })

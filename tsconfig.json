@@ -14,7 +14,10 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "material": ["./lib/mui/"]
+    }
   },
   "include": ["next-env.d.ts", "next-auth.d.ts", "**/*.ts", "**/*.tsx", "global.d.ts"],
   "exclude": ["node_modules", "staking-contract"]
