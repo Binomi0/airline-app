@@ -61,10 +61,11 @@ export async function mintLicense(
   requiredLicenseId: number,
   amount = 1
 ) {
+  console.log('token idd =>', tokenId)
   const cc = await license.claimCondition(tokenId)
   const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [requiredLicenseId])
 
-  await license.claim(
+  return await license.claim(
     otherAccount.address,
     tokenId,
     amount,
@@ -128,7 +129,7 @@ export async function mintAircraft(
   const cc = await aircraft.claimCondition(tokenId)
   const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [tokenId])
 
-  await aircraft.claim(
+  return await aircraft.claim(
     otherAccount.address,
     tokenId,
     amount,
