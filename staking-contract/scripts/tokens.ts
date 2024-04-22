@@ -5,12 +5,14 @@ const deployTokens = async (owner: SignerWithAddress) => {
   const Airline = await ethers.getContractFactory('AirlineCoin')
   const airLine = await Airline.deploy(owner.address, 'Airline Coin', 'AIRL')
   await airLine.deployed()
+  console.log('AIRL Admin =>', await airLine.owner())
 
   console.log(`Airline deployed to ${airLine.address}`)
 
   const AirlineRewardCoin = await ethers.getContractFactory('AirlineRewardCoin')
   const airLineReward = await AirlineRewardCoin.deploy(owner.address, 'Airline Gas', 'FLG')
   await airLineReward.deployed()
+  console.log('AIRG Admin =>', await airLineReward.owner())
 
   console.log(`AirLineReward deployed to ${airLineReward.address}`)
 

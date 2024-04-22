@@ -2,35 +2,33 @@ import { ethers } from 'hardhat'
 import deployAircraft from './aircraft'
 import deployLicense from './license'
 import deployTokens from './tokens'
+import deployStaking from './staking'
+import { parseUnits } from 'ethers/lib/utils'
+import deployFlightController from './flightController'
 
 async function main() {
   const accounts = await ethers.getSigners()
-  const [owner] = accounts
+  console.log('account1 =>', accounts[0].address)
+  console.log('account2 =>', accounts[1].address)
+  const [owner, otherAccount] = accounts
+  const initialBalance = await otherAccount.getBalance()
   const { airLine, airLineReward, nativeTokenWrapper } = await deployTokens(owner)
 
-  const StakingAirline = await ethers.getContractFactory('StakingAirline')
-  const stakingAirline = await StakingAirline.deploy(
-    1,
-    owner.address,
-    1,
-    100,
-    airLine.address,
-    airLineReward.address,
-    nativeTokenWrapper.address
-  )
-  await stakingAirline.deployed()
-  console.log(`STAKING deployed to ${stakingAirline.address}`)
+  await airLine.approve(otherAccount.address, parseUnits('100000', 'ether'))
+  await airLine.transfer(otherAccount.address, parseUnits('100000', 'ether'))
 
-  console.log('airlineReward balance =>', await airLineReward.balanceOf(owner.address))
-  await airLineReward.approve(stakingAirline.address, 1_000_000_000)
-  await stakingAirline.depositRewardTokens(1_000_000_000)
-
-  console.log('airlineReward balance =>', await airLineReward.balanceOf(owner.address))
+  await deployStaking(accounts, airLine, airLineReward, nativeTokenWrapper)
 
   const license = await deployLicense(accounts, airLine)
   console.log('license =>', !!license)
-  const aircraft = await deployAircraft(accounts, airLine, license)
+  const { aircraft } = await deployAircraft(accounts, airLine, license)
   console.log('aircraft =>', !!aircraft)
+
+  console.log('otherAccount AIRL balance =>', (await airLine.balanceOf(otherAccount.address)).toString())
+  await deployFlightController(accounts, aircraft.address, airLine)
+  console.log('otherAccount AIRL balance =>', (await airLine.balanceOf(otherAccount.address)).toString())
+  console.log('otherAccount ETH balance =>', (await otherAccount.getBalance()).toString())
+  console.log('total otherAccount gas cost =>', initialBalance.sub(await otherAccount.getBalance()).toString())
 }
 
 // We recommend this pattern to be able to use async/await everywhere

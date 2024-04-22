@@ -16,6 +16,7 @@ export async function deployLicenseNFT(owner: string) {
   const License = await ethers.getContractFactory('LicenseNFT')
   const license = await License.deploy(owner, 'License', 'AIRC', owner, 0, owner)
   await license.deployed()
+  console.log('license address =>', license.address)
 
   return license
 }
@@ -32,6 +33,7 @@ export async function deployAircraftNFT(owner: SignerWithAddress, licenseAddress
     licenseAddress
   )
   await aircraft.deployed()
+  console.log('aircraft address =>', aircraft.address)
 
   return aircraft
 }

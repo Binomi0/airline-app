@@ -41,8 +41,8 @@ const useAuth = (): UseAuthReturnType => {
         const { data } = await axios.get<User>('/api/user/get')
         setUser(data)
         setToken(token)
-        loginSuccessSwal()
         loadAccount(data)
+        loginSuccessSwal()
       } catch (err) {
         const error = err as Error
         console.error('err =>', error)

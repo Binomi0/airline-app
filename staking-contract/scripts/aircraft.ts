@@ -22,7 +22,7 @@ const deployAircraft = async (accounts: SignerWithAddress[], airlineCoin: Airlin
   await setClaimConditionsAircraft(aircraft, 3, airlineCoin)
   await mintAircraft(aircraft, otherAccount, 3, airlineCoin)
 
-  return { aircraft, license }
+  return { aircraft }
 }
 
 export default deployAircraft

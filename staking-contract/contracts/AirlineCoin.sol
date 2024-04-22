@@ -11,5 +11,6 @@ contract AirlineCoin is ERC20Base {
   ) ERC20Base(_defaultAdmin, _name, _symbol) {
     // 1 millon + 18
     mintTo(address(msg.sender), 1_000_000_000_000_000_000_000_000);
+    _setupOwner(address(msg.sender));
   }
 }
