@@ -24,6 +24,7 @@ import { getCookie } from 'cookies-next'
 import 'lib/alchemy'
 import { themeStore } from 'store/theme.atom'
 import ThemeWrapper from 'components/ThemeWrapper'
+import NFTProvider from 'components/NFTProvider'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -62,23 +63,27 @@ export default function MyApp(props: MyAppProps) {
             </Head>
             <ThemeWrapper>
               <ErrorBoundary>
-                <AircraftProvider>
-                  <LicenseProvider>
-                    <TokenProvider>
-                      <VaProvider>
-                        <LiveFlightsProvider>
-                          <MainProvider>
-                            <AppBar />
-                            <Sidebar />
-                            <RightSidebar />
-                          </MainProvider>
-                          <Component loading={loading} />
-                          <SpeedInsights />
-                        </LiveFlightsProvider>
-                      </VaProvider>
-                    </TokenProvider>
-                  </LicenseProvider>
-                </AircraftProvider>
+                <NFTProvider>
+                  {({ nfts }) => (
+                    <AircraftProvider nfts={nfts}>
+                      <LicenseProvider>
+                        <TokenProvider>
+                          <VaProvider>
+                            <LiveFlightsProvider>
+                              <MainProvider>
+                                <AppBar />
+                                <Sidebar />
+                                <RightSidebar />
+                              </MainProvider>
+                              <Component loading={loading} />
+                              <SpeedInsights />
+                            </LiveFlightsProvider>
+                          </VaProvider>
+                        </TokenProvider>
+                      </LicenseProvider>
+                    </AircraftProvider>
+                  )}
+                </NFTProvider>
               </ErrorBoundary>
             </ThemeWrapper>
           </CustomWeb3Provider>

@@ -6,8 +6,6 @@ import { useRouter } from 'next/router'
 import IvaoAtcs from './components/IvaoAtcs'
 // import useCargo from 'hooks/useCargo'
 // import { getCallsign } from 'utils'
-import { nftAircraftTokenAddress } from 'contracts/address'
-import { useContract, useNFTs } from '@thirdweb-dev/react'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
 import FlightLandIcon from '@mui/icons-material/FlightLand'
 import Stack from '@mui/material/Stack'
@@ -57,7 +55,6 @@ const IvaoView = ({ isLoading }: Props) => {
   const { live, getLive } = useLiveFlightProviderContext()
   const [start, setStart] = useState((router.query.start as string) ?? '')
   const [end, setEnd] = useState((router.query.end as string) ?? '')
-  const { contract } = useContract(nftAircraftTokenAddress)
   const ivaoUser = useRecoilValue(ivaoUserStore)
   const authToken = useRecoilValue(authStore)
   const ivaoAuthToken = useRecoilValue(ivaoUserAuthStore)
@@ -67,14 +64,7 @@ const IvaoView = ({ isLoading }: Props) => {
   const cargo = useRecoilValue(cargoStore)
   const [aircraft, setAircraft] = useState<string>('-1')
   const [metar, setMetar] = useState<string>('')
-  const { ownedAircrafts } = useAircraftProviderContext()
-
-  const {
-    data: aircrafts = []
-    //  isLoading,
-    //   isFetched,
-    //    refetch: refetchAircrafts
-  } = useNFTs(contract)
+  const { ownedAircrafts, aircrafts } = useAircraftProviderContext()
 
   const isAllowed = (distance?: number) => hasRequirement(aircrafts, distance ?? 0, aircraft)
 

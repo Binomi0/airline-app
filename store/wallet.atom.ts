@@ -1,8 +1,8 @@
-import { Wallet } from 'ethers'
+import { SmartAccountSigner } from '@alchemy/aa-core'
 import { atom, selector } from 'recoil'
 
 export const walletStore = atom<{
-  baseSigner?: Wallet
+  baseSigner?: SmartAccountSigner
   smartSigner?: any
   paymasterSigner?: any
   smartAccountAddress?: string

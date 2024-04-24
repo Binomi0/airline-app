@@ -7,7 +7,7 @@ import { useLicenseProviderContext } from 'context/LicenseProvider/LicenseProvid
 import { useTokenProviderContext } from 'context/TokenProvider'
 import Swal from 'sweetalert2'
 import { getNFTAttributes } from 'utils'
-import LinearProgress from '@mui/material/LinearProgress'
+import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
@@ -61,7 +61,12 @@ const LicenseView: React.FC = () => {
     [balance.airl, claimLicenseNFT, getAirlBalance, refetchLicenses]
   )
 
-  if (isLoading) return <LinearProgress />
+  if (isLoading)
+    return (
+      <Box textAlign='center'>
+        <CircularProgress thickness={1} size={256} />
+      </Box>
+    )
 
   return (
     <Box my={4}>
