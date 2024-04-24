@@ -2,6 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { ethers } from 'hardhat'
 import { AirlineCoin } from '../typechain-types'
 import { parseUnits } from 'ethers/lib/utils'
+import { time } from '@nomicfoundation/hardhat-network-helpers'
 
 const handleError = (err: unknown) => {
   const { error } = err as { error: Error }
@@ -37,6 +38,7 @@ const deployFlightController = async (
     //   handleError(err)
     // }
 
+    await time.increase(1800)
     console.log('Ending flight...')
     try {
       const txReceipt = await flightController.connect(owner).completeFlight(otherAccount.address, 123)
@@ -60,8 +62,6 @@ const deployFlightController = async (
 
       await airlineCoin.mintTo(otherAccount.address, parseUnits(String(rewards), 'ether'))
       console.log('Minted ok')
-      const _flight = await flightController.connect(otherAccount).flightDetails(otherAccount.address)
-      console.log(_flight)
     } catch (err) {
       handleError(err)
     }
