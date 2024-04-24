@@ -29,6 +29,10 @@ export const AuthProvider = ({ children }: Props) => {
         .get('/api/user/get')
         .then((response) => {
           startTransition(() => {
+            // axios
+            //   .get('api/alchemy/nfts')
+            //   .then((r) => r.data)
+            //   .then(console.log)
             setUser(response.data)
             initWallet(response.data)
           })
