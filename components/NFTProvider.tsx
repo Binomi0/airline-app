@@ -1,15 +1,20 @@
 import { ReactNode, useMemo } from 'react'
 import axios from 'config/axios'
-import { Nft } from 'alchemy-sdk'
+import { AircraftProvider } from 'context/AircraftProvider'
+import { LicenseProvider } from 'context/LicenseProvider'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars
-  children: ({ nfts }: { nfts: Promise<Nft[]> }) => ReactNode
+  children: ReactNode
 }
 
 const NFTProvider = ({ children }: Props) => {
   const nfts = useMemo(() => axios.get('api/alchemy/nfts').then((r) => r.data.nfts), [])
-  return children({ nfts })
+  return (
+    <AircraftProvider nfts={nfts}>
+      <LicenseProvider>{children}</LicenseProvider>
+    </AircraftProvider>
+  )
 }
 
 export default NFTProvider

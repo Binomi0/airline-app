@@ -2461,7 +2461,7 @@
     "@thirdweb-dev/dynamic-contracts" "^1.2.4"
     erc721a-upgradeable "^3.3.0"
 
-"@thirdweb-dev/contracts@^4":
+"@thirdweb-dev/contracts@^3.14.0":
   version "3.14.0"
   resolved "https://packages.turinlabs.com/@thirdweb-dev%2fcontracts/-/contracts-3.14.0.tgz#0f16b5a6744a023fecf3279648a3f2ebeb8d70ba"
   integrity sha512-4LxNj/RgcbVlHESUx/FTKA2AXb/LhWqSjUgmM4glBW6fyZysUKFZUuL+zvZwxY+zbVpMdPqDjMPF0mET2LF25Q==

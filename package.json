@@ -56,7 +56,7 @@
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^3.1.7",
     "@simplewebauthn/types": "^9.0.1",
-    "@thirdweb-dev/contracts": "^4",
+    "@thirdweb-dev/contracts": "^3.14.0",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^18.11.11",
     "@types/nodemailer": "^6.4.9",

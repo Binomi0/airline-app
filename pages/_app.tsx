@@ -10,8 +10,6 @@ import { MainProvider } from 'context/MainProvider'
 import { AuthProvider } from 'context/AuthProvider'
 import CustomWeb3Provider from 'components/CustomWeb3Provider'
 import RightSidebar from 'components/Sidebar/Right'
-import { AircraftProvider } from 'context/AircraftProvider/AircraftProvider.provider'
-import { LicenseProvider } from 'context/LicenseProvider/LicenseProvider.provider'
 import { TokenProvider } from 'context/TokenProvider'
 import { VaProvider } from 'context/VaProvider'
 import { LiveFlightsProvider } from 'context/LiveFlightProvider'
@@ -64,25 +62,19 @@ export default function MyApp(props: MyAppProps) {
             <ThemeWrapper>
               <ErrorBoundary>
                 <NFTProvider>
-                  {({ nfts }) => (
-                    <AircraftProvider nfts={nfts}>
-                      <LicenseProvider>
-                        <TokenProvider>
-                          <VaProvider>
-                            <LiveFlightsProvider>
-                              <MainProvider>
-                                <AppBar />
-                                <Sidebar />
-                                <RightSidebar />
-                              </MainProvider>
-                              <Component loading={loading} />
-                              <SpeedInsights />
-                            </LiveFlightsProvider>
-                          </VaProvider>
-                        </TokenProvider>
-                      </LicenseProvider>
-                    </AircraftProvider>
-                  )}
+                  <TokenProvider>
+                    <VaProvider>
+                      <LiveFlightsProvider>
+                        <MainProvider>
+                          <AppBar />
+                          <Sidebar />
+                          <RightSidebar />
+                        </MainProvider>
+                        <Component loading={loading} />
+                        <SpeedInsights />
+                      </LiveFlightsProvider>
+                    </VaProvider>
+                  </TokenProvider>
                 </NFTProvider>
               </ErrorBoundary>
             </ThemeWrapper>
