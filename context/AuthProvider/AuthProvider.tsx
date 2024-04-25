@@ -3,7 +3,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil'
 import axios from 'config/axios'
 import { authStore } from 'store/auth.atom'
 import { userState } from 'store/user.atom'
-import useWallet from 'hooks/useWallet'
+import useAccountSigner from 'hooks/useAccountSigner'
 
 export const INITIAL_STATE = {
   user: undefined,
@@ -19,7 +19,7 @@ let counter = 0
 export const AuthProvider = ({ children }: Props) => {
   const [token, setAuthToken] = useRecoilState(authStore)
   const setUser = useSetRecoilState(userState)
-  const { initWallet } = useWallet()
+  const { loadAccount } = useAccountSigner()
 
   useEffect(() => {
     if (counter > 0) return
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: Props) => {
         .then((response) => {
           startTransition(() => {
             setUser(response.data)
-            initWallet(response.data)
+            loadAccount(response.data)
           })
         })
 
@@ -42,7 +42,8 @@ export const AuthProvider = ({ children }: Props) => {
           counter = 0
         })
     }
-  }, [initWallet, setAuthToken, setUser, token])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
 
   return <div>{children}</div>
 }

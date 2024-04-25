@@ -1,0 +1,8 @@
+export const stakingAddress = '0x9bDD64340D3CE0607f51bBC7508CA40D45849ab8'
+export const coinTokenAddress = '0xE5b6F5e695BA6E4aeD92B68c4CC8Df1160D69A81'
+export const rewardTokenAddress = '0x9bE634797af98cB560DB23260b5f7C6e98AcCAcf'
+export const nativeTokenWrapperAddress = '0x01c93598EeC9131C05a2450Cd033cbd8F82da31e'
+export const nftAircraftTokenAddress = '0xdABF214E5a833269c192D9d70efDdE174680628D'
+export const nftLicenseTokenAddress = '0x00436c9F57dfFd96cECd129c04D9E488c57266cF'
+export const factoryAddress = ''
+export const flightNftAddress = '0x69F94e46cbC82Ab02781ac4FaFc3580d21f1a888'

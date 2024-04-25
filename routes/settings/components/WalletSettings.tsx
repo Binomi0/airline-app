@@ -13,6 +13,7 @@ import { downloadFile } from 'utils'
 import { askExportKeySwal, missingExportKeySwal } from 'lib/swal'
 import { useRecoilState } from 'recoil'
 import { User } from 'types'
+import { Wallet } from 'alchemy-sdk'
 
 interface Props {
   user?: User
@@ -26,21 +27,18 @@ const WalletSettings = ({ user }: Props) => {
 
     const base64Key = localStorage.getItem(user.id)
     if (!base64Key) {
-      if (wallet.baseSigner?.privateKey) {
-        const { isConfirmed } = await askExportKeySwal(wallet.baseSigner.privateKey)
-        if (isConfirmed) downloadFile(Buffer.from(wallet.baseSigner.privateKey).toString(), wallet.baseSigner.address)
-      } else {
-        return missingExportKeySwal()
-      }
+      return missingExportKeySwal()
     } else {
       if (wallet.smartAccountAddress) {
-        if (wallet.baseSigner?.privateKey) {
-          const { isConfirmed } = await askExportKeySwal(wallet.baseSigner.privateKey)
+        const key = Buffer.from(base64Key, 'base64').toString()
+        const baseSigner = new Wallet(key.slice(0, 66))
+        if (baseSigner.privateKey) {
+          const { isConfirmed } = await askExportKeySwal(baseSigner.privateKey)
           if (isConfirmed) downloadFile(base64Key, wallet.smartAccountAddress)
         }
       }
     }
-  }, [user?.id, wallet?.baseSigner?.address, wallet?.baseSigner?.privateKey, wallet.smartAccountAddress])
+  }, [user?.id, wallet.smartAccountAddress])
 
   return (
     <Paper elevation={6}>

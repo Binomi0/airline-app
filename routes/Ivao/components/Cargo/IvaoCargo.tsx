@@ -23,8 +23,8 @@ import useCargo from 'hooks/useCargo'
 import { destinationStore } from 'store/destination.atom'
 import CargoSelectAircraft from './CargoSelectAircraft'
 import { aircraftNameToIcaoCode } from 'types'
-import { useAircraftProviderContext } from 'context/AircraftProvider'
 import { useRouter } from 'next/router'
+import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 interface Props {
   aircraft: string
@@ -44,7 +44,7 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
   const balance = useRecoilValue(tokenBalanceStore)
   const { cargo, newCargo, setCargo } = useCargo()
   const destinations = useRecoilValue(destinationStore)
-  const { ownedAircrafts } = useAircraftProviderContext()
+  const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
 
   const currentAircraft = useMemo(() => aircrafts.find((ac) => ac.metadata.id === aircraft), [aircrafts, aircraft])
 
@@ -128,7 +128,7 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
           active={!!cargo}
           currentAircraft={currentAircraft}
         />
-        {ownedAircrafts.length === 0 && (
+        {ownedAircrafts && ownedAircrafts.length === 0 && (
           <Box width='100%' p={2}>
             <Alert
               severity='error'

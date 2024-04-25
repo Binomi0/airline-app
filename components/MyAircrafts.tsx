@@ -8,12 +8,13 @@ import Stack from '@mui/material/Stack'
 import { MediaRenderer } from '@thirdweb-dev/react'
 import React from 'react'
 import { getNFTAttributes } from 'utils'
-import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
+import { useRecoilValue } from 'recoil'
+import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 const MyAircrafts = () => {
-  const { ownedAircrafts } = useAircraftProviderContext()
+  const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
 
-  return ownedAircrafts.length > 0 ? (
+  return ownedAircrafts && ownedAircrafts.length > 0 ? (
     <Box my={4}>
       <Typography variant='h2'>My Aircrafts</Typography>
       <Grid container spacing={2}>

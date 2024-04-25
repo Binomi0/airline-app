@@ -1,13 +1,16 @@
+'use client'
+
 import { Wallet } from 'ethers'
 import { useCallback } from 'react'
 import { createModularAccountAlchemyClient } from '@alchemy/aa-alchemy'
-import { Hex, LocalAccountSigner, sepolia } from '@alchemy/aa-core'
+import { Hex, LocalAccountSigner, SmartAccountSigner, WalletClientSigner, sepolia } from '@alchemy/aa-core'
 import { accountImportErrorSwal, missingKeySwal } from 'lib/swal'
 import { useSetRecoilState } from 'recoil'
 import { IWallet } from 'models/Wallet'
 import { walletStore } from 'store/wallet.atom'
 import { getApi, postApi } from 'lib/api'
 import { User } from 'types'
+import { createWalletClient, custom } from 'viem'
 
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS = '0x9406Cc6185a346906296840746125a0E44976454'
 // const ENTRY_POINT = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
@@ -21,10 +24,8 @@ const useWallet = (): UseWallet => {
   const setWallet = useSetRecoilState(walletStore)
 
   const initialize = useCallback(
-    async (_signer: Wallet, _user: User) => {
-      if (!_signer || !_user.id) return
-
-      const signer = LocalAccountSigner.privateKeyToAccountSigner(_signer.privateKey as Hex)
+    async (signer: SmartAccountSigner, _user: User) => {
+      if (!signer || !_user.id) return
       const modularAccountAlchemyClient = await createModularAccountAlchemyClient({
         apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY_ETH_SEPOLIA,
         chain: sepolia,
@@ -48,12 +49,12 @@ const useWallet = (): UseWallet => {
         const updateWallet = postApi('/api/wallet', {
           id: _user.id,
           smartAccountAddress: smartAccountAddress,
-          signerAddress: _signer.address
+          signerAddress: await signer.getAddress()
         })
 
         await Promise.all([updateUser, updateWallet])
         setWallet({
-          baseSigner: _signer,
+          baseSigner: signer,
           smartSigner: smartAccountClient,
           paymasterSigner: modularAccountAlchemyClient,
           smartAccountAddress,
@@ -66,11 +67,11 @@ const useWallet = (): UseWallet => {
           await postApi('/api/wallet', {
             id: _user.id,
             smartAccountAddress: _user.address,
-            signerAddress: _signer.address
+            signerAddress: await signer.getAddress()
           })
         }
         setWallet({
-          baseSigner: _signer,
+          baseSigner: signer,
           smartSigner: smartAccountClient,
           paymasterSigner: modularAccountAlchemyClient,
           smartAccountAddress: _user.address,
@@ -120,7 +121,9 @@ const useWallet = (): UseWallet => {
 
           if (isValidWallet && _user.id) {
             localStorage.setItem(_user.id, base64Key)
-            await initialize(baseSigner, _user)
+            const localSigner = LocalAccountSigner.privateKeyToAccountSigner(baseSigner.privateKey as Hex)
+
+            await initialize(localSigner, _user)
             resolve(true)
           } else {
             reject(new Error('Invalid wallet'))
@@ -137,23 +140,45 @@ const useWallet = (): UseWallet => {
       if (!_user || !_user.id) throw new Error('Missing user while initializing wallet')
 
       try {
+        if (typeof window !== 'undefined') {
+          const externalProvider = window.ethereum // or anyother EIP-1193 provider
+          const walletClient = createWalletClient({
+            chain: sepolia, // can provide a different chain here
+            transport: custom(externalProvider)
+          })
+
+          const [address] = await walletClient?.getAddresses()
+          if (address) {
+            const signer: SmartAccountSigner = new WalletClientSigner(
+              walletClient,
+              'json-rpc' // signerType
+            )
+            await initialize(signer, _user)
+            return
+          }
+        }
+
         // This is where the wallet is created for the first time?
         if (!_user.address) {
           console.log('initWallet user has no address')
+
           const random = Wallet.createRandom()
           const base64Key = Buffer.from(random.privateKey).toString('base64')
 
           localStorage.setItem(_user.id, base64Key)
+          const localSigner = LocalAccountSigner.privateKeyToAccountSigner(random.privateKey as Hex)
 
-          await initialize(random, _user)
+          await initialize(localSigner, _user)
           return
         }
 
         const walletId = localStorage.getItem(_user.id)
         if (walletId) {
           const signer = new Wallet(Buffer.from(walletId, 'base64').toString().slice(0, 66))
+          const localSigner = LocalAccountSigner.privateKeyToAccountSigner(signer.privateKey as Hex)
+
           if (await checkSigner(signer)) {
-            await initialize(signer, _user)
+            await initialize(localSigner, _user)
           }
           return
         } else {

@@ -1,6 +1,5 @@
 import React from 'react'
 // import Flights from './Flights'
-import { useAircraftProviderContext } from 'context/AircraftProvider'
 // import useCargo from 'hooks/useCargo'
 // import { useVaProviderContext } from 'context/VaProvider'
 import { IvaoPilot } from 'types'
@@ -11,6 +10,7 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { useRecoilValue } from 'recoil'
 import { pilotStore } from 'store/pilot.atom'
+import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 const STEP = 12
 
@@ -26,7 +26,7 @@ const IvaoPilots = () => {
     // page
     setPage
   ] = React.useState(0)
-  const { ownedAircrafts } = useAircraftProviderContext()
+  const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
   // const { cargo, newCargo } = useCargo()
   const pilots = useRecoilValue(pilotStore)
 

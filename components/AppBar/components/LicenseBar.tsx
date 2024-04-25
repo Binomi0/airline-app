@@ -3,18 +3,18 @@ import AvatarGroup from '@mui/material/AvatarGroup'
 import CircularProgress from '@mui/material/CircularProgress'
 import Tooltip from '@mui/material/Tooltip'
 import { MediaRenderer } from '@thirdweb-dev/react'
-import { useLicenseProviderContext } from 'context/LicenseProvider/LicenseProvider.context'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
+import { ownedLicenseNftStore } from 'store/licenseNFT.atom'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const LicenseBar = () => {
-  const { ownedLicenses, isLoading } = useLicenseProviderContext()
+  const ownedLicenses = useRecoilValue(ownedLicenseNftStore)
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
 
   return (
     <div>
-      {isLoading && !smartAccountAddress ? (
+      {!smartAccountAddress ? (
         <CircularProgress size={24} />
       ) : (
         ownedLicenses &&

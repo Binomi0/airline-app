@@ -1,5 +1,3 @@
-import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
 import { coinTokenAddress, nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
 import { BaseContract, ethers } from 'ethers'
 import { useCallback, useState } from 'react'

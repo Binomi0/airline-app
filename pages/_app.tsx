@@ -10,8 +10,6 @@ import { MainProvider } from 'context/MainProvider'
 import { AuthProvider } from 'context/AuthProvider'
 import CustomWeb3Provider from 'components/CustomWeb3Provider'
 import RightSidebar from 'components/Sidebar/Right'
-import { AircraftProvider } from 'context/AircraftProvider/AircraftProvider.provider'
-import { LicenseProvider } from 'context/LicenseProvider/LicenseProvider.provider'
 import { TokenProvider } from 'context/TokenProvider'
 import { VaProvider } from 'context/VaProvider'
 import { LiveFlightsProvider } from 'context/LiveFlightProvider'
@@ -24,6 +22,7 @@ import { getCookie } from 'cookies-next'
 import 'lib/alchemy'
 import { themeStore } from 'store/theme.atom'
 import ThemeWrapper from 'components/ThemeWrapper'
+import NFTProvider from 'components/NFTProvider'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -62,23 +61,21 @@ export default function MyApp(props: MyAppProps) {
             </Head>
             <ThemeWrapper>
               <ErrorBoundary>
-                <AircraftProvider>
-                  <LicenseProvider>
-                    <TokenProvider>
-                      <VaProvider>
-                        <LiveFlightsProvider>
-                          <MainProvider>
-                            <AppBar />
-                            <Sidebar />
-                            <RightSidebar />
-                          </MainProvider>
-                          <Component loading={loading} />
-                          <SpeedInsights />
-                        </LiveFlightsProvider>
-                      </VaProvider>
-                    </TokenProvider>
-                  </LicenseProvider>
-                </AircraftProvider>
+                <NFTProvider>
+                  <TokenProvider>
+                    <VaProvider>
+                      <LiveFlightsProvider>
+                        <MainProvider>
+                          <AppBar />
+                          <Sidebar />
+                          <RightSidebar />
+                        </MainProvider>
+                        <Component loading={loading} />
+                        <SpeedInsights />
+                      </LiveFlightsProvider>
+                    </VaProvider>
+                  </TokenProvider>
+                </NFTProvider>
               </ErrorBoundary>
             </ThemeWrapper>
           </CustomWeb3Provider>
