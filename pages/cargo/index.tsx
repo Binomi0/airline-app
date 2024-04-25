@@ -5,7 +5,6 @@ import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector
 import { VaProvider } from 'context/VaProvider'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
-import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import LinearProgress from '@mui/material/LinearProgress'
 import Container from '@mui/material/Container'
@@ -15,12 +14,13 @@ import Button from '@mui/material/Button'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import type { PageProps } from 'types'
+import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 const CargoPage = ({ loading }: PageProps) => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const [aircraft, setAircraft] = useState<NFT>()
-  const { ownedAircrafts, isLoading } = useAircraftProviderContext()
+  const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
   const { live } = useLiveFlightProviderContext()
 
   React.useEffect(() => {
@@ -31,7 +31,7 @@ const CargoPage = ({ loading }: PageProps) => {
     return <Disconnected />
   }
 
-  if (isLoading) {
+  if (!ownedAircrafts) {
     return <LinearProgress />
   }
 

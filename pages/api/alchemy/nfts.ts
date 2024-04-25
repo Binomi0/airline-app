@@ -53,8 +53,17 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     try {
       console.log('NFTS')
-      // const response = await alchemy.nft.getNftsForContract(nftAircraftTokenAddress)
       const response = await alchemy.nft.getNftMetadataBatch([...aircrafts, ...licenses])
+      res.status(200).send(response)
+      return
+    } catch (error) {
+      console.log('NFTS ERROR', error)
+      res.status(400).send(error)
+      return
+    }
+  } else if (req.method === 'POST') {
+    try {
+      const response = await alchemy.nft.getNftsForOwner(req.body.address)
       res.status(200).send(response)
       return
     } catch (error) {

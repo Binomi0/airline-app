@@ -5,18 +5,18 @@ import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import useClaimNFT from 'hooks/useClaimNFT'
 import Swal from 'sweetalert2'
-import { useAircraftProviderContext } from 'context/AircraftProvider/AircraftProvider.context'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import AircraftItem from './components/AircraftItem'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Fade from '@mui/material/Fade'
 import Grid from '@mui/material/Grid'
+import { aircraftNftStore } from 'store/aircraftNFT.atom'
 
 const HangarView: React.FC = () => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { getAirlBalance } = useTokenProviderContext()
-  const { aircrafts, isLoading } = useAircraftProviderContext()
+  const aircrafts = useRecoilValue(aircraftNftStore)
   const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
   const { claimAircraftNFT, isClaiming } = useClaimNFT(aircraftContract)
 
@@ -49,7 +49,7 @@ const HangarView: React.FC = () => {
     [claimAircraftNFT, getAirlBalance, smartAccountAddress]
   )
 
-  if (isLoading) {
+  if (!aircrafts) {
     return (
       <Box textAlign='center'>
         <CircularProgress size={60} color='secondary' />

@@ -3,7 +3,6 @@ import { useRecoilState, useSetRecoilState } from 'recoil'
 import axios from 'config/axios'
 import { authStore } from 'store/auth.atom'
 import { userState } from 'store/user.atom'
-// import useWallet from 'hooks/useWallet'
 import useAccountSigner from 'hooks/useAccountSigner'
 
 export const INITIAL_STATE = {
@@ -43,7 +42,8 @@ export const AuthProvider = ({ children }: Props) => {
           counter = 0
         })
     }
-  }, [loadAccount, setAuthToken, setUser, token])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
 
   return <div>{children}</div>
 }

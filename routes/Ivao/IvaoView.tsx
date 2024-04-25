@@ -27,9 +27,9 @@ import Swal from 'sweetalert2'
 import { postApi } from 'lib/api'
 import { cargoStore } from 'store/cargo.atom'
 import { hasRequirement } from 'utils'
-import { useAircraftProviderContext } from 'context/AircraftProvider'
 import axios from 'config/axios'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
+import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 const getMetar = async (callsign: string, ivaoAuthToken?: string | null) =>
   axios
@@ -64,9 +64,10 @@ const IvaoView = ({ isLoading }: Props) => {
   const cargo = useRecoilValue(cargoStore)
   const [aircraft, setAircraft] = useState<string>('-1')
   const [metar, setMetar] = useState<string>('')
-  const { ownedAircrafts, aircrafts } = useAircraftProviderContext()
+  const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
+  const aircrafts = useRecoilValue(aircraftNftStore)
 
-  const isAllowed = (distance?: number) => hasRequirement(aircrafts, distance ?? 0, aircraft)
+  const isAllowed = (distance?: number) => hasRequirement(aircrafts ?? [], distance ?? 0, aircraft)
 
   const handleSelectAtc = useCallback(
     (callsign: string, side: 'start' | 'end') => {
@@ -177,7 +178,7 @@ const IvaoView = ({ isLoading }: Props) => {
   }, [router])
 
   React.useEffect(() => {
-    if (ownedAircrafts.length > 0) {
+    if (ownedAircrafts && ownedAircrafts.length > 0) {
       setAircraft('0')
     }
   }, [ownedAircrafts])
@@ -241,7 +242,7 @@ const IvaoView = ({ isLoading }: Props) => {
             <Cargo
               setAircraft={setAircraft}
               aircraft={aircraft}
-              aircrafts={aircrafts}
+              aircrafts={aircrafts ?? []}
               start={start}
               end={end}
               onBooking={handleBooking}

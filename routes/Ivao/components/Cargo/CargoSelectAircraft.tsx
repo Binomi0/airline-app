@@ -9,9 +9,10 @@ import React, { useMemo } from 'react'
 import { formatNumber } from 'utils'
 import BigNumber from 'bignumber.js'
 import { NFT } from '@thirdweb-dev/sdk'
-import { useAircraftProviderContext } from 'context/AircraftProvider'
 import BlockIcon from '@mui/icons-material/Block'
 import { useTheme } from '@mui/material'
+import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
+import { useRecoilValue } from 'recoil'
 
 interface Props {
   aircraft: string
@@ -36,12 +37,13 @@ const CargoSelectAircraft = ({
   requiredGas
 }: Props) => {
   const theme = useTheme()
-  const { ownedAircrafts } = useAircraftProviderContext()
+  const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
   const missingAircrafts = useMemo(
-    () => aircrafts.filter((a) => !ownedAircrafts.some((o) => o.metadata.id === a.metadata.id)),
+    () => aircrafts.filter((a) => ownedAircrafts && !ownedAircrafts.some((o) => o.metadata.id === a.metadata.id)),
     [aircrafts, ownedAircrafts]
   )
 
+  if (!ownedAircrafts) return null
   return (
     <Stack direction='row' spacing={2} p={2}>
       <Stack justifyContent='space-between' spacing={2}>

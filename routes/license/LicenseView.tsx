@@ -3,7 +3,6 @@ import { NFT, useContract } from '@thirdweb-dev/react'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import LicenseItem from './components/LicenseItem'
 import useClaimNFT from 'hooks/useClaimNFT'
-import { useLicenseProviderContext } from 'context/LicenseProvider/LicenseProvider.context'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import Swal from 'sweetalert2'
 import { getNFTAttributes } from 'utils'
@@ -13,10 +12,12 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import { useRecoilValue } from 'recoil'
 import { tokenBalanceStore } from 'store/balance.atom'
+import { licenseNftStore, ownedLicenseNftStore } from 'store/licenseNFT.atom'
 
 const LicenseView: React.FC = () => {
   const { contract } = useContract(nftLicenseTokenAddress)
-  const { licenses, ownedLicenses: owned, refetchLicenses, isLoading } = useLicenseProviderContext()
+  const licenses = useRecoilValue(licenseNftStore)
+  const ownedLicenses = useRecoilValue(ownedLicenseNftStore)
   const { claimLicenseNFT, isClaiming } = useClaimNFT(contract)
   const { getAirlBalance } = useTokenProviderContext()
   const balance = useRecoilValue(tokenBalanceStore)
@@ -46,7 +47,8 @@ const LicenseView: React.FC = () => {
           })
           await getAirlBalance()
           console.timeEnd()
-          await refetchLicenses()
+          // TODO:
+          // await refetchLicenses()
           console.timeEnd()
           refetch()
         }
@@ -58,10 +60,10 @@ const LicenseView: React.FC = () => {
         })
       }
     },
-    [balance.airl, claimLicenseNFT, getAirlBalance, refetchLicenses]
+    [balance.airl, claimLicenseNFT, getAirlBalance]
   )
 
-  if (isLoading)
+  if (!licenses)
     return (
       <Box textAlign='center'>
         <CircularProgress thickness={1} size={256} />
@@ -81,7 +83,7 @@ const LicenseView: React.FC = () => {
                 nft={license}
                 claimLicenseNFT={handleClaim(license)}
                 key={license.metadata.id}
-                owned={owned.some((n) => license.metadata.id === n.metadata.id)}
+                owned={ownedLicenses?.some((n) => license.metadata.id === n.metadata.id) ?? false}
               />
             )
         )}
