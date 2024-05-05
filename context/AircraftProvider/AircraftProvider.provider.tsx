@@ -17,10 +17,10 @@ export const INITIAL_STATE: AircraftReducerState = {
 
 interface Props {
   children: React.ReactNode
-  nfts: Promise<Nft[]>
+  nfts: Nft[]
 }
 
-export const AircraftProvider = ({ children, nfts: getNfts }: Props) => {
+export const AircraftProvider = ({ children, nfts }: Props) => {
   const user = useRecoilValue(userState)
   const { contract } = useContract(nftAircraftTokenAddress)
   const { data: aircrafts = [], isLoading, isFetched, refetch: refetchAircrafts } = useNFTs(contract)
@@ -36,17 +36,17 @@ export const AircraftProvider = ({ children, nfts: getNfts }: Props) => {
   const setOwnedAircrafts = useCallback((owned: NFT[]) => dispatch({ type: 'SET_OWNED_AIRCRAFTS', payload: owned }), [])
   const setAircrafts = useCallback((list: NFT[]) => dispatch({ type: 'SET_AIRCRAFTS', payload: list }), [])
 
-  const handleUpdateOwnedAircrafts = useCallback(async () => {
-    setOwnedAircrafts(ownedAircrafts)
-  }, [ownedAircrafts, setOwnedAircrafts])
+  // const handleUpdateOwnedAircrafts = useCallback(async () => {
+  //   setOwnedAircrafts(ownedAircrafts)
+  // }, [ownedAircrafts, setOwnedAircrafts])
+
+  // React.useEffect(() => {
+  //   if (isFetched) handleUpdateOwnedAircrafts()
+  // }, [handleUpdateOwnedAircrafts, isFetched])
 
   React.useEffect(() => {
-    if (isFetched) handleUpdateOwnedAircrafts()
-  }, [handleUpdateOwnedAircrafts, isFetched])
-
-  React.useEffect(() => {
-    getNfts.then(console.log)
-  }, [getNfts])
+    console.log({ nfts })
+  }, [nfts])
 
   return (
     <Provider value={{ ...state, isLoading, setOwnedAircrafts, setAircrafts, refetchAircrafts }}>{children}</Provider>

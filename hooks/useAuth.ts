@@ -3,12 +3,11 @@ import useAccountSigner from './useAccountSigner'
 import { deleteCookie } from 'cookies-next'
 import { loginSuccessSwal } from 'lib/swal'
 import { useRouter } from 'next/router'
-import { AccountSignerStatus, User } from 'types'
+import { AccountSignerStatus } from 'types'
 import { useSetRecoilState } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 import { userState } from 'store/user.atom'
 import { authStore } from 'store/auth.atom'
-import axios from 'config/axios'
 
 interface UseAuthReturnType {
   // eslint-disable-next-line no-unused-vars
@@ -20,7 +19,7 @@ interface UseAuthReturnType {
 }
 
 const useAuth = (): UseAuthReturnType => {
-  const { verifyCredential, createCredential, loadAccount } = useAccountSigner()
+  const { verifyCredential, createCredential } = useAccountSigner()
   const [status, setStatus] = useState<AccountSignerStatus>()
   const router = useRouter()
   const setWallet = useSetRecoilState(walletStore)
@@ -38,10 +37,7 @@ const useAuth = (): UseAuthReturnType => {
           throw new Error('while verify user credentials')
         }
 
-        const { data } = await axios.get<User>('/api/user/get')
-        setUser(data)
         setToken(token)
-        loadAccount(data)
         loginSuccessSwal()
       } catch (err) {
         const error = err as Error
@@ -49,7 +45,7 @@ const useAuth = (): UseAuthReturnType => {
         setStatus(error.message === 'Missing wallet key' ? 'missingKey' : 'error')
       }
     },
-    [loadAccount, setToken, setUser, verifyCredential]
+    [setToken, verifyCredential]
   )
 
   const handleSignUp = useCallback(
@@ -58,10 +54,7 @@ const useAuth = (): UseAuthReturnType => {
       try {
         const { verified, token } = await createCredential(email)
         if (verified) {
-          const { data } = await axios.get<User>('/api/user/get')
-          setUser(data)
           setToken(token)
-          loadAccount(data)
           loginSuccessSwal()
         }
       } catch (err) {
@@ -69,7 +62,7 @@ const useAuth = (): UseAuthReturnType => {
         setStatus('error')
       }
     },
-    [createCredential, loadAccount, setToken, setUser]
+    [createCredential, setToken]
   )
 
   const handleSignOut = useCallback(() => {

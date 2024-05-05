@@ -24,7 +24,7 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
   const user = useRecoilValue(userState)
   const [status, setStatus] = useState<AccountSignerStatus>()
   const wallet = useRecoilValue(walletStore)
-  const { initWallet } = useWallet()
+  const { initWallet, initCustomWallet } = useWallet()
 
   const createCredential = useCallback(async (email: string) => {
     try {
@@ -37,7 +37,6 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
         data: request,
         email
       })
-      console.log('validation =>', validation)
       setStatus(validation?.verified ? 'success' : 'error')
 
       return { verified: Boolean(validation?.verified), token: validation?.token }
@@ -73,14 +72,15 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       if (wallet.isLoaded) return
 
       try {
-        await initWallet(_user)
+        await initCustomWallet(_user)
+        // await initWallet(_user)
         setStatus('success')
       } catch (err) {
         setStatus('error')
         throw new Error('While loading account')
       }
     },
-    [initWallet, wallet.isLoaded]
+    [initCustomWallet, wallet.isLoaded]
   )
 
   const addBackup = useCallback(async () => {

@@ -16,7 +16,7 @@ import BigNumber from 'bignumber.js'
 // A unique identifier for your website
 const rpID = process.env.NEXT_PUBLIC_DOMAIN
 // The URL at which registrations and authentications should occur
-const origin = process.env.ORIGIN
+const origin = process.env.NEXT_PUBLIC_ORIGIN
 
 // @ts-ignore
 export const verifySignature = async function (authenticator, response, expectedChallenge) {
@@ -30,6 +30,7 @@ export const verifySignature = async function (authenticator, response, expected
       expectedChallenge,
       expectedOrigin: origin,
       expectedRPID: rpID,
+      // expectedType: ['webauthn.get', 'payment.get'],
       authenticator: {
         ...authenticator,
         credentialID: new Uint8Array(

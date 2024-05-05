@@ -23,11 +23,14 @@ const SettingsPage = ({ loading }: PageProps) => {
   const [hasBackup, setHasBackup] = useState(false)
 
   useEffect(() => {
-    if (!user) return
-
-    axios.get('api/webauthn/get').then((response: AxiosResponse<{ authenticators: string[] }>) => {
-      setHasBackup(!!response.data.authenticators.length)
-    })
+    if (!user) {
+      router.push('/signin')
+    } else {
+      axios.get('api/webauthn/get').then((response: AxiosResponse<{ authenticators: string[] }>) => {
+        console.log(response.data.authenticators)
+        setHasBackup(response.data.authenticators.length > 1)
+      })
+    }
   }, [user, router])
 
   return user ? (

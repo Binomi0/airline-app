@@ -13,9 +13,11 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import { useRecoilValue } from 'recoil'
 import { tokenBalanceStore } from 'store/balance.atom'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const LicenseView: React.FC = () => {
   const { contract } = useContract(nftLicenseTokenAddress)
+  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { licenses, ownedLicenses: owned, refetchLicenses, isLoading } = useLicenseProviderContext()
   const { claimLicenseNFT, isClaiming } = useClaimNFT(contract)
   const { getAirlBalance } = useTokenProviderContext()
@@ -46,7 +48,7 @@ const LicenseView: React.FC = () => {
           })
           await getAirlBalance()
           console.timeEnd()
-          await refetchLicenses()
+          await refetchLicenses(smartAccountAddress ?? '')
           console.timeEnd()
           refetch()
         }
@@ -58,7 +60,7 @@ const LicenseView: React.FC = () => {
         })
       }
     },
-    [balance.airl, claimLicenseNFT, getAirlBalance, refetchLicenses]
+    [balance.airl, claimLicenseNFT, getAirlBalance, refetchLicenses, smartAccountAddress]
   )
 
   if (isLoading)

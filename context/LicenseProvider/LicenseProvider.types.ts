@@ -10,7 +10,7 @@ export type LicenseReducerState = {
 }
 
 export type LicenseContextProps = LicenseReducerState & {
-  refetchLicenses: () => Promise<any>
+  refetchLicenses: (smartAccountAddress: string) => Promise<void>
 }
 
 export type LicenseReducerHandler = (state: LicenseReducerState, action: Actions) => LicenseReducerState

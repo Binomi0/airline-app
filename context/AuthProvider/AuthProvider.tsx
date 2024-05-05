@@ -1,5 +1,5 @@
 import React, { startTransition, useEffect } from 'react'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import axios from 'config/axios'
 import { authStore } from 'store/auth.atom'
 import { userState } from 'store/user.atom'
@@ -18,14 +18,14 @@ interface Props {
 let counter = 0
 
 export const AuthProvider = ({ children }: Props) => {
-  const [token, setAuthToken] = useRecoilState(authStore)
-  const setUser = useSetRecoilState(userState)
+  const token = useRecoilValue(authStore)
+  const [user, setUser] = useRecoilState(userState)
   const { loadAccount } = useAccountSigner()
 
   useEffect(() => {
-    if (counter > 0) return
-    counter++
-    if (token) {
+    if (token && !user) {
+      if (counter > 0) return
+      counter++
       axios
         .get('/api/user/get')
         .then((response) => {
@@ -39,11 +39,10 @@ export const AuthProvider = ({ children }: Props) => {
           console.error('AuthProvider error =>', err)
         })
         .finally(() => {
-          setAuthToken(token)
           counter = 0
         })
     }
-  }, [loadAccount, setAuthToken, setUser, token])
+  }, [loadAccount, setUser, token, user])
 
   return <div>{children}</div>
 }

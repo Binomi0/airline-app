@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+import * as typ from './solidityTypes'
+
 import { NFT } from '@thirdweb-dev/sdk'
 import { atc } from 'mocks'
 import ivaoPilot from 'mocks/ivaoPilot'
@@ -294,4 +296,48 @@ export const aircraftNameToIcaoCode = {
   'Cessna C700 Longitude': IcaoCodes.C700,
   'Boeing 737-600': IcaoCodes.B737,
   'Antonov An-225 Mriya': IcaoCodes.AN225
+}
+
+export interface UserOperation {
+  sender: typ.address
+  nonce: typ.uint256
+  initCode: typ.bytes
+  callData: typ.bytes
+  callGasLimit: typ.uint128
+  verificationGasLimit: typ.uint128
+  preVerificationGas: typ.uint256
+  maxFeePerGas: typ.uint256
+  maxPriorityFeePerGas: typ.uint256
+  paymaster: typ.address
+  paymasterVerificationGasLimit: number
+  paymasterPostOpGasLimit: number
+  paymasterData: typ.bytes
+  signature: typ.bytes
+}
+
+export interface PackedUserOperation {
+  sender: typ.address
+  nonce: typ.uint256
+  initCode: typ.bytes
+  callData: typ.bytes
+  accountGasLimits: typ.bytes32
+  preVerificationGas: typ.uint256
+  gasFees: typ.bytes32
+  paymasterAndData: typ.bytes
+  signature: typ.bytes
+}
+
+export interface LicenseMetadata {
+  image: string
+  type: string
+  name: string
+  icao: string
+}
+
+export interface LicenseNft {
+  id: string
+  price: number
+  description: string
+  name: string
+  metadata: LicenseMetadata
 }

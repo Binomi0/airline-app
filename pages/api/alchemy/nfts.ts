@@ -52,7 +52,6 @@ const licenses: NftMetadataBatchToken[] = [
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     try {
-      console.log('NFTS')
       // const response = await alchemy.nft.getNftsForContract(nftAircraftTokenAddress)
       const response = await alchemy.nft.getNftMetadataBatch([...aircrafts, ...licenses])
       res.status(200).send(response)
