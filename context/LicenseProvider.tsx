@@ -4,7 +4,6 @@ import { useContract, useNFTs, useOwnedNFTs } from '@thirdweb-dev/react'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
 import { licenseNftStore, ownedLicenseNftStore } from 'store/licenseNFT.atom'
-import LinearProgress from '@mui/material/LinearProgress'
 
 interface Props {
   children: React.ReactNode
@@ -26,5 +25,5 @@ export const LicenseProvider = ({ children }: Props) => {
     setOwnedLicenseNftStore(ownedLicenses)
   }, [ownedLicenses, setOwnedLicenseNftStore])
 
-  return <React.Suspense fallback={<LinearProgress />}>{children}</React.Suspense>
+  return children
 }
