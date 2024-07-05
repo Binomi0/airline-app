@@ -1,13 +1,13 @@
+import axios from 'axios'
 import React, { FC, startTransition, useCallback, useReducer, useState } from 'react'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { getApi } from 'lib/api'
+import type { Atc } from 'types'
+import { ivaoUserStore } from 'store/ivao-user.atom'
+import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
-import type { Atc } from 'types'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { ivaoUserStore } from 'store/ivao-user.atom'
-import { getApi } from 'lib/api'
-import axios from 'axios'
-import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 
 const MIN_IVAO_REQ_DELAY = 20000
 export const INITIAL_STATE: IVAOClients = {
@@ -54,18 +54,23 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const getAtcs = useCallback(
     async (_token?: string) => {
       if (!_token) return
+      console.log({ _token })
 
       setIsLoading((s) => s + 1)
-      const response = await axios.get<Atc[]>('api/ivao/atc/tower', {
-        headers: {
-          Authorization: `Bearer ${_token}`
-        }
-      })
+      try {
+        const response = await axios.get<Atc[]>('api/ivao/atc/tower', {
+          headers: {
+            Authorization: `Bearer ${_token}`
+          }
+        })
 
-      startTransition(() => {
-        setAtcs(response.data ?? [])
+        startTransition(() => {
+          setAtcs(response.data ?? [])
+          setIsLoading((s) => s - 1)
+        })
+      } catch (error) {
         setIsLoading((s) => s - 1)
-      })
+      }
     },
     [setAtcs]
   )

@@ -140,23 +140,23 @@ const useWallet = (): UseWallet => {
       if (!_user || !_user.id) throw new Error('Missing user while initializing wallet')
 
       try {
-        if (typeof window !== 'undefined') {
-          const externalProvider = window.ethereum // or anyother EIP-1193 provider
-          const walletClient = createWalletClient({
-            chain: sepolia, // can provide a different chain here
-            transport: custom(externalProvider)
-          })
+        // if (typeof window !== 'undefined') {
+        //   const externalProvider = window.ethereum // or anyother EIP-1193 provider
+        //   const walletClient = createWalletClient({
+        //     chain: sepolia, // can provide a different chain here
+        //     transport: custom(externalProvider)
+        //   })
 
-          const [address] = await walletClient?.getAddresses()
-          if (address) {
-            const signer: SmartAccountSigner = new WalletClientSigner(
-              walletClient,
-              'json-rpc' // signerType
-            )
-            await initialize(signer, _user)
-            return
-          }
-        }
+        //   const [address] = await walletClient?.getAddresses()
+        //   if (address) {
+        //     const signer: SmartAccountSigner = new WalletClientSigner(
+        //       walletClient,
+        //       'json-rpc' // signerType
+        //     )
+        //     await initialize(signer, _user)
+        //     return
+        //   }
+        // }
 
         // This is where the wallet is created for the first time?
         if (!_user.address) {

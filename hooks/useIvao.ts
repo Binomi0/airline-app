@@ -22,13 +22,7 @@ const useIvao = (): UseIvaoReturnType => {
   const requestIvaoUser = useCallback(
     (token: string) => {
       axios
-        .get('/api/ivao/user', {
-          // signal: controller.signal,
-          headers: {
-            'x-ivao-auth': `Bearer ${token}`,
-            Authorization: `Bearer ${token}`
-          }
-        })
+        .get('/api/ivao/user')
         .then((response: AxiosResponse) => {
           setIvaoUser(response.data)
           localStorage.setItem('ivao-auth-token', token)
@@ -77,6 +71,8 @@ const useIvao = (): UseIvaoReturnType => {
         .finally(() => {
           setIsLoading(false)
         })
+    } else {
+      throw new Error('Ivao returned different values')
     }
   }, [router.query, requestIvaoUser])
 

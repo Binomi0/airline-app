@@ -8,7 +8,7 @@ import { paymasterSignerStore, smartAccountSignerStore } from 'store/wallet.atom
 
 const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) => {
   const [isLoading, setIsLoading] = useState(false)
-  const smartSigner = useRecoilValue(smartAccountSignerStore)
+  // const smartSigner = useRecoilValue(smartAccountSignerStore)
   const paymasterSigner = useRecoilValue(paymasterSignerStore)
 
   const stake = useCallback(
@@ -61,18 +61,18 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
 
   const claimRewards = useCallback(
     async (amount: string) => {
-      if (!contract || !smartSigner) return
+      if (!contract || !paymasterSigner) return
       setIsLoading(true)
 
       try {
         const erc20Staking = new ethers.Contract(target, contract.abi)
         const data = erc20Staking.interface.encodeFunctionData('claimRewards', [])
-        const hash = await smartSigner.sendUserOperation({ uo: { target, data } })
+        const hash = await paymasterSigner.sendUserOperation({ uo: { target, data } })
 
-        await smartSigner.waitForUserOperationTransaction(hash)
+        await paymasterSigner.waitForUserOperationTransaction(hash)
         await postApi('/api/transaction/user', { operation: 'claimRewards', amount, hash })
 
-        const receipt = await smartSigner.getUserOperationReceipt(hash)
+        const receipt = await paymasterSigner.getUserOperationReceipt(hash)
         setIsLoading(false)
 
         return receipt
@@ -86,7 +86,7 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
         setIsLoading(false)
       }
     },
-    [contract, smartSigner]
+    [contract, paymasterSigner]
   )
 
   return { stake, withdraw, claimRewards, isLoading }

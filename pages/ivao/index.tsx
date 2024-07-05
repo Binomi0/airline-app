@@ -13,18 +13,13 @@ const IVAOPage = ({ loading }: PageProps) => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const { initIvaoAuth } = useVaProviderContext()
-  // const { authorize, isLoading } = useIvao()
   const { live } = useLiveFlightProviderContext()
 
   React.useEffect(() => {
     if (live) router.push('/live')
   }, [live, router])
 
-  useEffect(() => {
-    initIvaoAuth()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  // useEffect(authorize, [authorize])
+  useEffect(initIvaoAuth, [initIvaoAuth])
 
   if (loading) return <LinearProgress />
   if (!user) return <Disconnected />

@@ -3,6 +3,13 @@ import { ivaoInstance } from 'config/axios'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
 
+/**
+ * @description Handles request for metar ICAO codes
+ *
+ * @param req CustomNextApiRequest
+ * @param res NextApiResponse
+ * @returns {string} metar information
+ */
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
     res.status(405).end()

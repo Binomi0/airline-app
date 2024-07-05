@@ -72,6 +72,7 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
         })
         .catch((err: AxiosError) => {
           if (err.response?.status === 401) {
+            console.log('Error de auth en ivao, probando de nuevo initIvaoAuth')
             initIvaoAuth()
           }
           console.error(err)

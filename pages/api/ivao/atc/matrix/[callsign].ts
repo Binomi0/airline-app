@@ -24,6 +24,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const towers = atcs.reduce(reduceAtcTower, [])
     const result = atcs.reduce(reduceTowerMatrix(towers), [])
 
+    console.log('CALLSIGN =>', req.query.callsign)
+
     const currentMatrix = result.find((current) => Boolean(current[req.query.callsign as string]))
     if (!currentMatrix) {
       res.status(204).end({ result })

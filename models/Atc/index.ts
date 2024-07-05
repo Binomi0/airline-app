@@ -8,7 +8,7 @@ const atcSchema: mongoose.Schema = new mongoose.Schema<AtcSchema>(
     time: Number,
     id: Number,
     userId: Number,
-    callsign: {type: String, unique: true, index: true},
+    callsign: { type: String, unique: true, index: true },
     serverId: String,
     softwareTypeId: String,
     softwareVersion: String,
@@ -38,6 +38,26 @@ const atcSchema: mongoose.Schema = new mongoose.Schema<AtcSchema>(
       lines: [String],
       revision: String,
       timestamp: String
+    },
+    atcPosition: {
+      airportId: String,
+      atcCallsign: String,
+      military: Boolean,
+      middleIdentifier: Number,
+      position: String,
+      composePosition: String,
+      regionMap: [],
+      regionMapPolygon: [],
+      airport: {
+        icao: String,
+        iata: String,
+        name: String,
+        countryId: String,
+        city: String,
+        latitude: Number,
+        longitude: Number,
+        military: Boolean
+      }
     }
   },
   {

@@ -1,14 +1,15 @@
-import { ReactNode } from 'react'
 import { AircraftProvider } from 'context/AircraftProvider'
 import { LicenseProvider } from 'context/LicenseProvider'
 
 interface Props {
-  children: ReactNode
+  children: JSX.Element
 }
 
 const NFTProvider = ({ children }: Props) => (
   <AircraftProvider>
-    <LicenseProvider>{children}</LicenseProvider>
+    <LicenseProvider>
+      <div>{children}</div>
+    </LicenseProvider>
   </AircraftProvider>
 )
 

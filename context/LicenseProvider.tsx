@@ -6,7 +6,7 @@ import { userState } from 'store/user.atom'
 import { licenseNftStore, ownedLicenseNftStore } from 'store/licenseNFT.atom'
 
 interface Props {
-  children: React.ReactNode
+  children: JSX.Element
 }
 
 export const LicenseProvider = ({ children }: Props) => {

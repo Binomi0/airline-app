@@ -2,6 +2,7 @@
 import { NFT } from '@thirdweb-dev/sdk'
 import { atc } from 'mocks'
 import ivaoPilot from 'mocks/ivaoPilot'
+import Atc from 'models/Atc'
 import { VaUser } from 'models/User'
 
 export interface AircraftAttributes {
@@ -242,12 +243,10 @@ export interface Coords {
   latitude: number
   longitude: number
 }
-export interface ActiveAtc {
+export interface ActiveAtc extends Atc {
   callsign: string
-  userId: string
-  atcPosition: {
-    airport: Coords
-  }
+  userId: number
+  atcPosition: Atc['atcPosition']
 }
 
 export interface TowerMatrix {

@@ -6,7 +6,7 @@ import { userState } from 'store/user.atom'
 import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 interface Props {
-  children: React.ReactNode
+  children: JSX.Element
 }
 
 export const AircraftProvider = ({ children }: Props) => {

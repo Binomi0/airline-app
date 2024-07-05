@@ -15,9 +15,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       scope: 'openid profile location flight_plans:read configuration bookings:read tracker training email birthday',
       client_id: process.env.NEXT_PUBLIC_IVAO_ID,
       client_secret: process.env.IVAO_SECRET
-      // TODO: Receive redirect URL from env?
-      // redirect_url: `${process.env.NEXT_PUBLIC_ORIGIN}/ivao/authorize`
-      // redirectUrl: `${process.env.NEXT_PUBLIC_ORIGIN}/ivao/authorize`
     }
 
     const response = await ivaoInstance.post<{ access_token?: string }>('/v2/oauth/token', body, {
@@ -31,7 +28,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // FIXME: Missing state and challenge validation
 
-    ivaoInstance.defaults.headers.common.Authorization = `Bearer ${req.query.code}`
     const decoded = jwt.decode(req.query.code as string, { json: true, complete: true })
     if (!decoded) {
       res.status(403).end()
@@ -78,8 +74,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   } else {
     res.status(405).end()
   }
-
-  ivaoInstance.defaults.headers.common.Authorization = ''
 
   res.status(401).end()
 }

@@ -130,7 +130,11 @@ const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
           }
         })
 
-        const txHash = await wallet.paymasterSigner.waitForUserOperationTransaction(uo)
+        const txHash = await wallet.paymasterSigner.waitForUserOperationTransaction(uo, {
+          intervalMs: 5000,
+          multiplier: 1,
+          maxRetries: 10
+        })
 
         setIsClaiming(false)
         return txHash

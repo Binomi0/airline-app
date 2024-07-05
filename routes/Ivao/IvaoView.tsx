@@ -30,6 +30,7 @@ import { hasRequirement } from 'utils'
 import axios from 'config/axios'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
+import IvaoLogin from './components/IvaoLogin'
 
 const getMetar = async (callsign: string, ivaoAuthToken?: string | null) =>
   axios
