@@ -27,28 +27,28 @@ const HomeView = () => {
             <Paper elevation={12}>
               <Box p={2}>
                 <Typography variant='h4' gutterBottom>
-                  Welcome to DecentralAir!
+                  Welcome to WeiFly!
                 </Typography>
                 <Typography variant='body1' paragraph>
-                  DecentralAir is a decentralized virtual airline powered by blockchain technology. We`re
-                  revolutionizing the aviation industry by providing users with ownership and control over their virtual
-                  aircraft, transparent operations, and community-driven governance.
+                  WeiFly is a decentralized virtual airline powered by blockchain technology. We`re revolutionizing the
+                  aviation industry by providing users with ownership and control over their virtual aircraft,
+                  transparent operations, and community-driven governance.
                 </Typography>
               </Box>
             </Paper>
             <Paper elevation={12}>
               <Box p={2} mt={2}>
                 <Typography variant='h5' gutterBottom>
-                  Benefits of DecentralAir:
+                  Benefits of WeiFly:
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <Paper elevation={24}>
                       <Box p={2}>
                         <Typography variant='body2' color='textSecondary' paragraph>
-                          <strong>Decentralized Ownership:</strong> With DecentralAir, you truly own your virtual
-                          aircraft as non-fungible tokens (NFTs) on the blockchain. No centralized authority can take
-                          away your ownership rights.
+                          <strong>Decentralized Ownership:</strong> With WeiFly, you truly own your virtual aircraft as
+                          non-fungible tokens (NFTs) on the blockchain. No centralized authority can take away your
+                          ownership rights.
                         </Typography>
                       </Box>
                     </Paper>
@@ -68,9 +68,9 @@ const HomeView = () => {
                     <Paper elevation={24}>
                       <Box p={2}>
                         <Typography variant='body2' color='textSecondary' paragraph>
-                          <strong>Community-Driven Governance:</strong> DecentralAir is governed by its community of
-                          users. Through decentralized decision-making mechanisms, users have a say in the direction of
-                          the platform and its future development.
+                          <strong>Community-Driven Governance:</strong> WeiFly is governed by its community of users.
+                          Through decentralized decision-making mechanisms, users have a say in the direction of the
+                          platform and its future development.
                         </Typography>
                       </Box>
                     </Paper>
@@ -148,7 +148,7 @@ const HomeView = () => {
                     Step 1: Register an Account
                   </Typography>
                   <Typography variant='body1' paragraph>
-                    Sign up for a DecentralAir account using your email address and create a password.
+                    Sign up for a WeiFly account using your email address and create a password.
                   </Typography>
                   {/* Add visual aids like diagrams or screenshots if needed */}
                 </Paper>
@@ -195,7 +195,7 @@ const HomeView = () => {
                       Greater Control and Ownership
                     </Typography>
                     <Typography variant='body1' paragraph>
-                      With DecentralAir, users have greater control and ownership of their virtual aircraft assets as
+                      With WeiFly, users have greater control and ownership of their virtual aircraft assets as
                       non-fungible tokens (NFTs) on the blockchain.
                     </Typography>
                   </Box>
@@ -208,8 +208,8 @@ const HomeView = () => {
                       Lower Fees and Transparent Pricing
                     </Typography>
                     <Typography variant='body1' paragraph>
-                      DecentralAir offers lower fees and more transparent pricing compared to traditional airlines,
-                      thanks to its decentralized nature and blockchain technology.
+                      WeiFly offers lower fees and more transparent pricing compared to traditional airlines, thanks to
+                      its decentralized nature and blockchain technology.
                     </Typography>
                   </Box>
                 </Paper>
@@ -221,8 +221,8 @@ const HomeView = () => {
                       Community Engagement and Collaboration
                     </Typography>
                     <Typography variant='body1' paragraph>
-                      Participate in DecentralAir`s vibrant community, engage with other users, and collaborate on the
-                      future development of the platform through decentralized governance mechanisms.
+                      Participate in WeiFly`s vibrant community, engage with other users, and collaborate on the future
+                      development of the platform through decentralized governance mechanisms.
                     </Typography>
                   </Box>
                 </Paper>
