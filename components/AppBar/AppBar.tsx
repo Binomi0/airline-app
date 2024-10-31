@@ -22,6 +22,7 @@ import { smartAccountAddressStore } from 'store/wallet.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import styles from './appbar.module.css'
 import { AlertTitle, Button, Container } from '@mui/material'
+import Link from 'next/link'
 
 const copyToClipboard = (msg: string) => {
   navigator.clipboard.writeText(msg)
@@ -78,7 +79,9 @@ const CustomAppBar: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Image src='/logo64x64-white.png' alt='logo' width={32} height={32} />
+          <Link href='/'>
+            <Image src='/logo64x64-white.png' alt='logo' width={32} height={32} />
+          </Link>
           {matches ? (
             <Typography ml={2} variant='h6' component='div' sx={{ flexGrow: 1 }}>
               WeiFly (Alpha)
