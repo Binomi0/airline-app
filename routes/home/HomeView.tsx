@@ -12,12 +12,20 @@ import FlightIcon from '@mui/icons-material/Flight'
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn'
 import SecurityIcon from '@mui/icons-material/Security'
 import Stack from '@mui/material/Stack'
+import styles from './home.module.css'
 
 const HomeView = () => {
   return (
     <Container>
-      <Box my={4} textAlign='center'>
-        <Typography variant='h1'>WeiFly</Typography>
+      <Box my={4} textAlign='center' width='100%'>
+        <h1 className={styles.animatedText}>
+          <span>W</span>
+          <span>E</span>
+          <span>I</span>
+          <span>F</span>
+          <span>L</span>
+          <span>Y</span>
+        </h1>
         <Typography variant='h2'>Decentralized Virtual Airline</Typography>
       </Box>
 

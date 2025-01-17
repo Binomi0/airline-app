@@ -1,13 +1,11 @@
-import { NFT } from '@thirdweb-dev/sdk'
+import { Nft } from 'alchemy-sdk'
 import { atom } from 'recoil'
 
-type AircraftStore = {
-  ownedAircrafts: Readonly<NFT[]>
-  aircrafts: Readonly<NFT[]>
-  isLoading: boolean
-}
-
-export const aircraftStore = atom<AircraftStore | undefined>({
-  key: 'aircraft',
-  default: undefined
+export const aircraftStore = atom<Nft[]>({
+  key: 'aircraftNftStore',
+  default: []
+})
+export const ownedAircraftStore = atom<Nft[]>({
+  key: 'ownedAircraftNftStore',
+  default: []
 })

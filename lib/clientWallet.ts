@@ -20,9 +20,10 @@ import { getContract } from 'viem'
 import LicenseNftJson from 'contracts/abi/LicenseNFT.json'
 import EntryPointJSON from '@account-abstraction/contracts/artifacts/EntryPoint.json'
 import { EntryPoint } from 'permissionless/_types/types'
+import { localhost } from '@wagmi/chains'
 
 export const provider = new ethers.providers.JsonRpcProvider({
-  url: 'http://localhost:8545'
+  url: 'http://localhost:3001/rpc'
 })
 
 export const aaSigner = provider.getSigner()
@@ -35,7 +36,7 @@ export const publicBundlerClient = createPublicClient({
   batch: {
     multicall: true
   },
-  chain: hardhat,
+  chain: localhost,
   transport: http('http://localhost:3001/rpc') // use your RPC provider or bundler
 }).extend(actions)
 
@@ -46,7 +47,7 @@ export const publicClient = createPublicClient({
   batch: {
     multicall: true
   },
-  chain: hardhat,
+  chain: localhost,
   transport: http('http://localhost:8545') // use your RPC provider or bundler
 })
 

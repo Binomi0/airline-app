@@ -3,8 +3,12 @@ import axios from 'config/axios'
 import { AircraftProvider } from 'context/AircraftProvider'
 import { LicenseProvider } from 'context/LicenseProvider'
 import { Nft } from 'alchemy-sdk'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
+import alchemy from 'lib/alchemy'
+import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
+import { aircraftStore } from 'store/aircraft.atom'
+import { nftLicenseStore } from 'store/nft.licenses.atom'
 
 interface Props {
   // eslint-disable-next-line no-unused-vars
@@ -12,19 +16,25 @@ interface Props {
 }
 
 const NFTProvider = ({ children }: Props) => {
-  const user = useRecoilValue(userState)
-  const [fetched, setFetched] = useState(false)
-  const [nfts, setNfts] = useState<Nft[]>([])
+  const setAircraftNftStore = useSetRecoilState(aircraftStore)
+  // const setLicenseNftStore = useSetRecoilState(nftLicenseStore)
 
   useEffect(() => {
-    if (fetched || !user) return
-    axios.get('/api/alchemy/nfts').then((r) => {
-      setFetched(true)
-      setNfts(r.data.nfts)
+    const promises = [
+      alchemy.nft.getNftsForContract(nftAircraftTokenAddress),
+      alchemy.nft.getNftsForContract(nftLicenseTokenAddress)
+    ]
+
+    Promise.all(promises).then(([aircrafts, licenses]) => {
+      setAircraftNftStore(aircrafts.nfts)
+      // setLicenseNftStore(licenses.nfts)
     })
-  }, [fetched, user])
+  }, [setAircraftNftStore])
+
+  // console.log({ aircraftNfts, licenseNfts })
+  // return null
   return (
-    <AircraftProvider nfts={nfts}>
+    <AircraftProvider>
       <LicenseProvider>{children}</LicenseProvider>
     </AircraftProvider>
   )

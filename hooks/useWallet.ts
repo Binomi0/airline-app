@@ -150,35 +150,40 @@ const useWallet = (): UseWallet => {
         console.log({ wallet })
         const accountFactory = new Contract(AF_ADDR, AccountFactoryJSON.abi, random) as AccountFactory
         const initCode = getBaseInitCode(accountFactory, random.address)
+
         const entryPoint = new Contract(EP_ADDR, EntryPointAbi, random) as unknown as EntryPoint
-        const sender = await getSender(entryPoint, initCode)
-        console.log({ sender })
-        const rpcSigner = new ethers.providers.JsonRpcSigner({}, provider, sender as string)
-        console.log({ rpcSigner })
+        try {
+          const sender = await getSender(entryPoint, initCode)
+          console.log({ sender })
+        } catch (error) {
+          console.error(error)
+        }
+        // const rpcSigner = new ethers.providers.JsonRpcSigner({}, provider, sender as string)
+        // console.log({ rpcSigner })
 
-        const updateUser = postApi('/api/user/update', { address: sender })
-        const updateWallet = postApi('/api/wallet', {
-          id: _user.id,
-          smartAccountAddress: sender,
-          signerAddress: random.address
-        })
+        // const updateUser = postApi('/api/user/update', { address: sender })
+        // const updateWallet = postApi('/api/wallet', {
+        //   id: _user.id,
+        //   smartAccountAddress: sender,
+        //   signerAddress: random.address
+        // })
 
-        await Promise.all([updateUser, updateWallet])
-        setWallet({
-          baseSigner: undefined,
-          smartSigner: undefined,
-          paymasterSigner: undefined,
-          smartAccountAddress: sender as string,
-          isLoaded: true
-        })
+        // await Promise.all([updateUser, updateWallet])
+        // setWallet({
+        //   baseSigner: undefined,
+        //   smartSigner: undefined,
+        //   paymasterSigner: undefined,
+        //   smartAccountAddress: sender as string,
+        //   isLoaded: true
+        // })
       } else {
-        setWallet({
-          baseSigner: undefined,
-          smartSigner: undefined,
-          paymasterSigner: undefined,
-          smartAccountAddress: wallet.smartAccountAddress,
-          isLoaded: true
-        })
+        // setWallet({
+        //   baseSigner: undefined,
+        //   smartSigner: undefined,
+        //   paymasterSigner: undefined,
+        //   smartAccountAddress: wallet.smartAccountAddress,
+        //   isLoaded: true
+        // })
       }
     },
     [setWallet]

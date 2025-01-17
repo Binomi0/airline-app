@@ -6,3 +6,5 @@ export const nftAircraftTokenAddress = '0xa1B21336DD0064a07F842D106004872eB76a8D
 export const nftLicenseTokenAddress = '0xB51200877E61E9310cb76cFC1B625CAE98DC73E5' // NEW
 export const factoryAddress = '0x152546eaCCe1Bd86F11Ffd6ccf607bb77fc26E4E'
 export const flightNftAddress = '0xF2219dA181DCE1636511D5f65F7B5a1B1c9C5103'
+
+export const accountFactoryAddr = '0xe84a7f213bf463c5D3Ac07f51C6a0264DAE0f0d4'

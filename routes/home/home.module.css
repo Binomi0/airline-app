@@ -1,0 +1,50 @@
+.animatedText {
+  font-size: 6rem;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  gap: 0.2rem; /* Separación entre letras */
+}
+
+.animatedText span {
+  display: inline-block;
+  transform: translateX(100%); /* Empieza fuera, a la derecha */
+  opacity: 0; /* Invisible inicialmente */
+  animation: slideIn 1s ease-in-out forwards;
+}
+
+.animatedText span:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.animatedText span:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.animatedText span:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.animatedText span:nth-child(4) {
+  animation-delay: 0.8s;
+}
+
+.animatedText span:nth-child(5) {
+  animation-delay: 1s;
+}
+
+.animatedText span:nth-child(6) {
+  animation-delay: 1.2s;
+}
+
+/* Animación para desplazar las letras */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%); /* Fuera, a la derecha */
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0); /* En su posición natural */
+    opacity: 1;
+  }
+}
