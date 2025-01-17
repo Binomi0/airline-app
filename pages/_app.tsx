@@ -36,12 +36,15 @@ export default function MyApp(props: MyAppProps) {
   const [loading, setLoading] = React.useState(false)
 
   React.useEffect(() => {
-    Router.events.on('routeChangeStart', () => setLoading(true))
-    Router.events.on('routeChangeComplete', () => setLoading(false))
+    const start = () => setLoading(true)
+    const stop = () => setLoading(false)
+
+    Router.events.on('routeChangeStart', () => start)
+    Router.events.on('routeChangeComplete', () => stop)
 
     return () => {
-      Router.events.off('routeChangeStart', () => setLoading(true))
-      Router.events.off('routeChangeComplete', () => setLoading(false))
+      Router.events.off('routeChangeStart', () => start)
+      Router.events.off('routeChangeComplete', () => stop)
     }
   }, [])
 
