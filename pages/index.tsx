@@ -6,7 +6,7 @@ import styles from '../styles/Home.module.css'
 import { PageProps } from 'types'
 import HomeView from 'routes/home/HomeView'
 
-const Home: NextPage<PageProps> = ({ loading }) => {
+const Home: NextPage<PageProps> = () => {
   return (
     <Box position='relative'>
       <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />

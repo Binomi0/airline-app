@@ -1,4 +1,3 @@
-import { Hex } from '@alchemy/aa-core'
 import { useContract } from '@thirdweb-dev/react'
 import { Contract } from 'ethers'
 import { useCallback, useState } from 'react'
@@ -6,6 +5,7 @@ import AirlineCoin from 'contracts/abi/AirlineCoin.json'
 import BigNumber from 'bignumber.js'
 import { useRecoilState } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { Hex } from 'types'
 
 const MAX_INT_ETH = '0x8000000000000000000000000000000000000000000000000000000000000000'
 

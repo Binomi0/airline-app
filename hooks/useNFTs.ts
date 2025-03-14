@@ -1,7 +1,7 @@
 import React from 'react'
 import { Nft } from 'alchemy-sdk'
-import { Hex } from '@alchemy/aa-core'
 import alchemy from 'lib/alchemy'
+import { Hex } from 'types'
 
 const useNFTs = (contract: Hex) => {
   const [data, setData] = React.useState<Nft[]>()

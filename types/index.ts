@@ -294,3 +294,5 @@ export const aircraftNameToIcaoCode = {
   'Boeing 737-600': IcaoCodes.B737,
   'Antonov An-225 Mriya': IcaoCodes.AN225
 }
+
+export type Hex = `0x${string}`

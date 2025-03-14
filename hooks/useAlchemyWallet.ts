@@ -2,9 +2,10 @@ import { useCallback } from 'react'
 import { ethers } from 'ethers'
 import { coinTokenAddress } from 'contracts/address'
 import AirlineCoin from 'contracts/abi/AirlineCoin.json'
-import { Hex, UserOperationCallData } from '@alchemy/aa-core'
+import { UserOperationCallData } from '@alchemy/aa-core'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { Hex } from 'types'
 
 const useAlchemyWallet = () => {
   const wallet = useRecoilValue(walletStore)
