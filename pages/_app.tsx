@@ -39,17 +39,21 @@ export default function MyApp(props: MyAppProps) {
     const start = () => setLoading(true)
     const stop = () => setLoading(false)
 
-    Router.events.on('routeChangeStart', () => start)
-    Router.events.on('routeChangeComplete', () => stop)
+    Router.events.on('routeChangeStart', start)
+    Router.events.on('routeChangeComplete', stop)
 
     return () => {
-      Router.events.off('routeChangeStart', () => start)
-      Router.events.off('routeChangeComplete', () => stop)
+      Router.events.off('routeChangeStart', start)
+      Router.events.off('routeChangeComplete', stop)
     }
   }, [])
 
   return (
     <CacheProvider value={emotionCache}>
+      <Head>
+        <meta name='viewport' content='initial-scale=1, width=device-width' />
+        <title>Weifly a decentralized virtual airline based on Ethereum</title>
+      </Head>
       <RecoilRoot
         initializeState={({ set }) => {
           set(authStore, getCookie('token') as string)
@@ -58,10 +62,6 @@ export default function MyApp(props: MyAppProps) {
       >
         <AuthProvider>
           <CustomWeb3Provider>
-            <Head>
-              <meta name='viewport' content='initial-scale=1, width=device-width' />
-              <title>Weifly a decentralized virtual airline based on Ethereum</title>
-            </Head>
             <ThemeWrapper>
               <ErrorBoundary>
                 <NFTProvider>
@@ -69,7 +69,7 @@ export default function MyApp(props: MyAppProps) {
                     <VaProvider>
                       <LiveFlightsProvider>
                         <MainProvider>
-                          <AppBar />
+                          <AppBar loading={loading} />
                           <Sidebar />
                           <RightSidebar />
                         </MainProvider>

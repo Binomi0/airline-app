@@ -43,7 +43,7 @@ const handler = async (req: ApiRequest, res: NextApiResponse) => {
     }
 
     // Send founds to new user
-    // sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
+    sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
     await Wallet.create({
       id: req.body.id,
       email: req.user,
@@ -51,7 +51,7 @@ const handler = async (req: ApiRequest, res: NextApiResponse) => {
       signerAddress: req.body.signerAddress,
       amount,
       // set {starterGift: true} if initial transfer was succesful
-      starterGift: false
+      starterGift: true
     })
 
     res.status(201).end()
