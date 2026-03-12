@@ -1,4 +1,4 @@
-import { useContract, useNFT } from '@thirdweb-dev/react'
+import { useContract, useNFT } from 'thirdweb/react'
 import { VaProvider } from 'context/VaProvider'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useRouter } from 'next/router'

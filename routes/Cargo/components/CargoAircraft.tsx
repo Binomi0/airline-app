@@ -8,14 +8,7 @@ import Grid from '@mui/material/Grid'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import {
-  MediaRenderer,
-  useClaimNFT,
-  useContract,
-  useLazyMint,
-  useNFT,
-  useSetClaimConditions
-} from '@thirdweb-dev/react'
+import { MediaRenderer, useClaimNFT, useContract, useLazyMint, useNFT, useSetClaimConditions } from 'thirdweb/react'
 import axios from 'config/axios'
 import { flightNftAddress, nftLicenseTokenAddress } from 'contracts/address'
 import { postApi } from 'lib/api'

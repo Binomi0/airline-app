@@ -1,4 +1,4 @@
-import { NFT } from '@thirdweb-dev/react'
+import { NFT } from 'thirdweb/react'
 import React, { useCallback } from 'react'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
 import AircraftCardHeader from './AircraftCardHeader'

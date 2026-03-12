@@ -1,5 +1,5 @@
 import { Hex } from '@alchemy/aa-core'
-import { useContract } from '@thirdweb-dev/react'
+import { useContract } from 'thirdweb/react'
 import { Contract } from 'ethers'
 import { useCallback, useState } from 'react'
 import AirlineCoin from 'contracts/abi/AirlineCoin.json'

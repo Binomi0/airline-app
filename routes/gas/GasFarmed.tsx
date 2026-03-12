@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
-import { useContract, useContractRead } from '@thirdweb-dev/react'
+import { useContract, useContractRead } from 'thirdweb/react'
 import { stakingAddress } from 'contracts/address'
 import { formatNumber } from 'utils'
 import { useRecoilValue } from 'recoil'

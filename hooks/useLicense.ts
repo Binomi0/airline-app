@@ -1,4 +1,4 @@
-import { useContract, useNFTBalance } from '@thirdweb-dev/react'
+import { useContract, useNFTBalance } from 'thirdweb/react'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'

@@ -1,6 +1,6 @@
 import React, { startTransition, useState } from 'react'
 import router from 'next/router'
-import { MediaRenderer, NFT } from '@thirdweb-dev/react'
+import { MediaRenderer, NFT } from 'thirdweb/react'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { nftAircraftTokenAddress } from 'contracts/address'

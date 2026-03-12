@@ -24,10 +24,6 @@ import styles from './appbar.module.css'
 import { AlertTitle, Button, Container } from '@mui/material'
 import Link from 'next/link'
 
-const copyToClipboard = (msg: string) => {
-  navigator.clipboard.writeText(msg)
-}
-
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
 
 const initialSnackState: AppBarSnack = { open: false, message: '', status: 'success' }
@@ -47,8 +43,8 @@ const CustomAppBar: React.FC = () => {
 
   useEffect(() => {
     setSnack({ open: status === 'missingKey', message: 'Missing Key', status: 'error' })
-    setSnack({ open: status === 'error', message: 'An error has occoured', status: 'error' })
     if (status === 'error') {
+      setSnack({ open: status === 'error', message: 'An error has occoured', status: 'error' })
       setUserActionStarted(undefined)
     }
   }, [status])
@@ -56,6 +52,7 @@ const CustomAppBar: React.FC = () => {
   useEffect(() => {
     getBalances()
   }, [getBalances])
+
   return (
     <>
       <Snackbar
@@ -101,7 +98,7 @@ const CustomAppBar: React.FC = () => {
           {matches && smartAccountAddress && (
             <Stack
               direction='row'
-              onClick={() => copyToClipboard(smartAccountAddress)}
+              onClick={() => navigator.clipboard.writeText(smartAccountAddress)}
               spacing={1}
               className={styles.card}
               maxWidth={150}
@@ -117,7 +114,6 @@ const CustomAppBar: React.FC = () => {
           )}
           <AppBarAuth
             toggleSidebar={toggleSidebar}
-            matches={matches}
             setUserActionStarted={setUserActionStarted}
             userActionStarted={userActionStarted}
             user={user}

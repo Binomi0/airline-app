@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { NFT, useContract } from '@thirdweb-dev/react'
+import { NFT, useContract } from 'thirdweb/react'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import LicenseItem from './components/LicenseItem'
 import useClaimNFT from 'hooks/useClaimNFT'

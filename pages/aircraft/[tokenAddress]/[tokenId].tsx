@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import React from 'react'
-import { MediaRenderer, useClaimNFT, useContract, useNFT, useNFTBalance } from '@thirdweb-dev/react'
+import { MediaRenderer, useClaimNFT, useContract, useNFT, useNFTBalance } from 'thirdweb/react'
 import { getNFTAttributes } from 'utils'
 import { NextPage } from 'next'
 import { nftLicenseTokenAddress } from 'contracts/address'

@@ -1,6 +1,6 @@
 import React from 'react'
 import { nftLicenseTokenAddress } from 'contracts/address'
-import { useContract, useNFTs, useOwnedNFTs } from '@thirdweb-dev/react'
+import { useContract, useNFTs, useOwnedNFTs } from 'thirdweb/react'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { userState } from 'store/user.atom'
 import { licenseNftStore, ownedLicenseNftStore } from 'store/licenseNFT.atom'

@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Cargo, FRoute, IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
-import { NFT } from '@thirdweb-dev/react'
+import { NFT } from 'thirdweb/react'
 import Swal from 'sweetalert2'
 import FlightDetailsHeader from './FlightDetailsHeader'
 import FlightDetailsCargo from './FlightDetailsCargo'

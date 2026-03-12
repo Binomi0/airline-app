@@ -15,7 +15,7 @@ import {
   getIcaoCodeFromAircraftNFT,
   getNFTAttributes
 } from 'utils'
-import { NFT } from '@thirdweb-dev/sdk'
+import { NFT } from 'thirdweb'
 import BigNumber from 'bignumber.js'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'

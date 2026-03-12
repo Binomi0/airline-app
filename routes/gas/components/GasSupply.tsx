@@ -1,6 +1,6 @@
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
-import { useContract, useContractRead } from '@thirdweb-dev/react'
+import { useContract, useContractRead } from 'thirdweb/react'
 import { stakingAddress } from 'contracts/address'
 import { memo } from 'react'
 import { formatNumber } from 'utils'

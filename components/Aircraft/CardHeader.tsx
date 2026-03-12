@@ -1,6 +1,6 @@
 import React, { startTransition, useState } from 'react'
 import router from 'next/router'
-import { MediaRenderer, NFT } from '@thirdweb-dev/react'
+import { MediaRenderer, NFT } from 'thirdweb/react'
 import CardHeader from '@mui/material/CardHeader'
 import Avatar from '@mui/material/Avatar'
 import Collapse from '@mui/material/Collapse'

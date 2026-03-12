@@ -1,10 +1,9 @@
 import React from 'react'
-import { Nft } from 'alchemy-sdk'
-import { Hex } from '@alchemy/aa-core'
 import alchemy from 'lib/alchemy'
+import { Hex, NFT } from 'thirdweb'
 
 const useNFTs = (contract: Hex) => {
-  const [data, setData] = React.useState<Nft[]>()
+  const [data, setData] = React.useState<NFT[]>()
   const [error, setError] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
 

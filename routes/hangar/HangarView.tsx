@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { NFT, useContract } from '@thirdweb-dev/react'
+import { NFT, useContract } from 'thirdweb/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'

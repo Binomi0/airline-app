@@ -18,6 +18,7 @@ export const LiveFlightsProvider: FC<{ children: React.ReactNode }> = ({ childre
   const { Provider } = LiveFlightProviderContext
 
   const setPilot = useCallback((pilot?: Readonly<IvaoPilot>) => {
+    if (!pilot) return
     dispatch({ type: 'SET_PILOT', payload: pilot })
   }, [])
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { useContract } from '@thirdweb-dev/react'
+import { useContract } from 'thirdweb/react'
 import { ethers } from 'ethers'
 import { formatNumber } from 'utils'
 import { coinTokenAddress, stakingAddress } from 'contracts/address'

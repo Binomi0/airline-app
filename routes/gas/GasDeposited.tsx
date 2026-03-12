@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { formatNumber } from 'utils'
-import { useContract } from '@thirdweb-dev/react'
+import { useContract } from 'thirdweb/react'
 import { stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import { ethers } from 'ethers'
