@@ -1,20 +1,22 @@
-import { SmartAccountSigner } from '@alchemy/aa-core'
+import { ThirdwebClient, Chain } from 'thirdweb'
 import { atom, selector } from 'recoil'
 
 export const walletStore = atom<{
-  baseSigner?: SmartAccountSigner
-  smartSigner?: any
-  paymasterSigner?: any
+  baseSigner?: any // Local private key account
+  smartSigner?: any // This will be the Thirdweb Smart Account
   smartAccountAddress?: string
   isLoaded?: boolean
+  twClient?: ThirdwebClient
+  twChain?: Chain
 }>({
   key: 'wallet',
   default: {
     isLoaded: false,
     baseSigner: undefined,
     smartSigner: undefined,
-    paymasterSigner: undefined,
-    smartAccountAddress: ''
+    smartAccountAddress: '',
+    twClient: undefined,
+    twChain: undefined
   }
 })
 
@@ -27,14 +29,6 @@ export const baseSignerStore = selector({
   }
 })
 
-export const paymasterSignerStore = selector({
-  key: 'paymasterSigner',
-  get: ({ get }) => {
-    const state = get(walletStore)
-
-    return state?.paymasterSigner
-  }
-})
 
 export const smartAccountSignerStore = selector({
   key: 'smartSigner',
