@@ -1,32 +1,38 @@
 import { useCallback, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
-import alchemy from 'lib/alchemy'
-import { Hex } from '@alchemy/aa-core'
+import { smartAccountAddressStore, walletStore } from 'store/wallet.atom'
+import { readContract } from 'thirdweb'
 
-const useTokenBalance = (contract?: Hex) => {
+const useTokenBalance = (contractAddress?: string) => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
+  const { twClient, twChain } = useRecoilValue(walletStore)
   const [balance, setBalance] = useState<BigNumber | undefined>()
   const [isFetched, setIsFetched] = useState<boolean>(false)
 
   const getBalance = useCallback(async () => {
-    if (!contract || !smartAccountAddress) return new BigNumber(0)
+    if (!contractAddress || !smartAccountAddress || !twClient || !twChain) return new BigNumber(0)
 
-    console.log({ smartAccountAddress })
-    const { tokenBalances } = await alchemy.core.getTokenBalances(smartAccountAddress, [contract])
-    console.log({ tokenBalances })
-    const result = new BigNumber(tokenBalances[0].tokenBalance || '0').div(1e18)
+    try {
+      const data = await readContract({
+        contract: {
+          client: twClient,
+          chain: twChain,
+          address: contractAddress as `0x${string}`
+        },
+        method: "function balanceOf(address) view returns (uint256)",
+        params: [smartAccountAddress as `0x${string}`]
+      })
 
-    setBalance(result)
-    setIsFetched(true)
-
-    return result
-  }, [contract, smartAccountAddress])
-
-  // useEffect(() => {
-  //   getBalance()
-  // }, [getBalance])
+      const result = new BigNumber(data.toString()).div(1e18)
+      setBalance(result)
+      setIsFetched(true)
+      return result
+    } catch (error) {
+      console.error('Error fetching balance:', error)
+      return new BigNumber(0)
+    }
+  }, [contractAddress, smartAccountAddress, twChain, twClient])
 
   return { balance, refetch: getBalance, getBalance, isFetched }
 }

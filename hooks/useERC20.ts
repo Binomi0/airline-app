@@ -1,60 +1,73 @@
-import { Hex } from '@alchemy/aa-core'
-import { useContract } from 'thirdweb/react'
-import { Contract } from 'ethers'
 import { useCallback, useState } from 'react'
-import AirlineCoin from 'contracts/abi/AirlineCoin.json'
 import BigNumber from 'bignumber.js'
-import { useRecoilState } from 'recoil'
+import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { prepareContractCall, readContract, sendTransaction, waitForReceipt } from 'thirdweb'
 
-const MAX_INT_ETH = '0x8000000000000000000000000000000000000000000000000000000000000000'
+const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
 
 interface UseERC20ReturnType {
   // eslint-disable-next-line no-unused-vars
-  getAllowance: (spender: Hex) => Promise<BigNumber>
+  getAllowance: (spender: string) => Promise<BigNumber>
   // eslint-disable-next-line no-unused-vars
-  setAllowance: (to: Hex) => Promise<boolean>
+  setAllowance: (to: string) => Promise<boolean>
   isLoading: boolean
 }
 
-const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
+const useERC20 = (tokenAddress: string): UseERC20ReturnType => {
   const [isLoading, setIsLoading] = useState(false)
-  const { contract } = useContract(tokenAddress, 'token')
-  const [wallet] = useRecoilState(walletStore)
+  const { smartSigner, twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
 
   const getAllowance = useCallback(
     async (spender: string): Promise<BigNumber> => {
-      if (!wallet.smartAccountAddress || !contract) return new BigNumber(0)
+      if (!smartAccountAddress || !twClient || !twChain) return new BigNumber(0)
       setIsLoading(true)
 
       try {
-        const allowance = await contract.erc20.allowanceOf(wallet.smartAccountAddress, spender)
+        const allowance = await readContract({
+          contract: {
+            client: twClient,
+            chain: twChain,
+            address: tokenAddress as `0x${string}`
+          },
+          method: "function allowance(address owner, address spender) view returns (uint256)",
+          params: [smartAccountAddress as `0x${string}`, spender as `0x${string}`]
+        })
 
         setIsLoading(false)
-        return new BigNumber(allowance.displayValue)
+        return new BigNumber(allowance.toString()).div(1e18) // Adjusting based on displayValue behavior
       } catch (error) {
         console.error('getAllowance', error)
         setIsLoading(false)
         return new BigNumber(0)
       }
     },
-    [wallet.smartAccountAddress, contract]
+    [smartAccountAddress, twChain, twClient, tokenAddress]
   )
 
   const setAllowance = useCallback(
     async (to: string) => {
-      if (!wallet.paymasterSigner) return false
+      if (!smartSigner || !twClient || !twChain) return false
       try {
         setIsLoading(true)
 
-        const erc20Contract = new Contract(tokenAddress, AirlineCoin.abi)
-        const encodedCallData = erc20Contract.interface.encodeFunctionData('approve', [to, MAX_INT_ETH])
-
-        const uo = await wallet.paymasterSigner.sendUserOperation({
-          uo: { target: tokenAddress, data: encodedCallData as Hex }
+        const tx = prepareContractCall({
+          contract: {
+            client: twClient,
+            chain: twChain,
+            address: tokenAddress as `0x${string}`
+          },
+          method: "function approve(address spender, uint256 amount)",
+          params: [to as `0x${string}`, MAX_UINT256]
         })
-        const txHash = await wallet.paymasterSigner.waitForUserOperationTransaction(uo)
-        console.log({ txHash })
+
+        const result = await sendTransaction({
+          transaction: tx,
+          account: smartSigner
+        })
+
+        const receipt = await waitForReceipt(result)
+        console.log({ txHash: receipt.transactionHash })
         setIsLoading(false)
         return true
       } catch (error) {
@@ -63,7 +76,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         throw new Error('Error while setAllowance')
       }
     },
-    [wallet.paymasterSigner, tokenAddress]
+    [smartSigner, twClient, twChain, tokenAddress]
   )
   return { setAllowance, getAllowance, isLoading }
 }

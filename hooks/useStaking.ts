@@ -1,83 +1,117 @@
-import { SmartContract } from '@thirdweb-dev/sdk'
 import { stakingAddress as target } from 'contracts/address'
-import { BigNumber, ethers } from 'ethers'
+import { BigNumber } from 'ethers'
 import { postApi } from 'lib/api'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
-import { paymasterSignerStore, smartAccountSignerStore } from 'store/wallet.atom'
+import { walletStore } from 'store/wallet.atom'
+import { prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb'
 
-const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) => {
+const useStaking = () => {
   const [isLoading, setIsLoading] = useState(false)
-  // const smartSigner = useRecoilValue(smartAccountSignerStore)
-  const paymasterSigner = useRecoilValue(paymasterSignerStore)
+  const { smartSigner, twClient, twChain } = useRecoilValue(walletStore)
 
   const stake = useCallback(
     async (amount: BigNumber) => {
-      if (!contract || !paymasterSigner) return
+      if (!smartSigner || !twClient || !twChain) return
       setIsLoading(true)
 
       try {
-        const erc20Staking = new ethers.Contract(target, contract.abi)
-        const data = erc20Staking.interface.encodeFunctionData('stake', [amount])
-        const uo = await paymasterSigner.sendUserOperation({ uo: { target, data } })
+        const tx = prepareContractCall({
+          contract: {
+            client: twClient,
+            chain: twChain,
+            address: target
+          },
+          method: "function stake(uint256 amount)",
+          params: [amount.toBigInt()]
+        })
 
-        const hash = await paymasterSigner.waitForUserOperationTransaction(uo)
+        const result = await sendTransaction({
+          transaction: tx,
+          account: smartSigner
+        })
+
+        const receipt = await waitForReceipt(result)
+        const hash = receipt.transactionHash
+
         await postApi('/api/transaction/user', { operation: 'stake', amount, hash })
-
-        const receipt = await paymasterSigner.getUserOperationReceipt(hash)
         setIsLoading(false)
 
         return receipt
       } catch (error) {
+        console.error('Error in stake:', error)
         setIsLoading(false)
       }
     },
-    [contract, paymasterSigner]
+    [smartSigner, twChain, twClient]
   )
 
   const withdraw = useCallback(
     async (amount: BigNumber) => {
-      if (!contract || !paymasterSigner) return
+      if (!smartSigner || !twClient || !twChain) return
       setIsLoading(true)
 
       try {
-        const erc20Staking = new ethers.Contract(target, contract.abi)
-        const data = erc20Staking.interface.encodeFunctionData('withdraw', [amount])
-        const uo = await paymasterSigner.sendUserOperation({ uo: { target, data } })
+        const tx = prepareContractCall({
+          contract: {
+            client: twClient,
+            chain: twChain,
+            address: target
+          },
+          method: "function withdraw(uint256 amount)",
+          params: [amount.toBigInt()]
+        })
 
-        const hash = await paymasterSigner.waitForUserOperationTransaction(uo)
+        const result = await sendTransaction({
+          transaction: tx,
+          account: smartSigner
+        })
+
+        const receipt = await waitForReceipt(result)
+        const hash = receipt.transactionHash
+
         await postApi('/api/transaction/user', { operation: 'withdraw', amount, hash })
-
-        const receipt = await paymasterSigner.getUserOperationReceipt(hash)
         setIsLoading(false)
 
         return receipt
       } catch (err) {
+        console.error('Error in withdraw:', err)
         setIsLoading(false)
       }
     },
-    [contract, paymasterSigner]
+    [smartSigner, twChain, twClient]
   )
 
   const claimRewards = useCallback(
     async (amount: string) => {
-      if (!contract || !paymasterSigner) return
+      if (!smartSigner || !twClient || !twChain) return
       setIsLoading(true)
 
       try {
-        const erc20Staking = new ethers.Contract(target, contract.abi)
-        const data = erc20Staking.interface.encodeFunctionData('claimRewards', [])
-        const hash = await paymasterSigner.sendUserOperation({ uo: { target, data } })
+        const tx = prepareContractCall({
+          contract: {
+            client: twClient,
+            chain: twChain,
+            address: target
+          },
+          method: "function claimRewards()",
+          params: []
+        })
 
-        await paymasterSigner.waitForUserOperationTransaction(hash)
+        const result = await sendTransaction({
+          transaction: tx,
+          account: smartSigner
+        })
+
+        const receipt = await waitForReceipt(result)
+        const hash = receipt.transactionHash
+
         await postApi('/api/transaction/user', { operation: 'claimRewards', amount, hash })
-
-        const receipt = await paymasterSigner.getUserOperationReceipt(hash)
         setIsLoading(false)
 
         return receipt
       } catch (err) {
-        // @ts-expect-error
+        // @ts-expect-error - Keeping original error logic partially
         if (err?.message === `AA21 didn't pay prefund`) {
           console.log('Paga cabrón xD')
         } else {
@@ -86,7 +120,7 @@ const useStaking = (contract?: SmartContract<ethers.BaseContract> | undefined) =
         setIsLoading(false)
       }
     },
-    [contract, paymasterSigner]
+    [smartSigner, twChain, twClient]
   )
 
   return { stake, withdraw, claimRewards, isLoading }

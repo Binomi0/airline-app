@@ -1,38 +1,47 @@
-import { Hex } from '@alchemy/aa-core'
-import { SmartContract } from '@thirdweb-dev/sdk'
 import { nftLicenseTokenAddress } from 'contracts/address'
-import { BaseContract, ethers } from 'ethers'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
-import { paymasterSignerStore, smartAccountSignerStore } from 'store/wallet.atom'
+import { walletStore } from 'store/wallet.atom'
+import { prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb'
 
-const useSafeTransferFrom = (contract: SmartContract<BaseContract>) => {
+const useSafeTransferFrom = () => {
   const [loading, setLoading] = useState(false)
-  // const smartSigner = useRecoilValue(smartAccountSignerStore)
-  const paymasterSigner = useRecoilValue(paymasterSignerStore)
+  const { smartSigner, twClient, twChain } = useRecoilValue(walletStore)
 
   const safeTransferFrom = useCallback(async () => {
-    if (!paymasterSigner) return
+    if (!smartSigner || !twClient || !twChain) return
     setLoading(true)
 
-    const erc1155Contract = new ethers.Contract(nftLicenseTokenAddress, contract.abi)
-    const encodedCallData = erc1155Contract.interface.encodeFunctionData('safeTransferFrom', [
-      '0xA832BC0b75161E5f69cBd66970b8df7eCE846e47', // FROM
-      '0x98CDf5F4D4D7f5b97F84c82fC44F591a239290e4', // TO
-      0, // TOKEN ID
-      1, // QUANTITY
-      '0x' // DATA
-    ])
+    try {
+      const tx = prepareContractCall({
+        contract: {
+          client: twClient,
+          chain: twChain,
+          address: nftLicenseTokenAddress
+        },
+        method: "function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data)",
+        params: [
+          '0xA832BC0b75161E5f69cBd66970b8df7eCE846e47', // FROM (Hardcoded in original)
+          '0x98CDf5F4D4D7f5b97F84c82fC44F591a239290e4', // TO (Hardcoded in original)
+          0n, // TOKEN ID
+          1n, // QUANTITY
+          '0x' // DATA
+        ]
+      })
 
-    const { hash } = await paymasterSigner.sendUserOperation({
-      target: nftLicenseTokenAddress,
-      data: encodedCallData as Hex
-    })
+      const result = await sendTransaction({
+        transaction: tx,
+        account: smartSigner
+      })
 
-    await paymasterSigner.waitForUserOperationTransaction(hash as Hex)
-
-    setLoading(false)
-  }, [contract.abi, paymasterSigner])
+      const receipt = await waitForReceipt(result)
+      console.log('Transfer successful:', receipt.transactionHash)
+    } catch (error) {
+      console.error('Error in safeTransferFrom:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [smartSigner, twChain, twClient])
 
   return {
     safeTransferFrom,
