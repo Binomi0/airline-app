@@ -7,6 +7,8 @@ This is a NextJS application with:
 - State management using Redux in `/store`
 - Mongoose models `/models/`
 - Common libs code `/libs/`
+- Common utils `/utils/`
+
 - React Hooks `/hooks/`
 
 ## Coding Standards
