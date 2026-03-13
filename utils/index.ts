@@ -1,4 +1,5 @@
 import { NFT } from 'thirdweb'
+import nextApiInstance from 'config/axios'
 import {
   ActiveAtc,
   Airport,
@@ -272,3 +273,5 @@ export const gallonsToLiters = (gallons?: number): number => {
   const litersPerGallon = 3.78541 // 1 gallon is approximately 3.78541 liters
   return gallons * litersPerGallon
 }
+
+export const fetcher = (url: string) => nextApiInstance.get(url).then((res) => res.data)

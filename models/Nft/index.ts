@@ -27,7 +27,21 @@ const nftSchema: mongoose.Schema = new mongoose.Schema(
     supply: { type: BigInt }
   },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: {
+      transform: (doc, ret) => {
+        if (typeof ret.id === 'bigint') ret.id = ret.id.toString()
+        if (typeof ret.supply === 'bigint') ret.supply = ret.supply.toString()
+        return ret
+      }
+    },
+    toObject: {
+      transform: (doc, ret) => {
+        if (typeof ret.id === 'bigint') ret.id = ret.id.toString()
+        if (typeof ret.supply === 'bigint') ret.supply = ret.supply.toString()
+        return ret
+      }
+    }
   }
 )
 
