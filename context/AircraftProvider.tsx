@@ -1,7 +1,6 @@
 import React from 'react'
 import { nftAircraftTokenAddress } from 'contracts/address'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { userState } from 'store/user.atom'
+import { useSetRecoilState } from 'recoil'
 import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 import { getContract } from 'thirdweb'
 import { sepolia } from 'thirdweb/chains'
@@ -14,10 +13,10 @@ interface Props {
 }
 
 export const AircraftProvider = ({ children }: Props) => {
-  const user = useRecoilValue(userState)
   const contract = getContract({ address: nftAircraftTokenAddress, chain: sepolia, client: twClient })
   const { data: aircrafts } = useNFTs(contract.address)
   const { data: ownedAircrafts } = useOwnedNfts(contract.address)
+  console.log({ ownedAircrafts, aircrafts })
 
   const setAircraftNFTs = useSetRecoilState(aircraftNftStore)
   const setOwnedAircrafts = useSetRecoilState(ownedAircraftNftStore)
