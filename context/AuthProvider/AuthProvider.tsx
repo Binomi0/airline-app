@@ -22,28 +22,25 @@ export const AuthProvider = ({ children }: Props) => {
   const { loadAccount } = useAccountSigner()
 
   useEffect(() => {
-    if (counter > 0) return
+    if (!token || counter > 0) return
     counter++
-    if (token) {
-      axios
-        .get('/api/user/get')
-        .then((response) => {
-          startTransition(() => {
-            setUser(response.data)
-            loadAccount(response.data)
-          })
+    axios
+      .get('/api/user/get')
+      .then((response) => {
+        startTransition(() => {
+          setUser(response.data)
+          loadAccount(response.data)
         })
+      })
 
-        .catch((err) => {
-          console.error('AuthProvider error =>', err)
-        })
-        .finally(() => {
-          setAuthToken(token)
-          counter = 0
-        })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token])
+      .catch((err) => {
+        console.error('AuthProvider error =>', err)
+      })
+      .finally(() => {
+        setAuthToken(token)
+        counter = 0
+      })
+  }, [loadAccount, setAuthToken, setUser, token])
 
   return <div>{children}</div>
 }
