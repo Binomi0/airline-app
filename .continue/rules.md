@@ -7,8 +7,10 @@ This is a NextJS application with:
 - State management using Redux in `/store`
 - Mongoose models `/models/`
 - Common libs code `/libs/`
+<<<<<<< HEAD
+=======
 - Common utils `/utils/`
-
+>>>>>>> f6d29ff (add rules to continue pligin)
 - React Hooks `/hooks/`
 
 ## Coding Standards
