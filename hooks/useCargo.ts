@@ -47,7 +47,7 @@ const useCargo = (): UseCargo => {
           distance: route.distance,
           details,
           aircraft,
-          aircraftId: aircraft.metadata.id as string,
+          aircraftId: aircraft.id.toString(),
           weight,
           callsign,
           prize,

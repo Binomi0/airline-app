@@ -1,11 +1,14 @@
 import { useRouter } from 'next/router'
-import React from 'react'
-import { MediaRenderer, useClaimNFT, useContract, useNFT, useNFTBalance } from 'thirdweb/react'
+import React, { useMemo } from 'react'
+import { MediaRenderer, useReadContract } from 'thirdweb/react'
 import { getNFTAttributes } from 'utils'
 import { NextPage } from 'next'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
+import { walletStore } from 'store/wallet.atom'
+import useClaimNFT from 'hooks/useClaimNFT'
+import { getContract } from 'thirdweb'
+import { getNFT, balanceOf } from 'thirdweb/extensions/erc1155'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Alert from '@mui/material/Alert'
@@ -20,22 +23,63 @@ import CardActions from '@mui/material/CardActions'
 import Button from '@mui/material/Button'
 
 const maps: Record<string, string> = {
-  0: '0',
-  1: '1',
-  2: '2',
-  3: '0',
-  4: '3'
+  '0': '0',
+  '1': '1',
+  '2': '2',
+  '3': '0',
+  '4': '3'
 }
 
 const AircraftView: NextPage = () => {
   const router = useRouter()
-  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
-  const { contract } = useContract(router.query.tokenAddress as string)
-  const { contract: license } = useContract(nftLicenseTokenAddress)
-  const { mutateAsync: claimNFT, isLoading } = useClaimNFT(contract)
-  const { data: nft, error } = useNFT(contract, router.query.tokenId as string)
-  const { data } = useNFTBalance(contract, smartAccountAddress, router.query.tokenId as string)
-  const { data: licenseBalance } = useNFTBalance(license, smartAccountAddress, maps[router.query.tokenId as string])
+  const { twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
+  
+  const contract = useMemo(() => {
+    if (!twClient || !twChain || !router.query.tokenAddress) return undefined
+    return getContract({
+      client: twClient,
+      chain: twChain,
+      address: router.query.tokenAddress as string
+    })
+  }, [twChain, twClient, router.query.tokenAddress])
+  
+  const licenseContract = useMemo(() => {
+    if (!twClient || !twChain) return undefined
+    return getContract({
+      client: twClient,
+      chain: twChain,
+      address: nftLicenseTokenAddress
+    })
+  }, [twChain, twClient])
+
+  const { claimAircraftNFT: claimNFT, isClaiming: isLoading } = useClaimNFT()
+
+  const { data: nft, error } = useReadContract(getNFT, {
+    contract: contract!,
+    tokenId: BigInt((router.query.tokenId as string) || '0'),
+    queryOptions: {
+      enabled: !!contract && !!router.query.tokenId
+    }
+  })
+
+  const { data: balance } = useReadContract(balanceOf, {
+    contract: contract!,
+    owner: smartAccountAddress!,
+    tokenId: BigInt((router.query.tokenId as string) || '0'),
+    queryOptions: {
+      enabled: !!contract && !!smartAccountAddress && !!router.query.tokenId
+    }
+  })
+
+  const licenseTokenId = maps[router.query.tokenId as string]
+  const { data: licenseBalance } = useReadContract(balanceOf, {
+    contract: licenseContract!,
+    owner: smartAccountAddress!,
+    tokenId: BigInt(licenseTokenId || '0'),
+    queryOptions: {
+      enabled: !!licenseContract && !!smartAccountAddress
+    }
+  })
 
   if (!nft) return <>Loading...</>
 
@@ -60,21 +104,21 @@ const AircraftView: NextPage = () => {
                 left: 0,
                 '&::before': {
                   position: 'relative',
-                  content: `${!data?.isZero() ? "'OWNED'" : "'LOCKED'"}`,
+                  content: `${balance && balance > 0n ? "'OWNED'" : "'LOCKED'"}`,
                   width: '50px',
                   height: '50px',
                   top: 100,
                   left: 50,
                   fontSize: '36px',
-                  color: `${!data?.isZero() ? 'green' : 'red'}`,
+                  color: `${balance && balance > 0n ? 'green' : 'red'}`,
                   background: 'white',
                   padding: 1,
                   borderRadius: 2,
-                  boxShadow: `0 0 8px 0px ${!data?.isZero() ? 'green' : 'red'}`
+                  boxShadow: `0 0 8px 0px ${balance && balance > 0n ? 'green' : 'red'}`
                 }
               }}
             >
-              <MediaRenderer width='100%' src={nft.metadata.image} />
+            <MediaRenderer client={twClient!} width='100%' src={nft.metadata.image} />
             </Box>
             <CardHeader title={nft.metadata.name} subheader={nft.metadata.description} />
             <CardContent>
@@ -91,17 +135,13 @@ const AircraftView: NextPage = () => {
             </CardContent>
             <CardActions>
               <Button
-                disabled={isLoading || !data?.isZero()}
+                disabled={isLoading || (!!balance && balance > 0n)}
                 variant='contained'
                 onClick={() =>
-                  claimNFT({
-                    to: smartAccountAddress,
-                    quantity: 1,
-                    tokenId: nft.metadata.id
-                  })
+                  claimNFT(nft as any)
                 }
               >
-                {licenseBalance?.isZero() ? 'Require licencia' : `Claim ${nft.metadata.name}`}
+                {licenseBalance === 0n ? 'Require licencia' : `Claim ${nft.metadata.name}`}
               </Button>
             </CardActions>
           </Card>

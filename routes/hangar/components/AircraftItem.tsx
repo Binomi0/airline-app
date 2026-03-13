@@ -1,4 +1,4 @@
-import { NFT } from 'thirdweb/react'
+import { NFT } from 'thirdweb'
 import React, { useCallback } from 'react'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
 import AircraftCardHeader from './AircraftCardHeader'
@@ -22,8 +22,8 @@ interface Props {
 
 const AircraftItem = ({ nft, isClaiming, onClaim }: Props) => {
   const user = useRecoilValue(userState)
-  const { hasAircraft, refetch: refetchAircraft } = useAircraft(nft.metadata.id)
-  const { hasLicense, refetch: refetchLicense } = useLicense(getLicenseIdFromAttributes(getNFTAttributes(nft)))
+  const { hasAircraft, refetch: refetchAircraft } = useAircraft()
+  const { hasLicense, refetch: refetchLicense } = useLicense()
 
   const refetch = useCallback(() => {
     refetchAircraft()

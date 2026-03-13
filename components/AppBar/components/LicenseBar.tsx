@@ -3,14 +3,14 @@ import AvatarGroup from '@mui/material/AvatarGroup'
 import CircularProgress from '@mui/material/CircularProgress'
 import Tooltip from '@mui/material/Tooltip'
 import { MediaRenderer } from 'thirdweb/react'
+import { walletStore } from 'store/wallet.atom'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { ownedLicenseNftStore } from 'store/licenseNFT.atom'
-import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const LicenseBar = () => {
   const ownedLicenses = useRecoilValue(ownedLicenseNftStore)
-  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
+  const { twClient, smartAccountAddress} = useRecoilValue(walletStore)
 
   return (
     <div>
@@ -22,9 +22,9 @@ const LicenseBar = () => {
           <AvatarGroup>
             {ownedLicenses
               .map((license) => (
-                <Tooltip arrow title={(license.metadata.name as string).split(' - ')[1]} key={license.metadata.id}>
+                <Tooltip arrow title={(license.metadata.name as string).split(' - ')[1]} key={license.id.toString()}>
                   <Avatar>
-                    <MediaRenderer width='50px' height='50px' src={license.metadata.image} />
+                    <MediaRenderer client={twClient!} width='50px' height='50px' src={license.metadata.image} />
                   </Avatar>
                 </Tooltip>
               ))

@@ -39,7 +39,7 @@ const CargoSelectAircraft = ({
   const theme = useTheme()
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
   const missingAircrafts = useMemo(
-    () => aircrafts.filter((a) => ownedAircrafts && !ownedAircrafts.some((o) => o.metadata.id === a.metadata.id)),
+    () => aircrafts.filter((a) => ownedAircrafts && !ownedAircrafts.some((o) => o.id.toString() === a.id.toString())),
     [aircrafts, ownedAircrafts]
   )
 
@@ -71,9 +71,9 @@ const CargoSelectAircraft = ({
               {ownedAircrafts?.map((ownedAircraft) => (
                 <MenuItem
                   sx={{ minWidth: 250 }}
-                  key={ownedAircraft.metadata.id}
+                  key={ownedAircraft.id.toString()}
                   disabled={currentAircraft && !hasEnoughFuel()}
-                  value={ownedAircraft.metadata.id}
+                  value={ownedAircraft.id.toString()}
                 >
                   <Stack direction='row' justifyContent='space-between'>
                     <Typography fontWeight={500}>{ownedAircraft.metadata.name}</Typography>
@@ -84,9 +84,9 @@ const CargoSelectAircraft = ({
               {missingAircrafts?.map((ownedAircraft) => (
                 <MenuItem
                   sx={{ minWidth: 250 }}
-                  key={ownedAircraft.metadata.id}
+                  key={ownedAircraft.id.toString()}
                   disabled
-                  value={ownedAircraft.metadata.id}
+                  value={ownedAircraft.id.toString()}
                   aria-disabled
                 >
                   <Stack direction='row' justifyContent='space-between' width='100%'>

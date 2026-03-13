@@ -18,8 +18,8 @@ const AppBarInfo = ({ user, matches, toggleSidebar }: Props) => {
     !user && (
       <div>
         <LicenseBar />
-        <GasBalanceBar show={matches} />
-        <AirBalanceBar show={matches} />
+        <GasBalanceBar />
+        <AirBalanceBar />
         <IconButton
           onClick={() => toggleSidebar('right')}
           size='large'

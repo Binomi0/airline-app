@@ -7,13 +7,15 @@ import { prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb'
 import useERC20 from './useERC20'
 
 // We define a simplified NFT type to maintain internal consistency
-interface NFTMetadata {
-  id: string
-  [key: string]: any
-}
-
 interface NFT {
-  metadata: NFTMetadata
+  id: bigint | string
+  metadata: {
+    id?: string | number
+    name?: string
+    description?: string
+    image?: string
+    [key: string]: any
+  }
   [key: string]: any
 }
 
@@ -47,8 +49,8 @@ const useClaimNFT = (): UseClaimNFT => {
           await setAllowance(nftAircraftTokenAddress)
         }
 
-        const nftId = Number(aircraftNFT.metadata.id)
-        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0 ? nftId - 1 : 0])
+        const nftId = BigInt(aircraftNFT.id)
+        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0n ? nftId - 1n : 0n])
         
         // In v5, we define the method and params directly
         const tx = prepareContractCall({
@@ -60,7 +62,7 @@ const useClaimNFT = (): UseClaimNFT => {
           method: "function claim(address receiver, uint256 tokenId, uint256 quantity, address currency, uint256 pricePerToken, (bytes32[] proof, uint256 quantityLimitPerWallet, uint256 pricePerToken, address currency) allowlistProof, bytes data)",
           params: [
             smartAccountAddress,
-            BigInt(aircraftNFT.metadata.id),
+            nftId,
             1n,
             coinTokenAddress, // Assuming currency is coinTokenAddress
             0n, // We should ideally fetch activePhase.price, but for now we follow the logic
@@ -102,8 +104,8 @@ const useClaimNFT = (): UseClaimNFT => {
           await setAllowance(nftLicenseTokenAddress)
         }
 
-        const nftId = Number(nft.metadata.id)
-        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0 ? nftId - 1 : 0])
+        const nftId = BigInt(nft.id)
+        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0n ? nftId - 1n : 0n])
 
         const tx = prepareContractCall({
           contract: {
@@ -114,7 +116,7 @@ const useClaimNFT = (): UseClaimNFT => {
           method: "function claim(address receiver, uint256 tokenId, uint256 quantity, address currency, uint256 pricePerToken, (bytes32[] proof, uint256 quantityLimitPerWallet, uint256 pricePerToken, address currency) allowlistProof, bytes data)",
           params: [
             smartAccountAddress,
-            BigInt(nft.metadata.id),
+            nftId,
             1n,
             coinTokenAddress,
             0n,

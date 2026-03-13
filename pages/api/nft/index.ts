@@ -1,10 +1,7 @@
-import { connectDB, dbDisconnect } from 'lib/mongoose'
-import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import { connectDB } from 'lib/mongoose'
+import { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
-import alchemy from 'lib/alchemy'
-import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
 import Nft from 'models/Nft'
-import User from 'models/User'
 import { NFT } from 'thirdweb'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {

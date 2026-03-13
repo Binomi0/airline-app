@@ -1,10 +1,8 @@
-import { useContract, useNFTBalance, useReadContract } from 'thirdweb/react'
+import { useReadContract } from 'thirdweb/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
-import { createThirdwebClient } from 'thirdweb'
+import { walletStore } from 'store/wallet.atom'
 import { getContract } from 'thirdweb'
-import { sepolia } from 'thirdweb/chains'
 import { getOwnedNFTs } from 'thirdweb/extensions/erc721'
 
 interface UseAircraftReturnType {
@@ -12,19 +10,21 @@ interface UseAircraftReturnType {
   refetch: () => void
 }
 
-const useAircraft = (id?: string): UseAircraftReturnType => {
+const useAircraft = (): UseAircraftReturnType => {
+  const { twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
+
   const contract = getContract({
-    client,
+    client: twClient!,
     address: nftAircraftTokenAddress,
-    chain: sepolia
+    chain: twChain!
   })
-  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
-  // const newContract = useReadContract({ contract })
-  const { data, refetch } = useReadContract(getOwnedNFTs, { contract, owner: smartAccountAddress! })
 
-  // const { data, refetch } = useNFTBalance(contract, smartAccountAddress, id)
+  const { data, refetch } = useReadContract(getOwnedNFTs, {
+    contract,
+    owner: smartAccountAddress!
+  })
 
-  return { hasAircraft: smartAccountAddress ? !data?.length : false, refetch }
+  return { hasAircraft: !!data && data.length > 0, refetch }
 }
 
 export default useAircraft

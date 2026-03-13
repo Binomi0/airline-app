@@ -1,6 +1,9 @@
 import React, { startTransition, useState } from 'react'
 import router from 'next/router'
-import { MediaRenderer, NFT } from 'thirdweb/react'
+import { MediaRenderer } from 'thirdweb/react'
+import { NFT } from 'thirdweb'
+import { walletStore } from 'store/wallet.atom'
+import { useRecoilValue } from 'recoil'
 import CardHeader from '@mui/material/CardHeader'
 import Avatar from '@mui/material/Avatar'
 import Collapse from '@mui/material/Collapse'
@@ -10,6 +13,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { nftAircraftTokenAddress } from 'contracts/address'
 
 const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
+  const { twClient } = useRecoilValue(walletStore)
   const [open, setOpen] = useState(false)
   const { name, description, image, id } = nft.metadata
   const subheader = open ? description : `${description?.split(' ').slice(0, 8).join(' ')} ...`
@@ -32,7 +36,7 @@ const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
         }}
         avatar={
           <Avatar variant='rounded'>
-            <MediaRenderer width='50px' height='50px' src={image} />
+            <MediaRenderer client={twClient!} width='50px' height='50px' src={image} />
           </Avatar>
         }
         title={name}
@@ -49,7 +53,7 @@ const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
       />
       <Collapse in={open}>
         <div onClick={handleRedirect}>
-          <MediaRenderer height='100%' width='100%' src={image} />
+          <MediaRenderer client={twClient!} height='100%' width='100%' src={image} />
         </div>
       </Collapse>
     </>

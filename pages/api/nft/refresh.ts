@@ -1,5 +1,5 @@
 import { connectDB } from 'lib/mongoose'
-import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
 import alchemy from 'lib/alchemy'
 import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'

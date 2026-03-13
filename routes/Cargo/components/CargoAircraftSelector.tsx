@@ -11,20 +11,23 @@ import { MediaRenderer } from 'thirdweb/react'
 import { NFT } from 'thirdweb'
 import { useRouter } from 'next/router'
 import React, { Dispatch, SetStateAction } from 'react'
+import { useRecoilValue } from 'recoil'
+import { walletStore } from 'store/wallet.atom'
 
 const CargoAircraftSelector: React.FC<{
   setAircraft: Dispatch<SetStateAction<NFT | undefined>>
   owned: Readonly<NFT[]>
 }> = ({ owned }) => {
   const router = useRouter()
+  const { twClient } = useRecoilValue(walletStore)
 
   const handleSelectAircraft = React.useCallback(
     (nft: NFT) => () => {
       if (router.query.pilot) {
-        const url = `cargo/${nft.metadata.id}/new?pilot=${router.query.pilot}&origin=${router.query.origin}&destination=${router.query.destination}`
+        const url = `cargo/${nft.id.toString()}/new?pilot=${router.query.pilot}&origin=${router.query.origin}&destination=${router.query.destination}`
         router.push(url)
       } else {
-        router.push(`cargo/${nft.metadata.id}/new`)
+        router.push(`cargo/${nft.id.toString()}/new`)
       }
     },
     [router]
@@ -46,10 +49,10 @@ const CargoAircraftSelector: React.FC<{
             }
           >
             {owned.map((nft) => (
-              <ListItemButton key={nft.metadata.id} onClick={handleSelectAircraft(nft)}>
+              <ListItemButton key={nft.id.toString()} onClick={handleSelectAircraft(nft)}>
                 <ListItemIcon>
                   <Avatar variant='square'>
-                    <MediaRenderer width='50px' height='50px' src={nft?.metadata.image} />
+                    <MediaRenderer client={twClient!} width='50px' height='50px' src={nft?.metadata.image} />
                   </Avatar>
                 </ListItemIcon>
                 <Typography color='common.black'>{nft.metadata.name}</Typography>

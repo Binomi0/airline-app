@@ -1,9 +1,9 @@
-import { NFT } from 'thirdweb/react'
+import { NFT } from 'thirdweb'
 import React, { useCallback, useState } from 'react'
 import { getNFTAttributes } from 'utils'
 import LicenseItemHeader from './LicenseItemHeader'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
+import { walletStore } from 'store/wallet.atom'
 import useLicense from 'hooks/useLicense'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
@@ -25,18 +25,18 @@ interface Props {
 }
 
 const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming }) => {
-  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
+  const { smartAccountAddress } = useRecoilValue(walletStore)
   const balance = useRecoilValue(tokenBalanceStore)
-  const { hasLicense, refetch } = useLicense(nft.metadata.id)
-  const [claimingNFT, setClaimingNFT] = useState(-1)
+  const { hasLicense, refetch } = useLicense()
+  const [claimingNFT, setClaimingNFT] = useState<bigint | -1>(-1)
 
   const { name, description, image } = nft.metadata
   const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
 
   const handleClaimLicense = useCallback(async () => {
-    setClaimingNFT(Number(nft.metadata.id))
+    setClaimingNFT(BigInt(nft.id))
     claimLicenseNFT(refetch)
-  }, [claimLicenseNFT, nft.metadata.id, refetch])
+  }, [claimLicenseNFT, nft.id, refetch])
 
   const getNFTPrice = useCallback((nft: NFT) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
@@ -94,7 +94,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
               variant='contained'
               onClick={handleClaimLicense}
             >
-              {isClaiming && claimingNFT === Number(nft.metadata.id) ? (
+              {isClaiming && claimingNFT === BigInt(nft.id) ? (
                 <CircularProgress size={25} />
               ) : (
                 `Claim ${(nft.metadata.name as string)?.split(' - ')[1]} for ${getNFTPrice(nft)} AIRL`
@@ -107,4 +107,4 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
   )
 }
 
-export default LicenseItem
+export default React.memo(LicenseItem)

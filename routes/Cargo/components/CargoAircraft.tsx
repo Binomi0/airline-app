@@ -8,19 +8,20 @@ import Grid from '@mui/material/Grid'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { MediaRenderer, useClaimNFT, useContract, useLazyMint, useNFT, useSetClaimConditions } from 'thirdweb/react'
-import axios from 'config/axios'
-import { flightNftAddress, nftLicenseTokenAddress } from 'contracts/address'
+import { MediaRenderer, useReadContract } from 'thirdweb/react'
+import { getContract } from 'thirdweb'
+import { getNFT } from 'thirdweb/extensions/erc721'
+import { walletStore } from 'store/wallet.atom'
+import { nftLicenseTokenAddress } from 'contracts/address'
 import { postApi } from 'lib/api'
 import { useRouter } from 'next/router'
 import React, { useCallback, useMemo } from 'react'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
 import Swal from 'sweetalert2'
 import { Cargo } from 'types'
 import { getNFTAttributes } from 'utils'
 
-interface Aircraft {
+interface AircraftAttributes {
   combustible: string
   cargo: string
   license: string
@@ -28,60 +29,40 @@ interface Aircraft {
 
 const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ cargo, onCancel }) => {
   const router = useRouter()
-  const address = useRecoilValue(smartAccountAddressStore)
-  const { contract: flightContract } = useContract(flightNftAddress)
-  const { contract: licenseContract } = useContract(nftLicenseTokenAddress)
-  const { mutateAsync: lazyMint, isLoading: isMinting } = useLazyMint(flightContract)
-  const { mutateAsync: claimNFT, isLoading: isClaiming } = useClaimNFT(flightContract)
-  const { mutate: setClaimConditions, error } = useSetClaimConditions(flightContract)
+  const { twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
 
-  const aircraftAttributes: Aircraft = useMemo(() => {
-    if (!cargo) return {} as Aircraft
-    const attributes = getNFTAttributes(cargo?.aircraft).reduce(
+  const aircraftAttributes: AircraftAttributes = useMemo(() => {
+    if (!cargo?.aircraft) return {} as AircraftAttributes
+    const attributes = getNFTAttributes(cargo.aircraft).reduce(
       (acc, curr) =>
         ({
           ...acc,
           [curr.trait_type]: curr.value
-        } as Aircraft),
-      {} as Aircraft
+        } as AircraftAttributes),
+      {} as AircraftAttributes
     )
 
     return attributes
   }, [cargo])
-  const { data: license } = useNFT(licenseContract, aircraftAttributes.license)
+
+  const licenseContract = useMemo(() => {
+    if (!twClient || !twChain) return undefined
+    return getContract({
+      client: twClient,
+      chain: twChain,
+      address: nftLicenseTokenAddress
+    })
+  }, [twChain, twClient])
+
+  const { data: license } = useReadContract(getNFT, {
+    contract: licenseContract!,
+    tokenId: BigInt(aircraftAttributes.license || 0)
+  })
 
   const progressBar = useMemo(
     () => (Number(cargo?.weight) / Number(aircraftAttributes.cargo)) * 100,
     [cargo, aircraftAttributes]
   )
-
-  // MOVE THIS LOGIC WHEN FLIGHT HAS FINISHED
-  // const handleLazyMint = useCallback(async () => {
-  //   await lazyMint({
-  //     metadatas: [
-  //       {
-  //         name: `${cargo?.origin} - ${cargo?.destination}`,
-  //         description: `User: ${address}, flight on ${Date.now()} this cargo`,
-  //         image: "ipfs://QmWgvZzrNpQyyRyrEtsDUM7kyguAZurbSa2XKAHpRy415z",
-  //         attributes: [{ cargo }],
-  //       },
-  //     ],
-  //   });
-  // }, [lazyMint, cargo, address]);
-
-  // MOVE THIS LOGIC WHEN FLIGHT HAS FINISHED
-  // const handleClaim = useCallback(async () => {
-  //   await claimNFT({
-  //     to: address,
-  //     quantity: 1,
-  //     tokenId: 0,
-  //     options: {
-  //       checkERC20Allowance: true,
-  //       currencyAddress: "0x773F0e20Ab2E9afC479C82105E924C2E0Ada5aa9",
-  //       pricePerToken: 0,
-  //     },
-  //   });
-  // }, [claimNFT, address]);
 
   const handleRequestFlight = useCallback(async () => {
     if (!cargo) return
@@ -95,9 +76,9 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
         showCancelButton: true
       })
       if (isConfirmed) {
-        const cargo = await postApi('/api/cargo/new', newCargo)
-        if (!cargo) return
-        await postApi('/api/live/new', { cargo })
+        const cargoResult = await postApi('/api/cargo/new', newCargo)
+        if (!cargoResult) return
+        await postApi('/api/live/new', { cargo: cargoResult })
         router.push('/live')
       }
     } catch (err) {
@@ -111,7 +92,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} sm={6} key={cargo.aircraft.metadata.id}>
+      <Grid item xs={12} sm={6} key={cargo.aircraft.id.toString()}>
         <Card>
           <CardHeader
             sx={{
@@ -121,12 +102,12 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
             subheader={cargo.aircraft.metadata.description?.split('. ')[0]}
             avatar={
               <Avatar variant='rounded'>
-                <MediaRenderer width='50px' height='50px' src={cargo.aircraft.metadata.image} />
+                <MediaRenderer client={twClient!} width='50px' height='50px' src={cargo.aircraft.metadata.image} />
               </Avatar>
             }
             action={
               <Avatar>
-                <MediaRenderer width='50px' height='50px' src={license?.metadata.image} />
+                <MediaRenderer client={twClient!} width='50px' height='50px' src={license?.metadata.image} />
               </Avatar>
             }
           />
@@ -143,7 +124,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
                 </b>
               </Typography>
               <Typography textAlign='center' variant='caption'>
-                Max Capacity: <b>{getNFTAttributes(cargo.aircraft).find((a) => a.trait_type === 'cargo')?.value} Kg</b>
+                Max Capacity: <b>{aircraftAttributes.cargo} Kg</b>
               </Typography>
               <Typography>
                 Callsign: <b>{cargo.callsign}</b>
@@ -162,7 +143,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
           </CardContent>
 
           <CardActions>
-            <Button disabled={!address} color='secondary' variant='contained' fullWidth onClick={handleRequestFlight}>
+            <Button disabled={!smartAccountAddress} color='secondary' variant='contained' fullWidth onClick={handleRequestFlight}>
               Reservar
             </Button>
             <Button variant='contained' color='error' fullWidth onClick={onCancel}>

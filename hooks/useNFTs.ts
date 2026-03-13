@@ -1,17 +1,26 @@
 import React from 'react'
-import alchemy from 'lib/alchemy'
-import { Hex, NFT } from 'thirdweb'
+import { getContract, NFT } from 'thirdweb'
+import { getNFTs } from 'thirdweb/extensions/erc721'
+import { useRecoilValue } from 'recoil'
+import { walletStore } from 'store/wallet.atom'
 
-const useNFTs = (contract: Hex) => {
+const useNFTs = (contractAddress: string) => {
+  const { twClient, twChain } = useRecoilValue(walletStore)
   const [data, setData] = React.useState<NFT[]>()
   const [error, setError] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
 
-  const getNFTs = React.useCallback(async () => {
+  const fetchNFTs = React.useCallback(async () => {
+    if (!twClient || !twChain || !contractAddress) return
     setIsLoading(true)
 
     try {
-      const { nfts } = await alchemy.nft.getNftsForContract(contract)
+      const contract = getContract({
+        client: twClient,
+        chain: twChain,
+        address: contractAddress as `0x${string}`
+      })
+      const nfts = await getNFTs({ contract })
       setData(nfts)
     } catch (error) {
       console.error(error)
@@ -20,11 +29,11 @@ const useNFTs = (contract: Hex) => {
     } finally {
       setIsLoading(false)
     }
-  }, [contract])
+  }, [contractAddress, twChain, twClient])
 
   React.useEffect(() => {
-    getNFTs()
-  }, [getNFTs])
+    fetchNFTs()
+  }, [fetchNFTs])
 
   return { data, isLoading, error }
 }
