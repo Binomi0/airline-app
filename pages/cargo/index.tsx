@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { NFT } from 'thirdweb/react'
+import { type NFT } from 'thirdweb'
 import CargoView from 'routes/Cargo/CargoView'
 import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector'
 import { VaProvider } from 'context/VaProvider'

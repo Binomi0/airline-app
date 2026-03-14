@@ -1,4 +1,4 @@
-import { NFT } from 'thirdweb/react'
+import { type NFT } from 'thirdweb'
 import CargoItem from './CargoItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
 import { FRoute } from 'types'

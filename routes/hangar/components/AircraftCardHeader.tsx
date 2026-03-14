@@ -1,6 +1,8 @@
 import React, { startTransition, useState } from 'react'
 import router from 'next/router'
-import { MediaRenderer, NFT } from 'thirdweb/react'
+import { type NFT } from 'thirdweb'
+import { MediaRenderer } from 'thirdweb/react'
+import { twClient } from 'config'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { nftAircraftTokenAddress } from 'contracts/address'
@@ -32,7 +34,7 @@ const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
         }}
         avatar={
           <Avatar variant='rounded'>
-            <MediaRenderer width='50px' height='50px' src={image} />
+            <MediaRenderer client={twClient} width='50px' height='50px' src={image} />
           </Avatar>
         }
         title={name}
@@ -49,7 +51,7 @@ const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
       />
       <Collapse in={open}>
         <div onClick={handleRedirect}>
-          <MediaRenderer height='100%' width='100%' src={image} />
+          <MediaRenderer client={twClient} height='100%' width='100%' src={image} />
         </div>
       </Collapse>
     </>

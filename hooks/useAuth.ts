@@ -77,7 +77,7 @@ const useAuth = (): UseAuthReturnType => {
       ...curr,
       baseSigner: undefined,
       smartSigner: undefined,
-      smartAccountAddress: '',
+      smartAccountAddress: undefined,
       isLoaded: false
     }))
     deleteCookie('token')
