@@ -8,11 +8,9 @@ import { IWallet } from 'models/Wallet'
 import { walletStore } from 'store/wallet.atom'
 import { getApi, postApi } from 'lib/api'
 import { User } from 'types'
-import { createThirdwebClient, defineChain } from 'thirdweb'
+import { createThirdwebClient } from 'thirdweb'
 import { privateKeyToAccount, smartWallet } from 'thirdweb/wallets'
-import { twClient } from 'components/CustomWeb3Provider'
-
-const chain = defineChain(11155111) // Sepolia
+import { twClient, activeChain as chain } from 'config'
 
 interface UseWallet {
   // eslint-disable-next-line no-unused-vars

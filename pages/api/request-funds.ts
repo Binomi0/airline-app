@@ -2,12 +2,10 @@ import { NextApiResponse } from 'next'
 import { coinTokenAddress } from 'contracts/address'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import Wallet from 'models/Wallet'
-import { createThirdwebClient, defineChain, getContract, readContract, sendAndConfirmTransaction } from 'thirdweb'
+import { getContract, readContract, sendAndConfirmTransaction } from 'thirdweb'
 import { privateKeyToAccount } from 'thirdweb/wallets'
 import { transfer } from 'thirdweb/extensions/erc20'
-
-const twClient = createThirdwebClient({ clientId: process.env.NEXT_PUBLIC_TW_CLIENT_ID || "" })
-const chain = defineChain(11155111) // Sepolia
+import { twClient, activeChain as chain } from 'config'
 
 interface ApiRequest extends CustomNextApiRequest {
   body: {

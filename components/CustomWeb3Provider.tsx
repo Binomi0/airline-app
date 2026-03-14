@@ -8,7 +8,7 @@ interface Props {
   children: ReactNode
 }
 
-export const twClient = createThirdwebClient({ clientId: process.env.NEXT_PUBLIC_TW_CLIENT_ID })
+
 
 const CustomWeb3Provider = ({ children }: Props) => {
   return (

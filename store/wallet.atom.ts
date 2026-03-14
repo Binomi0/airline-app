@@ -1,7 +1,6 @@
 import { ThirdwebClient, Chain } from 'thirdweb'
-import { sepolia} from 'thirdweb/chains'
 import { atom, selector } from 'recoil'
-import { twClient } from 'components/CustomWeb3Provider'
+import { twClient, activeChain } from 'config'
 
 export const walletStore = atom<{
   baseSigner?: any // Local private key account
@@ -17,8 +16,8 @@ export const walletStore = atom<{
     baseSigner: undefined,
     smartSigner: undefined,
     smartAccountAddress: '',
-    twClient: twClient,
-    twChain: sepolia
+    twClient,
+    twChain: activeChain
   }
 })
 

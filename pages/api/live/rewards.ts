@@ -5,12 +5,10 @@ import User from 'models/User'
 import Cargo, { ICargo } from 'models/Cargo'
 import { CargoStatus, CargoStep, LastTrackStateEnum } from 'types'
 import Live from 'models/Live'
-import { createThirdwebClient, defineChain, getContract, sendAndConfirmTransaction } from 'thirdweb'
+import { getContract, sendAndConfirmTransaction } from 'thirdweb'
 import { privateKeyToAccount } from 'thirdweb/wallets'
 import { transfer } from 'thirdweb/extensions/erc20'
-
-const twClient = createThirdwebClient({ clientId: process.env.NEXT_PUBLIC_TW_CLIENT_ID || "" })
-const chain = defineChain(11155111) // Sepolia
+import { twClient, activeChain as chain } from 'config'
 
 const validateFullFlight = (steps: CargoStep[]): number => {
   let counter = 0
