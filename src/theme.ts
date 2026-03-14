@@ -1,5 +1,5 @@
 import { Roboto, Sora } from 'next/font/google'
-import { createTheme, responsiveFontSizes } from '@mui/material/styles'
+import { createTheme, responsiveFontSizes, ThemeOptions } from '@mui/material/styles'
 import { grey, red } from '@mui/material/colors'
 
 export const roboto = Roboto({
@@ -9,46 +9,105 @@ export const roboto = Roboto({
   fallback: ['Helvetica', 'Arial', 'sans-serif']
 })
 export const sora = Sora({
-  weight: ['300', '400', '500', '700'],
+  weight: ['300', '400', '500', '600', '700'],
   subsets: ['latin'],
   display: 'swap',
   fallback: ['Helvetica', 'Arial', 'sans-serif']
 })
+
+const commonTypography: ThemeOptions['typography'] = {
+  fontFamily: 'Sora, sans-serif',
+  allVariants: {
+    fontFamily: 'Sora, sans-serif'
+  },
+  h1: {
+    fontWeight: 700
+  },
+  h2: {
+    fontWeight: 600
+  },
+  h3: {
+    fontWeight: 600
+  },
+  h4: {
+    fontWeight: 600
+  },
+  h5: {
+    fontWeight: 600
+  },
+  h6: {
+    fontWeight: 600
+  },
+  body1: {
+    fontWeight: 400
+  },
+  body2: {
+    fontWeight: 500
+  },
+  button: {
+    textTransform: 'none',
+    fontWeight: 600
+  }
+}
+
+const commonComponents: ThemeOptions['components'] = {
+  MuiButton: {
+    styleOverrides: {
+      root: {
+        borderRadius: '8px'
+      }
+    }
+  },
+  MuiCard: {
+    styleOverrides: {
+      root: {
+        borderRadius: '16px',
+        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
+      }
+    }
+  },
+  MuiAppBar: {
+    styleOverrides: {
+      root: {
+        background: 'rgba(11, 15, 25, 0.7)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: 'none',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+      }
+    }
+  }
+}
+
 // Create a theme instance.
 const lTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#556cd6'
+      main: '#3B82F6'
     },
     secondary: {
-      main: '#19857b'
+      main: '#10B981'
     },
     error: {
       main: red.A400
     },
     background: {
-      // default: '#0f1318',
-      // paper: '#0f1318'
+      default: '#F3F4F6',
+      paper: '#FFFFFF'
     }
   },
-  typography: {
-    fontFamily: 'Sora',
-    allVariants: {
-      fontFamily: 'Sora'
-    },
-    h1: {
-      textShadow: '2px 2px 10px grey',
-      fontWeight: 700
-    },
-    h2: {
-      fontWeight: 500
-    },
-    body1: {
-      fontWeight: 300
-    },
-    body2: {
-      fontWeight: 500
+  typography: commonTypography,
+  components: {
+    ...commonComponents,
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: 'none',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)'
+        }
+      }
     }
   }
 })
@@ -57,35 +116,22 @@ const dTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#556cd6'
+      main: '#3B82F6'
     },
     secondary: {
-      main: '#19857b'
+      main: '#10B981'
     },
     error: {
       main: red.A400
     },
+    background: {
+      default: '#0B0F19',
+      paper: '#111827'
+    },
     grey
   },
-  typography: {
-    fontFamily: 'Sora',
-    allVariants: {
-      fontFamily: 'Sora'
-    },
-    h1: {
-      textShadow: '2px 2px 10px grey',
-      fontWeight: 700
-    },
-    h2: {
-      fontWeight: 500
-    },
-    body1: {
-      fontWeight: 300
-    },
-    body2: {
-      fontWeight: 500
-    }
-  }
+  typography: commonTypography,
+  components: commonComponents
 })
 
 export const darkTheme = responsiveFontSizes(dTheme)

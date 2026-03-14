@@ -1,114 +1,68 @@
 import { connectDB } from 'lib/mongoose'
 import { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
+import alchemy from 'lib/alchemy'
 import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
 import Nft from 'models/Nft'
 import User from 'models/User'
-import { getContract } from 'thirdweb'
-import { getNFT, getOwnedNFTs } from 'thirdweb/extensions/erc1155'
-import { twClient, activeChain as chain } from 'config'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   await connectDB()
 
   if (req.method === 'GET') {
     try {
-      // Initialize contracts
-      const aircraftContract = getContract({
-        client: twClient,
-        chain,
-        address: nftAircraftTokenAddress
-      })
+      // 1. Sync all NFTs from the contract (metadata)
+      const aircraftNfts = await alchemy.nft.getNftsForContract(nftAircraftTokenAddress)
+      const licenseNfts = await alchemy.nft.getNftsForContract(nftLicenseTokenAddress)
+      const allNfts = [...aircraftNfts.nfts, ...licenseNfts.nfts]
 
-      const licenseContract = getContract({
-        client: twClient,
-        chain,
-        address: nftLicenseTokenAddress
-      })
-
-      // Helper function to fetch all tokens for a contract
-      const fetchAllTokens = async (contract: any, contractAddress: string) => {
-        let tokenId = 0n
-        while (true) {
-          try {
-            const nft = await getNFT({
-              contract,
-              tokenId,
-            })
-            allNfts.push({ nft, contractAddress, type: nft.type || 'ERC1155' })
-            tokenId++
-          } catch (e) {
-            // Assume we've reached the end of minted tokens when getNFT throws
-            console.log(`Finished fetching NFTs for ${contractAddress} at tokenId ${tokenId}`)
-            break
-          }
-        }
-      }
-
-      const allNfts: any[] = []
-
-      await fetchAllTokens(aircraftContract, nftAircraftTokenAddress)
-      await fetchAllTokens(licenseContract, nftLicenseTokenAddress)
-
-      for (const { nft, contractAddress, type } of allNfts) {
-        const tokenId = BigInt(nft.id)
-        const tokenUri = nft.tokenURI || ''
+      console.log(allNfts[0].raw.metadata.attributes)
+      for (const nft of allNfts) {
+        const tokenId = BigInt(nft.tokenId)
+        const tokenUri = typeof nft.tokenUri === 'string' ? nft.tokenUri : (nft.tokenUri as any)?.raw || ''
 
         await Nft.findOneAndUpdate(
-          { id: tokenId, tokenAddress: contractAddress },
+          { id: tokenId, tokenAddress: nft.contract.address },
           {
             metadata: {
               uri: tokenUri,
-              name: nft.name,
-              description: nft.description,
+              name: nft.name || (nft as any).rawMetadata?.name,
+              description: nft.description || (nft as any).rawMetadata?.description,
               image: nft.image?.cachedUrl || nft.image?.originalUrl || (nft as any).rawMetadata?.image,
-              attributes: nft.metadata.attributes,
+              attributes: (nft as any).raw?.metadata?.attributes,
             },
             id: tokenId,
             tokenURI: tokenUri,
-            type: type,
-            tokenAddress: contractAddress,
-            chainId: chain.id,
-            supply: (nft as any).supply || BigInt(0),
-            owner: nft.owner || null
+            type: nft.tokenType === 'ERC1155' ? 'ERC1155' : 'ERC721',
+            tokenAddress: nft.contract.address,
+            chainId: 11155111, // Sepolia
+            supply: (nft as any).totalSupply ? BigInt((nft as any).totalSupply) : BigInt(0)
           },
           { upsert: true, new: true }
         )
       }
 
-      // Sync ownership for the current user if they have an address
+      // 2. Sync ownership for the current user if they have an address
       const user = await User.findById(req.id)
       if (user && user.address) {
-        try {
-          // Check ownership of Aircraft
-          const ownedAircrafts = await getOwnedNFTs({ contract: aircraftContract, address: user.address })
-          for (const owned of ownedAircrafts) {
-            await Nft.findOneAndUpdate(
-              { id: BigInt(owned.id), tokenAddress: nftAircraftTokenAddress },
-              { owner: user.address },
-              { new: true }
-            )
-          }
-        } catch(e) { console.error('Error fetching owned aircrafts:', e) }
+        const ownedNfts = await alchemy.nft.getNftsForOwner(user.address, {
+          contractAddresses: [nftAircraftTokenAddress, nftLicenseTokenAddress]
+        })
 
-        try {
-          // Check ownership of License
-          const ownedLicenses = await getOwnedNFTs({ contract: licenseContract, address: user.address })
-          for (const owned of ownedLicenses) {
-            await Nft.findOneAndUpdate(
-              { id: BigInt(owned.id), tokenAddress: nftLicenseTokenAddress },
-              { owner: user.address },
-              { new: true }
-            )
-          }
-        } catch(e) { console.error('Error fetching owned licenses:', e) }
+        for (const ownedNft of ownedNfts.ownedNfts) {
+           await Nft.findOneAndUpdate(
+             { id: BigInt(ownedNft.tokenId), tokenAddress: ownedNft.contract.address },
+             { owner: user.address },
+             { new: true }
+           )
+        }
       }
 
       const dbNfts = await Nft.find({})
       return res.status(200).json(dbNfts)
     } catch (error) {
       console.error('API NFT error:', error)
-      return res.status(500).json({ error: String(error) })
+      return res.status(500).send(error)
     }
   } else if (req.method === 'DELETE') {
     // Implement delete logic if needed
