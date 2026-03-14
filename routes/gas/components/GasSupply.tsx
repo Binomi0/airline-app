@@ -1,13 +1,27 @@
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
-import { useContract, useContractRead } from 'thirdweb/react'
+import { getContract } from 'thirdweb'
+import { useReadContract } from 'thirdweb/react'
 import { stakingAddress } from 'contracts/address'
 import { memo } from 'react'
 import { formatNumber } from 'utils'
+import { useRecoilValue } from 'recoil'
+import { walletStore } from 'store/wallet.atom'
 
 const GasSupply = () => {
-  const { contract } = useContract(stakingAddress)
-  const { data, isLoading } = useContractRead(contract, 'getRewardTokenBalance')
+  const { twClient, twChain } = useRecoilValue(walletStore)
+
+  const contract = (twClient && twChain) ? getContract({
+    client: twClient,
+    chain: twChain,
+    address: stakingAddress as `0x${string}`
+  }) : undefined
+
+  const { data, isLoading } = useReadContract({
+    contract: contract as any,
+    method: 'function getRewardTokenBalance() view returns (uint256)',
+    params: []
+  })
 
   return (
     <Typography paragraph>

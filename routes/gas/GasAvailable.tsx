@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react'
-import { useContract } from 'thirdweb/react'
 import { ethers } from 'ethers'
 import { formatNumber } from 'utils'
 import { coinTokenAddress, stakingAddress } from 'contracts/address'
@@ -21,8 +20,7 @@ interface Props {
 }
 
 const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
-  const { contract: staking } = useContract(stakingAddress)
-  const { stake } = useStaking(staking)
+  const { stake } = useStaking()
   const { setAllowance, getAllowance } = useERC20(coinTokenAddress)
   const [loading, setLoading] = useState(false)
 

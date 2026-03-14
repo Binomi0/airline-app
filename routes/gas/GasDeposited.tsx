@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import { formatNumber } from 'utils'
-import { useContract } from 'thirdweb/react'
 import { stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import { ethers } from 'ethers'
@@ -19,13 +18,12 @@ interface Props {
 }
 
 const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
-  const { contract } = useContract(stakingAddress)
-  const { withdraw, isLoading } = useStaking(contract)
-  const maxAmount = (Number(staking?.amountStaked) / 1e18).toString()
+  const { withdraw, isLoading } = useStaking()
+  const maxAmount = (Number(staking?.[0] || 0) / 1e18).toString()
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
-      if (staking?.amountStaked.gte(ethers.utils.parseEther(unstakeAmount))) {
+      if (staking && staking[0] >= ethers.utils.parseEther(unstakeAmount).toBigInt()) {
         const { isConfirmed } = await handleUnStakeSwal(unstakeAmount)
         if (isConfirmed) {
           await withdraw(ethers.utils.parseEther(unstakeAmount))
@@ -47,7 +45,7 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
         <Box p={1}>
           <Typography variant='subtitle1'>Deposited</Typography>
           <Typography variant='subtitle2' paragraph>
-            {staking ? formatNumber(Number(staking.amountStaked.toString()) / 1e18) : formatNumber()} sAIRL
+            {staking ? formatNumber(Number(staking[0].toString()) / 1e18) : formatNumber()} sAIRL
           </Typography>
           <GasForm
             max={maxAmount}
