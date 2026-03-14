@@ -6,7 +6,8 @@ import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import Disconnected from 'components/Disconnected'
 import { useTokenProviderContext } from 'context/TokenProvider'
-import { useContract, useContractRead } from 'thirdweb/react'
+import { getContract } from 'thirdweb'
+import { useReadContract } from 'thirdweb/react'
 import { stakingAddress } from 'contracts/address'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
@@ -16,7 +17,7 @@ import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import type { PageProps } from 'types'
 import LinearProgress from '@mui/material/LinearProgress'
-import { smartAccountAddressStore } from 'store/wallet.atom'
+import { smartAccountAddressStore, walletStore } from 'store/wallet.atom'
 import { tokenBalanceStore } from 'store/balance.atom'
 
 const Gas = ({ loading }: PageProps) => {
@@ -24,8 +25,19 @@ const Gas = ({ loading }: PageProps) => {
   const address = useRecoilValue(smartAccountAddressStore)
   const balance = useRecoilValue(tokenBalanceStore)
   const { getAirlBalance, getAirgBalance } = useTokenProviderContext()
-  const { contract } = useContract(stakingAddress)
-  const { data: staking, refetch: getStakingInfo } = useContractRead(contract, 'stakers', [address])
+  const { twClient, twChain } = useRecoilValue(walletStore)
+
+  const contract = (twClient && twChain) ? getContract({
+    client: twClient,
+    chain: twChain,
+    address: stakingAddress as `0x${string}`
+  }) : undefined
+
+  const { data: staking, refetch: getStakingInfo } = useReadContract({
+    contract: contract as any,
+    method: 'function stakers(address) view returns (uint256 amountStaked, uint256 timeOfLastUpdate, uint256 unclaimedRewards, uint256 conditionIdOflastUpdate)',
+    params: [address as `0x${string}`]
+  })
 
   if (!user) {
     return <Disconnected />
