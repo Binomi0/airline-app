@@ -41,7 +41,8 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
   const getNFTPrice = useCallback((nft: NFT) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
     if (!attribute) {
-      throw new Error('missing types')
+      console.warn(`NFT ${nft.id} is missing 'price' attribute`)
+      return '0'
     }
 
     return attribute.value

@@ -101,7 +101,8 @@ export function getCargoWeight(aircraft: NFT) {
   const attribute = getNFTAttributes(aircraft).find((attribute) => attribute.trait_type === 'cargo')
 
   if (!attribute) {
-    throw new Error('Missing attribute')
+    console.warn(`Aircraft ${aircraft.id} is missing 'cargo' attribute`)
+    return 0
   }
 
   return Number(attribute.value) * randomIntFromInterval(40, 70) || 0
@@ -124,6 +125,7 @@ export function getCargoPrize(distance: number, aircraft: NFT) {
         return base * (1 + randomIntFromInterval(35, 75))
     }
   }
+  console.warn(`Aircraft ${aircraft.id} is missing 'license' attribute`)
   return 0
 }
 
