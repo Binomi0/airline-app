@@ -1,8 +1,5 @@
-import { useReadContract } from 'thirdweb/react'
 import { useRecoilValue } from 'recoil'
-import { walletStore } from 'store/wallet.atom'
-import { getOwnedNFTs } from 'thirdweb/extensions/erc721'
-import { useAppContracts } from 'hooks/useAppContracts'
+import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 interface UseAircraftReturnType {
   hasAircraft: boolean
@@ -10,15 +7,9 @@ interface UseAircraftReturnType {
 }
 
 const useAircraft = (): UseAircraftReturnType => {
-  const { smartAccountAddress } = useRecoilValue(walletStore)
-  const { aircraftContract: contract } = useAppContracts()
+  const data = useRecoilValue(ownedAircraftNftStore)
 
-  const { data, refetch } = useReadContract(getOwnedNFTs, {
-    contract: contract!,
-    owner: smartAccountAddress!
-  })
-
-  return { hasAircraft: !!data && data.length > 0, refetch }
+  return { hasAircraft: !!data && data.length > 0, refetch: () => {} }
 }
 
 export default useAircraft
