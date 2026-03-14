@@ -1,12 +1,10 @@
 import { connectDB } from 'lib/mongoose'
-import { CustomNextApiRequest } from 'lib/withAuth'
-import { NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next'
 import alchemy from 'lib/alchemy'
 import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
 import Nft from 'models/Nft'
-import User from 'models/User'
 
-const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await connectDB()
 
   if (req.method === 'GET') {
@@ -16,7 +14,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       const licenseNfts = await alchemy.nft.getNftsForContract(nftLicenseTokenAddress)
       const allNfts = [...aircraftNfts.nfts, ...licenseNfts.nfts]
 
-      console.log(allNfts[0].raw.metadata.attributes)
       for (const nft of allNfts) {
         const tokenId = BigInt(nft.tokenId)
         const tokenUri = typeof nft.tokenUri === 'string' ? nft.tokenUri : (nft.tokenUri as any)?.raw || ''
@@ -42,30 +39,12 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         )
       }
 
-      // 2. Sync ownership for the current user if they have an address
-      const user = await User.findById(req.id)
-      if (user && user.address) {
-        const ownedNfts = await alchemy.nft.getNftsForOwner(user.address, {
-          contractAddresses: [nftAircraftTokenAddress, nftLicenseTokenAddress]
-        })
-
-        for (const ownedNft of ownedNfts.ownedNfts) {
-           await Nft.findOneAndUpdate(
-             { id: BigInt(ownedNft.tokenId), tokenAddress: ownedNft.contract.address },
-             { owner: user.address },
-             { new: true }
-           )
-        }
-      }
-
       const dbNfts = await Nft.find({})
       return res.status(200).json(dbNfts)
     } catch (error) {
       console.error('API NFT error:', error)
       return res.status(500).send(error)
     }
-  } else if (req.method === 'DELETE') {
-    // Implement delete logic if needed
   }
 
   res.status(405).end()

@@ -1,0 +1,97 @@
+import { connectDB } from 'lib/mongoose'
+import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import { NextApiResponse } from 'next'
+import alchemy from 'lib/alchemy'
+import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
+import Nft from 'models/Nft'
+import User from 'models/User'
+import UserNft from 'models/UserNft'
+
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
+  if (req.method === 'GET') {
+    await connectDB()
+    try {
+      if (!req.id) {
+        return res.status(401).send('Unauthorized')
+      }
+      const user = await User.findOne({ email: req.user })
+      if (!user || !user.address) {
+        return res.status(400).json({ error: 'User wallet not found' })
+      }
+
+      const address = user.address.toLowerCase()
+      const forceRefresh = req.query.refresh === 'true'
+
+      // Database-First: Check for NFTs in UserNft for this owner
+      let ownedNftsInDb = await UserNft.find({ address }).populate('nft')
+
+      // If no NFTs in DB or forceRefresh, sync with Alchemy
+      if (ownedNftsInDb.length === 0 || forceRefresh) {
+        console.log(`[owned.ts] Syncing with Alchemy for ${address}`)
+        const { ownedNfts } = await alchemy.nft.getNftsForOwner(address, {
+          contractAddresses: [nftAircraftTokenAddress, nftLicenseTokenAddress]
+        })
+
+        if (ownedNfts.length > 0) {
+          const syncPromises = ownedNfts.map(async (ownedNft) => {
+            const tokenId = ownedNft.tokenId
+            const tokenAddress = ownedNft.contract.address.toLowerCase()
+
+            // 1. Ensure global Nft metadata exists (could be missing if refresh.ts hasn't run)
+            let nftDoc = await Nft.findOne({ id: tokenId, tokenAddress })
+            if (!nftDoc) {
+              const tokenUri = typeof ownedNft.tokenUri === 'string' ? ownedNft.tokenUri : (ownedNft.tokenUri as any)?.raw || ''
+              // Create a minimal Nft doc with info from Alchemy
+              nftDoc = await Nft.create({
+                id: tokenId,
+                tokenAddress,
+                tokenURI: tokenUri,
+                type: ownedNft.tokenType === 'ERC1155' ? 'ERC1155' : 'ERC721',
+                chainId: 11155111, // Sepolia
+                metadata: {
+                  uri: tokenUri,
+                  name: (ownedNft as any).title || (ownedNft as any).name || (ownedNft as any).rawMetadata?.name,
+                  description: ownedNft.description || (ownedNft as any).rawMetadata?.description,
+                  image: (ownedNft as any).image?.cachedUrl || (ownedNft as any).image?.originalUrl || (ownedNft as any).media?.[0]?.raw || (ownedNft as any).rawMetadata?.image || '',
+                  attributes: (ownedNft as any).rawMetadata?.attributes || []
+                }
+              })
+            }
+
+            // 2. Link to UserNft
+            return UserNft.findOneAndUpdate(
+              {
+                user: user._id,
+                address,
+                tokenId,
+                tokenAddress
+              },
+              {
+                user: user._id,
+                nft: nftDoc._id,
+                address,
+                tokenId,
+                tokenAddress,
+                chainId: 11155111 // Sepolia
+              },
+              { upsert: true, new: true }
+            )
+          })
+
+          await Promise.all(syncPromises)
+          // Re-fetch populated data
+          ownedNftsInDb = await UserNft.find({ address }).populate('nft')
+        }
+      }
+
+      return res.status(200).json(ownedNftsInDb)
+    } catch (error) {
+      console.error('[owned.ts] Error:', error)
+      return res.status(500).json({ error: 'Internal server error' })
+    }
+  }
+
+  res.status(405).end()
+}
+
+export default withAuth(handler)

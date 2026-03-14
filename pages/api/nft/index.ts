@@ -1,10 +1,9 @@
 import { connectDB } from 'lib/mongoose'
-import { CustomNextApiRequest } from 'lib/withAuth'
-import { NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next'
 import Nft from 'models/Nft'
 import { NFT } from 'thirdweb'
 
-const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await connectDB()
 
   if (req.method === 'GET') {

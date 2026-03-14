@@ -1,45 +1,50 @@
-import React from 'react'
-import { getContract, Hex, NFT } from 'thirdweb'
-import { getOwnedNFTs } from 'thirdweb/extensions/erc721'
+import { Hex } from 'thirdweb'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import useSWR from 'swr'
+import { fetcher } from 'utils'
+import { useMemo } from 'react'
 
 const useOwnedNfts = (tokenAddress?: Hex) => {
-  const { smartAccountAddress, twClient, twChain } = useRecoilValue(walletStore)
-  const [data, setData] = React.useState<NFT[]>([])
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [error, setError] = React.useState('')
+  const { smartAccountAddress } = useRecoilValue(walletStore)
 
-  const fetchOwnedNfts = React.useCallback(async () => {
-    if (!smartAccountAddress || !tokenAddress || !twClient || !twChain) return
-    try {
-      setIsLoading(true)
-      const contract = getContract({
-        client: twClient,
-        chain: twChain,
-        address: tokenAddress
-      })
-      const nfts = await getOwnedNFTs({
-        contract,
-        owner: smartAccountAddress
-      })
-      setData(nfts)
-    } catch (error) {
-      console.error('useOwnedNFTs', error)
-      setError(error as string)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [smartAccountAddress, tokenAddress, twChain, twClient])
+  // Only fetch if we have a wallet address
+  const { data, error, isLoading, mutate } = useSWR<any[]>(
+    smartAccountAddress ? '/api/nft/owned' : null,
+    fetcher
+  )
 
-  React.useEffect(() => {
-    fetchOwnedNfts()
-  }, [fetchOwnedNfts])
+  const filteredData = useMemo(() => {
+    if (!data) return []
+    
+    // Filter by tokenAddress if provided
+    const filtered = tokenAddress 
+      ? data.filter((item) => item.tokenAddress.toLowerCase() === tokenAddress.toLowerCase())
+      : data
+
+    // Map to a structure compatible with existing components
+    // Existing components expect property like aircraft.name and aircraft.raw.metadata.attributes
+    return filtered.map((item) => ({
+      ...item.nft,
+      tokenId: item.tokenId,
+      owner: item.address,
+      // Map metadata properties to top-level for convenience
+      name: item.nft?.metadata?.name,
+      description: item.nft?.metadata?.description,
+      image: item.nft?.metadata?.image,
+      // Mimic thirdweb raw structure for components using it
+      raw: {
+        metadata: item.nft?.metadata
+      },
+      userNftId: item._id
+    }))
+  }, [data, tokenAddress])
 
   return {
-    data,
+    data: filteredData,
     isLoading,
-    error
+    error,
+    mutate
   }
 }
 
