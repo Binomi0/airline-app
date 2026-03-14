@@ -1,10 +1,10 @@
 import React from 'react'
-import { getContract, NFT } from 'thirdweb'
+import { getContract, Hex, NFT } from 'thirdweb'
 import { getNFTs } from 'thirdweb/extensions/erc721'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 
-const useNFTs = (contractAddress: string) => {
+const useNFTs = (contractAddress: Hex) => {
   const { twClient, twChain } = useRecoilValue(walletStore)
   const [data, setData] = React.useState<NFT[]>()
   const [error, setError] = React.useState('')
@@ -18,7 +18,7 @@ const useNFTs = (contractAddress: string) => {
       const contract = getContract({
         client: twClient,
         chain: twChain,
-        address: contractAddress as `0x${string}`
+        address: contractAddress
       })
       const nfts = await getNFTs({ contract })
       setData(nfts)

@@ -14,7 +14,7 @@ const GasSupply = () => {
   const contract = (twClient && twChain) ? getContract({
     client: twClient,
     chain: twChain,
-    address: stakingAddress as `0x${string}`
+    address: stakingAddress
   }) : undefined
 
   const { data, isLoading } = useReadContract({

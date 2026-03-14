@@ -80,9 +80,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
             contract: getContract({
               client: twClient,
               chain,
-              address: coinTokenAddress as `0x${string}`
+              address: coinTokenAddress
             }),
-            to: user.address as `0x${string}`,
+            to: user.address,
             amount: cargo.prize.toString()
           })
 
@@ -90,7 +90,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
             transaction,
             account: serverAccount
           })
-          
+
           console.log('Reward transfer successful:', receipt.transactionHash)
         } else {
           console.error('Missing THIRDWEB_AUTH_PRIVATE_KEY for rewards')

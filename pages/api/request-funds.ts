@@ -50,10 +50,10 @@ const handler = async (req: ApiRequest, res: NextApiResponse) => {
       contract: {
         client: twClient,
         chain,
-        address: coinTokenAddress as `0x${string}`
+        address: coinTokenAddress
       },
       method: "function balanceOf(address) view returns (uint256)",
-      params: [serverAccount.address as `0x${string}`]
+      params: [serverAccount.address]
     })
 
     const balanceValue = Number(balanceWei) / 1e18
@@ -67,9 +67,9 @@ const handler = async (req: ApiRequest, res: NextApiResponse) => {
       contract: getContract({
         client: twClient,
         chain,
-        address: coinTokenAddress as `0x${string}`
+        address: coinTokenAddress
       }),
-      to: smartAccountAddress as `0x${string}`,
+      to: smartAccountAddress,
       amount: amount
     })
 

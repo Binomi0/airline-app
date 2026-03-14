@@ -27,13 +27,13 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
   const contract = (twClient && twChain) ? getContract({
     client: twClient,
     chain: twChain,
-    address: stakingAddress as `0x${string}`
+    address: stakingAddress
   }) : undefined
 
   const { data: stakeInfo, refetch: getStakeInfo } = useReadContract({
     contract: contract as any,
     method: 'function getStakeInfo(address _staker) view returns (uint256 _tokensStaked, uint256 _rewards)',
-    params: [smartAccountAddress as `0x${string}`]
+    params: [smartAccountAddress!]
   })
 
   const { claimRewards, isLoading: isClaiming } = useStaking()

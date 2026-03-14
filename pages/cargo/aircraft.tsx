@@ -26,7 +26,7 @@ const CargoItem = () => {
   const { data: balance, isLoading } = useReadContract({
     contract: contract as any,
     method: 'function balanceOf(address account, uint256 id) view returns (uint256)',
-    params: [address as `0x${string}`, 1n]
+    params: [address!, 1n]
   })
 
   const handleClick = useCallback(() => {

@@ -3,7 +3,7 @@ import { TokenProviderContext } from './TokenProvider.context'
 import { TokenReducerState } from './TokenProvider.types'
 import { coinTokenAddress, rewardTokenAddress } from 'contracts/address'
 import { BigNumber } from 'bignumber.js'
-import alchemy from 'lib/alchemy'
+import axios from 'config/axios'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { tokenBalanceStore } from 'store/balance.atom'
@@ -24,10 +24,12 @@ export const TokenProvider: FC<{ children: React.ReactNode }> = ({ children }) =
   const getBalance = useCallback(async () => {
     if (!smartAccountAddress) return
 
-    const { tokenBalances } = await alchemy.core.getTokenBalances(smartAccountAddress, [
-      coinTokenAddress,
-      rewardTokenAddress
-    ])
+    const { data } = await axios.post('/api/token/balance', {
+      address: smartAccountAddress,
+      tokens: [coinTokenAddress, rewardTokenAddress]
+    })
+
+    const { tokenBalances } = data
 
     setBalance({
       airl: new BigNumber(tokenBalances[0].tokenBalance || '0').div(1e18),

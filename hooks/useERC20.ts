@@ -2,7 +2,8 @@ import { useCallback, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
-import { prepareContractCall, readContract, sendTransaction, waitForReceipt } from 'thirdweb'
+import { Hex, prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb'
+import axios from 'config/axios'
 
 const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
 
@@ -14,7 +15,7 @@ interface UseERC20ReturnType {
   isLoading: boolean
 }
 
-const useERC20 = (tokenAddress: string): UseERC20ReturnType => {
+const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
   const [isLoading, setIsLoading] = useState(false)
   const { smartSigner, twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
 
@@ -24,14 +25,10 @@ const useERC20 = (tokenAddress: string): UseERC20ReturnType => {
       setIsLoading(true)
 
       try {
-        const allowance = await readContract({
-          contract: {
-            client: twClient,
-            chain: twChain,
-            address: tokenAddress as `0x${string}`
-          },
+        const { data: allowance } = await axios.post('/api/contracts/read', {
+          address: tokenAddress,
           method: "function allowance(address owner, address spender) view returns (uint256)",
-          params: [smartAccountAddress as `0x${string}`, spender as `0x${string}`]
+          params: [smartAccountAddress, spender]
         })
 
         setIsLoading(false)
@@ -55,10 +52,10 @@ const useERC20 = (tokenAddress: string): UseERC20ReturnType => {
           contract: {
             client: twClient,
             chain: twChain,
-            address: tokenAddress as `0x${string}`
+            address: tokenAddress!
           },
           method: "function approve(address spender, uint256 amount)",
-          params: [to as `0x${string}`, MAX_UINT256]
+          params: [to, MAX_UINT256]
         })
 
         const result = await sendTransaction({

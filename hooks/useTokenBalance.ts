@@ -2,9 +2,9 @@ import { useCallback, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore, walletStore } from 'store/wallet.atom'
-import { readContract } from 'thirdweb'
+import { Hex, readContract } from 'thirdweb'
 
-const useTokenBalance = (contractAddress?: string) => {
+const useTokenBalance = (contractAddress?: Hex) => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { twClient, twChain } = useRecoilValue(walletStore)
   const [balance, setBalance] = useState<BigNumber | undefined>()
@@ -18,10 +18,10 @@ const useTokenBalance = (contractAddress?: string) => {
         contract: {
           client: twClient,
           chain: twChain,
-          address: contractAddress as `0x${string}`
+          address: contractAddress
         },
         method: "function balanceOf(address) view returns (uint256)",
-        params: [smartAccountAddress as `0x${string}`]
+        params: [smartAccountAddress]
       })
 
       const result = new BigNumber(data.toString()).div(1e18)
