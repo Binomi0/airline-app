@@ -10,7 +10,7 @@ import { ownedLicenseNftStore } from 'store/licenseNFT.atom'
 
 const LicenseBar = () => {
   const ownedLicenses = useRecoilValue(ownedLicenseNftStore)
-  const { twClient, smartAccountAddress} = useRecoilValue(walletStore)
+  const { twClient, smartAccountAddress } = useRecoilValue(walletStore)
 
   return (
     <div>

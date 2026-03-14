@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const LicenseProvider = ({ children }: Props) => {
-  const { data: nfts, mutate } = useSWR<any[]>('/api/nft', fetcher)
+  const { data: nfts } = useSWR<any[]>('/api/nft', fetcher)
   const setLicenseNFTs = useSetRecoilState(licenseNftStore)
   const setOwnedLicenseNftStore = useSetRecoilState(ownedLicenseNftStore)
   const { licenseContract } = useAppContracts()
@@ -21,9 +21,7 @@ export const LicenseProvider = ({ children }: Props) => {
 
   const licenseList = React.useMemo(() => {
     if (!nfts) return []
-    return nfts.filter(
-      (nft: any) => nft.tokenAddress.toLowerCase() === (licenseContract?.address || '').toLowerCase()
-    )
+    return nfts.filter((nft: any) => nft.tokenAddress.toLowerCase() === (licenseContract?.address || '').toLowerCase())
   }, [nfts, licenseContract])
 
   React.useEffect(() => {

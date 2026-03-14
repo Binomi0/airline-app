@@ -27,7 +27,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
       try {
         const { data: allowance } = await axios.post('/api/contracts/read', {
           address: tokenAddress,
-          method: "function allowance(address owner, address spender) view returns (uint256)",
+          method: 'function allowance(address owner, address spender) view returns (uint256)',
           params: [smartAccountAddress, spender]
         })
 
@@ -54,7 +54,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
             chain: twChain,
             address: tokenAddress!
           },
-          method: "function approve(address spender, uint256 amount)",
+          method: 'function approve(address spender, uint256 amount)',
           params: [to, MAX_UINT256]
         })
 

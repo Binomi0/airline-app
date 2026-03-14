@@ -33,7 +33,7 @@ const maps: Record<string, string> = {
 const AircraftView: NextPage = () => {
   const router = useRouter()
   const { twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
-  
+
   const contract = useMemo(() => {
     if (!twClient || !twChain || !router.query.tokenAddress) return undefined
     return getContract({
@@ -42,7 +42,7 @@ const AircraftView: NextPage = () => {
       address: router.query.tokenAddress as string
     })
   }, [twChain, twClient, router.query.tokenAddress])
-  
+
   const licenseContract = useMemo(() => {
     if (!twClient || !twChain) return undefined
     return getContract({
@@ -118,7 +118,7 @@ const AircraftView: NextPage = () => {
                 }
               }}
             >
-            <MediaRenderer client={twClient!} width='100%' src={nft.metadata.image} />
+              <MediaRenderer client={twClient!} width='100%' src={nft.metadata.image} />
             </Box>
             <CardHeader title={nft.metadata.name} subheader={nft.metadata.description} />
             <CardContent>
@@ -137,9 +137,7 @@ const AircraftView: NextPage = () => {
               <Button
                 disabled={isLoading || (!!balance && balance > 0n)}
                 variant='contained'
-                onClick={() =>
-                  claimNFT(nft as any)
-                }
+                onClick={() => claimNFT(nft as any)}
               >
                 {licenseBalance === 0n ? 'Require licencia' : `Claim ${nft.metadata.name}`}
               </Button>

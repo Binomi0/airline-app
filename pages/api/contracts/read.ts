@@ -7,13 +7,13 @@ import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { z } from 'zod'
 
 export const twServer = createThirdwebClient({
-  secretKey: process.env.TW_SECRET_KEY || '',
+  secretKey: process.env.TW_SECRET_KEY || ''
 })
 
 const ReadContractSchema = z.object({
   address: z.string().min(1, 'Address is required'),
   method: z.union([z.string().min(1), z.record(z.unknown())]),
-  params: z.array(z.string()).optional().default([]),
+  params: z.array(z.string()).optional().default([])
 })
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {

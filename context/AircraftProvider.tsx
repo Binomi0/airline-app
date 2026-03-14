@@ -17,9 +17,7 @@ export const AircraftProvider = ({ children }: Props) => {
 
   const aircrafts = React.useMemo(() => {
     if (!nfts) return []
-    return nfts.filter(
-      (nft: any) => nft.tokenAddress.toLowerCase() === (aircraftContract?.address || '').toLowerCase()
-    )
+    return nfts.filter((nft: any) => nft.tokenAddress.toLowerCase() === (aircraftContract?.address || '').toLowerCase())
   }, [nfts, aircraftContract])
 
   const ownedAircrafts = React.useMemo(() => {

@@ -20,7 +20,7 @@ const useTokenBalance = (contractAddress?: Hex) => {
           chain: twChain,
           address: contractAddress
         },
-        method: "function balanceOf(address) view returns (uint256)",
+        method: 'function balanceOf(address) view returns (uint256)',
         params: [smartAccountAddress]
       })
 

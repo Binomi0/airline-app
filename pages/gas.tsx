@@ -26,10 +26,10 @@ const Gas = ({ loading }: PageProps) => {
   const { getAirlBalance, getAirgBalance } = useTokenProviderContext()
   const { stakingContract: contract } = useAppContracts()
 
-
   const { data: staking, refetch: getStakingInfo } = useReadContract({
     contract: contract!,
-    method: 'function stakers(address) view returns (uint256 amountStaked, uint256 timeOfLastUpdate, uint256 unclaimedRewards, uint256 conditionIdOflastUpdate)',
+    method:
+      'function stakers(address) view returns (uint256 amountStaked, uint256 timeOfLastUpdate, uint256 unclaimedRewards, uint256 conditionIdOflastUpdate)',
     params: [address!]
   })
 

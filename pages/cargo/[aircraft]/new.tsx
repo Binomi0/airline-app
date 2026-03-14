@@ -21,7 +21,7 @@ const CargoAircraft = ({ loading }: PageProps) => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const { twClient, twChain } = useRecoilValue(walletStore)
-  
+
   const contract = useMemo(() => {
     if (!twClient || !twChain) return undefined
     return getContract({
@@ -33,7 +33,7 @@ const CargoAircraft = ({ loading }: PageProps) => {
 
   const { data, isLoading } = useReadContract(getNFT, {
     contract: contract!,
-    tokenId: BigInt(router.query.aircraft as string || 0)
+    tokenId: BigInt((router.query.aircraft as string) || 0)
   })
 
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)

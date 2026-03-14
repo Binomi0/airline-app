@@ -9,16 +9,13 @@ const useOwnedNfts = (tokenAddress?: Hex) => {
   const { smartAccountAddress } = useRecoilValue(walletStore)
 
   // Only fetch if we have a wallet address
-  const { data, error, isLoading, mutate } = useSWR<any[]>(
-    smartAccountAddress ? '/api/nft/owned' : null,
-    fetcher
-  )
+  const { data, error, isLoading, mutate } = useSWR<any[]>(smartAccountAddress ? '/api/nft/owned' : null, fetcher)
 
   const filteredData = useMemo(() => {
     if (!data) return []
-    
+
     // Filter by tokenAddress if provided
-    const filtered = tokenAddress 
+    const filtered = tokenAddress
       ? data.filter((item) => item.tokenAddress.toLowerCase() === tokenAddress.toLowerCase())
       : data
 

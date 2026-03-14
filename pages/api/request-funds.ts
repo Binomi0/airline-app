@@ -52,7 +52,7 @@ const handler = async (req: ApiRequest, res: NextApiResponse) => {
         chain,
         address: coinTokenAddress
       },
-      method: "function balanceOf(address) view returns (uint256)",
+      method: 'function balanceOf(address) view returns (uint256)',
       params: [serverAccount.address]
     })
 

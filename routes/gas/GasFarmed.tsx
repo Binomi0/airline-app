@@ -24,11 +24,14 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { twClient, twChain } = useRecoilValue(walletStore)
 
-  const contract = (twClient && twChain) ? getContract({
-    client: twClient,
-    chain: twChain,
-    address: stakingAddress
-  }) : undefined
+  const contract =
+    twClient && twChain
+      ? getContract({
+          client: twClient,
+          chain: twChain,
+          address: stakingAddress
+        })
+      : undefined
 
   const { data: stakeInfo, refetch: getStakeInfo } = useReadContract({
     contract: contract as any,

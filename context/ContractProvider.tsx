@@ -36,12 +36,8 @@ interface Props {
   children: ReactNode
 }
 
-
-
-
 export const ContractProvider = ({ children }: Props) => {
   const { twClient: client, twChain: chain } = useRecoilValue(walletStore)
-
 
   const contracts = useMemo(() => {
     if (!client || !chain) {
@@ -56,7 +52,7 @@ export const ContractProvider = ({ children }: Props) => {
       }
     }
 
-    const getCustomContract = ( address: string) => getContract({ client, chain, address })
+    const getCustomContract = (address: string) => getContract({ client, chain, address })
 
     return {
       stakingContract: getCustomContract(stakingAddress),
@@ -65,13 +61,9 @@ export const ContractProvider = ({ children }: Props) => {
       coinContract: getCustomContract(coinTokenAddress),
       rewardContract: getCustomContract(rewardTokenAddress),
       factoryContract: getCustomContract(factoryAddress),
-      flightContract: getCustomContract(flightNftAddress),
+      flightContract: getCustomContract(flightNftAddress)
     }
   }, [client, chain])
 
-  return (
-    <ContractContext.Provider value={contracts}>
-      {children}
-    </ContractContext.Provider>
-  )
+  return <ContractContext.Provider value={contracts}>{children}</ContractContext.Provider>
 }

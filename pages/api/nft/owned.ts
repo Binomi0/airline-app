@@ -40,7 +40,8 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
             // 1. Ensure global Nft metadata exists (could be missing if refresh.ts hasn't run)
             let nftDoc = await Nft.findOne({ id: tokenId, tokenAddress })
             if (!nftDoc) {
-              const tokenUri = typeof ownedNft.tokenUri === 'string' ? ownedNft.tokenUri : (ownedNft.tokenUri as any)?.raw || ''
+              const tokenUri =
+                typeof ownedNft.tokenUri === 'string' ? ownedNft.tokenUri : (ownedNft.tokenUri as any)?.raw || ''
               // Create a minimal Nft doc with info from Alchemy
               nftDoc = await Nft.create({
                 id: tokenId,
@@ -52,7 +53,12 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
                   uri: tokenUri,
                   name: (ownedNft as any).title || (ownedNft as any).name || (ownedNft as any).rawMetadata?.name,
                   description: ownedNft.description || (ownedNft as any).rawMetadata?.description,
-                  image: (ownedNft as any).image?.cachedUrl || (ownedNft as any).image?.originalUrl || (ownedNft as any).media?.[0]?.raw || (ownedNft as any).rawMetadata?.image || '',
+                  image:
+                    (ownedNft as any).image?.cachedUrl ||
+                    (ownedNft as any).image?.originalUrl ||
+                    (ownedNft as any).media?.[0]?.raw ||
+                    (ownedNft as any).rawMetadata?.image ||
+                    '',
                   attributes: (ownedNft as any).rawMetadata?.attributes || []
                 }
               })

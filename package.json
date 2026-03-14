@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prettier": "prettier -w components context hooks pages routes utils",
+    "prettier": "prettier -w components config context hooks models pages store routes utils types",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

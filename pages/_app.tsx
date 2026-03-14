@@ -53,28 +53,28 @@ export default function MyApp(props: MyAppProps) {
               <ThemeWrapper>
                 <ErrorBoundary>
                   <NFTProvider>
-                  <TokenProvider>
-                     <VaProvider>
-                      <LiveFlightsProvider>
-                        <MainProvider>
-                          <AppBar />
-                          <Sidebar />
-                          <RightSidebar />
-                        </MainProvider>
-                        <WithRouter>
-                          <Component />
-                        </WithRouter>
-                        {/* <SpeedInsights /> */}
+                    <TokenProvider>
+                      <VaProvider>
+                        <LiveFlightsProvider>
+                          <MainProvider>
+                            <AppBar />
+                            <Sidebar />
+                            <RightSidebar />
+                          </MainProvider>
+                          <WithRouter>
+                            <Component />
+                          </WithRouter>
+                          {/* <SpeedInsights /> */}
                         </LiveFlightsProvider>
                       </VaProvider>
                     </TokenProvider>
                   </NFTProvider>
-                 </ErrorBoundary>
+                </ErrorBoundary>
               </ThemeWrapper>
             </ContractProvider>
           </CustomWeb3Provider>
         </AuthProvider>
       </RecoilRoot>
-  </CacheProvider>
+    </CacheProvider>
   )
 }

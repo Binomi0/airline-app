@@ -7,10 +7,10 @@ import React from 'react'
 
 const Header: React.FC = () => {
   return (
-    <Box textAlign="center">
-      <Image fontSize="large" />
-      <Stack direction="row" spacing={1}>
-        <Typography align="center" fontWeight={700} variant="h3">
+    <Box textAlign='center'>
+      <Image fontSize='large' />
+      <Stack direction='row' spacing={1}>
+        <Typography align='center' fontWeight={700} variant='h3'>
           Welcome to WeiFly!
         </Typography>
       </Stack>

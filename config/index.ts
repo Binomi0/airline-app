@@ -5,7 +5,7 @@ import { sepolia } from 'thirdweb/chains'
 export const queryClient = new QueryClient()
 
 export const twClient = createThirdwebClient({
-  clientId: process.env.NEXT_PUBLIC_TW_CLIENT_ID || '',
+  clientId: process.env.NEXT_PUBLIC_TW_CLIENT_ID || ''
 })
 
 // export const twServer = createThirdwebClient({

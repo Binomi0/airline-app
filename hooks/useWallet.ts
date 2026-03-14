@@ -102,7 +102,7 @@ const useWallet = (): UseWallet => {
           const base64Key = (e.target.result as string).split('base64,')[1]
           const key = Buffer.from(base64Key, 'base64').toString()
           const privateKey = key.slice(0, 66)
-          
+
           const personalAccount = privateKeyToAccount({
             client: twClient,
             privateKey: privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`
@@ -150,7 +150,7 @@ const useWallet = (): UseWallet => {
         if (walletId) {
           const key = Buffer.from(walletId, 'base64').toString().slice(0, 66)
           const privateKey = key.startsWith('0x') ? key : `0x${key}`
-          
+
           const personalAccount = privateKeyToAccount({
             client: twClient,
             privateKey

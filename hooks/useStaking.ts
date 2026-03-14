@@ -22,7 +22,7 @@ const useStaking = () => {
             chain: twChain,
             address: target
           },
-          method: "function stake(uint256 amount)",
+          method: 'function stake(uint256 amount)',
           params: [amount.toBigInt()]
         })
 
@@ -58,7 +58,7 @@ const useStaking = () => {
             chain: twChain,
             address: target
           },
-          method: "function withdraw(uint256 amount)",
+          method: 'function withdraw(uint256 amount)',
           params: [amount.toBigInt()]
         })
 
@@ -94,7 +94,7 @@ const useStaking = () => {
             chain: twChain,
             address: target
           },
-          method: "function claimRewards()",
+          method: 'function claimRewards()',
           params: []
         })
 

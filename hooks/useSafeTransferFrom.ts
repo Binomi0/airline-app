@@ -19,7 +19,7 @@ const useSafeTransferFrom = () => {
           chain: twChain,
           address: nftLicenseTokenAddress
         },
-        method: "function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data)",
+        method: 'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data)',
         params: [
           '0xA832BC0b75161E5f69cBd66970b8df7eCE846e47', // FROM (Hardcoded in original)
           '0x98CDf5F4D4D7f5b97F84c82fC44F591a239290e4', // TO (Hardcoded in original)

@@ -30,7 +30,6 @@ export const baseSignerStore = selector({
   }
 })
 
-
 export const smartAccountSignerStore = selector({
   key: 'smartSigner',
   get: ({ get }) => {

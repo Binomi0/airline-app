@@ -8,8 +8,6 @@ interface Props {
   children: ReactNode
 }
 
-
-
 const CustomWeb3Provider = ({ children }: Props) => {
   return (
     <QueryClientProvider client={queryClient}>

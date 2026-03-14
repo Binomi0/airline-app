@@ -10,7 +10,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const dbNfts = await Nft.find<NFT[]>({})
       if (dbNfts.length === 0) {
-
         return res.redirect('/api/nft/refresh')
       }
 

@@ -143,7 +143,13 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
           </CardContent>
 
           <CardActions>
-            <Button disabled={!smartAccountAddress} color='secondary' variant='contained' fullWidth onClick={handleRequestFlight}>
+            <Button
+              disabled={!smartAccountAddress}
+              color='secondary'
+              variant='contained'
+              fullWidth
+              onClick={handleRequestFlight}
+            >
               Reservar
             </Button>
             <Button variant='contained' color='error' fullWidth onClick={onCancel}>

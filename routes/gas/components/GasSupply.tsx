@@ -11,11 +11,14 @@ import { walletStore } from 'store/wallet.atom'
 const GasSupply = () => {
   const { twClient, twChain } = useRecoilValue(walletStore)
 
-  const contract = (twClient && twChain) ? getContract({
-    client: twClient,
-    chain: twChain,
-    address: stakingAddress
-  }) : undefined
+  const contract =
+    twClient && twChain
+      ? getContract({
+          client: twClient,
+          chain: twChain,
+          address: stakingAddress
+        })
+      : undefined
 
   const { data, isLoading } = useReadContract({
     contract: contract as any,

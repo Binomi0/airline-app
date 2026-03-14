@@ -8,9 +8,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).end()
     return
   }
-  
+
   const { address, token, tokens } = req.body
-  
+
   if (!address || (!token && !tokens)) {
     res.status(400).send('Missing address, token or tokens')
     return

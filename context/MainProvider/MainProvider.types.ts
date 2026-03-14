@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 type Actions = ToggleSidebar
-type ToggleSidebar = Readonly<{ type: 'TOGGLE_SIDEBAR', payload: 'left' | 'right' }>
+type ToggleSidebar = Readonly<{ type: 'TOGGLE_SIDEBAR'; payload: 'left' | 'right' }>
 
 export type MainReducerState = {
   sidebarOpen: boolean

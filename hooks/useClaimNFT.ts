@@ -33,25 +33,28 @@ const useClaimNFT = (): UseClaimNFT => {
   const [isClaiming, setIsClaiming] = useState(false)
   const { smartSigner, twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
 
-  const checkAndSetAllowance = useCallback(async (tokenAddress: string, spender: string, amount: bigint) => {
-    if (tokenAddress.toLowerCase() === NATIVE_TOKEN) return
+  const checkAndSetAllowance = useCallback(
+    async (tokenAddress: string, spender: string, amount: bigint) => {
+      if (tokenAddress.toLowerCase() === NATIVE_TOKEN) return
 
-    const { data: allowance } = await axios.post('/api/contracts/read', {
-      address: tokenAddress,
-      method: "function allowance(address owner, address spender) view returns (uint256)",
-      params: [smartAccountAddress, spender]
-    })
-
-    if (BigInt(allowance) < amount) {
-      const tx = prepareContractCall({
-        contract: { client: twClient!, chain: twChain!, address: tokenAddress as Hex },
-        method: "function approve(address spender, uint256 amount)",
-        params: [spender, ethers.constants.MaxUint256.toBigInt()]
+      const { data: allowance } = await axios.post('/api/contracts/read', {
+        address: tokenAddress,
+        method: 'function allowance(address owner, address spender) view returns (uint256)',
+        params: [smartAccountAddress, spender]
       })
-      const result = await sendTransaction({ transaction: tx, account: smartSigner! })
-      await waitForReceipt(result)
-    }
-  }, [smartAccountAddress, twClient, twChain, smartSigner])
+
+      if (BigInt(allowance) < amount) {
+        const tx = prepareContractCall({
+          contract: { client: twClient!, chain: twChain!, address: tokenAddress as Hex },
+          method: 'function approve(address spender, uint256 amount)',
+          params: [spender, ethers.constants.MaxUint256.toBigInt()]
+        })
+        const result = await sendTransaction({ transaction: tx, account: smartSigner! })
+        await waitForReceipt(result)
+      }
+    },
+    [smartAccountAddress, twClient, twChain, smartSigner]
+  )
 
   const claimNFT = useCallback(
     async (contractAddress: string, nft: NFT) => {
@@ -66,11 +69,12 @@ const useClaimNFT = (): UseClaimNFT => {
         // Fetch claim condition dynamically
         const condition = await readContract({
           contract: { client: twClient, chain: twChain, address: contractAddress as Hex },
-          method: "function claimCondition(uint256) view returns (uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata)",
+          method:
+            'function claimCondition(uint256) view returns (uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata)',
           params: [nftId]
         })
 
-        const [,,,,,, currency, ] = condition
+        const [, , , , , , currency] = condition
         const pricePerToken = condition[5]
         const quantityLimitPerWallet = condition[3]
 
@@ -84,7 +88,8 @@ const useClaimNFT = (): UseClaimNFT => {
             chain: twChain,
             address: contractAddress as Hex
           },
-          method: "function claim(address receiver, uint256 tokenId, uint256 quantity, address currency, uint256 pricePerToken, (bytes32[] proof, uint256 quantityLimitPerWallet, uint256 pricePerToken, address currency) allowlistProof, bytes data)",
+          method:
+            'function claim(address receiver, uint256 tokenId, uint256 quantity, address currency, uint256 pricePerToken, (bytes32[] proof, uint256 quantityLimitPerWallet, uint256 pricePerToken, address currency) allowlistProof, bytes data)',
           params: [
             smartAccountAddress,
             nftId,

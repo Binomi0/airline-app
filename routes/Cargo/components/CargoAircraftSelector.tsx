@@ -24,7 +24,9 @@ const CargoAircraftSelector: React.FC<{
   const handleSelectAircraft = React.useCallback(
     (nft: NFT) => () => {
       if (router.query.pilot) {
-        const url = `cargo/${nft.id.toString()}/new?pilot=${router.query.pilot}&origin=${router.query.origin}&destination=${router.query.destination}`
+        const url = `cargo/${nft.id.toString()}/new?pilot=${router.query.pilot}&origin=${
+          router.query.origin
+        }&destination=${router.query.destination}`
         router.push(url)
       } else {
         router.push(`cargo/${nft.id.toString()}/new`)

@@ -26,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               name: nft.name || (nft as any).rawMetadata?.name,
               description: nft.description || (nft as any).rawMetadata?.description,
               image: nft.image?.cachedUrl || nft.image?.originalUrl || (nft as any).rawMetadata?.image,
-              attributes: (nft as any).raw?.metadata?.attributes,
+              attributes: (nft as any).raw?.metadata?.attributes
             },
             id: tokenId,
             tokenURI: tokenUri,
