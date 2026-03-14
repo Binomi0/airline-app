@@ -23,6 +23,7 @@ import { themeStore } from 'store/theme.atom'
 import 'lib/alchemy'
 import createEmotionCache from '../src/createEmotionCache'
 import '../styles/globals.css'
+import { ContractProvider } from 'context/ContractProvider'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -44,15 +45,16 @@ export default function MyApp(props: MyAppProps) {
       >
         <AuthProvider>
           <CustomWeb3Provider>
-            <Head>
-              <meta name='viewport' content='initial-scale=1, width=device-width' />
-              <title>Weifly a decentralized virtual airline based on Ethereum</title>
-            </Head>
-            <ThemeWrapper>
-              <ErrorBoundary>
-                <NFTProvider>
+            <ContractProvider>
+              <Head>
+                <meta name='viewport' content='initial-scale=1, width=device-width' />
+                <title>Weifly a decentralized virtual airline based on Ethereum</title>
+              </Head>
+              <ThemeWrapper>
+                <ErrorBoundary>
+                  <NFTProvider>
                   <TokenProvider>
-                    <VaProvider>
+                     <VaProvider>
                       <LiveFlightsProvider>
                         <MainProvider>
                           <AppBar />
@@ -63,15 +65,16 @@ export default function MyApp(props: MyAppProps) {
                           <Component />
                         </WithRouter>
                         {/* <SpeedInsights /> */}
-                      </LiveFlightsProvider>
-                    </VaProvider>
-                  </TokenProvider>
-                </NFTProvider>
-              </ErrorBoundary>
-            </ThemeWrapper>
+                        </LiveFlightsProvider>
+                      </VaProvider>
+                    </TokenProvider>
+                  </NFTProvider>
+                 </ErrorBoundary>
+              </ThemeWrapper>
+            </ContractProvider>
           </CustomWeb3Provider>
         </AuthProvider>
       </RecoilRoot>
-    </CacheProvider>
+  </CacheProvider>
   )
 }

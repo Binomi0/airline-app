@@ -1,22 +1,12 @@
 import { useReadContract } from 'thirdweb/react'
-import { nftLicenseTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
-import { getContract } from 'thirdweb'
 import { getOwnedNFTs } from 'thirdweb/extensions/erc721'
-import { useMemo } from 'react'
+import { useAppContracts } from 'hooks/useAppContracts'
 
 const useLicense = () => {
-  const { twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
-
-  const contract = useMemo(() => {
-    if (!twClient || !twChain) return undefined
-    return getContract({
-      client: twClient,
-      address: nftLicenseTokenAddress,
-      chain: twChain
-    })
-  }, [twChain, twClient])
+  const { smartAccountAddress } = useRecoilValue(walletStore)
+  const { licenseContract: contract } = useAppContracts()
 
   const { data, refetch } = useReadContract(getOwnedNFTs, { 
     contract: contract!, 

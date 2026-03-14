@@ -4,9 +4,8 @@ import MuiLink from '@mui/material/Link'
 import Image from 'next/image'
 import image from 'public/img/real_replica_cessna_172.png'
 import styles from 'styles/Home.module.css'
-import { getContract } from 'thirdweb'
 import { useReadContract } from 'thirdweb/react'
-import { nftAircraftTokenAddress } from 'contracts/address'
+import { useAppContracts } from 'hooks/useAppContracts'
 import Link from 'next/link'
 import Disconnected from 'components/Disconnected'
 import Box from '@mui/material/Box'
@@ -16,18 +15,13 @@ import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Button from '@mui/material/Button'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore, walletStore } from 'store/wallet.atom'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 
 const CargoItem = () => {
   const router = useRouter()
   const address = useRecoilValue(smartAccountAddressStore)
-  const { twClient, twChain } = useRecoilValue(walletStore)
+  const { aircraftContract: contract } = useAppContracts()
 
-  const contract = (twClient && twChain) ? getContract({
-    client: twClient,
-    chain: twChain,
-    address: nftAircraftTokenAddress as `0x${string}`
-  }) : undefined
 
   const { data: balance, isLoading } = useReadContract({
     contract: contract as any,

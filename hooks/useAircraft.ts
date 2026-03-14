@@ -1,9 +1,8 @@
 import { useReadContract } from 'thirdweb/react'
-import { nftAircraftTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
-import { getContract } from 'thirdweb'
 import { getOwnedNFTs } from 'thirdweb/extensions/erc721'
+import { useAppContracts } from 'hooks/useAppContracts'
 
 interface UseAircraftReturnType {
   hasAircraft: boolean
@@ -11,16 +10,11 @@ interface UseAircraftReturnType {
 }
 
 const useAircraft = (): UseAircraftReturnType => {
-  const { twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
-
-  const contract = getContract({
-    client: twClient!,
-    address: nftAircraftTokenAddress,
-    chain: twChain!
-  })
+  const { smartAccountAddress } = useRecoilValue(walletStore)
+  const { aircraftContract: contract } = useAppContracts()
 
   const { data, refetch } = useReadContract(getOwnedNFTs, {
-    contract,
+    contract: contract!,
     owner: smartAccountAddress!
   })
 

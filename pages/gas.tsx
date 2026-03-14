@@ -6,9 +6,8 @@ import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import Disconnected from 'components/Disconnected'
 import { useTokenProviderContext } from 'context/TokenProvider'
-import { getContract } from 'thirdweb'
 import { useReadContract } from 'thirdweb/react'
-import { stakingAddress } from 'contracts/address'
+import { useAppContracts } from 'hooks/useAppContracts'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
@@ -25,18 +24,13 @@ const Gas = ({ loading }: PageProps) => {
   const address = useRecoilValue(smartAccountAddressStore)
   const balance = useRecoilValue(tokenBalanceStore)
   const { getAirlBalance, getAirgBalance } = useTokenProviderContext()
-  const { twClient, twChain } = useRecoilValue(walletStore)
+  const { stakingContract: contract } = useAppContracts()
 
-  const contract = (twClient && twChain) ? getContract({
-    client: twClient,
-    chain: twChain,
-    address: stakingAddress as `0x${string}`
-  }) : undefined
 
   const { data: staking, refetch: getStakingInfo } = useReadContract({
-    contract: contract as any,
+    contract: contract!,
     method: 'function stakers(address) view returns (uint256 amountStaked, uint256 timeOfLastUpdate, uint256 unclaimedRewards, uint256 conditionIdOflastUpdate)',
-    params: [address as `0x${string}`]
+    params: [address!]
   })
 
   if (!user) {
