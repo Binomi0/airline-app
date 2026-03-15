@@ -64,7 +64,7 @@ export default function MyApp(props: MyAppProps) {
                           <WithRouter>
                             <Component />
                           </WithRouter>
-                          {/* <SpeedInsights /> */}
+                          <SpeedInsights />
                         </LiveFlightsProvider>
                       </VaProvider>
                     </TokenProvider>

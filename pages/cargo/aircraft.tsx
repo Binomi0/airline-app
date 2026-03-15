@@ -22,7 +22,7 @@ const CargoItem = () => {
   const address = useRecoilValue(smartAccountAddressStore)
   const { aircraftContract: contract } = useAppContracts()
 
-  const { data: balance, isLoading } = useReadContract({
+  const { data: balance } = useReadContract({
     contract: contract as any,
     method: 'function balanceOf(address account, uint256 id) view returns (uint256)',
     params: [address!, 1n]

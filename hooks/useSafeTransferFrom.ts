@@ -44,7 +44,7 @@ const useSafeTransferFrom = () => {
         ]
       })
 
-    const result = await sendTransaction({
+      const result = await sendTransaction({
         transaction: tx,
         account: currentSigner
       })

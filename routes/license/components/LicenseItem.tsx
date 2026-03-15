@@ -27,7 +27,7 @@ interface Props {
 const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming }) => {
   const { smartAccountAddress } = useRecoilValue(walletStore)
   const balance = useRecoilValue(tokenBalanceStore)
-  const { hasLicense, refetch } = useLicense()
+  const { refetch } = useLicense()
   const [claimingNFT, setClaimingNFT] = useState<bigint | -1>(-1)
 
   const { name, description, image } = nft.metadata
@@ -50,7 +50,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
 
   return (
     <Grid item xs={12} md={6} lg={4}>
-      {hasLicense && (
+      {owned && (
         <Box position='relative'>
           <Box
             sx={{
@@ -87,7 +87,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
           ))}
         </CardContent>
 
-        {smartAccountAddress && !hasLicense && (
+        {smartAccountAddress && !owned && (
           <CardActions>
             <Button
               color={balance.airl?.isGreaterThan(attribute?.value || 0) ? 'success' : 'primary'}

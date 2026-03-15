@@ -5,21 +5,21 @@
 
 export interface WeiflyPRFExtensionInputs {
   eval?: {
-    first: BufferSource;
-    second?: BufferSource;
-  };
+    first: BufferSource
+    second?: BufferSource
+  }
   evalByCredential?: {
     [credentialId: string]: {
-      first: BufferSource;
-      second?: BufferSource;
-    };
-  };
+      first: BufferSource
+      second?: BufferSource
+    }
+  }
 }
 
 export interface WeiflyPRFExtensionOutputs {
-  enabled?: boolean;
+  enabled?: boolean
   results?: {
-    first: ArrayBuffer;
-    second?: ArrayBuffer;
-  };
+    first: ArrayBuffer
+    second?: ArrayBuffer
+  }
 }

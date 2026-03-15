@@ -16,7 +16,7 @@ import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import type { PageProps } from 'types'
 import LinearProgress from '@mui/material/LinearProgress'
-import { smartAccountAddressStore, walletStore } from 'store/wallet.atom'
+import { smartAccountAddressStore } from 'store/wallet.atom'
 import { tokenBalanceStore } from 'store/balance.atom'
 
 const Gas = ({ loading }: PageProps) => {
