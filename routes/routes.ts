@@ -1,1 +1,1 @@
-const privateRoutes = ['cargo', 'live', 'gas']
+export const privateRoutes = ['cargo', 'live', 'gas', 'settings', 'hangar']

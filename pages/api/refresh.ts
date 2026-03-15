@@ -1,25 +1,44 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiResponse } from 'next'
 import jwt from 'jsonwebtoken'
 import { setCookie } from 'cookies-next'
-import withAuth from 'lib/withAuth'
+import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import User from 'models/User'
+import { jwtSecret } from 'config'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
     res.status(405).end()
     return
   }
 
   try {
-    const user = await User.findOne({ email: req.body.email })
+    const user = await User.findOne({ email: req.user })
     if (!user) {
-      throw new Error(`Missing user ${user.email}`)
+      throw new Error(`User not found: ${req.user}`)
     }
 
-    const token = jwt.sign({ data: { email: req.body.email, id: user?.id } }, process.env.JWT_SECRET, {
-      expiresIn: '1d'
+    const token = jwt.sign({ data: { email: req.user, id: req.id } }, jwtSecret as string, { expiresIn: '1h' })
+
+    setCookie('token', token, {
+      req,
+      res,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24,
+      path: '/'
     })
-    setCookie('token', token, { req, res })
+
+    setCookie('isLoggedIn', 'true', {
+      req,
+      res,
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24,
+      path: '/'
+    })
+
     res.status(200).end()
     return
   } catch (err) {

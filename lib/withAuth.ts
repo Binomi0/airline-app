@@ -1,4 +1,4 @@
-import { getCookie } from 'cookies-next'
+import { setCookie } from 'cookies-next'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { connectDB } from './mongoose'
@@ -21,26 +21,43 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
 
     await connectDB()
 
-    const cookieToken = getCookie('token', { req, res })
-    const headerToken = req.headers.authorization?.split(' ')[1]
-    const token = (cookieToken || headerToken) as string
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1]
 
-    if (token) {
-      const decoded = jwt.verify(token, jwtSecret) as JwtPayload
-      if (decoded.data?.email) {
-        const user = await User.findOne({ email: decoded.data.email }, { _id: 1, id: 1 })
-        if (user?._id) {
-          req.user = decoded.data.email
-          req.id = user._id
-          req.userId = user.id
-          return handler(req, res)
+    if (token && typeof token === 'string') {
+      try {
+        const decoded = jwt.verify(token, jwtSecret) as JwtPayload
+        if (decoded.data?.email) {
+          // Sync isLoggedIn hint cookie if missing
+          if (!req.cookies.isLoggedIn) {
+            setCookie('isLoggedIn', 'true', {
+              req,
+              res,
+              httpOnly: false,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              maxAge: 60 * 60 * 24,
+              path: '/'
+            })
+          }
+
+          const user = await User.findOne({ email: decoded.data.email }, { _id: 1, id: 1 })
+          if (user?._id) {
+            req.user = decoded.data.email
+            req.id = user._id
+            req.userId = user.id
+            return handler(req, res)
+          } else {
+            console.warn(`[withAuth] User not found in database for email: ${decoded.data.email}`)
+          }
         }
+      } catch (err) {
+        console.error('[withAuth] JWT Verification Failed:', (err as Error).message)
       }
     }
   } catch (err) {
-    console.error('Authentication Error:', (err as Error).message)
+    console.error('[withAuth] Unexpected Error:', (err as Error).message)
   }
-  
+
   res.status(401).end()
 }
 

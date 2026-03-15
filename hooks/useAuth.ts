@@ -6,8 +6,8 @@ import { useRouter } from 'next/router'
 import { AccountSignerStatus, User } from 'types'
 import { useSetRecoilState } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
-import { userState } from 'store/user.atom'
 import { authStore } from 'store/auth.atom'
+import { userState } from 'store/user.atom'
 import axios from 'config/axios'
 
 interface UseAuthReturnType {
@@ -24,14 +24,14 @@ const useAuth = (): UseAuthReturnType => {
   const [status, setStatus] = useState<AccountSignerStatus>()
   const router = useRouter()
   const setWallet = useSetRecoilState(walletStore)
+  const setAuthToken = useSetRecoilState(authStore)
   const setUser = useSetRecoilState(userState)
-  const setToken = useSetRecoilState(authStore)
 
   const handleSignIn = useCallback(
     async (email: string) => {
       setStatus('loading')
       try {
-        const { verified, token } = await verifyCredential(email)
+        const { verified } = await verifyCredential(email)
         if (!verified) {
           // User cancelled challenge or timeout
           setStatus('error')
@@ -39,8 +39,8 @@ const useAuth = (): UseAuthReturnType => {
         }
 
         const { data } = await axios.get<User>('/api/user/get')
+        setAuthToken('true')
         setUser(data)
-        setToken(token)
         loadAccount(data)
         loginSuccessSwal()
       } catch (err) {
@@ -49,18 +49,18 @@ const useAuth = (): UseAuthReturnType => {
         setStatus(error.message === 'Missing wallet key' ? 'missingKey' : 'error')
       }
     },
-    [loadAccount, setToken, setUser, verifyCredential]
+    [loadAccount, setAuthToken, setUser, verifyCredential]
   )
 
   const handleSignUp = useCallback(
     async (email: string) => {
       setStatus('loading')
       try {
-        const { verified, token } = await createCredential(email)
+        const { verified } = await createCredential(email)
         if (verified) {
           const { data } = await axios.get<User>('/api/user/get')
+          setAuthToken('true')
           setUser(data)
-          setToken(token)
           loadAccount(data)
           loginSuccessSwal()
         }
@@ -69,7 +69,7 @@ const useAuth = (): UseAuthReturnType => {
         setStatus('error')
       }
     },
-    [createCredential, loadAccount, setToken, setUser]
+    [createCredential, loadAccount, setAuthToken, setUser]
   )
 
   const handleSignOut = useCallback(() => {
@@ -81,10 +81,10 @@ const useAuth = (): UseAuthReturnType => {
       isLoaded: false
     }))
     deleteCookie('token')
+    deleteCookie('isLoggedIn')
     setUser(undefined)
-    setToken(undefined)
     router.asPath !== '/signin' && router.push('/signin')
-  }, [router, setToken, setUser, setWallet])
+  }, [router, setUser, setWallet])
 
   return { handleSignIn, handleSignUp, handleSignOut, status }
 }

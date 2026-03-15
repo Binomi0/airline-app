@@ -45,7 +45,7 @@ const useThirdwebWallet = () => {
             address: coinTokenAddress
           },
           method: 'function allowance(address owner, address spender) view returns (uint256)',
-          params: [currentSigner.address, currentSigner.address] 
+          params: [currentSigner.address, currentSigner.address]
           // Wait, in useAlchemyWallet it was approving balance to itself?
           // Let's re-verify the original logic.
         })

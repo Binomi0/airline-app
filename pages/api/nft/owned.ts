@@ -100,4 +100,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   res.status(405).end()
 }
 
-export default withAuth(handler)
+export default function withAuthOwnedHandler(req: any, res: any) {
+  return withAuth(handler)(req, res)
+}

@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken'
 import { setCookie } from 'cookies-next'
 import { connectDB } from 'lib/mongoose'
 import Webauthn from 'models/Webauthn'
-import { Authenticator } from 'types'
 import User from 'models/User'
+import { jwtSecret } from 'config'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body } = req
@@ -22,36 +22,62 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     throw new Error(`Could not find authenticator ${body.data.id} for auth ${auth?._id}`)
   }
 
-  let verification
+  let verified = false
 
   try {
-    verification = {
-      verified: auth.authenticators.some(
-        async (authenticator: Authenticator) => await verifySignature(authenticator, body.data, auth.challenge)
-      )
+    for (const authenticator of auth.authenticators) {
+      const result = await verifySignature(authenticator, body.data, auth.challenge)
+      if (result) {
+        verified = true
+        break
+      }
     }
   } catch (err) {
-    const error = err as Error
-    console.error('Login verification error:', error)
-    res.status(400).send({ error: error.message, verified: false })
-    return
+    console.error('Login verification error:', err)
+    return res.status(400).json({ error: 'Verification failed', verified: false })
+  }
+
+  if (!verified) {
+    console.warn(`Invalid verification attempt for email: ${req.body.email}`)
+    return res.status(401).json({ verified: false, error: 'Invalid credentials' })
   }
 
   try {
-    console.log('EMAIL =>', req.body.email)
     const user = await User.findOne({ email: req.body.email })
     if (!user) {
-      throw new Error(`Missing user ${user.email}`)
+      return res.status(404).json({ error: 'User not found' })
     }
-    const token = jwt.sign({ data: { email: req.body.email, id: user.id } }, process.env.JWT_SECRET, {
+
+    const token = jwt.sign({ data: { email: req.body.email, id: user.id } }, jwtSecret as string, {
       expiresIn: '1d'
     })
-    setCookie('token', token, { req, res })
-    res.send({ verified: verification.verified, id: user?.id, emailVerified: user?.emailVerified, token })
-    return
+
+    setCookie('token', token, {
+      req,
+      res,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24, // 1 day
+      path: '/'
+    })
+
+    // Companion cookie to let the frontend know a session exists
+    setCookie('isLoggedIn', 'true', {
+      req,
+      res,
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24,
+      path: '/'
+    })
+
+    // Do not return the token in the body to prevent client-side JS access (HttpOnly)
+    return res.status(200).json({ verified: true, id: user.id, emailVerified: user.emailVerified })
   } catch (err) {
     console.error('login-response error =>', err)
-    res.status(500).send(err)
+    return res.status(500).json({ error: 'Internal server error' })
   }
 }
 

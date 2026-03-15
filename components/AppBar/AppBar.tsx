@@ -77,7 +77,7 @@ const CustomAppBar: React.FC = () => {
             <MenuIcon />
           </IconButton>
           <Link href='/'>
-            <Image src='/logo64x64-white.png' alt='logo' width={32} height={32} />
+            <img src='/logo64x64-white.png' alt='logo' width={32} height={32} />
           </Link>
           {matches ? (
             <Typography ml={2} variant='h6' component='div' sx={{ flexGrow: 1 }}>

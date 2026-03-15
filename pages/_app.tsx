@@ -39,7 +39,7 @@ export default function MyApp(props: MyAppProps) {
     <CacheProvider value={emotionCache}>
       <RecoilRoot
         initializeState={({ set }) => {
-          set(authStore, getCookie('token') as string)
+          set(authStore, getCookie('isLoggedIn') as string)
           set(themeStore, 'dark')
         }}
       >

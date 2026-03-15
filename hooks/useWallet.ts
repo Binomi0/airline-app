@@ -1,6 +1,6 @@
 import { Wallet } from 'ethers'
 import { useCallback } from 'react'
-import { consentCloudSyncSwal, consentSecureWalletSwal, unlockWalletSwal } from 'lib/swal'
+import { consentCloudSyncSwal, consentSecureWalletSwal, unlockWalletSwal, errorSwal } from 'lib/swal'
 import { useSetRecoilState } from 'recoil'
 import { IWallet } from 'models/Wallet'
 import { walletStore } from 'store/wallet.atom'
@@ -16,7 +16,8 @@ const PRF_SALT = new TextEncoder().encode('weifly-vault-v1')
 interface UseWallet {
   // eslint-disable-next-line no-unused-vars
   initWallet: (user: User) => Promise<void>
-  getPRFSecret: () => Promise<ArrayBuffer>
+  // eslint-disable-next-line no-unused-vars
+  getPRFSecret: (allowedCredentialIds?: string[]) => Promise<ArrayBuffer>
   // eslint-disable-next-line no-unused-vars
   getPrivateKey: (user: User) => Promise<string>
   // eslint-disable-next-line no-unused-vars
@@ -28,14 +29,19 @@ interface UseWallet {
 const useWallet = (): UseWallet => {
   const setWallet = useSetRecoilState(walletStore)
 
-  const getPRFSecret = useCallback(async () => {
+  const getPRFSecret = useCallback(async (allowedCredentialIds?: string[]) => {
     try {
+      const allowCredentials = allowedCredentialIds?.map((id) => ({
+        id: Buffer.from(id, 'base64'),
+        type: 'public-key' as const
+      }))
+
       const credential = (await navigator.credentials.get({
         publicKey: {
           challenge: new Uint8Array(32) as unknown as BufferSource, // dummy for PRF
           timeout: 60000,
           userVerification: 'required',
-          allowCredentials: [], // allows any passkey on this RP
+          allowCredentials: allowCredentials || [],
           extensions: {
             // @ts-ignore
             prf: {
@@ -117,14 +123,25 @@ const useWallet = (): UseWallet => {
         if (vault.protected) {
           const { isConfirmed } = await unlockWalletSwal()
           if (!isConfirmed) throw new Error('Wallet unlocking cancelled')
-          const prfSecret = await getPRFSecret()
+
+          // Fetch allowed credentials to isolate passkey
+          const { authenticators } = (await getApi<any>('/api/webauthn/get')) || { authenticators: [] }
+          const allowedIds = authenticators.map((a: any) => a.credentialID)
+
+          const prfSecret = await getPRFSecret(allowedIds)
           const cryptoKey = await deriveKeyFromPRF(prfSecret)
           return (await decryptVault(vault.ciphertext, cryptoKey, vault.iv)) as string
         }
         return raw.slice(0, 66)
       } catch (e) {
-        // Migration Path or plain key
-        return raw.slice(0, 66)
+        if (e instanceof Error && e.message.includes('decrypt')) {
+          throw new Error('Could not decrypt wallet. Is it the correct Passkey?')
+        }
+        // Migration Path: only if it doesn't look like a vault
+        if (!raw.includes('"protected":true')) {
+          return raw.slice(0, 66)
+        }
+        throw e
       }
     },
     [getPRFSecret]
@@ -232,7 +249,12 @@ const useWallet = (): UseWallet => {
           try {
             const { isConfirmed } = await unlockWalletSwal()
             if (!isConfirmed) throw new Error('Cloud recovery cancelled')
-            const prfSecret = await getPRFSecret()
+
+            // Fetch allowed credentials to isolate passkey
+            const { authenticators } = (await getApi<any>('/api/webauthn/get')) || { authenticators: [] }
+            const allowedIds = authenticators.map((a: any) => a.credentialID)
+
+            const prfSecret = await getPRFSecret(allowedIds)
             const cryptoKey = await deriveKeyFromPRF(prfSecret)
             const privateKey = (await decryptVault(wallet.encryptedVault, cryptoKey, wallet.iv)) as `0x${string}`
 
@@ -244,8 +266,8 @@ const useWallet = (): UseWallet => {
               return
             }
           } catch (e) {
-            console.warn('Cloud recovery skipped or failed:', e)
-            // Still loaded (from step 0) but locked
+            console.error('Cloud recovery error:', e)
+            errorSwal('Recovery failed', 'Could not restore your wallet. Ensure you are using the correct Passkey.')
             return
           }
         }
@@ -259,7 +281,11 @@ const useWallet = (): UseWallet => {
               try {
                 const { isConfirmed } = await unlockWalletSwal()
                 if (!isConfirmed) throw new Error('Local unlock cancelled')
-                const prfSecret = await getPRFSecret()
+                // Fetch allowed credentials to isolate passkey
+                const { authenticators } = (await getApi<any>('/api/webauthn/get')) || { authenticators: [] }
+                const allowedIds = authenticators.map((a: any) => a.credentialID)
+
+                const prfSecret = await getPRFSecret(allowedIds)
                 const cryptoKey = await deriveKeyFromPRF(prfSecret)
                 const privateKey = (await decryptVault(vault.ciphertext, cryptoKey, vault.iv)) as `0x${string}`
 
@@ -268,8 +294,8 @@ const useWallet = (): UseWallet => {
                 await initialize(personalAccount, _user, isCloudSynced)
                 return
               } catch (e) {
-                console.warn('Local unlock rejected:', e)
-                // Still loaded (from step 0) but locked
+                console.error('Local unlock error:', e)
+                errorSwal('Unlock failed', 'Could not decrypt your wallet. Ensure you are using the correct Passkey.')
                 return
               }
             }
