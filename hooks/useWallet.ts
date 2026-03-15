@@ -64,7 +64,7 @@ const useWallet = (): UseWallet => {
 
   const initialize = useCallback(
     async (personalAccount: any, _user: User, isCloudSynced: boolean = false) => {
-      if (!personalAccount || !_user.id) return
+      if (!personalAccount || !_user.id) return null
 
       try {
         const account = await smartWallet({
@@ -98,6 +98,8 @@ const useWallet = (): UseWallet => {
           twClient,
           twChain: chain
         })
+
+        return account
       } catch (error) {
         console.error('Error initializing Thirdweb wallet:', error)
         throw error
@@ -205,8 +207,7 @@ const useWallet = (): UseWallet => {
       const wallet = await getApi<IWallet>('/api/wallet')
       const isCloudSynced = !!wallet?.encryptedVault
 
-      await initialize(personalAccount, _user, isCloudSynced)
-      return personalAccount
+      return await initialize(personalAccount, _user, isCloudSynced)
     },
     [getPrivateKey, initialize]
   )

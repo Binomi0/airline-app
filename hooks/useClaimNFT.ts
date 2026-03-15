@@ -38,13 +38,13 @@ const useClaimNFT = (): UseClaimNFT => {
   const { unlockSigner } = useWallet()
 
   const checkAndSetAllowance = useCallback(
-    async (tokenAddress: string, spender: string, amount: bigint) => {
+    async (tokenAddress: string, spender: string, amount: bigint, account: any, ownerAddress: string) => {
       if (tokenAddress.toLowerCase() === NATIVE_TOKEN) return
 
       const { data: allowance } = await axios.post('/api/contracts/read', {
         address: tokenAddress,
         method: 'function allowance(address owner, address spender) view returns (uint256)',
-        params: [smartAccountAddress, spender]
+        params: [ownerAddress, spender]
       })
 
       if (BigInt(allowance) < amount) {
@@ -53,11 +53,11 @@ const useClaimNFT = (): UseClaimNFT => {
           method: 'function approve(address spender, uint256 amount)',
           params: [spender, ethers.constants.MaxUint256.toBigInt()]
         })
-        const result = await sendTransaction({ transaction: tx, account: smartSigner! })
+        const result = await sendTransaction({ transaction: tx, account })
         await waitForReceipt(result)
       }
     },
-    [smartAccountAddress, twClient, twChain, smartSigner]
+    [twClient, twChain]
   )
 
   const claimNFT = useCallback(
@@ -93,7 +93,7 @@ const useClaimNFT = (): UseClaimNFT => {
         const pricePerToken = condition[5]
         const quantityLimitPerWallet = condition[3]
 
-        await checkAndSetAllowance(currency, contractAddress, pricePerToken)
+        await checkAndSetAllowance(currency, contractAddress, pricePerToken, currentSigner, currentSigner.address)
 
         const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0n ? nftId - 1n : 0n])
 
@@ -106,7 +106,7 @@ const useClaimNFT = (): UseClaimNFT => {
           method:
             'function claim(address receiver, uint256 tokenId, uint256 quantity, address currency, uint256 pricePerToken, (bytes32[] proof, uint256 quantityLimitPerWallet, uint256 pricePerToken, address currency) allowlistProof, bytes data)',
           params: [
-            smartAccountAddress,
+            currentSigner.address,
             nftId,
             1n,
             currency,
