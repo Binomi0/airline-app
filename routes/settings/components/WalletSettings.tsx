@@ -1,12 +1,14 @@
 import React, { useCallback } from 'react'
-import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Divider, Paper, Stack, Tooltip, Typography } from '@mui/material'
 import BackupIcon from '@mui/icons-material/Backup'
 import { walletStore } from 'store/wallet.atom'
 import { downloadFile } from 'utils'
-import { missingExportKeySwal, walletExportSwal, unlockWalletSwal } from 'lib/swal'
+import { missingExportKeySwal, walletExportSwal, unlockWalletSwal, consentCloudSyncSwal } from 'lib/swal'
 import { useRecoilState } from 'recoil'
 import useWallet from 'hooks/useWallet'
 import { decryptVault, deriveKeyFromPRF } from 'utils/crypto'
+import { Check, Close, Info } from '@mui/icons-material'
+import { postApi } from 'lib/api'
 
 interface Props {
   user: any
@@ -14,7 +16,17 @@ interface Props {
 
 const WalletSettings = ({ user }: Props) => {
   const [wallet] = useRecoilState(walletStore)
-  const { getPRFSecret } = useWallet() as any
+  const { getPRFSecret, getPrivateKey, syncWallet } = useWallet() as any
+
+  const handleUploadKey = useCallback(async () => {
+    if (!user?.id) return
+    try {
+      const privateKey = await getPrivateKey(user)
+      await syncWallet(privateKey, user)
+    } catch (error) {
+      console.error('Upload error:', error)
+    }
+  }, [user, getPrivateKey, syncWallet])
 
   const handleExportKey = useCallback(async () => {
     if (!user?.id) return
@@ -31,7 +43,8 @@ const WalletSettings = ({ user }: Props) => {
       try {
         const vault = JSON.parse(raw)
         if (vault.protected) {
-          await unlockWalletSwal()
+          const { isConfirmed } = await unlockWalletSwal()
+          if (!isConfirmed) return
           const prfSecret = await getPRFSecret()
           const cryptoKey = await deriveKeyFromPRF(prfSecret)
           privateKey = await decryptVault(vault.ciphertext, cryptoKey, vault.iv)
@@ -56,31 +69,71 @@ const WalletSettings = ({ user }: Props) => {
 
   return (
     <Paper elevation={6}>
-      <Box p={4}>
-        <Stack spacing={4}>
+      <Box p={2}>
+        <Stack spacing={2}>
           <Typography variant='h5' fontWeight='bold'>
             Wallet Security
           </Typography>
+
+          <Divider />
 
           <Stack direction='row' justifyContent='space-between' alignItems='center'>
             <Stack spacing={1}>
               <Typography variant='subtitle1' fontWeight='medium'>
                 Passkey Protection
               </Typography>
-              <Tooltip title={wallet.isLoaded ? 'Active' : 'Not Loaded'}>
-                <Typography variant='body2' color='text.secondary'>
-                  Your private key is {wallet.isLoaded ? 'encrypted with your Passkey' : 'not secured'}.
-                </Typography>
-              </Tooltip>
+              <Box>
+                <Tooltip title={wallet.isLoaded ? 'Active' : 'Not Loaded'}>
+                  <Stack alignItems='center' direction='row' spacing={1}>
+                    {wallet.isLoaded ? <Check fontSize='small' color='success' /> : <Close color='error' />}
+                    <Typography variant='caption' color={wallet.isLoaded ? 'success.main' : 'error.main'}>
+                      Your private key is {wallet.isLoaded ? 'encrypted with your Passkey' : 'not secured'}.
+                    </Typography>
+                  </Stack>
+                </Tooltip>
+              </Box>
             </Stack>
+            <Button size='small' variant='outlined' color='error' onClick={handleExportKey}>
+              <Stack spacing={1} direction='row' alignItems='center'>
+                <Typography>Export Private Key</Typography>
+              </Stack>
+            </Button>
+          </Stack>
 
-            <button
-              onClick={handleExportKey}
-              className='flex items-center gap-2 rounded-lg bg-red-500/10 px-4 py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/20'
-            >
-              <BackupIcon className='h-4 w-4' />
-              Unlock & Export Private Key
-            </button>
+          <Divider />
+
+          <Stack direction='row' justifyContent='space-between' alignItems='center'>
+            <Stack spacing={1}>
+              <Typography variant='subtitle1' fontWeight='medium'>
+                Cloud Wallet Backup
+              </Typography>
+              <Tooltip title={wallet.isCloudSynced ? 'Backup Active' : 'Backup Missing'}>
+                <Stack alignItems='center' direction='row' spacing={1}>
+                  {wallet.isCloudSynced ? (
+                    <Check fontSize='small' color='success' />
+                  ) : (
+                    <Info fontSize='small' color='error' />
+                  )}
+                  <Typography variant='caption' color={wallet.isCloudSynced ? 'success.main' : 'error.main'}>
+                    WeiFly{' '}
+                    {wallet.isCloudSynced ? 'has a copy of your encrypted key' : 'does not have a backup of your key'}.
+                  </Typography>
+                </Stack>
+              </Tooltip>
+              <Typography fontSize='small' variant='body2' color='text.secondary'>
+                In case you lose your device, you can restore your wallet using your Passkey.
+              </Typography>
+            </Stack>
+            {!wallet.isCloudSynced && (
+              <Stack spacing={2}>
+                <Button size='small' variant='outlined' color='error' onClick={handleUploadKey}>
+                  <Stack spacing={1} direction='row' alignItems='center'>
+                    <BackupIcon className='h-4 w-4' />
+                    <Typography>Upload to Cloud</Typography>
+                  </Stack>
+                </Button>
+              </Stack>
+            )}
           </Stack>
         </Stack>
       </Box>

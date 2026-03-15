@@ -1,12 +1,6 @@
 import { Wallet } from 'ethers'
 import { useCallback } from 'react'
-import {
-  accountImportErrorSwal,
-  consentCloudSyncSwal,
-  consentSecureWalletSwal,
-  missingKeySwal,
-  unlockWalletSwal
-} from 'lib/swal'
+import { consentCloudSyncSwal, consentSecureWalletSwal, missingKeySwal, unlockWalletSwal } from 'lib/swal'
 import { useSetRecoilState } from 'recoil'
 import { IWallet } from 'models/Wallet'
 import { walletStore } from 'store/wallet.atom'
@@ -23,6 +17,10 @@ interface UseWallet {
   // eslint-disable-next-line no-unused-vars
   initWallet: (user: User) => Promise<void>
   getPRFSecret: () => Promise<ArrayBuffer>
+  // eslint-disable-next-line no-unused-vars
+  getPrivateKey: (user: User) => Promise<string>
+  // eslint-disable-next-line no-unused-vars
+  syncWallet: (privateKey: string, user: User) => Promise<void>
 }
 
 const useWallet = (): UseWallet => {
@@ -57,7 +55,7 @@ const useWallet = (): UseWallet => {
   }, [])
 
   const initialize = useCallback(
-    async (personalAccount: any, _user: User) => {
+    async (personalAccount: any, _user: User, isCloudSynced: boolean = false) => {
       if (!personalAccount || !_user.id) return
 
       try {
@@ -87,6 +85,7 @@ const useWallet = (): UseWallet => {
           smartSigner: account,
           smartAccountAddress: (_user.address || smartAccountAddress) as `0x${string}`,
           isLoaded: true,
+          isCloudSynced,
           twClient,
           twChain: chain
         })
@@ -104,34 +103,78 @@ const useWallet = (): UseWallet => {
     return wallet.signerAddress.toLowerCase() === signerAddress.toLowerCase()
   }, [])
 
-  const protectAndSync = useCallback(
+  const getPrivateKey = useCallback(
+    async (_user: User): Promise<string> => {
+      const storedValue = _user.id ? localStorage.getItem(_user.id) : null
+      if (!storedValue) throw new Error('No local key found')
+
+      const raw = Buffer.from(storedValue, 'base64').toString()
+      try {
+        const vault = JSON.parse(raw)
+        if (vault.protected) {
+          const { isConfirmed } = await unlockWalletSwal()
+          if (!isConfirmed) throw new Error('Wallet unlocking cancelled')
+          const prfSecret = await getPRFSecret()
+          const cryptoKey = await deriveKeyFromPRF(prfSecret)
+          return (await decryptVault(vault.ciphertext, cryptoKey, vault.iv)) as string
+        }
+        return raw.slice(0, 66)
+      } catch (e) {
+        // Migration Path or plain key
+        return raw.slice(0, 66)
+      }
+    },
+    [getPRFSecret]
+  )
+
+  const syncWallet = useCallback(
     async (privateKey: string, _user: User) => {
-      const { isConfirmed: wantSecure } = await consentSecureWalletSwal()
-      if (!wantSecure) {
-        const base64Key = Buffer.from(privateKey).toString('base64')
-        if (_user.id) localStorage.setItem(_user.id, base64Key)
-        return
+      let ciphertext = ''
+      let iv = ''
+
+      const storedValue = _user.id ? localStorage.getItem(_user.id) : null
+      if (storedValue) {
+        try {
+          const vault = JSON.parse(Buffer.from(storedValue, 'base64').toString())
+          if (vault.protected) {
+            ciphertext = vault.ciphertext
+            iv = vault.iv
+          }
+        } catch (e) {
+          // Not a vault, will encrypt below
+        }
       }
 
-      const prfSecret = await getPRFSecret()
-      const cryptoKey = await deriveKeyFromPRF(prfSecret)
-      const { ciphertext, iv } = await encryptVault(privateKey, cryptoKey)
+      if (!ciphertext || !iv) {
+        const { isConfirmed: wantSecure } = await consentSecureWalletSwal()
+        if (!wantSecure) {
+          const base64Key = Buffer.from(privateKey).toString('base64')
+          if (_user.id) localStorage.setItem(_user.id, base64Key)
+          return
+        }
 
-      const vaultData = JSON.stringify({ ciphertext, iv, protected: true })
-      if (_user.id) {
-        localStorage.setItem(_user.id, Buffer.from(vaultData).toString('base64'))
+        const prfSecret = await getPRFSecret()
+        const cryptoKey = await deriveKeyFromPRF(prfSecret)
+        const encrypted = await encryptVault(privateKey, cryptoKey)
+        ciphertext = encrypted.ciphertext
+        iv = encrypted.iv
+
+        const vaultData = JSON.stringify({ ciphertext, iv, protected: true })
+        if (_user.id) {
+          localStorage.setItem(_user.id, Buffer.from(vaultData).toString('base64'))
+        }
       }
 
       const { isConfirmed: wantSync } = await consentCloudSyncSwal()
       if (wantSync && ciphertext && iv) {
-        await postApi('/api/wallet', {
-          id: _user.id,
+        await postApi('/api/wallet/backup', {
           encryptedVault: ciphertext,
           iv: iv
         })
+        setWallet((prev) => ({ ...prev, isCloudSynced: true }))
       }
     },
-    [getPRFSecret]
+    [getPRFSecret, setWallet]
   )
 
   const initWallet = useCallback(
@@ -146,18 +189,19 @@ const useWallet = (): UseWallet => {
           const formattedKey = (privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`) as Hex
           const personalAccount = privateKeyToAccount({ client: twClient, privateKey: formattedKey })
 
-          await protectAndSync(privateKey, _user)
-          await initialize(personalAccount, _user)
+          await syncWallet(privateKey, _user)
+          await initialize(personalAccount, _user, false) // Will be synced if confirm in syncWallet
           return
         }
 
         // 2. Local/Recovery check
-        const storedValue = localStorage.getItem(_user.id)
+        const storedValue = _user.id ? localStorage.getItem(_user.id) : null
         let wallet: any = await getApi<IWallet>('/api/wallet')
 
         // Case A: Cloud Recovery (New Device)
         if (!storedValue && wallet?.encryptedVault) {
-          await unlockWalletSwal()
+          const { isConfirmed } = await unlockWalletSwal()
+          if (!isConfirmed) throw new Error('Cloud recovery cancelled')
           const prfSecret = await getPRFSecret()
           const cryptoKey = await deriveKeyFromPRF(prfSecret)
           const privateKey = (await decryptVault(wallet.encryptedVault, cryptoKey, wallet.iv)) as `0x${string}`
@@ -166,7 +210,7 @@ const useWallet = (): UseWallet => {
           if (personalAccount.address.toLowerCase() === wallet.signerAddress.toLowerCase()) {
             const vaultData = JSON.stringify({ ciphertext: wallet.encryptedVault, iv: wallet.iv, protected: true })
             if (_user.id) localStorage.setItem(_user.id, Buffer.from(vaultData).toString('base64'))
-            await initialize(personalAccount, _user)
+            await initialize(personalAccount, _user, true)
             return
           }
         }
@@ -177,13 +221,15 @@ const useWallet = (): UseWallet => {
           try {
             const vault = JSON.parse(raw)
             if (vault.protected) {
-              await unlockWalletSwal()
+              const { isConfirmed } = await unlockWalletSwal()
+              if (!isConfirmed) throw new Error('Local unlock cancelled')
               const prfSecret = await getPRFSecret()
               const cryptoKey = await deriveKeyFromPRF(prfSecret)
               const privateKey = (await decryptVault(vault.ciphertext, cryptoKey, vault.iv)) as `0x${string}`
 
               const personalAccount = privateKeyToAccount({ client: twClient, privateKey })
-              await initialize(personalAccount, _user)
+              const isCloudSynced = !!wallet?.encryptedVault
+              await initialize(personalAccount, _user, isCloudSynced)
               return
             }
           } catch (e) {
@@ -193,8 +239,8 @@ const useWallet = (): UseWallet => {
             const personalAccount = privateKeyToAccount({ client: twClient, privateKey })
 
             if (await checkSigner(personalAccount.address)) {
-              await protectAndSync(privateKey, _user)
-              await initialize(personalAccount, _user)
+              await syncWallet(privateKey, _user)
+              await initialize(personalAccount, _user, false)
               return
             }
           }
@@ -208,10 +254,10 @@ const useWallet = (): UseWallet => {
         // Logic for importing file... (simplified for brevity, can be re-added if needed)
       }
     },
-    [checkSigner, initialize, getPRFSecret, protectAndSync]
+    [checkSigner, initialize, getPRFSecret, syncWallet]
   )
 
-  return { initWallet, getPRFSecret }
+  return { initWallet, getPRFSecret, getPrivateKey, syncWallet }
 }
 
 export default useWallet

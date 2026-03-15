@@ -3,6 +3,7 @@ import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { connectDB } from './mongoose'
 import User from 'models/User'
+import { jwtSecret } from 'config'
 
 export interface CustomNextApiRequest extends NextApiRequest {
   user?: string
@@ -13,39 +14,22 @@ export interface CustomNextApiRequest extends NextApiRequest {
 
 const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, res: NextApiResponse) => {
   try {
+    if (!jwtSecret) {
+      console.error('JWT_SECRET is not configured')
+      return res.status(500).end()
+    }
+
     await connectDB()
 
     const cookieToken = getCookie('token', { req, res })
-    if (cookieToken) {
-      const decoded = jwt.verify(cookieToken as string, process.env.JWT_SECRET) as JwtPayload
-      if (decoded.data.email) {
-        const user = await User.findOne({ email: decoded.data.email }, { _id: 1, id: 1 })
-        if (!user) {
-          res.status(401).end()
-          return
-        }
-        if (!user?._id) {
-          throw new Error('[cookieToken] Missing _id in user?')
-        }
-        req.user = decoded.data.email
-        req.id = user._id
-        req.userId = user.id
-        return handler(req, res)
-      }
-    } else {
-      const headerToken = req.headers.authorization?.split(' ')[1]
-      if (headerToken) {
-        const decoded = jwt.verify(headerToken as string, process.env.JWT_SECRET) as JwtPayload
-        if (decoded.data.email) {
-          const user = await User.findOne({ email: decoded.data.email }, { _id: 1, id: 1 })
-          if (!user) {
-            res.status(401).end()
-            return
-          }
-          if (!user?._id) {
-            throw new Error('[headerToken] Missing _id in user?')
-          }
+    const headerToken = req.headers.authorization?.split(' ')[1]
+    const token = (cookieToken || headerToken) as string
 
+    if (token) {
+      const decoded = jwt.verify(token, jwtSecret) as JwtPayload
+      if (decoded.data?.email) {
+        const user = await User.findOne({ email: decoded.data.email }, { _id: 1, id: 1 })
+        if (user?._id) {
           req.user = decoded.data.email
           req.id = user._id
           req.userId = user.id
@@ -54,8 +38,9 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
       }
     }
   } catch (err) {
-    console.error('Error', err)
+    console.error('Authentication Error:', (err as Error).message)
   }
+  
   res.status(401).end()
 }
 

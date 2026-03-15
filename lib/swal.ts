@@ -173,5 +173,8 @@ export const unlockWalletSwal = async () =>
     text: 'Please use your Passkey to unlock your digital assets.',
     icon: 'info',
     showConfirmButton: true,
-    confirmButtonText: 'Unlock'
+    showCancelButton: true,
+    confirmButtonText: 'Unlock',
+    cancelButtonText: 'Cancel',
+    allowOutsideClick: false
   })

@@ -48,7 +48,8 @@
     "sweetalert2": "^11.7.27",
     "swr": "^2.2.5",
     "thirdweb": "^5.119.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",

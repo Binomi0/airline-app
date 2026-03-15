@@ -26,7 +26,7 @@ const AccountSettings = ({ hasBackup }: Props) => {
   return (
     <Paper elevation={6}>
       <Box p={2}>
-        <Typography variant='h5'>Account</Typography>
+        <Typography variant='h5'>Account (Login)</Typography>
       </Box>
       <Divider />
       <Box>
