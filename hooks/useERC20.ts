@@ -2,8 +2,10 @@ import { useCallback, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { userState } from 'store/user.atom'
 import { Hex, prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb'
 import axios from 'config/axios'
+import useWallet from './useWallet'
 
 const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
 
@@ -17,7 +19,9 @@ interface UseERC20ReturnType {
 
 const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
   const [isLoading, setIsLoading] = useState(false)
-  const { smartSigner, twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
+  const { smartSigner, twClient, twChain, smartAccountAddress, isLocked } = useRecoilValue(walletStore)
+  const user = useRecoilValue(userState)
+  const { unlockSigner } = useWallet()
 
   const getAllowance = useCallback(
     async (spender: string): Promise<BigNumber> => {
@@ -44,7 +48,18 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
 
   const setAllowance = useCallback(
     async (to: string) => {
-      if (!smartSigner || !twClient || !twChain) return false
+      let currentSigner = smartSigner
+
+      if (isLocked && user) {
+        try {
+          currentSigner = await unlockSigner(user)
+        } catch (e) {
+          console.error('Failed to unlock signer:', e)
+          throw new Error('Wallet must be unlocked to perform transactions')
+        }
+      }
+
+      if (!currentSigner || !twClient || !twChain) return false
       try {
         setIsLoading(true)
 
@@ -60,7 +75,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
 
         const result = await sendTransaction({
           transaction: tx,
-          account: smartSigner
+          account: currentSigner
         })
 
         const receipt = await waitForReceipt(result)
@@ -73,7 +88,7 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
         throw new Error('Error while setAllowance')
       }
     },
-    [smartSigner, twClient, twChain, tokenAddress]
+    [smartSigner, twClient, twChain, tokenAddress, isLocked, unlockSigner, user]
   )
   return { setAllowance, getAllowance, isLoading }
 }

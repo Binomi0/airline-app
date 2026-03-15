@@ -4,15 +4,30 @@ import { postApi } from 'lib/api'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { userState } from 'store/user.atom'
 import { prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb'
+import useWallet from './useWallet'
 
 const useStaking = () => {
   const [isLoading, setIsLoading] = useState(false)
-  const { smartSigner, twClient, twChain } = useRecoilValue(walletStore)
+  const { smartSigner, twClient, twChain, isLocked } = useRecoilValue(walletStore)
+  const user = useRecoilValue(userState)
+  const { unlockSigner } = useWallet()
 
   const stake = useCallback(
     async (amount: BigNumber) => {
-      if (!smartSigner || !twClient || !twChain) return
+      let currentSigner = smartSigner
+
+      if (isLocked && user) {
+        try {
+          currentSigner = await unlockSigner(user)
+        } catch (e) {
+          console.error('Failed to unlock signer:', e)
+          throw new Error('Wallet must be unlocked to perform transactions')
+        }
+      }
+
+      if (!currentSigner || !twClient || !twChain) return
       setIsLoading(true)
 
       try {
@@ -28,7 +43,7 @@ const useStaking = () => {
 
         const result = await sendTransaction({
           transaction: tx,
-          account: smartSigner
+          account: currentSigner
         })
 
         const receipt = await waitForReceipt(result)
@@ -43,12 +58,23 @@ const useStaking = () => {
         setIsLoading(false)
       }
     },
-    [smartSigner, twChain, twClient]
+    [smartSigner, twChain, twClient, isLocked, unlockSigner, user]
   )
 
   const withdraw = useCallback(
     async (amount: BigNumber) => {
-      if (!smartSigner || !twClient || !twChain) return
+      let currentSigner = smartSigner
+
+      if (isLocked && user) {
+        try {
+          currentSigner = await unlockSigner(user)
+        } catch (e) {
+          console.error('Failed to unlock signer:', e)
+          throw new Error('Wallet must be unlocked to perform transactions')
+        }
+      }
+
+      if (!currentSigner || !twClient || !twChain) return
       setIsLoading(true)
 
       try {
@@ -64,7 +90,7 @@ const useStaking = () => {
 
         const result = await sendTransaction({
           transaction: tx,
-          account: smartSigner
+          account: currentSigner
         })
 
         const receipt = await waitForReceipt(result)
@@ -79,12 +105,23 @@ const useStaking = () => {
         setIsLoading(false)
       }
     },
-    [smartSigner, twChain, twClient]
+    [smartSigner, twChain, twClient, isLocked, unlockSigner, user]
   )
 
   const claimRewards = useCallback(
     async (amount: string) => {
-      if (!smartSigner || !twClient || !twChain) return
+      let currentSigner = smartSigner
+
+      if (isLocked && user) {
+        try {
+          currentSigner = await unlockSigner(user)
+        } catch (e) {
+          console.error('Failed to unlock signer:', e)
+          throw new Error('Wallet must be unlocked to perform transactions')
+        }
+      }
+
+      if (!currentSigner || !twClient || !twChain) return
       setIsLoading(true)
 
       try {
@@ -100,7 +137,7 @@ const useStaking = () => {
 
         const result = await sendTransaction({
           transaction: tx,
-          account: smartSigner
+          account: currentSigner
         })
 
         const receipt = await waitForReceipt(result)
@@ -120,7 +157,7 @@ const useStaking = () => {
         setIsLoading(false)
       }
     },
-    [smartSigner, twChain, twClient]
+    [smartSigner, twChain, twClient, isLocked, unlockSigner, user]
   )
 
   return { stake, withdraw, claimRewards, isLoading }

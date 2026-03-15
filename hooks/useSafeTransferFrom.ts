@@ -2,14 +2,29 @@ import { nftLicenseTokenAddress } from 'contracts/address'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { userState } from 'store/user.atom'
 import { prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb'
+import useWallet from './useWallet'
 
 const useSafeTransferFrom = () => {
   const [loading, setLoading] = useState(false)
-  const { smartSigner, twClient, twChain } = useRecoilValue(walletStore)
+  const { smartSigner, twClient, twChain, isLocked } = useRecoilValue(walletStore)
+  const user = useRecoilValue(userState)
+  const { unlockSigner } = useWallet()
 
   const safeTransferFrom = useCallback(async () => {
-    if (!smartSigner || !twClient || !twChain) return
+    let currentSigner = smartSigner
+
+    if (isLocked && user) {
+      try {
+        currentSigner = await unlockSigner(user)
+      } catch (e) {
+        console.error('Failed to unlock signer:', e)
+        throw new Error('Wallet must be unlocked to perform transactions')
+      }
+    }
+
+    if (!currentSigner || !twClient || !twChain) return
     setLoading(true)
 
     try {
@@ -31,7 +46,7 @@ const useSafeTransferFrom = () => {
 
       const result = await sendTransaction({
         transaction: tx,
-        account: smartSigner
+        account: currentSigner
       })
 
       const receipt = await waitForReceipt(result)
@@ -41,7 +56,7 @@ const useSafeTransferFrom = () => {
     } finally {
       setLoading(false)
     }
-  }, [smartSigner, twChain, twClient])
+  }, [smartSigner, twChain, twClient, isLocked, unlockSigner, user])
 
   return {
     safeTransferFrom,

@@ -7,6 +7,7 @@ export const walletStore = atom<{
   smartSigner?: any // This will be the Thirdweb Smart Account
   smartAccountAddress?: Hex
   isLoaded?: boolean
+  isLocked?: boolean
   isCloudSynced?: boolean
   twClient?: ThirdwebClient
   twChain?: Chain
@@ -14,6 +15,7 @@ export const walletStore = atom<{
   key: 'wallet',
   default: {
     isLoaded: false,
+    isLocked: true,
     isCloudSynced: false,
     baseSigner: undefined,
     smartSigner: undefined,

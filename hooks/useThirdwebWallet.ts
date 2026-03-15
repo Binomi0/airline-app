@@ -2,15 +2,30 @@ import { useCallback } from 'react'
 import { coinTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { userState } from 'store/user.atom'
 import { prepareContractCall, sendTransaction, waitForReceipt, readContract } from 'thirdweb'
+import useWallet from './useWallet'
 import { ethers } from 'ethers'
 
 const useThirdwebWallet = () => {
-  const { smartSigner, twClient, twChain } = useRecoilValue(walletStore)
+  const { smartSigner, twClient, twChain, isLocked } = useRecoilValue(walletStore)
+  const user = useRecoilValue(userState)
+  const { unlockSigner } = useWallet()
 
   const sendTWTransaction = useCallback(
     async (target: string, value: string) => {
-      if (!smartSigner || !twClient || !twChain) {
+      let currentSigner = smartSigner
+
+      if (isLocked && user) {
+        try {
+          currentSigner = await unlockSigner(user)
+        } catch (e) {
+          console.error('Failed to unlock signer:', e)
+          throw new Error('Wallet must be unlocked to perform transactions')
+        }
+      }
+
+      if (!currentSigner || !twClient || !twChain) {
         console.error('Wallet not fully loaded', {
           smartSigner: !!smartSigner,
           twClient: !!twClient,
@@ -30,7 +45,7 @@ const useThirdwebWallet = () => {
             address: coinTokenAddress
           },
           method: 'function allowance(address owner, address spender) view returns (uint256)',
-          params: [smartSigner.address, smartSigner.address] // Spender is also the smart wallet in this context of transferFrom?
+          params: [currentSigner.address, currentSigner.address] 
           // Wait, in useAlchemyWallet it was approving balance to itself?
           // Let's re-verify the original logic.
         })
@@ -53,12 +68,12 @@ const useThirdwebWallet = () => {
               address: coinTokenAddress
             },
             method: 'function approve(address spender, uint256 amount)',
-            params: [smartSigner.address, maxUint256]
+            params: [currentSigner.address, maxUint256]
           })
 
           const approveResult = await sendTransaction({
             transaction: approveTx,
-            account: smartSigner
+            account: currentSigner
           })
 
           await waitForReceipt(approveResult)
@@ -74,12 +89,12 @@ const useThirdwebWallet = () => {
             address: coinTokenAddress
           },
           method: 'function transferFrom(address from, address to, uint256 amount)',
-          params: [smartSigner.address, target, amount]
+          params: [currentSigner.address, target, amount]
         })
 
         const transferResult = await sendTransaction({
           transaction: transferFromTx,
-          account: smartSigner
+          account: currentSigner
         })
 
         const receipt = await waitForReceipt(transferResult)
@@ -89,7 +104,7 @@ const useThirdwebWallet = () => {
         throw error
       }
     },
-    [smartSigner, twClient, twChain]
+    [smartSigner, twClient, twChain, isLocked, unlockSigner, user]
   )
 
   return { sendTransaction: sendTWTransaction }

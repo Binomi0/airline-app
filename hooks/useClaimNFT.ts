@@ -3,8 +3,10 @@ import { ethers } from 'ethers'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { userState } from 'store/user.atom'
 import { Hex, prepareContractCall, readContract, sendTransaction, waitForReceipt } from 'thirdweb'
 import axios from 'config/axios'
+import useWallet from './useWallet'
 
 // We define a simplified NFT type to maintain internal consistency
 interface NFT {
@@ -31,7 +33,9 @@ const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
 const useClaimNFT = (): UseClaimNFT => {
   const [isClaiming, setIsClaiming] = useState(false)
-  const { smartSigner, twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
+  const { smartSigner, twClient, twChain, smartAccountAddress, isLocked } = useRecoilValue(walletStore)
+  const user = useRecoilValue(userState)
+  const { unlockSigner } = useWallet()
 
   const checkAndSetAllowance = useCallback(
     async (tokenAddress: string, spender: string, amount: bigint) => {
@@ -58,7 +62,18 @@ const useClaimNFT = (): UseClaimNFT => {
 
   const claimNFT = useCallback(
     async (contractAddress: string, nft: NFT) => {
-      if (!smartSigner || !twClient || !twChain || !smartAccountAddress) {
+      let currentSigner = smartSigner
+
+      if (isLocked && user) {
+        try {
+          currentSigner = await unlockSigner(user)
+        } catch (e) {
+          console.error('Failed to unlock signer:', e)
+          throw new Error('Wallet must be unlocked to perform transactions')
+        }
+      }
+
+      if (!currentSigner || !twClient || !twChain || !smartAccountAddress) {
         throw new Error('Missing wallet params')
       }
       setIsClaiming(true)
@@ -109,7 +124,7 @@ const useClaimNFT = (): UseClaimNFT => {
 
         const result = await sendTransaction({
           transaction: tx,
-          account: smartSigner
+          account: currentSigner
         })
 
         const receipt = await waitForReceipt(result)
@@ -121,7 +136,7 @@ const useClaimNFT = (): UseClaimNFT => {
         throw err
       }
     },
-    [smartAccountAddress, smartSigner, twChain, twClient, checkAndSetAllowance]
+    [smartAccountAddress, smartSigner, twChain, twClient, checkAndSetAllowance, isLocked, unlockSigner, user]
   )
 
   const claimAircraftNFT = useCallback((nft: NFT) => claimNFT(nftAircraftTokenAddress, nft), [claimNFT])
