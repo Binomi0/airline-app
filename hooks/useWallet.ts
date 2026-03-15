@@ -215,21 +215,26 @@ const useWallet = (): UseWallet => {
     async (_user: User) => {
       if (!_user || !_user.id) throw new Error('Missing user while initializing wallet')
 
-      // 0. Pre-emptive address setting (Read-only state)
-      if (_user.address) {
+      try {
+        // 1. Fetch wallet from API to discover state
+        const wallet = await getApi<IWallet>('/api/wallet')
+        const isCloudSynced = !!wallet?.encryptedVault
+        const smartAccountAddress = (_user.address || wallet?.smartAccountAddress) as Hex | undefined
+
+        // 2. Set discovery state (Read-only / Locked)
         setWallet((prev) => ({
           ...prev,
-          smartAccountAddress: _user.address as Hex,
+          smartAccountAddress: smartAccountAddress || prev.smartAccountAddress,
           isLoaded: true,
           isLocked: true,
+          isCloudSynced,
           twClient,
           twChain: chain
         }))
-      }
 
-      try {
-        // 1. Initial Account check (User with no wallet yet)
-        if (!_user.address) {
+        // 3. New User Flow: Initial Account check (User with no wallet yet in local or cloud)
+        const storedValue = _user.id ? localStorage.getItem(_user.id) : null
+        if (!smartAccountAddress && !storedValue && !isCloudSynced) {
           const random = Wallet.createRandom()
           const privateKey = random.privateKey
           const formattedKey = (privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`) as Hex
@@ -239,86 +244,11 @@ const useWallet = (): UseWallet => {
           await initialize(personalAccount, _user, false)
           return
         }
-
-        // 2. Local/Recovery check
-        const storedValue = _user.id ? localStorage.getItem(_user.id) : null
-        const wallet = await getApi<IWallet>('/api/wallet')
-
-        // Case A: Cloud Recovery (New Device)
-        if (!storedValue && wallet?.encryptedVault && wallet?.iv) {
-          try {
-            const { isConfirmed } = await unlockWalletSwal()
-            if (!isConfirmed) throw new Error('Cloud recovery cancelled')
-
-            // Fetch allowed credentials to isolate passkey
-            const { authenticators } = (await getApi<any>('/api/webauthn/get')) || { authenticators: [] }
-            const allowedIds = authenticators.map((a: any) => a.credentialID)
-
-            const prfSecret = await getPRFSecret(allowedIds)
-            const cryptoKey = await deriveKeyFromPRF(prfSecret)
-            const privateKey = (await decryptVault(wallet.encryptedVault, cryptoKey, wallet.iv)) as `0x${string}`
-
-            const personalAccount = privateKeyToAccount({ client: twClient, privateKey })
-            if (personalAccount.address.toLowerCase() === wallet.signerAddress.toLowerCase()) {
-              const vaultData = JSON.stringify({ ciphertext: wallet.encryptedVault, iv: wallet.iv, protected: true })
-              if (_user.id) localStorage.setItem(_user.id, Buffer.from(vaultData).toString('base64'))
-              await initialize(personalAccount, _user, true)
-              return
-            }
-          } catch (e) {
-            console.error('Cloud recovery error:', e)
-            errorSwal('Recovery failed', 'Could not restore your wallet. Ensure you are using the correct Passkey.')
-            return
-          }
-        }
-
-        // Case B: Unlock Local Vault
-        if (storedValue) {
-          const raw = Buffer.from(storedValue, 'base64').toString()
-          try {
-            const vault = JSON.parse(raw)
-            if (vault.protected) {
-              try {
-                const { isConfirmed } = await unlockWalletSwal()
-                if (!isConfirmed) throw new Error('Local unlock cancelled')
-                // Fetch allowed credentials to isolate passkey
-                const { authenticators } = (await getApi<any>('/api/webauthn/get')) || { authenticators: [] }
-                const allowedIds = authenticators.map((a: any) => a.credentialID)
-
-                const prfSecret = await getPRFSecret(allowedIds)
-                const cryptoKey = await deriveKeyFromPRF(prfSecret)
-                const privateKey = (await decryptVault(vault.ciphertext, cryptoKey, vault.iv)) as `0x${string}`
-
-                const personalAccount = privateKeyToAccount({ client: twClient, privateKey })
-                const isCloudSynced = !!wallet?.encryptedVault
-                await initialize(personalAccount, _user, isCloudSynced)
-                return
-              } catch (e) {
-                console.error('Local unlock error:', e)
-                errorSwal('Unlock failed', 'Could not decrypt your wallet. Ensure you are using the correct Passkey.')
-                return
-              }
-            }
-          } catch (e) {
-            // Migration Path: Plain base64 key
-            const key = raw.slice(0, 66)
-            const privateKey = (key.startsWith('0x') ? key : `0x${key}`) as `0x${string}`
-            const personalAccount = privateKeyToAccount({ client: twClient, privateKey })
-
-            if (await checkSigner(personalAccount.address)) {
-              await syncWallet(privateKey, _user)
-              const isCloudSynced = !!wallet?.encryptedVault
-              await initialize(personalAccount, _user, isCloudSynced)
-              return
-            }
-          }
-        }
       } catch (error) {
         console.error('initWallet error:', error)
-        // If everything fails, the pre-emptive setWallet from step 0 might still allow read-only
       }
     },
-    [checkSigner, initialize, getPRFSecret, syncWallet, setWallet]
+    [initialize, setWallet, syncWallet]
   )
 
   return { initWallet, getPRFSecret, getPrivateKey, syncWallet, unlockSigner }
