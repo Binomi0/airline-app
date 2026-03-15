@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Wallet } from 'ethers'
 import { useCallback } from 'react'
 import { consentCloudSyncSwal, consentSecureWalletSwal, unlockWalletSwal, errorSwal } from 'lib/swal'
@@ -10,52 +11,51 @@ import { privateKeyToAccount, smartWallet } from 'thirdweb/wallets'
 import { twClient, activeChain as chain } from 'config'
 import { decryptVault, deriveKeyFromPRF, encryptVault } from 'utils/crypto'
 import { Hex } from 'thirdweb'
+import { WeiflyPRFExtensionOutputs } from 'types/webauthn'
 
 const PRF_SALT = new TextEncoder().encode('weifly-vault-v1')
 
 interface UseWallet {
-  // eslint-disable-next-line no-unused-vars
   initWallet: (user: User) => Promise<void>
-  // eslint-disable-next-line no-unused-vars
   getPRFSecret: (allowedCredentialIds?: string[]) => Promise<ArrayBuffer>
-  // eslint-disable-next-line no-unused-vars
   getPrivateKey: (user: User) => Promise<string>
-  // eslint-disable-next-line no-unused-vars
   syncWallet: (privateKey: string, user: User) => Promise<void>
-  // eslint-disable-next-line no-unused-vars
   unlockSigner: (user: User) => Promise<any>
 }
 
 const useWallet = (): UseWallet => {
   const setWallet = useSetRecoilState(walletStore)
 
-  const getPRFSecret = useCallback(async (allowedCredentialIds?: string[]) => {
+  const getPRFSecret = useCallback(async (allowedCredentialIds?: string[]): Promise<ArrayBuffer> => {
     try {
-      const allowCredentials = allowedCredentialIds?.map((id) => ({
-        id: Buffer.from(id, 'base64'),
-        type: 'public-key' as const
-      }))
+      const allowCredentials: PublicKeyCredentialDescriptor[] =
+        allowedCredentialIds?.map((id) => ({
+          id: Buffer.from(id, 'base64'),
+          type: 'public-key'
+        })) || []
 
       const credential = (await navigator.credentials.get({
         publicKey: {
-          challenge: new Uint8Array(32) as unknown as BufferSource, // dummy for PRF
+          challenge: new Uint8Array(32) as unknown as BufferSource,
           timeout: 60000,
           userVerification: 'required',
-          allowCredentials: allowCredentials || [],
+          allowCredentials,
           extensions: {
-            // @ts-ignore
             prf: {
               eval: { first: PRF_SALT as unknown as BufferSource }
             }
           }
         }
-      })) as any
+      })) as PublicKeyCredential
 
-      const prfResults = credential?.getClientExtensionResults()?.prf
+      const extensionResults = credential.getClientExtensionResults()
+      const prfResults = extensionResults.prf as WeiflyPRFExtensionOutputs | undefined
+
       if (!prfResults?.results?.first) {
         throw new Error('PRF extension not supported or failed')
       }
-      return prfResults.results.first as ArrayBuffer
+
+      return prfResults.results.first
     } catch (error) {
       console.error('Passkey PRF error:', error)
       throw error
