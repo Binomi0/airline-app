@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { formatNumber } from 'utils'
 import { stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
-import { ethers } from 'ethers'
+import { toWei } from 'thirdweb'
 import useStaking from 'hooks/useStaking'
 import GradientCard from 'components/GradientCard'
 import { handleUnStakeSwal, maxWithdrawExceeded, unstakedSwal } from 'lib/swal'
@@ -23,10 +23,10 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
-      if (staking && staking[0] >= ethers.parseEther(unstakeAmount)) {
+      if (staking && staking[0] >= toWei(unstakeAmount)) {
         const { isConfirmed } = await handleUnStakeSwal(unstakeAmount)
         if (isConfirmed) {
-          await withdraw(ethers.parseEther(unstakeAmount))
+          await withdraw(toWei(unstakeAmount))
           unstakedSwal()
 
           getStakingInfo()

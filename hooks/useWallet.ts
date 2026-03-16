@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Wallet } from 'ethers'
+import { generatePrivateKey } from 'viem/accounts'
 import { useCallback } from 'react'
 import { consentCloudSyncSwal, consentSecureWalletSwal, unlockWalletSwal, errorSwal } from 'lib/swal'
 import { useSetRecoilState } from 'recoil'
@@ -236,8 +236,7 @@ const useWallet = (): UseWallet => {
         // 3. New User Flow: Initial Account check (User with no wallet yet in local or cloud)
         const storedValue = _user.id ? localStorage.getItem(_user.id) : null
         if (!smartAccountAddress && !storedValue && !isCloudSynced) {
-          const random = Wallet.createRandom()
-          const privateKey = random.privateKey
+          const privateKey = generatePrivateKey()
           const formattedKey = (privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`) as Hex
           const personalAccount = privateKeyToAccount({ client: twClient, privateKey: formattedKey })
 

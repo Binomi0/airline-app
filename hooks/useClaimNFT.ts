@@ -1,5 +1,5 @@
 import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
-import { ethers } from 'ethers'
+import { encodeAbiParameters } from 'thirdweb/utils'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
@@ -95,7 +95,7 @@ const useClaimNFT = (): UseClaimNFT => {
 
         await checkAndSetAllowance(currency, contractAddress, pricePerToken, currentSigner, currentSigner.address)
 
-        const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(['uint256'], [nftId > 0n ? nftId - 1n : 0n])
+        const encodedData = encodeAbiParameters([{ type: 'uint256' }], [nftId > 0n ? nftId - 1n : 0n])
 
         const tx = prepareContractCall({
           contract: {

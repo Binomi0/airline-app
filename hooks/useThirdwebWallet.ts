@@ -5,8 +5,7 @@ import { walletStore } from 'store/wallet.atom'
 import { userState } from 'store/user.atom'
 import { prepareContractCall, sendTransaction, waitForReceipt, readContract } from 'thirdweb'
 import useWallet from './useWallet'
-import { ethers } from 'ethers'
-
+import { toWei } from 'thirdweb'
 const useThirdwebWallet = () => {
   const { smartSigner, twClient, twChain, isLocked } = useRecoilValue(walletStore)
   const user = useRecoilValue(userState)
@@ -35,7 +34,7 @@ const useThirdwebWallet = () => {
       }
 
       try {
-        const amount = ethers.parseEther(value)
+        const amount = toWei(value)
 
         // 1. Check current allowance
         const currentAllowance = await readContract({

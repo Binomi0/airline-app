@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { ethers } from 'ethers'
+import { toWei, toEther } from 'thirdweb'
 import { formatNumber } from 'utils'
 import { coinTokenAddress, stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
@@ -26,7 +26,7 @@ const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
 
   const handleStake = useCallback(
     async (amount: string) => {
-      const parsedAmount = ethers.parseEther(amount)
+      const parsedAmount = toWei(amount)
       if (airl !== undefined && airl >= parsedAmount) {
         setLoading(true)
         const { isConfirmed } = await handleStakeSwal(amount)
@@ -55,10 +55,10 @@ const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
         <Box p={1}>
           <Typography variant='subtitle1'>Available to deposit</Typography>
           <Typography variant='subtitle2' paragraph>
-            {airl !== undefined ? formatNumber(Number(ethers.formatEther(airl || 0n))) : formatNumber()} AIRL
+            {airl !== undefined ? formatNumber(Number(toEther(airl || 0n))) : formatNumber()} AIRL
           </Typography>
           <GasForm
-            max={airl !== undefined ? ethers.formatEther(airl).toString() : '0'}
+            max={airl !== undefined ? toEther(airl).toString() : '0'}
             onClick={handleStake}
             loading={loading}
             label='Amount to Stake'
