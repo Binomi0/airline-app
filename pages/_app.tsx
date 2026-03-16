@@ -2,7 +2,7 @@ import * as React from 'react'
 import Head from 'next/head'
 import { AppProps } from 'next/app'
 import { CacheProvider, EmotionCache } from '@emotion/react'
-import { SpeedInsights } from '@vercel/speed-insights/next'
+// import { SpeedInsights } from '@vercel/speed-insights/next'
 import { RecoilRoot } from 'recoil'
 import { getCookie } from 'cookies-next'
 import AppBar from 'components/AppBar'
@@ -64,7 +64,7 @@ export default function MyApp(props: MyAppProps) {
                           <WithRouter>
                             <Component />
                           </WithRouter>
-                          <SpeedInsights />
+                          {/* <SpeedInsights /> */}
                         </LiveFlightsProvider>
                       </VaProvider>
                     </TokenProvider>

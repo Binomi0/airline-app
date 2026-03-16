@@ -18,12 +18,17 @@ interface Props {
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
   onClaim: (refetch: () => void) => void
+  hasAircraft?: boolean
+  hasLicense?: boolean
 }
 
-const AircraftItem = ({ nft, isClaiming, onClaim }: Props) => {
+const AircraftItem = ({ nft, isClaiming, onClaim, hasAircraft: hasAircraftProp, hasLicense: hasLicenseProp }: Props) => {
   const user = useRecoilValue(userState)
-  const { hasAircraft, refetch: refetchAircraft } = useAircraft()
-  const { hasLicense, refetch: refetchLicense } = useLicense()
+  const { hasAircraft: hasAircraftInternal, refetch: refetchAircraft } = useAircraft()
+  const { hasLicense: hasLicenseInternal, refetch: refetchLicense } = useLicense()
+
+  const hasAircraft = hasAircraftProp ?? hasAircraftInternal
+  const hasLicense = hasLicenseProp ?? hasLicenseInternal
 
   const refetch = useCallback(() => {
     refetchAircraft()

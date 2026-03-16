@@ -4,6 +4,8 @@ import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 import { fetcher } from 'utils'
 import useSWR from 'swr'
 import { useAppContracts } from 'hooks/useAppContracts'
+import useOwnedNfts from 'hooks/useOwnedNFTs'
+import { Hex } from 'thirdweb'
 
 interface Props {
   children: JSX.Element
@@ -14,23 +16,22 @@ export const AircraftProvider = ({ children }: Props) => {
   const setAircraftNFTs = useSetRecoilState(aircraftNftStore)
   const setOwnedAircraftsStore = useSetRecoilState(ownedAircraftNftStore)
   const { aircraftContract } = useAppContracts()
+  const { data: ownedNfts } = useOwnedNfts(aircraftContract?.address as Hex)
 
   const aircrafts = React.useMemo(() => {
     if (!nfts) return []
     return nfts.filter((nft: any) => nft.tokenAddress.toLowerCase() === (aircraftContract?.address || '').toLowerCase())
   }, [nfts, aircraftContract])
 
-  const ownedAircrafts = React.useMemo(() => {
-    return aircrafts.filter((nft: any) => nft.owner !== null)
-  }, [aircrafts])
-
   React.useEffect(() => {
     setAircraftNFTs(aircrafts)
   }, [aircrafts, setAircraftNFTs])
 
   React.useEffect(() => {
-    setOwnedAircraftsStore(ownedAircrafts)
-  }, [ownedAircrafts, setOwnedAircraftsStore])
+    if (ownedNfts) {
+      setOwnedAircraftsStore(ownedNfts)
+    }
+  }, [ownedNfts, setOwnedAircraftsStore])
 
   return children
 }

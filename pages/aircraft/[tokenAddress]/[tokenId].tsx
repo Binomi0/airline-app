@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
-import { MediaRenderer, useReadContract } from 'thirdweb/react'
-import { getNFTAttributes } from 'utils'
+import { useReadContract } from 'thirdweb/react'
 import { NextPage } from 'next'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
@@ -14,13 +13,7 @@ import Box from '@mui/material/Box'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import Stack from '@mui/material/Stack'
-import CardActions from '@mui/material/CardActions'
-import Button from '@mui/material/Button'
+import AircraftItem from 'routes/hangar/components/AircraftItem'
 
 const maps: Record<string, string> = {
   '0': '0',
@@ -95,55 +88,15 @@ const AircraftView: NextPage = () => {
           <Typography variant='h1'>Aircraft Details</Typography>
         </Box>
 
-        <Grid item xs={3}>
-          <Card>
-            <Box
-              sx={{
-                position: 'relative',
-                top: 0,
-                left: 0,
-                '&::before': {
-                  position: 'relative',
-                  content: `${balance && balance > 0n ? "'OWNED'" : "'LOCKED'"}`,
-                  width: '50px',
-                  height: '50px',
-                  top: 100,
-                  left: 50,
-                  fontSize: '36px',
-                  color: `${balance && balance > 0n ? 'green' : 'red'}`,
-                  background: 'white',
-                  padding: 1,
-                  borderRadius: 2,
-                  boxShadow: `0 0 8px 0px ${balance && balance > 0n ? 'green' : 'red'}`
-                }
-              }}
-            >
-              <MediaRenderer client={twClient!} width='100%' src={nft.metadata.image} />
-            </Box>
-            <CardHeader title={nft.metadata.name} subheader={nft.metadata.description} />
-            <CardContent>
-              <Stack direction='row' justifyContent='space-between'>
-                <Typography>Price</Typography>
-                <Typography variant='body2'>0.01</Typography>
-              </Stack>
-              {getNFTAttributes(nft).map((attribute) => (
-                <Stack direction='row' justifyContent='space-between' key={attribute.trait_type}>
-                  <Typography>{attribute.trait_type}</Typography>
-                  <Typography variant='body2'>{attribute.value}</Typography>
-                </Stack>
-              ))}
-            </CardContent>
-            <CardActions>
-              <Button
-                disabled={isLoading || (!!balance && balance > 0n)}
-                variant='contained'
-                onClick={() => claimNFT(nft as any)}
-              >
-                {licenseBalance === 0n ? 'Require licencia' : `Claim ${nft.metadata.name}`}
-              </Button>
-            </CardActions>
-          </Card>
-        </Grid>
+        <Box maxWidth={600} m='auto'>
+          <AircraftItem
+            nft={nft}
+            isClaiming={isLoading}
+            onClaim={() => claimNFT(nft as any)}
+            hasAircraft={!!balance && balance > 0n}
+            hasLicense={!!licenseBalance && licenseBalance > 0n}
+          />
+        </Box>
       </Box>
     </Container>
   )
