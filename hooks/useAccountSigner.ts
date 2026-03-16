@@ -33,14 +33,14 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       })
       if (!challenge) return { verified: false }
       const request = await startRegistration(challenge)
-      const validation = await postApi<{ verified: boolean; token?: string }>(WebAuthnUri.REGISTER, {
+      const validation = await postApi<{ success: boolean; token?: string }>(WebAuthnUri.REGISTER, {
         data: request,
         email
       })
       console.log('validation =>', validation)
-      setStatus(validation?.verified ? 'success' : 'error')
+      setStatus(validation?.success ? 'success' : 'error')
 
-      return { verified: Boolean(validation?.verified), token: validation?.token }
+      return { verified: Boolean(validation?.success), token: validation?.token }
     } catch (err) {
       console.error(err)
       setStatus('error')

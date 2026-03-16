@@ -1,38 +1,9 @@
-import { getCookie } from 'cookies-next'
+import { setCookie } from 'cookies-next'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { connectDB } from './mongoose'
 import User from 'models/User'
-
-const getUser = async (email: string) => {
-  const user = await User.findOne({ email }, { _id: 1, id: 1 })
-  if (!user) {
-    throw new Error('[cookieToken] Missing _id in user?')
-  }
-
-  if (!user?._id) {
-    throw new Error('[cookieToken] Missing _id in user?')
-  }
-
-  return user
-}
-
-const verifyToken = async (
-  headerToken: string,
-  handler: NextApiHandler,
-  req: CustomNextApiRequest,
-  res: NextApiResponse
-) => {
-  const decoded = jwt.verify(headerToken, process.env.JWT_SECRET) as JwtPayload
-  if (decoded.data.email) {
-    const user = await getUser(decoded.data.email)
-    req.user = decoded.data.email
-    req.id = user._id
-    req.userId = user.id
-
-    return handler(req, res)
-  }
-}
+import { jwtSecret } from 'config'
 
 export interface CustomNextApiRequest extends NextApiRequest {
   user?: string
@@ -40,22 +11,53 @@ export interface CustomNextApiRequest extends NextApiRequest {
   userId?: string
   headers: NextApiRequest['headers'] & { 'x-ivao-auth'?: string }
 }
+
 const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, res: NextApiResponse) => {
   try {
+    if (!jwtSecret) {
+      console.error('JWT_SECRET is not configured')
+      return res.status(500).end()
+    }
+
     await connectDB()
 
-    const cookieToken = getCookie('token', { req, res })
-    if (cookieToken) {
-      return verifyToken(cookieToken as string, handler, req, res)
-    } else {
-      const headerToken = req.headers.authorization?.split(' ')[1]
-      if (headerToken) {
-        return verifyToken(headerToken as string, handler, req, res)
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1]
+
+    if (token && typeof token === 'string') {
+      try {
+        const decoded = jwt.verify(token, jwtSecret) as JwtPayload
+        if (decoded.data?.email) {
+          // Sync isLoggedIn hint cookie if missing
+          if (!req.cookies.isLoggedIn) {
+            setCookie('isLoggedIn', 'true', {
+              req,
+              res,
+              httpOnly: false,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              maxAge: 60 * 60 * 24,
+              path: '/'
+            })
+          }
+
+          const user = await User.findOne({ email: decoded.data.email }, { _id: 1, id: 1 })
+          if (user?._id) {
+            req.user = decoded.data.email
+            req.id = user._id
+            req.userId = user.id
+            return handler(req, res)
+          } else {
+            console.warn(`[withAuth] User not found in database for email: ${decoded.data.email}`)
+          }
+        }
+      } catch (err) {
+        console.error('[withAuth] JWT Verification Failed:', (err as Error).message)
       }
     }
   } catch (err) {
-    console.error('Error', err)
+    console.error('[withAuth] Unexpected Error:', (err as Error).message)
   }
+
   res.status(401).end()
 }
 

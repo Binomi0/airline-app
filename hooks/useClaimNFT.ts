@@ -1,11 +1,25 @@
-import { coinTokenAddress, nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
-import { BaseContract, ethers } from 'ethers'
+import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
+import { ethers } from 'ethers'
 import { useCallback, useState } from 'react'
-import { NFT, SmartContract } from '@thirdweb-dev/sdk'
-import useERC20 from './useERC20'
-import { useRecoilState } from 'recoil'
+import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
-import { Hex } from 'types'
+import { userState } from 'store/user.atom'
+import { Hex, prepareContractCall, readContract, sendTransaction, waitForReceipt } from 'thirdweb'
+import axios from 'config/axios'
+import useWallet from './useWallet'
+
+// We define a simplified NFT type to maintain internal consistency
+interface NFT {
+  id: bigint | string
+  metadata: {
+    id?: string | number
+    name?: string
+    description?: string
+    image?: string
+    [key: string]: any
+  }
+  [key: string]: any
+}
 
 interface UseClaimNFT {
   // eslint-disable-next-line no-unused-vars
@@ -15,137 +29,118 @@ interface UseClaimNFT {
   isClaiming: boolean
 }
 
-const useClaimNFT = (contract?: SmartContract<BaseContract>): UseClaimNFT => {
-  const [isClaiming, setIsClaiming] = useState(false)
-  const [wallet] = useRecoilState(walletStore)
-  const { setAllowance, getAllowance } = useERC20(coinTokenAddress)
+const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
-  const claimAircraftNFT = useCallback(
-    async (aircraftNFT: NFT) => {
-      if (!wallet.paymasterSigner || !wallet.paymasterSigner.account || !contract || !wallet.smartAccountAddress) {
-        throw new Error('Missing params')
+const useClaimNFT = (): UseClaimNFT => {
+  const [isClaiming, setIsClaiming] = useState(false)
+  const { smartSigner, twClient, twChain, smartAccountAddress, isLocked } = useRecoilValue(walletStore)
+  const user = useRecoilValue(userState)
+  const { unlockSigner } = useWallet()
+
+  const checkAndSetAllowance = useCallback(
+    async (tokenAddress: string, spender: string, amount: bigint, account: any, ownerAddress: string) => {
+      if (tokenAddress.toLowerCase() === NATIVE_TOKEN) return
+
+      const { data: allowance } = await axios.post('/api/contracts/read', {
+        address: tokenAddress,
+        method: 'function allowance(address owner, address spender) view returns (uint256)',
+        params: [ownerAddress, spender]
+      })
+
+      if (BigInt(allowance) < amount) {
+        const tx = prepareContractCall({
+          contract: { client: twClient!, chain: twChain!, address: tokenAddress as Hex },
+          method: 'function approve(address spender, uint256 amount)',
+          params: [spender, ethers.constants.MaxUint256.toBigInt()]
+        })
+        const result = await sendTransaction({ transaction: tx, account })
+        await waitForReceipt(result)
+      }
+    },
+    [twClient, twChain]
+  )
+
+  const claimNFT = useCallback(
+    async (contractAddress: string, nft: NFT) => {
+      let currentSigner = smartSigner
+
+      if (isLocked && user) {
+        try {
+          currentSigner = await unlockSigner(user)
+        } catch (e) {
+          console.error('Failed to unlock signer:', e)
+          throw new Error('Wallet must be unlocked to perform transactions')
+        }
+      }
+
+      if (!currentSigner || !twClient || !twChain || !smartAccountAddress) {
+        throw new Error('Missing wallet params')
       }
       setIsClaiming(true)
 
       try {
-        const canClaim = await contract.erc1155.claimConditions.canClaim(
-          aircraftNFT.metadata.id,
-          1,
-          wallet.smartAccountAddress
-        )
-        if (!canClaim) {
-          setIsClaiming(false)
-          throw new Error('user cannot claim this Aircraft')
-        }
+        const nftId = BigInt(nft.id)
 
-        const allowance = await getAllowance(nftAircraftTokenAddress)
-        if (allowance.isZero()) {
-          await setAllowance(nftAircraftTokenAddress)
-        }
-
-        const activePhase = await contract.erc1155.claimConditions.getActive(aircraftNFT.metadata.id, {
-          withAllowList: true
+        // Fetch claim condition dynamically
+        const condition = await readContract({
+          contract: { client: twClient, chain: twChain, address: contractAddress as Hex },
+          method:
+            'function claimCondition(uint256) view returns (uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata)',
+          params: [nftId]
         })
-        const erc1155Contract = new ethers.Contract(nftAircraftTokenAddress, contract.abi)
-        const nftId = Number(aircraftNFT.metadata.id)
-        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0 ? nftId - 1 : 0])
-        const encodedCallData = erc1155Contract.interface.encodeFunctionData('claim', [
-          wallet.smartAccountAddress,
-          aircraftNFT.metadata.id,
-          1,
-          activePhase.currencyAddress,
-          activePhase.price,
-          {
-            proof: ['0x0000000000000000000000000000000000000000000000000000000000000000'],
-            quantityLimitPerWallet: activePhase.maxClaimablePerWallet,
-            pricePerToken: activePhase.price,
-            currency: activePhase.currencyAddress
+
+        const [, , , , , , currency] = condition
+        const pricePerToken = condition[5]
+        const quantityLimitPerWallet = condition[3]
+
+        await checkAndSetAllowance(currency, contractAddress, pricePerToken, currentSigner, currentSigner.address)
+
+        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0n ? nftId - 1n : 0n])
+
+        const tx = prepareContractCall({
+          contract: {
+            client: twClient,
+            chain: twChain,
+            address: contractAddress as Hex
           },
-          ethers.utils.hexlify(encodedData)
-        ])
-
-        const uo = await wallet.paymasterSigner.sendUserOperation({
-          account: wallet.paymasterSigner.account,
-          uo: {
-            target: nftAircraftTokenAddress,
-            data: encodedCallData as Hex
-          }
+          method:
+            'function claim(address receiver, uint256 tokenId, uint256 quantity, address currency, uint256 pricePerToken, (bytes32[] proof, uint256 quantityLimitPerWallet, uint256 pricePerToken, address currency) allowlistProof, bytes data)',
+          params: [
+            currentSigner.address,
+            nftId,
+            1n,
+            currency,
+            pricePerToken,
+            {
+              proof: ['0x0000000000000000000000000000000000000000000000000000000000000000' as Hex],
+              quantityLimitPerWallet,
+              pricePerToken,
+              currency
+            },
+            encodedData as Hex
+          ],
+          value: currency.toLowerCase() === NATIVE_TOKEN ? pricePerToken : 0n
         })
 
-        const txHash = await wallet.paymasterSigner.waitForUserOperationTransaction(uo)
+        const result = await sendTransaction({
+          transaction: tx,
+          account: currentSigner
+        })
 
+        const receipt = await waitForReceipt(result)
         setIsClaiming(false)
-        return txHash
+        return receipt.transactionHash
       } catch (err) {
-        console.error('While claiming aircraft:', err)
+        console.error(`While claiming NFT at ${contractAddress}:`, err)
         setIsClaiming(false)
-        throw new Error((err as Error).message)
+        throw err
       }
     },
-    [contract, getAllowance, setAllowance, wallet.smartAccountAddress, wallet.paymasterSigner]
+    [smartAccountAddress, smartSigner, twChain, twClient, checkAndSetAllowance, isLocked, unlockSigner, user]
   )
 
-  const claimLicenseNFT = useCallback(
-    async (nft: NFT) => {
-      try {
-        if (!wallet.paymasterSigner || !wallet.paymasterSigner.account || !contract || !wallet.smartAccountAddress)
-          return
-        setIsClaiming(true)
-
-        const canClaim = await contract.erc1155.claimConditions.canClaim(nft.metadata.id, 1, wallet.smartAccountAddress)
-        if (!canClaim) {
-          setIsClaiming(false)
-          return
-        }
-
-        const allowance = await getAllowance(nftLicenseTokenAddress)
-        if (allowance.isZero()) {
-          await setAllowance(nftLicenseTokenAddress)
-        }
-
-        const activePhase = await contract.erc1155.claimConditions.getActive(nft.metadata.id, { withAllowList: true })
-        const erc1155Contract = new ethers.Contract(nftLicenseTokenAddress, contract.abi)
-        const nftId = Number(nft.metadata.id)
-        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0 ? nftId - 1 : 0])
-        const encodedCallData = erc1155Contract.interface.encodeFunctionData('claim', [
-          wallet.smartAccountAddress,
-          nft.metadata.id,
-          1,
-          coinTokenAddress,
-          activePhase.price,
-          {
-            proof: ['0x0000000000000000000000000000000000000000000000000000000000000000'],
-            quantityLimitPerWallet: activePhase.maxClaimablePerWallet,
-            pricePerToken: activePhase.price,
-            currency: activePhase.currencyAddress
-          },
-          ethers.utils.hexlify(encodedData)
-        ])
-
-        const uo = await wallet.paymasterSigner.sendUserOperation({
-          account: wallet.paymasterSigner.account,
-          uo: {
-            target: nftLicenseTokenAddress,
-            data: encodedCallData
-          }
-        })
-
-        const txHash = await wallet.paymasterSigner.waitForUserOperationTransaction(uo, {
-          intervalMs: 5000,
-          multiplier: 1,
-          maxRetries: 10
-        })
-
-        setIsClaiming(false)
-        return txHash
-      } catch (err) {
-        console.error('While claiming license:', err)
-        setIsClaiming(false)
-        throw new Error('While claiming NFT')
-      }
-    },
-    [contract, getAllowance, setAllowance, wallet.smartAccountAddress, wallet.paymasterSigner]
-  )
+  const claimAircraftNFT = useCallback((nft: NFT) => claimNFT(nftAircraftTokenAddress, nft), [claimNFT])
+  const claimLicenseNFT = useCallback((nft: NFT) => claimNFT(nftLicenseTokenAddress, nft), [claimNFT])
 
   return { claimLicenseNFT, claimAircraftNFT, isClaiming }
 }

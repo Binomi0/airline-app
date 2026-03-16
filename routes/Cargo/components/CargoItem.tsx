@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { FRoute } from 'types'
 import styles from 'styles/Home.module.css'
 import Grow from '@mui/material/Grow'
-import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Typography from '@mui/material/Typography'
@@ -18,7 +18,8 @@ const CargoItem: React.FC<{
   origin: string
   // eslint-disable-next-line no-unused-vars
   onSelect: (origin: string, destination: string) => void
-}> = ({ flights, delay, origin, onSelect }) => {
+  style?: React.CSSProperties
+}> = ({ flights, delay, origin, onSelect, style }) => {
   const handleChange = useCallback(
     (event: SelectChangeEvent) => {
       onSelect(origin, event.target.value as string)
@@ -27,40 +28,42 @@ const CargoItem: React.FC<{
   )
 
   return (
-    <Grow in timeout={{ enter: delay }}>
-      <Grid item xs={12} md={6} lg={4} xl={3} p={2}>
-        <Card className={styles.card}>
-          <CardHeader
-            title={
-              <Typography variant='h2' color='white'>
-                {origin}
-              </Typography>
-            }
-          />
-          <CardContent>
-            <FormControl fullWidth>
-              <InputLabel id='flight-destination-select'>Destination</InputLabel>
-              <Select
-                defaultValue=''
-                labelId='flight-destination-select'
-                id='destination-select'
-                label='Destination'
-                onChange={handleChange}
-              >
-                <MenuItem disabled value=''>
-                  Select destination
-                </MenuItem>
-                {flights.map(({ destination }) => (
-                  <MenuItem value={destination} key={destination}>
-                    {destination}
+    <div style={style}>
+      <Grow in timeout={{ enter: delay }}>
+        <Box p={2}>
+          <Card className={styles.card}>
+            <CardHeader
+              title={
+                <Typography variant='h2' color='white'>
+                  {origin}
+                </Typography>
+              }
+            />
+            <CardContent>
+              <FormControl fullWidth>
+                <InputLabel id='flight-destination-select'>Destination</InputLabel>
+                <Select
+                  defaultValue=''
+                  labelId='flight-destination-select'
+                  id='destination-select'
+                  label='Destination'
+                  onChange={handleChange}
+                >
+                  <MenuItem disabled value=''>
+                    Select destination
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grow>
+                  {flights.map(({ destination }) => (
+                    <MenuItem value={destination} key={destination}>
+                      {destination}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </CardContent>
+          </Card>
+        </Box>
+      </Grow>
+    </div>
   )
 }
 

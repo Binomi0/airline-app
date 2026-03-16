@@ -1,29 +1,44 @@
 import React from 'react'
-import { useContract, useNFTs, useOwnedNFTs } from '@thirdweb-dev/react'
-import { nftAircraftTokenAddress } from 'contracts/address'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { userState } from 'store/user.atom'
+import { useSetRecoilState } from 'recoil'
 import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
+import { fetcher } from 'utils'
+import useSWR from 'swr'
+import { useAppContracts } from 'hooks/useAppContracts'
+import useOwnedNfts from 'hooks/useOwnedNFTs'
+import { Hex } from 'thirdweb'
 
 interface Props {
   children: JSX.Element
 }
 
 export const AircraftProvider = ({ children }: Props) => {
-  const user = useRecoilValue(userState)
-  const { contract } = useContract(nftAircraftTokenAddress)
-  const { data: aircrafts } = useNFTs(contract)
-  const { data: ownedAircrafts } = useOwnedNFTs(contract, user?.address)
+  const { data: nfts } = useSWR<any[]>('/api/nft', fetcher)
   const setAircraftNFTs = useSetRecoilState(aircraftNftStore)
-  const setOwnedAircrafts = useSetRecoilState(ownedAircraftNftStore)
+  const setOwnedAircraftsStore = useSetRecoilState(ownedAircraftNftStore)
+  const { aircraftContract } = useAppContracts()
+  const { data: ownedNfts } = useOwnedNfts(aircraftContract?.address as Hex)
+
+  const aircrafts = React.useMemo(() => {
+    if (!nfts) return []
+    const filtered = nfts.filter(
+      (nft: any) => nft.tokenAddress.toLowerCase() === (aircraftContract?.address || '').toLowerCase()
+    )
+
+    // Deduplicate by ID to avoid React key warnings (caused by inconsistent address casing in DB)
+    const unique = new Map()
+    filtered.forEach((nft) => unique.set(nft.id.toString(), nft))
+    return Array.from(unique.values())
+  }, [nfts, aircraftContract])
 
   React.useEffect(() => {
     setAircraftNFTs(aircrafts)
   }, [aircrafts, setAircraftNFTs])
 
   React.useEffect(() => {
-    setOwnedAircrafts(ownedAircrafts)
-  }, [ownedAircrafts, setOwnedAircrafts])
+    if (ownedNfts) {
+      setOwnedAircraftsStore(ownedNfts)
+    }
+  }, [ownedNfts, setOwnedAircraftsStore])
 
   return children
 }

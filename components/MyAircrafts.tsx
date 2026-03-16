@@ -5,7 +5,8 @@ import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
-import { MediaRenderer } from '@thirdweb-dev/react'
+import { MediaRenderer } from 'thirdweb/react'
+import { walletStore } from 'store/wallet.atom'
 import React from 'react'
 import { getNFTAttributes } from 'utils'
 import { useRecoilValue } from 'recoil'
@@ -13,15 +14,16 @@ import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 const MyAircrafts = () => {
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
+  const { twClient } = useRecoilValue(walletStore)
 
   return ownedAircrafts && ownedAircrafts.length > 0 ? (
     <Box my={4}>
       <Typography variant='h2'>My Aircrafts</Typography>
       <Grid container spacing={2}>
         {ownedAircrafts?.map((nft) => (
-          <Grid item xs={12} lg={4} key={nft.metadata.id}>
+          <Grid item xs={12} lg={4} key={nft.id.toString()}>
             <Card>
-              <MediaRenderer height='100%' width='100%' src={nft.metadata.image} />
+              <MediaRenderer client={twClient!} height='100%' width='100%' src={nft.metadata.image} />
               <CardHeader title={nft.metadata.name} subheader={nft.metadata.description} />
               <CardContent>
                 {getNFTAttributes(nft).length > 0 && (

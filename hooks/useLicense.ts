@@ -1,16 +1,29 @@
-import { useContract, useNFTBalance } from '@thirdweb-dev/react'
-import { nftLicenseTokenAddress } from 'contracts/address'
+import { useCallback } from 'react'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
+import { ownedLicenseNftStore } from 'store/licenseNFT.atom'
+import { useSWRConfig } from 'swr'
+import { fetcher } from 'utils'
 
-const useLicense = (id?: string) => {
-  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
-  const { contract } = useContract(nftLicenseTokenAddress)
-  const { data, refetch } = useNFTBalance(contract, smartAccountAddress, id)
+const useLicense = () => {
+  const data = useRecoilValue(ownedLicenseNftStore)
+  const { mutate } = useSWRConfig()
 
-  const hasLicense = smartAccountAddress && data ? !data.isZero() : false
+  const hasLicense = !!data && data.length > 0
 
-  return { hasLicense, refetch }
+  const isLicenseOwned = useCallback(
+    (id: string | bigint) => {
+      return !!data && data.some((n) => BigInt(n.id) === BigInt(id))
+    },
+    [data]
+  )
+
+  const refetch = async () => {
+    await fetcher('/api/nft/owned?refresh=true')
+    mutate('/api/nft')
+    mutate('/api/nft/owned')
+  }
+
+  return { data, hasLicense, isLicenseOwned, refetch }
 }
 
 export default useLicense

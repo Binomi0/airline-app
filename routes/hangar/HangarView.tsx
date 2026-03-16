@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { NFT, useContract } from '@thirdweb-dev/react'
+import { type NFT } from 'thirdweb'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
@@ -17,8 +17,7 @@ const HangarView: React.FC = () => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { getAirlBalance } = useTokenProviderContext()
   const aircrafts = useRecoilValue(aircraftNftStore)
-  const { contract: aircraftContract } = useContract(nftAircraftTokenAddress)
-  const { claimAircraftNFT, isClaiming } = useClaimNFT(aircraftContract)
+  const { claimAircraftNFT, isClaiming } = useClaimNFT()
 
   const handleClaim = useCallback(
     (aircraftNFT: NFT) => async (refetch: () => void) => {
@@ -64,7 +63,7 @@ const HangarView: React.FC = () => {
           {aircrafts.map((aircraft) => (
             <AircraftItem
               nft={aircraft}
-              key={aircraft.metadata.id}
+              key={aircraft.id.toString()}
               onClaim={handleClaim(aircraft)}
               isClaiming={isClaiming}
             />

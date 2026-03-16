@@ -6,7 +6,7 @@ import image from 'public/img/airplanes9.png'
 import { useVaProviderContext } from 'context/VaProvider'
 import { FRoute, Flight } from 'types'
 import useCargo from 'hooks/useCargo'
-import { NFT } from '@thirdweb-dev/react'
+import { NFT } from 'thirdweb'
 import NoAddress from 'routes/Cargo/components/NoAddress'
 import CargoReady from 'routes/Cargo/components/CargoReady'
 import CargoList from 'routes/Cargo/components/CargoList'
@@ -42,7 +42,7 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
       if (
         origin === cargo?.origin &&
         destination === cargo?.destination &&
-        aircraft.metadata.id === cargo?.aircraftId
+        aircraft.id.toString() === cargo?.aircraftId
       ) {
         return
       }

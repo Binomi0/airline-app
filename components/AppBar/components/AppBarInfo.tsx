@@ -8,18 +8,17 @@ import { User } from 'types'
 
 interface Props {
   user?: User
-  matches: boolean
   // eslint-disable-next-line no-unused-vars
   toggleSidebar: (side: 'left' | 'right') => void
 }
 
-const AppBarInfo = ({ user, matches, toggleSidebar }: Props) => {
+const AppBarInfo = ({ user, toggleSidebar }: Props) => {
   return (
     !user && (
       <div>
         <LicenseBar />
-        <GasBalanceBar show={matches} />
-        <AirBalanceBar show={matches} />
+        <GasBalanceBar />
+        <AirBalanceBar />
         <IconButton
           onClick={() => toggleSidebar('right')}
           size='large'

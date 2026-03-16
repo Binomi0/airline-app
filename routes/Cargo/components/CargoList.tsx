@@ -1,24 +1,30 @@
-import { NFT } from '@thirdweb-dev/react'
+import { type NFT } from 'thirdweb'
 import CargoItem from './CargoItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
 import { FRoute } from 'types'
 import { getCallsign } from 'utils'
-import { FixedSizeList, ListChildComponentProps } from 'react-window'
+import { List, RowComponentProps } from 'react-window'
 import Fade from '@mui/material/Fade'
 import Box from '@mui/material/Box'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 
-const renderRow = (
-  flightList: [string, FRoute[]][],
-  origin: string,
+interface RowProps {
+  flightList: [string, FRoute[]][]
   handleSelect: (origin: string, destination: string) => Promise<void>
-) =>
-  function renderCustomRow(props: ListChildComponentProps) {
-    const { index } = props
+}
 
-    return <CargoItem onSelect={handleSelect} origin={origin} flights={flightList[index][1]} delay={10 * (index + 1)} />
-  }
+const Row = ({ index, style, flightList, handleSelect }: RowComponentProps<RowProps>) => {
+  return (
+    <CargoItem
+      onSelect={handleSelect}
+      origin={flightList[index][0]}
+      flights={flightList[index][1]}
+      delay={10 * (index + 1)}
+      style={style}
+    />
+  )
+}
 
 const CargoList: React.FC<{
   // eslint-disable-next-line no-unused-vars
@@ -42,10 +48,15 @@ const CargoList: React.FC<{
 
   return (
     <Fade in={flights.length > 0 && !!address} unmountOnExit>
-      <Box sx={{ width: '100%', height: 400, maxWidth: 360, bgcolor: 'background.paper' }}>
-        <FixedSizeList height={968} width='100vw' itemSize={46} itemCount={flights.length} overscanCount={5}>
-          {renderRow(flights, origin, handleSelect)}
-        </FixedSizeList>
+      <Box sx={{ width: '100%', height: '70vh', bgcolor: 'background.paper' }}>
+        <List
+          rowHeight={180}
+          rowCount={flights.length}
+          rowComponent={Row}
+          rowProps={{ flightList: flights, handleSelect }}
+          overscanCount={5}
+          style={{ height: 600, width: '100%' }}
+        />
       </Box>
       {/* <Grid container spacing={2}>
         {flights.slice(0, 12).map(([key, value], index) => (

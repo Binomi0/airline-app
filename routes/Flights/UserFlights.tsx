@@ -1,11 +1,7 @@
-import React from 'react';
+import React from 'react'
 
 const UserFlights = () => {
-  return (
-    <div>
-      UserFlights
-    </div>
-  );
-};
+  return <div>UserFlights</div>
+}
 
-export default UserFlights;
+export default UserFlights

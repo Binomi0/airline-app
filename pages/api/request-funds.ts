@@ -1,63 +1,96 @@
 import { NextApiResponse } from 'next'
 import { coinTokenAddress } from 'contracts/address'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
-import sdk from 'lib/twSdk'
 import Wallet from 'models/Wallet'
+import { getContract, readContract, sendAndConfirmTransaction } from 'thirdweb'
+import { privateKeyToAccount } from 'thirdweb/wallets'
+import { transfer } from 'thirdweb/extensions/erc20'
+import { twClient, activeChain as chain } from 'config'
+import { z } from 'zod'
 
-interface ApiRequest extends CustomNextApiRequest {
-  body: {
-    smartAccountAddress: string
-    id: string
-    signerAddress: string
-  }
-}
+const RequestFundsSchema = z.object({
+  smartAccountAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid Ethereum address'),
+  id: z.string().min(1, 'ID is required'),
+  signerAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid signer address')
+})
 
-const handler = async (req: ApiRequest, res: NextApiResponse) => {
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
-    res.status(405).end()
-    return
-  }
-  if (!req.body.smartAccountAddress || !req.body.id || !req.body.signerAddress) {
-    res.status(400).end()
-    return
-  }
-  if (!process.env.THIRDWEB_AUTH_PRIVATE_KEY) {
-    res.status(403).end()
-    return
+    return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { smartAccountAddress } = req.body
+  const validation = RequestFundsSchema.safeParse(req.body)
+  if (!validation.success) {
+    return res.status(400).json({ error: 'Invalid request body', details: validation.error.format() })
+  }
+
+  const privateKey = process.env.THIRDWEB_AUTH_PRIVATE_KEY
+  if (!privateKey) {
+    console.error('THIRDWEB_AUTH_PRIVATE_KEY is missing')
+    return res.status(500).json({ error: 'Server configuration error' })
+  }
+
+  const { smartAccountAddress, id, signerAddress } = validation.data
+
   try {
     const requested = await Wallet.findOne({ smartAccountAddress })
     if (requested) {
-      res.status(202).end()
-      return
+      return res.status(202).json({ message: 'Funds already requested' })
     }
 
-    // amount to fill to each connected smartAccountAddress
+    const serverAccount = privateKeyToAccount({
+      client: twClient,
+      privateKey
+    })
+
     const amount = '2'
-    const balance = await sdk.wallet.balance(coinTokenAddress)
-    console.log('current main account balance =>', balance)
-    if (balance.value.lte(amount)) {
-      throw new Error('Missing funds in main account')
+
+    const balanceWei = await readContract({
+      contract: {
+        client: twClient,
+        chain,
+        address: coinTokenAddress
+      },
+      method: 'function balanceOf(address) view returns (uint256)',
+      params: [serverAccount.address]
+    })
+
+    const balanceValue = Number(balanceWei) / 1e18
+    if (balanceValue <= Number(amount)) {
+      console.error('Main account missing funds')
+      return res.status(500).json({ error: 'Internal processing error' })
     }
 
-    // Send founds to new user
-    sdk.wallet.transfer(smartAccountAddress, amount, coinTokenAddress)
+    const transaction = transfer({
+      contract: getContract({
+        client: twClient,
+        chain,
+        address: coinTokenAddress
+      }),
+      to: smartAccountAddress,
+      amount: amount
+    })
+
+    const receipt = await sendAndConfirmTransaction({
+      transaction,
+      account: serverAccount
+    })
+
+    console.log('Starter funds transfer successful:', receipt.transactionHash)
+
     await Wallet.create({
-      id: req.body.id,
+      id,
       email: req.user,
-      smartAccountAddress: req.body.smartAccountAddress,
-      signerAddress: req.body.signerAddress,
+      smartAccountAddress,
+      signerAddress,
       amount,
-      // set {starterGift: true} if initial transfer was succesful
       starterGift: true
     })
 
-    res.status(201).end()
+    res.status(201).json({ success: true, transactionHash: receipt.transactionHash })
   } catch (error) {
-    console.error('error =>', error)
-    res.status(500).json(error)
+    console.error('RequestFunds Error:', error)
+    res.status(500).json({ error: 'An error occurred while processing your request' })
   }
 }
 

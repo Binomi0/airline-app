@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect } from 'react'
-import { useContract, useContractRead } from '@thirdweb-dev/react'
+import { getContract } from 'thirdweb'
+import { useReadContract } from 'thirdweb/react'
 import { stakingAddress } from 'contracts/address'
 import { formatNumber } from 'utils'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
+import { smartAccountAddressStore, walletStore } from 'store/wallet.atom'
 import useStaking from 'hooks/useStaking'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
@@ -21,17 +22,32 @@ interface Props {
 
 const GasFarmed = ({ getAirgBalance }: Props) => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
-  const { contract } = useContract(stakingAddress)
-  const { data: stakeInfo, refetch: getStakeInfo } = useContractRead(contract, 'getStakeInfo', [smartAccountAddress])
-  const { claimRewards, isLoading: isClaiming } = useStaking(contract)
+  const { twClient, twChain } = useRecoilValue(walletStore)
 
-  const canClaimMin = stakeInfo?._rewards.gte(MIN_REWARDS_CLAIM)
+  const contract =
+    twClient && twChain
+      ? getContract({
+          client: twClient,
+          chain: twChain,
+          address: stakingAddress
+        })
+      : undefined
+
+  const { data: stakeInfo, refetch: getStakeInfo } = useReadContract({
+    contract: contract as any,
+    method: 'function getStakeInfo(address _staker) view returns (uint256 _tokensStaked, uint256 _rewards)',
+    params: [smartAccountAddress!]
+  })
+
+  const { claimRewards, isLoading: isClaiming } = useStaking()
+
+  const canClaimMin = stakeInfo && stakeInfo[1] >= BigInt(MIN_REWARDS_CLAIM)
 
   const handleClaimRewards = useCallback(async () => {
     if (canClaimMin) {
-      const { isConfirmed } = await stakingClaimRewardsSwal(Number(stakeInfo?._rewards) || 0)
+      const { isConfirmed } = await stakingClaimRewardsSwal(Number(stakeInfo?.[1] || 0))
       if (isConfirmed) {
-        await claimRewards(Number(stakeInfo?._rewards || 0).toString())
+        await claimRewards(Number(stakeInfo?.[1] || 0).toString())
         stakingRewardsClaimedSwal()
         getStakeInfo()
         getAirgBalance()
@@ -39,7 +55,7 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
     } else {
       stakingInsufficientRewardsSwal()
     }
-  }, [canClaimMin, stakeInfo?._rewards, claimRewards, getStakeInfo, getAirgBalance])
+  }, [canClaimMin, stakeInfo, claimRewards, getStakeInfo, getAirgBalance])
 
   useEffect(() => {
     const timer = setInterval(getStakeInfo, 30000)
@@ -56,7 +72,7 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
           </Typography>
 
           <Typography variant='h3' paragraph>
-            {formatNumber(Number(stakeInfo?._rewards || 0) / 1e18)} Liters
+            {formatNumber(Number(stakeInfo?.[1] || 0) / 1e18)} Liters
           </Typography>
 
           <Stack>

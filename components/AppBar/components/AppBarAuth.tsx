@@ -1,66 +1,50 @@
 import React from 'react'
 import { User } from 'types'
 import { UserActionStatus } from '..'
-import AirBalanceBar from './AirBalanceBar'
-import GasBalanceBar from './GasBalanceBar'
-import LicenseBar from './LicenseBar'
 import SignIn from './SignIn'
 import SignUp from './SignUp'
 import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
+import WithAuth from './Auth/WithAuth'
 
 interface Props {
   user?: User
   userActionStarted: UserActionStatus
   setUserActionStarted: React.Dispatch<React.SetStateAction<UserActionStatus>>
-  matches: boolean
   // eslint-disable-next-line no-unused-vars
   toggleSidebar: (side: 'left' | 'right') => void
 }
 
-const AppBarAuth = ({ user, matches, userActionStarted, setUserActionStarted, toggleSidebar }: Props) => {
+const AppBarAuth = ({ user, userActionStarted, setUserActionStarted, toggleSidebar }: Props) => {
+  if (user) {
+    return <WithAuth toggleSidebar={() => toggleSidebar('right')} />
+  }
   return (
     <Stack direction='row' alignItems='center' height={50} spacing={1}>
-      {!user && (
+      {!userActionStarted && (
         <>
-          {!userActionStarted && (
-            <>
-              <Button
-                variant='contained'
-                color='secondary'
-                onClick={() => {
-                  setUserActionStarted('signIn')
-                }}
-              >
-                Connect
-              </Button>
-              <Button
-                variant='contained'
-                onClick={() => {
-                  setUserActionStarted('signUp')
-                }}
-              >
-                Create Account
-              </Button>
-            </>
-          )}
-          {userActionStarted === 'signIn' && <SignIn onInteraction={setUserActionStarted} />}
-          {['signUp', 'code'].some((status) => status === userActionStarted) && (
-            <SignUp onInteraction={setUserActionStarted} />
-          )}
+          <Button
+            variant='contained'
+            color='secondary'
+            onClick={() => {
+              setUserActionStarted('signIn')
+            }}
+          >
+            Connect
+          </Button>
+          <Button
+            variant='contained'
+            onClick={() => {
+              setUserActionStarted('signUp')
+            }}
+          >
+            Create Account
+          </Button>
         </>
       )}
-      {user && (
-        <>
-          <LicenseBar />
-          <GasBalanceBar show={matches} />
-          <AirBalanceBar show={matches} />
-          <IconButton onClick={() => toggleSidebar('right')} edge='start' color='inherit' aria-label='menu'>
-            <MoreVertIcon />
-          </IconButton>
-        </>
+      {userActionStarted === 'signIn' && <SignIn onInteraction={setUserActionStarted} />}
+      {['signUp', 'code'].some((status) => status === userActionStarted) && (
+        <SignUp onInteraction={setUserActionStarted} />
       )}
     </Stack>
   )

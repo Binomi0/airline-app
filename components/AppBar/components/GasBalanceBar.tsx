@@ -6,13 +6,11 @@ import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { formatNumber } from 'utils'
+import { useMediaQuery } from '@mui/material'
 
-interface Props {
-  show: boolean
-}
-
-const GasBalanceBar = ({ show }: Props) => {
+const GasBalanceBar = () => {
   const balance = useRecoilValue(tokenBalanceStore)
+  const show = useMediaQuery('(min-width:768px)')
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
 
   return show && smartAccountAddress ? (

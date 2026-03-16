@@ -5,6 +5,8 @@ export interface IWallet extends Document {
   id: string
   signerAddress: string
   smartAccountAddress: string
+  encryptedVault?: string
+  iv?: string
 }
 
 const walletSchema: mongoose.Schema = new mongoose.Schema<IWallet>(
@@ -29,6 +31,14 @@ const walletSchema: mongoose.Schema = new mongoose.Schema<IWallet>(
       type: String,
       required: true,
       index: true
+    },
+    encryptedVault: {
+      type: String,
+      required: false
+    },
+    iv: {
+      type: String,
+      required: false
     }
   },
   {

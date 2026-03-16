@@ -6,24 +6,32 @@ import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import Disconnected from 'components/Disconnected'
 import { useTokenProviderContext } from 'context/TokenProvider'
-import { useContract, useContractRead } from '@thirdweb-dev/react'
-import { stakingAddress } from 'contracts/address'
+import { useReadContract } from 'thirdweb/react'
+import { useAppContracts } from 'hooks/useAppContracts'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
+import type { PageProps } from 'types'
+import LinearProgress from '@mui/material/LinearProgress'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { tokenBalanceStore } from 'store/balance.atom'
 
-const Gas = () => {
+const Gas = ({ loading }: PageProps) => {
   const user = useRecoilValue(userState)
   const address = useRecoilValue(smartAccountAddressStore)
   const balance = useRecoilValue(tokenBalanceStore)
   const { getAirlBalance, getAirgBalance } = useTokenProviderContext()
-  const { contract } = useContract(stakingAddress)
-  const { data: staking, refetch: getStakingInfo } = useContractRead(contract, 'stakers', [address])
+  const { stakingContract: contract } = useAppContracts()
+
+  const { data: staking, refetch: getStakingInfo } = useReadContract({
+    contract: contract!,
+    method:
+      'function stakers(address) view returns (uint256 amountStaked, uint256 timeOfLastUpdate, uint256 unclaimedRewards, uint256 conditionIdOflastUpdate)',
+    params: [address!]
+  })
 
   if (!user) {
     return <Disconnected />
@@ -32,6 +40,7 @@ const Gas = () => {
   return (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} src={image} alt='banner' fill />
+      {loading && <LinearProgress />}
 
       <Container>
         <Stack direction='row-reverse'>

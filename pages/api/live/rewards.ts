@@ -1,11 +1,14 @@
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
-import sdk from 'lib/twSdk'
 import { coinTokenAddress } from 'contracts/address'
 import User from 'models/User'
 import Cargo, { ICargo } from 'models/Cargo'
 import { CargoStatus, CargoStep, LastTrackStateEnum } from 'types'
 import Live from 'models/Live'
+import { getContract, sendAndConfirmTransaction } from 'thirdweb'
+import { privateKeyToAccount } from 'thirdweb/wallets'
+import { transfer } from 'thirdweb/extensions/erc20'
+import { twClient, activeChain as chain } from 'config'
 
 const validateFullFlight = (steps: CargoStep[]): number => {
   let counter = 0
@@ -65,7 +68,34 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       if (cargo.status !== CargoStatus.ABORTED && !cargo.isRewarded) {
         const remote = cargo.remote ? 3 : 1
         const prize = (cargo.prize / remote) * (1 + score / 100)
-        await sdk.wallet.transfer(user.address, cargo.prize, coinTokenAddress)
+
+        // Refactored transfer logic for Thirdweb v5
+        if (process.env.THIRDWEB_AUTH_PRIVATE_KEY) {
+          const serverAccount = privateKeyToAccount({
+            client: twClient,
+            privateKey: process.env.THIRDWEB_AUTH_PRIVATE_KEY
+          })
+
+          const transaction = transfer({
+            contract: getContract({
+              client: twClient,
+              chain,
+              address: coinTokenAddress
+            }),
+            to: user.address,
+            amount: cargo.prize.toString()
+          })
+
+          const receipt = await sendAndConfirmTransaction({
+            transaction,
+            account: serverAccount
+          })
+
+          console.log('Reward transfer successful:', receipt.transactionHash)
+        } else {
+          console.error('Missing THIRDWEB_AUTH_PRIVATE_KEY for rewards')
+          throw new Error('Server wallet not configured')
+        }
 
         await Promise.all([
           Cargo.findByIdAndUpdate<ICargo>(cargo._id, {

@@ -1,13 +1,18 @@
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
-import { useContract, useContractRead } from '@thirdweb-dev/react'
-import { stakingAddress } from 'contracts/address'
+import { useReadContract } from 'thirdweb/react'
 import { memo } from 'react'
 import { formatNumber } from 'utils'
+import { useAppContracts } from 'hooks/useAppContracts'
 
 const GasSupply = () => {
-  const { contract } = useContract(stakingAddress)
-  const { data, isLoading } = useContractRead(contract, 'getRewardTokenBalance')
+  const { stakingContract } = useAppContracts()
+
+  const { data, isLoading } = useReadContract({
+    contract: stakingContract!,
+    method: 'function getRewardTokenBalance() view returns (uint256)',
+    params: []
+  })
 
   return (
     <Typography paragraph>

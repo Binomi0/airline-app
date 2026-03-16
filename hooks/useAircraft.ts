@@ -1,19 +1,20 @@
-import { useContract, useNFTBalance } from '@thirdweb-dev/react'
-import { nftAircraftTokenAddress } from 'contracts/address'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
+import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 interface UseAircraftReturnType {
   hasAircraft: boolean
+  isAircraftOwned: (id: string | bigint) => boolean
   refetch: () => void
 }
 
-const useAircraft = (id?: string): UseAircraftReturnType => {
-  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
-  const { contract } = useContract(nftAircraftTokenAddress)
-  const { data, refetch } = useNFTBalance(contract, smartAccountAddress, id)
+const useAircraft = (): UseAircraftReturnType => {
+  const data = useRecoilValue(ownedAircraftNftStore)
 
-  return { hasAircraft: smartAccountAddress ? !data?.isZero() : false, refetch }
+  const isAircraftOwned = (id: string | bigint) => {
+    return !!data && data.some((n) => BigInt(n.id) === BigInt(id))
+  }
+
+  return { hasAircraft: !!data && data.length > 0, isAircraftOwned, refetch: () => {} }
 }
 
 export default useAircraft

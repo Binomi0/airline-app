@@ -15,7 +15,7 @@ import {
   getIcaoCodeFromAircraftNFT,
   getNFTAttributes
 } from 'utils'
-import { NFT } from '@thirdweb-dev/sdk'
+import { NFT } from 'thirdweb'
 import BigNumber from 'bignumber.js'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'
@@ -109,7 +109,7 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
             width: '100%',
             height: '100%',
             left: 0,
-            backgroundImage: `url(${aircrafts[Number(aircraft)]?.metadata.image})`,
+            backgroundImage: `url(${currentAircraft?.metadata.image})`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',

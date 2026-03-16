@@ -1,4 +1,5 @@
-import { NFT } from '@thirdweb-dev/sdk'
+import { NFT } from 'thirdweb'
+import nextApiInstance from 'config/axios'
 import {
   ActiveAtc,
   Airport,
@@ -100,7 +101,8 @@ export function getCargoWeight(aircraft: NFT) {
   const attribute = getNFTAttributes(aircraft).find((attribute) => attribute.trait_type === 'cargo')
 
   if (!attribute) {
-    throw new Error('Missing attribute')
+    console.warn(`Aircraft ${aircraft.id} is missing 'cargo' attribute`)
+    return 0
   }
 
   return Number(attribute.value) * randomIntFromInterval(40, 70) || 0
@@ -123,6 +125,7 @@ export function getCargoPrize(distance: number, aircraft: NFT) {
         return base * (1 + randomIntFromInterval(35, 75))
     }
   }
+  console.warn(`Aircraft ${aircraft.id} is missing 'license' attribute`)
   return 0
 }
 
@@ -272,3 +275,5 @@ export const gallonsToLiters = (gallons?: number): number => {
   const litersPerGallon = 3.78541 // 1 gallon is approximately 3.78541 liters
   return gallons * litersPerGallon
 }
+
+export const fetcher = (url: string) => nextApiInstance.get(url).then((res) => res.data)

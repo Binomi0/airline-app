@@ -30,3 +30,5 @@ namespace NodeJS {
     NEXT_PUBLIC_IVAO_ID: string
   }
 }
+
+declare module 'mongoose-bignumber'

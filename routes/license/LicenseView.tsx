@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
-import { NFT, useContract } from '@thirdweb-dev/react'
+import { useReadContract } from 'thirdweb/react'
+import { NFT } from 'thirdweb'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import LicenseItem from './components/LicenseItem'
 import useClaimNFT from 'hooks/useClaimNFT'
@@ -15,10 +16,9 @@ import { tokenBalanceStore } from 'store/balance.atom'
 import { licenseNftStore, ownedLicenseNftStore } from 'store/licenseNFT.atom'
 
 const LicenseView: React.FC = () => {
-  const { contract } = useContract(nftLicenseTokenAddress)
   const licenses = useRecoilValue(licenseNftStore)
   const ownedLicenses = useRecoilValue(ownedLicenseNftStore)
-  const { claimLicenseNFT, isClaiming } = useClaimNFT(contract)
+  const { claimLicenseNFT, isClaiming } = useClaimNFT()
   const { getAirlBalance } = useTokenProviderContext()
   const balance = useRecoilValue(tokenBalanceStore)
 
@@ -82,8 +82,8 @@ const LicenseView: React.FC = () => {
                 isClaiming={isClaiming}
                 nft={license}
                 claimLicenseNFT={handleClaim(license)}
-                key={license.metadata.id}
-                owned={ownedLicenses?.some((n) => license.metadata.id === n.metadata.id) ?? false}
+                key={license.id.toString()}
+                owned={ownedLicenses?.some((n) => BigInt(license.id) === BigInt(n.id)) ?? false}
               />
             )
         )}

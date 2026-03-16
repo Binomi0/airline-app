@@ -45,6 +45,13 @@ export const backupErrorSwal = async () =>
     icon: 'error'
   })
 
+export const errorSwal = async (title: string, text: string) =>
+  Swal.fire({
+    title,
+    text,
+    icon: 'error'
+  })
+
 export const missingExportKeySwal = async () =>
   Swal.fire({
     title: 'Missing local wallet',
@@ -67,13 +74,8 @@ export const accountImportErrorSwal = async () =>
     icon: 'error'
   })
 
-export const askExportKeySwal = async (qrcode: string) =>
+export const walletExportSwal = async (qrcode: string) =>
   Swal.fire({
-    // title: 'Export Wallet KEY',
-    // text: 'Wallet key is going to be download, please keep it safe.',
-    // icon: 'warning',
-    // showCancelButton: true,
-    // showConfirmButton: true,
     title: 'Export Wallet KEY',
     text: 'Do not share this with anyone, is the only way to unlock your funds in weifly',
     imageUrl: 'https://api.qrserver.com/v1/create-qr-code/?data=' + qrcode + '&amp;size=150x150',
@@ -150,4 +152,36 @@ export const stakingInsufficientRewardsSwal = async () =>
     title: 'Unsufficient Rewards',
     text: 'You need to collect at least 100L in order to claim gas',
     icon: 'warning'
+  })
+
+export const consentSecureWalletSwal = async () =>
+  Swal.fire({
+    title: 'Secure your Wallet?',
+    text: 'We can encrypt your private key using your Passkey. WeiFly will never have access to it.',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Secure with Passkey',
+    cancelButtonText: 'Later'
+  })
+
+export const consentCloudSyncSwal = async () =>
+  Swal.fire({
+    title: 'Cloud Backup?',
+    text: 'Do you want to sync your encrypted wallet to the cloud? This allows recovery on other devices using ONLY your Passkey.',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, sync it',
+    cancelButtonText: 'Local only'
+  })
+
+export const unlockWalletSwal = async () =>
+  Swal.fire({
+    title: 'Unlock Wallet',
+    text: 'Please use your Passkey to unlock your digital assets.',
+    icon: 'info',
+    showConfirmButton: true,
+    showCancelButton: true,
+    confirmButtonText: 'Unlock',
+    cancelButtonText: 'Cancel',
+    allowOutsideClick: false
   })

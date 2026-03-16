@@ -1,5 +1,6 @@
-import { MediaRenderer } from '@thirdweb-dev/react'
+import { MediaRenderer } from 'thirdweb/react'
 import React, { useState } from 'react'
+import { twClient } from 'config'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import CardHeader from '@mui/material/CardHeader'
@@ -25,7 +26,7 @@ const LicenseItemHeader: React.FC<{
         }}
         avatar={
           <Avatar variant='rounded'>
-            <MediaRenderer width='50px' height='50px' src={image} />
+            <MediaRenderer client={twClient} width='50px' height='50px' src={image} />
           </Avatar>
         }
         title={name}
@@ -63,7 +64,7 @@ const LicenseItemHeader: React.FC<{
             }
           }}
         >
-          <MediaRenderer width='100%' src={image} />
+          <MediaRenderer client={twClient} width='100%' src={image} />
         </Box>
       </Collapse>
     </>

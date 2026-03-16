@@ -1,9 +1,9 @@
-import { NFT } from '@thirdweb-dev/sdk'
 import axios from 'config/axios'
 import { cargos } from 'mocks/cargos'
 import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { cargoStore } from 'store/cargo.atom'
+import { NFT } from 'thirdweb'
 import { Cargo, CargoStatus, FRoute } from 'types'
 import { getCargoWeight, getRandomInt, getCargoPrize } from 'utils'
 
@@ -47,7 +47,7 @@ const useCargo = (): UseCargo => {
           distance: route.distance,
           details,
           aircraft,
-          aircraftId: aircraft.metadata.id,
+          aircraftId: aircraft.id.toString(),
           weight,
           callsign,
           prize,

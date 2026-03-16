@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { NFT } from '@thirdweb-dev/sdk'
+import { NFT } from 'thirdweb'
 import { atc } from 'mocks'
 import ivaoPilot from 'mocks/ivaoPilot'
 import Atc from 'models/Atc'

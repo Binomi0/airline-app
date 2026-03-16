@@ -1,4 +1,4 @@
-import { NFT } from '@thirdweb-dev/sdk'
+import { NFT } from 'thirdweb'
 import { atom } from 'recoil'
 
 export const aircraftNftStore = atom<NFT[] | undefined>({

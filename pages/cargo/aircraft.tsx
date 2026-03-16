@@ -4,8 +4,8 @@ import MuiLink from '@mui/material/Link'
 import Image from 'next/image'
 import image from 'public/img/real_replica_cessna_172.png'
 import styles from 'styles/Home.module.css'
-import { useContract, useNFTBalance } from '@thirdweb-dev/react'
-import { nftAircraftTokenAddress } from 'contracts/address'
+import { useReadContract } from 'thirdweb/react'
+import { useAppContracts } from 'hooks/useAppContracts'
 import Link from 'next/link'
 import Disconnected from 'components/Disconnected'
 import Box from '@mui/material/Box'
@@ -17,11 +17,29 @@ import Button from '@mui/material/Button'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 
+const maps: Record<string, string> = {
+  '0': '0',
+  '1': '1',
+  '2': '2',
+  '3': '0',
+  '4': '3'
+}
+
 const CargoItem = () => {
   const router = useRouter()
   const address = useRecoilValue(smartAccountAddressStore)
-  const { contract } = useContract(nftAircraftTokenAddress)
-  const { data } = useNFTBalance(contract, address, 1)
+  const { aircraftContract: contract } = useAppContracts()
+
+  const aircraftId = maps[router.query.id as string]
+
+  const { data: balance } = useReadContract({
+    contract: contract as any,
+    method: 'function balanceOf(address account, uint256 id) view returns (uint256)',
+    params: [address!, BigInt(aircraftId || '0')],
+    queryOptions: {
+      enabled: !!contract && !!address && !!router.query.id
+    }
+  })
 
   const handleClick = useCallback(() => {
     console.log('HANDLE CLICK ADD CARGO?')
@@ -49,7 +67,7 @@ const CargoItem = () => {
           </Alert>
         </Box>
 
-        {data?.isZero() ? (
+        {balance === 0n ? (
           <Box my={2}>
             <Alert severity='warning'>
               <AlertTitle>No available aircraft</AlertTitle>

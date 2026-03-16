@@ -1,4 +1,4 @@
-import { NFT } from '@thirdweb-dev/react'
+import { NFT } from 'thirdweb'
 import React, { useCallback } from 'react'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
 import AircraftCardHeader from './AircraftCardHeader'
@@ -6,6 +6,7 @@ import AircraftActions from './AircraftActions'
 import useAircraft from 'hooks/useAircraft'
 import useLicense from 'hooks/useLicense'
 import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -18,12 +19,23 @@ interface Props {
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
   onClaim: (refetch: () => void) => void
+  hasAircraft?: boolean
+  hasLicense?: boolean
 }
 
-const AircraftItem = ({ nft, isClaiming, onClaim }: Props) => {
+const AircraftItem = ({
+  nft,
+  isClaiming,
+  onClaim,
+  hasAircraft: hasAircraftProp,
+  hasLicense: hasLicenseProp
+}: Props) => {
   const user = useRecoilValue(userState)
-  const { hasAircraft, refetch: refetchAircraft } = useAircraft(nft.metadata.id)
-  const { hasLicense, refetch: refetchLicense } = useLicense(getLicenseIdFromAttributes(getNFTAttributes(nft)))
+  const { isAircraftOwned, refetch: refetchAircraft } = useAircraft()
+  const { isLicenseOwned, refetch: refetchLicense } = useLicense()
+
+  const hasAircraft = hasAircraftProp ?? isAircraftOwned(nft.id)
+  const hasLicense = hasLicenseProp ?? isLicenseOwned(getLicenseIdFromAttributes(getNFTAttributes(nft)))
 
   const refetch = useCallback(() => {
     refetchAircraft()
@@ -36,7 +48,23 @@ const AircraftItem = ({ nft, isClaiming, onClaim }: Props) => {
 
   return (
     <Grid item xs={12} lg={6}>
-      <Paper sx={{ border: hasAircraft ? '3px solid green' : undefined }}>
+      <Paper sx={{ border: hasAircraft ? '3px solid green' : undefined, position: 'relative' }}>
+        {hasAircraft && (
+          <Box
+            sx={{
+              '&:before': {
+                opacity: 0.1,
+                fontSize: '64px',
+                color: 'green',
+                content: '"OWNED"',
+                position: 'absolute',
+                top: 80,
+                left: 50,
+                transform: 'rotate(345deg)'
+              }
+            }}
+          />
+        )}
         <AircraftCardHeader nft={nft} />
 
         <CardContent>
