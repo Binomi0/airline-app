@@ -4,7 +4,6 @@ import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Typography from '@mui/material/Typography'
-import BigNumber from 'bignumber.js'
 import router from 'next/router'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
@@ -27,7 +26,7 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
     const { arrivalDistance, departureDistance } = pilot.lastTrack
 
     return getFuelForFlight(
-      new BigNumber(arrivalDistance).plus(departureDistance),
+      (arrivalDistance ?? 0) + (departureDistance ?? 0),
       pilot.flightPlan.aircraft.icaoCode as IcaoCode
     )
   }, [pilot.flightPlan.aircraft.icaoCode, pilot.lastTrack])
@@ -35,11 +34,12 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
   const finalGas = React.useMemo(() => {
     if (!cargo) return 0
 
-    return requiredGas.toNumber()
+    return requiredGas
   }, [cargo, requiredGas])
 
   const handleSelectFlight = React.useCallback(() => {
-    if (balance.airg?.isGreaterThanOrEqualTo(finalGas)) onSelectFlight()
+    const balanceAirgFloat = balance.airg !== undefined ? Number(balance.airg) / 1e18 : 0
+    if (balanceAirgFloat >= finalGas) onSelectFlight()
   }, [balance.airg, finalGas, onSelectFlight])
 
   return (
@@ -53,13 +53,13 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
         <Typography>{cargo?.details?.description}</Typography>
       </CardContent>
       <CardActions sx={{ justifyContent: 'flex-end' }}>
-        {balance.airg?.isLessThan(requiredGas) ? (
+        {(balance.airg !== undefined ? Number(balance.airg) / 1e18 : 0) < finalGas ? (
           <Button size='large' variant='contained' onClick={() => router.push('/gas')}>
             Go to Gas Station
           </Button>
         ) : (
           <Button
-            disabled={balance.airg?.isLessThan(finalGas)}
+            disabled={(balance.airg !== undefined ? Number(balance.airg) / 1e18 : 0) < finalGas}
             color='success'
             size='large'
             variant='contained'

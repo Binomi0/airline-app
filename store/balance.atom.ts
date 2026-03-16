@@ -1,9 +1,9 @@
 import { atom } from 'recoil'
-import { BigNumber } from 'bignumber.js'
+
 
 type TokenBalanceStore = {
-  airl?: BigNumber
-  airg?: BigNumber
+  airl?: bigint
+  airg?: bigint
 }
 
 export const tokenBalanceStore = atom<TokenBalanceStore>({

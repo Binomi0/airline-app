@@ -16,7 +16,7 @@ import {
   getNFTAttributes
 } from 'utils'
 import { NFT } from 'thirdweb'
-import BigNumber from 'bignumber.js'
+
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'
 import useCargo from 'hooks/useCargo'
@@ -49,12 +49,12 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
   const currentAircraft = useMemo(() => aircrafts.find((ac) => ac.metadata.id === aircraft), [aircrafts, aircraft])
 
   const requiredGas = React.useCallback(() => {
-    if (!currentAircraft) return new BigNumber(0)
+    if (!currentAircraft) return 0
 
     const icaoCode = getIcaoCodeFromAircraftNFT(currentAircraft.metadata.name as keyof typeof aircraftNameToIcaoCode)
-    if (!icaoCode) return new BigNumber(0)
+    if (!icaoCode) return 0
 
-    const fuel = getFuelForFlight(new BigNumber(cargo?.distance ?? 0), icaoCode)
+    const fuel = getFuelForFlight(cargo?.distance ?? 0, icaoCode)
 
     return fuel
   }, [currentAircraft, cargo?.distance])
@@ -64,7 +64,7 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
   }
 
   const hasEnoughFuel = useCallback(
-    () => requiredGas().isLessThanOrEqualTo(balance.airg ?? 0),
+    () => requiredGas() <= Number(balance.airg !== undefined ? (Number(balance.airg) / 1e18) : 0),
     [balance.airg, requiredGas]
   )
 
@@ -149,7 +149,7 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
               <AlertTitle>This selection exceeds aircraft range without refueling</AlertTitle>
               <Typography>
                 Max capacity for this aircraft is <b>{currentAircraft && getCurrentFuelInLiters(currentAircraft)}</b>{' '}
-                Liters, required: <b>{formatNumber(requiredGas().toNumber(), 0)}</b> Liters
+                Liters, required: <b>{formatNumber(requiredGas(), 0)}</b> Liters
               </Typography>
             </Alert>
           </Box>

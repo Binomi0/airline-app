@@ -23,10 +23,10 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
-      if (staking && staking[0] >= ethers.utils.parseEther(unstakeAmount).toBigInt()) {
+      if (staking && staking[0] >= ethers.parseEther(unstakeAmount)) {
         const { isConfirmed } = await handleUnStakeSwal(unstakeAmount)
         if (isConfirmed) {
-          await withdraw(ethers.utils.parseEther(unstakeAmount))
+          await withdraw(ethers.parseEther(unstakeAmount))
           unstakedSwal()
 
           getStakingInfo()

@@ -7,14 +7,14 @@ import useStaking from 'hooks/useStaking'
 import useERC20 from 'hooks/useERC20'
 import GradientCard from 'components/GradientCard'
 import { amountExceedBalanceSwal, handleStakeSwal, stakedSwal } from 'lib/swal'
-import BigNumber from 'bignumber.js'
+
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
 
 interface Props {
-  airl?: Readonly<BigNumber>
+  airl?: Readonly<bigint>
   getAirlBalance: () => void
   getStakingInfo: () => void
 }
@@ -26,17 +26,17 @@ const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
 
   const handleStake = useCallback(
     async (amount: string) => {
-      if (airl?.isGreaterThanOrEqualTo(amount)) {
+      const parsedAmount = ethers.parseEther(amount)
+      if (airl !== undefined && airl >= parsedAmount) {
         setLoading(true)
         const { isConfirmed } = await handleStakeSwal(amount)
         if (isConfirmed) {
-          const _amount = ethers.utils.parseEther(amount)
           const allowance = await getAllowance(stakingAddress)
 
-          if (allowance.isZero()) {
+          if (allowance === 0n) {
             await setAllowance(stakingAddress)
           }
-          await stake(_amount)
+          await stake(parsedAmount)
           stakedSwal()
           getAirlBalance()
           getStakingInfo()
@@ -55,10 +55,10 @@ const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
         <Box p={1}>
           <Typography variant='subtitle1'>Available to deposit</Typography>
           <Typography variant='subtitle2' paragraph>
-            {airl ? formatNumber(Number(airl.toNumber() || 0)) : formatNumber()} AIRL
+            {airl !== undefined ? formatNumber(Number(ethers.formatEther(airl || 0n))) : formatNumber()} AIRL
           </Typography>
           <GasForm
-            max={airl?.toString() || '0'}
+            max={airl !== undefined ? ethers.formatEther(airl).toString() : '0'}
             onClick={handleStake}
             loading={loading}
             label='Amount to Stake'

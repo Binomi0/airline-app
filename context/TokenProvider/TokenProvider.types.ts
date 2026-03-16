@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
-import BigNumber from 'bignumber.js'
+
 
 type Actions = GetBalances
 type GetBalances = void
 
 export type TokenReducerState = {
-  airl?: Readonly<BigNumber>
-  airg?: Readonly<BigNumber>
+  airl?: Readonly<bigint>
+  airg?: Readonly<bigint>
   isLoading: boolean
 }
 

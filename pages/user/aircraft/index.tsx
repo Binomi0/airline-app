@@ -51,7 +51,7 @@ const UserAircrafts: NextPage = () => {
         <Typography>
           Fuel Available:{' '}
           {Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-            balance.airg?.toNumber() || 0
+            Number(balance.airg !== undefined ? balance.airg / 10n**18n : 0n)
           )}{' '}
           Liters
         </Typography>

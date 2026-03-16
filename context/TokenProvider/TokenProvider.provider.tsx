@@ -9,8 +9,8 @@ import { smartAccountAddressStore } from 'store/wallet.atom'
 import { tokenBalanceStore } from 'store/balance.atom'
 
 export const INITIAL_STATE: TokenReducerState = {
-  airl: new BigNumber(0),
-  airg: new BigNumber(0),
+  airl: 0n,
+  airg: 0n,
   isLoading: false
 }
 
@@ -32,8 +32,8 @@ export const TokenProvider: FC<{ children: React.ReactNode }> = ({ children }) =
     const { tokenBalances } = data
 
     setBalance({
-      airl: new BigNumber(tokenBalances[0].tokenBalance || '0').div(1e18),
-      airg: new BigNumber(tokenBalances[1].tokenBalance || '0').div(1e18)
+      airl: BigInt(tokenBalances[0].tokenBalance || '0'),
+      airg: BigInt(tokenBalances[1].tokenBalance || '0')
     })
 
     setIsFetched(true)

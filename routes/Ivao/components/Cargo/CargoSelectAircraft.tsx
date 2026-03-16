@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import React, { useMemo } from 'react'
 import { formatNumber } from 'utils'
-import BigNumber from 'bignumber.js'
+
 import { NFT } from 'thirdweb'
 import BlockIcon from '@mui/icons-material/Block'
 import { useTheme } from '@mui/material'
@@ -21,8 +21,8 @@ interface Props {
   // eslint-disable-next-line no-unused-vars
   handleChange: (event: SelectChangeEvent) => void
   hasEnoughFuel: () => boolean
-  requiredGas: () => BigNumber
-  gasBalance?: BigNumber
+  requiredGas: () => number
+  gasBalance?: bigint
   active: boolean
 }
 
@@ -109,7 +109,7 @@ const CargoSelectAircraft = ({
                 : `${hasEnoughFuel() ? 'success' : 'error'}.dark`
             }
           >
-            Fuel available: <b>{formatNumber(gasBalance?.toNumber(), 0)} Liters</b>
+            Fuel available: <b>{formatNumber(Number(gasBalance !== undefined ? (Number(gasBalance) / 1e18) : 0), 0)} Liters</b>
           </Typography>
           {active && (
             <Typography
@@ -119,7 +119,7 @@ const CargoSelectAircraft = ({
                   : `${hasEnoughFuel() ? 'success' : 'error'}.dark`
               }
             >
-              Fuel required: <b>{formatNumber(requiredGas().toNumber(), 0)} Liters</b>
+              Fuel required: <b>{formatNumber(requiredGas(), 0)} Liters</b>
             </Typography>
           )}
         </Box>

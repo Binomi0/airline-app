@@ -3,13 +3,13 @@ import GasAvailable from './GasAvailable'
 import GasDeposited from './GasDeposited'
 import GasFarmed from './GasFarmed'
 import GasSupply from './components/GasSupply'
-import BigNumber from 'bignumber.js'
+
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 
 interface Props {
-  airl?: Readonly<BigNumber>
+  airl?: Readonly<bigint>
   staking: any
   getAirlBalance: () => void
   getStakingInfo: () => void

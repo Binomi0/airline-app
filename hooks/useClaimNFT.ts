@@ -51,7 +51,7 @@ const useClaimNFT = (): UseClaimNFT => {
         const tx = prepareContractCall({
           contract: { client: twClient!, chain: twChain!, address: tokenAddress as Hex },
           method: 'function approve(address spender, uint256 amount)',
-          params: [spender, ethers.constants.MaxUint256.toBigInt()]
+          params: [spender, BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')]
         })
         const result = await sendTransaction({ transaction: tx, account })
         await waitForReceipt(result)
@@ -95,7 +95,7 @@ const useClaimNFT = (): UseClaimNFT => {
 
         await checkAndSetAllowance(currency, contractAddress, pricePerToken, currentSigner, currentSigner.address)
 
-        const encodedData = ethers.utils.defaultAbiCoder.encode(['uint256'], [nftId > 0n ? nftId - 1n : 0n])
+        const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(['uint256'], [nftId > 0n ? nftId - 1n : 0n])
 
         const tx = prepareContractCall({
           contract: {

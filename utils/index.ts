@@ -12,7 +12,6 @@ import {
   aircraftNameToIcaoCode
 } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
-import BigNumber from 'bignumber.js'
 
 // A unique identifier for your website
 const rpID = process.env.NEXT_PUBLIC_DOMAIN
@@ -160,62 +159,63 @@ export const validateEmail = (email?: string) => {
   return expression.test(email)
 }
 
-export const getFuelForFlight = (distance: BigNumber, aircraftType: IcaoCode, passengers: number = 2) => {
+export const getFuelForFlight = (distance: number, aircraftType: IcaoCode, passengers: number = 2) => {
   switch (aircraftType) {
     case 'AN225': {
-      return distance.multipliedBy(9.99).plus(10000)
+      return (distance * 9.99) + 10000
     }
     case 'A20N': {
-      return distance.multipliedBy(0.0225 * Math.min(passengers, 2)).plus(1000)
+      return (distance * (0.0225 * Math.min(passengers, 2))) + 1000
     }
     case 'A21N': {
-      return distance.multipliedBy(2.8).plus(1000)
+      return (distance * 2.8) + 1000
     }
     case 'A319': {
-      return distance.multipliedBy(2.45).plus(1000)
+      return (distance * 2.45) + 1000
     }
     case 'A320': {
-      return distance.multipliedBy(3).plus(1000)
+      return (distance * 3) + 1000
     }
     case 'A321': {
-      return distance.multipliedBy(2.225).plus(1000)
+      return (distance * 2.225) + 1000
     }
     case 'A339': {
-      return distance.multipliedBy(2.21).plus(1000)
+      return (distance * 2.21) + 1000
     }
     case 'B350': {
-      return distance.multipliedBy(0.67).plus(3000)
+      return (distance * 0.67) + 3000
     }
     case 'B748': {
-      return distance.multipliedBy(4).plus(6000)
+      return (distance * 4) + 6000
     }
     case 'B738': {
-      return distance.multipliedBy(2.5).plus(7000)
+      return (distance * 2.5) + 7000
     }
     case 'B739': {
-      return distance.multipliedBy(2.45).plus(6000)
+      return (distance * 2.45) + 6000
     }
     case 'B737': {
-      return distance.multipliedBy(2.75).plus(1000)
+      return (distance * 2.75) + 1000
     }
     case 'B763': {
-      return distance.multipliedBy(4.8).plus(1000)
+      return (distance * 4.8) + 1000
     }
     case 'B77W': {
-      return distance.multipliedBy(5.5).plus(4000)
+      return (distance * 5.5) + 4000
     }
     case 'B788': {
-      return distance.multipliedBy(2.4).plus(3000)
+      return (distance * 2.4) + 3000
     }
     case 'C172': {
-      return distance.multipliedBy(0.36).plus(15)
+      return (distance * 0.36) + 15
     }
     case 'C700':
-      return distance.multipliedBy(5.43).plus(600)
+      return (distance * 5.43) + 600
     default:
-      return distance.multipliedBy(1.325)
+      return distance * 1.325
   }
 }
+
 
 export const reduceTowerMatrix =
   (atcs: ActiveAtc[]) =>
@@ -262,12 +262,12 @@ export const hasRequirement = (aircrafts: NFT[], distance: number, requirement?:
   const icaoCode = getIcaoCodeFromAircraftNFT(aircraft.metadata.name as keyof typeof aircraftNameToIcaoCode)
   if (!icaoCode) return false
 
-  const fuel = getFuelForFlight(new BigNumber(distance ?? 0), icaoCode)
+  const fuel = getFuelForFlight(distance ?? 0, icaoCode)
 
   const combustible = getNFTAttributes(aircraft).find((a) => a.trait_type === 'combustible')?.value
   if (!combustible) return false
 
-  return fuel.isLessThan(gallonsToLiters(Number(combustible)))
+  return fuel < gallonsToLiters(Number(combustible))
 }
 
 export const gallonsToLiters = (gallons?: number): number => {

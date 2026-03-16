@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import transporter from 'lib/nodemailer'
-import BigNumber from 'bignumber.js'
 import { connectDB } from 'lib/mongoose'
 import User from 'models/User'
 
@@ -18,10 +17,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         throw new Error('User not found')
       }
 
-      const code = new BigNumber(user.verificationCode)
-      const vcode = new BigNumber(req.body.code)
+      const code = Number(user.verificationCode)
+      const vcode = Number(req.body.code)
 
-      if (code.isEqualTo(vcode)) {
+      if (code === vcode) {
         await transporter.sendMail({
           from: process.env.EMAIL_FROM,
           to: req.body.email,

@@ -16,7 +16,7 @@ const GasBalanceBar = () => {
   return show && smartAccountAddress ? (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>
       <LocalGasStationIcon color='inherit' fontSize='medium' />
-      <Typography fontWeight={600}>{formatNumber(balance?.airg?.toNumber(), 0)} AIRG</Typography>
+      <Typography fontWeight={600}>{formatNumber(Number(balance?.airg !== undefined ? balance.airg / 10n ** 18n : 0n), 0)} AIRG</Typography>
     </Stack>
   ) : null
 }

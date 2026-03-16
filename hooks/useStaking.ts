@@ -1,5 +1,5 @@
 import { stakingAddress as target } from 'contracts/address'
-import { BigNumber } from 'ethers'
+
 import { postApi } from 'lib/api'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
@@ -15,7 +15,7 @@ const useStaking = () => {
   const { unlockSigner } = useWallet()
 
   const stake = useCallback(
-    async (amount: BigNumber) => {
+    async (amount: bigint) => {
       let currentSigner = smartSigner
 
       if (isLocked && user) {
@@ -38,7 +38,7 @@ const useStaking = () => {
             address: target
           },
           method: 'function stake(uint256 amount)',
-          params: [amount.toBigInt()]
+          params: [amount]
         })
 
         const result = await sendTransaction({
@@ -62,7 +62,7 @@ const useStaking = () => {
   )
 
   const withdraw = useCallback(
-    async (amount: BigNumber) => {
+    async (amount: bigint) => {
       let currentSigner = smartSigner
 
       if (isLocked && user) {
@@ -85,7 +85,7 @@ const useStaking = () => {
             address: target
           },
           method: 'function withdraw(uint256 amount)',
-          params: [amount.toBigInt()]
+          params: [amount]
         })
 
         const result = await sendTransaction({

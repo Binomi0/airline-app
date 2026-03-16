@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import BigNumber from 'bignumber.js'
+
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 import { userState } from 'store/user.atom'
@@ -11,7 +11,7 @@ const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffff
 
 interface UseERC20ReturnType {
   // eslint-disable-next-line no-unused-vars
-  getAllowance: (spender: string) => Promise<BigNumber>
+  getAllowance: (spender: string) => Promise<bigint>
   // eslint-disable-next-line no-unused-vars
   setAllowance: (to: string) => Promise<boolean>
   isLoading: boolean
@@ -24,8 +24,8 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
   const { unlockSigner } = useWallet()
 
   const getAllowance = useCallback(
-    async (spender: string): Promise<BigNumber> => {
-      if (!smartAccountAddress || !twClient || !twChain) return new BigNumber(0)
+    async (spender: string): Promise<bigint> => {
+      if (!smartAccountAddress || !twClient || !twChain) return 0n
       setIsLoading(true)
 
       try {
@@ -35,12 +35,11 @@ const useERC20 = (tokenAddress: Hex): UseERC20ReturnType => {
           params: [smartAccountAddress, spender]
         })
 
-        setIsLoading(false)
-        return new BigNumber(allowance.toString()).div(1e18) // Adjusting based on displayValue behavior
+        return BigInt(allowance || 0)
       } catch (error) {
         console.error('getAllowance', error)
         setIsLoading(false)
-        return new BigNumber(0)
+        return 0n
       }
     },
     [smartAccountAddress, twChain, twClient, tokenAddress]

@@ -16,7 +16,7 @@ const AirBalanceBar = () => {
   return show && smartAccountAddress ? (
     <Stack direction='row' alignItems='center' mx={2} spacing={1}>
       <AirplaneTicketIcon color='inherit' fontSize='medium' />
-      <Typography fontWeight={600}>{formatNumber(balance.airl?.toNumber())} AIRL</Typography>
+      <Typography fontWeight={600}>{formatNumber(Number(balance.airl !== undefined ? balance.airl / 10n ** 18n : 0n))} AIRL</Typography>
     </Stack>
   ) : null
 }

@@ -35,7 +35,7 @@ const useThirdwebWallet = () => {
       }
 
       try {
-        const amount = ethers.utils.parseEther(value).toBigInt()
+        const amount = ethers.parseEther(value)
 
         // 1. Check current allowance
         const currentAllowance = await readContract({
