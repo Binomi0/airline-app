@@ -109,7 +109,8 @@ const CargoSelectAircraft = ({
                 : `${hasEnoughFuel() ? 'success' : 'error'}.dark`
             }
           >
-            Fuel available: <b>{formatNumber(Number(gasBalance !== undefined ? (Number(gasBalance) / 1e18) : 0), 0)} Liters</b>
+            Fuel available:{' '}
+            <b>{formatNumber(Number(gasBalance !== undefined ? Number(gasBalance) / 1e18 : 0), 0)} Liters</b>
           </Typography>
           {active && (
             <Typography

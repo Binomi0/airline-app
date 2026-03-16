@@ -43,7 +43,9 @@ const Gas = () => {
         <Stack direction='row-reverse'>
           <Stack direction='row' alignItems='center' spacing={1}>
             <LocalGasStationIcon />
-            <Typography variant='h2'>{formatNumber(Number(balance.airg !== undefined ? balance.airg / 10n**18n : 0n))}</Typography>
+            <Typography variant='h2'>
+              {formatNumber(Number(balance.airg !== undefined ? balance.airg / 10n ** 18n : 0n))}
+            </Typography>
             <Typography variant='h6'>AIRG</Typography>
           </Stack>
         </Stack>

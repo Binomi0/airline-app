@@ -162,60 +162,59 @@ export const validateEmail = (email?: string) => {
 export const getFuelForFlight = (distance: number, aircraftType: IcaoCode, passengers: number = 2) => {
   switch (aircraftType) {
     case 'AN225': {
-      return (distance * 9.99) + 10000
+      return distance * 9.99 + 10000
     }
     case 'A20N': {
-      return (distance * (0.0225 * Math.min(passengers, 2))) + 1000
+      return distance * (0.0225 * Math.min(passengers, 2)) + 1000
     }
     case 'A21N': {
-      return (distance * 2.8) + 1000
+      return distance * 2.8 + 1000
     }
     case 'A319': {
-      return (distance * 2.45) + 1000
+      return distance * 2.45 + 1000
     }
     case 'A320': {
-      return (distance * 3) + 1000
+      return distance * 3 + 1000
     }
     case 'A321': {
-      return (distance * 2.225) + 1000
+      return distance * 2.225 + 1000
     }
     case 'A339': {
-      return (distance * 2.21) + 1000
+      return distance * 2.21 + 1000
     }
     case 'B350': {
-      return (distance * 0.67) + 3000
+      return distance * 0.67 + 3000
     }
     case 'B748': {
-      return (distance * 4) + 6000
+      return distance * 4 + 6000
     }
     case 'B738': {
-      return (distance * 2.5) + 7000
+      return distance * 2.5 + 7000
     }
     case 'B739': {
-      return (distance * 2.45) + 6000
+      return distance * 2.45 + 6000
     }
     case 'B737': {
-      return (distance * 2.75) + 1000
+      return distance * 2.75 + 1000
     }
     case 'B763': {
-      return (distance * 4.8) + 1000
+      return distance * 4.8 + 1000
     }
     case 'B77W': {
-      return (distance * 5.5) + 4000
+      return distance * 5.5 + 4000
     }
     case 'B788': {
-      return (distance * 2.4) + 3000
+      return distance * 2.4 + 3000
     }
     case 'C172': {
-      return (distance * 0.36) + 15
+      return distance * 0.36 + 15
     }
     case 'C700':
-      return (distance * 5.43) + 600
+      return distance * 5.43 + 600
     default:
       return distance * 1.325
   }
 }
-
 
 export const reduceTowerMatrix =
   (atcs: ActiveAtc[]) =>

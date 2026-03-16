@@ -2,7 +2,6 @@ import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
-import BigNumber from 'bignumber.js'
 import React, { memo } from 'react'
 import type { ChangeEvent } from 'react'
 
@@ -21,8 +20,8 @@ const GasForm: React.FC<{
   }
 
   function handleClick() {
-    const amount = new BigNumber(value)
-    if (amount.isZero() || amount.isNaN() || amount.isNegative()) return
+    const amount = BigInt(value)
+    if (amount === 0n || amount < 0n) return
     setValue('')
     onClick(value)
   }

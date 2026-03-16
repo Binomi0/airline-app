@@ -64,7 +64,7 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
   }
 
   const hasEnoughFuel = useCallback(
-    () => requiredGas() <= Number(balance.airg !== undefined ? (Number(balance.airg) / 1e18) : 0),
+    () => requiredGas() <= Number(balance.airg !== undefined ? Number(balance.airg) / 1e18 : 0),
     [balance.airg, requiredGas]
   )
 

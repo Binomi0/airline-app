@@ -90,7 +90,11 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
         {smartAccountAddress && !owned && (
           <CardActions>
             <Button
-              color={balance.airl !== undefined && (Number(balance.airl) / 1e18) > Number(attribute?.value || 0) ? 'success' : 'primary'}
+              color={
+                balance.airl !== undefined && Number(balance.airl) / 1e18 > Number(attribute?.value || 0)
+                  ? 'success'
+                  : 'primary'
+              }
               disabled={isClaiming || !smartAccountAddress}
               variant='contained'
               onClick={handleClaimLicense}

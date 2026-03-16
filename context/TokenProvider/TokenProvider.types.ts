@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 
-
 type Actions = GetBalances
 type GetBalances = void
 

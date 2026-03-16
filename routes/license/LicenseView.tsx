@@ -29,7 +29,7 @@ const LicenseView: React.FC = () => {
       const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
       const { name } = nft.metadata
 
-      const hasEnough = balance.airl !== undefined && ((Number(balance.airl) / 1e18) >= Number(attribute?.value || 0))
+      const hasEnough = balance.airl !== undefined && Number(balance.airl) / 1e18 >= Number(attribute?.value || 0)
       if (hasEnough) {
         const { isConfirmed } = await Swal.fire({
           title: name as string,
