@@ -31,4 +31,3 @@ namespace NodeJS {
   }
 }
 
-declare module 'mongoose-bignumber'
