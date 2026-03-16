@@ -21,17 +21,14 @@ import { userState } from 'store/user.atom'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import styles from './appbar.module.css'
-import { AlertTitle, Box, Button, Container, LinearProgress } from '@mui/material'
+import { AlertTitle, Button, Container } from '@mui/material'
 import Link from 'next/link'
 
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
 
 const initialSnackState: AppBarSnack = { open: false, message: '', status: 'success' }
 
-interface Props {
-  loading: boolean
-}
-const CustomAppBar = ({ loading }: Props) => {
+const CustomAppBar = () => {
   const matches = useMediaQuery('(min-width:768px)')
   const { toggleSidebar } = useMainProviderContext()
   const { getBalances } = useTokenProviderContext()
@@ -123,7 +120,6 @@ const CustomAppBar = ({ loading }: Props) => {
           />
         </Toolbar>
       </AppBar>
-      <Box height={1}>{loading && <LinearProgress />}</Box>
       {user && !user?.vaUser && (
         <Container>
           <Alert

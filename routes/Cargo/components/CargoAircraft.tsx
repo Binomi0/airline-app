@@ -41,7 +41,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
         ({
           ...acc,
           [curr.trait_type]: curr.value
-        } as AircraftAttributes),
+        }) as AircraftAttributes,
       {} as AircraftAttributes
     )
 

@@ -71,6 +71,7 @@ const IvaoPilots = () => {
   if (!pilots.length) {
     return <LinearProgress />
   }
+
   return ownedAircrafts ? (
     <>
       <Grid container spacing={2}>

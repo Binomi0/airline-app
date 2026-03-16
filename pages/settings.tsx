@@ -2,12 +2,10 @@ import styles from 'styles/Hangar.module.css'
 import Image from 'next/image'
 import image from 'public/img/airplanes3.png'
 import SettingsView from 'routes/settings/SettingsView'
-import LinearProgress from '@mui/material/LinearProgress'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
-import type { PageProps } from 'types'
 import { useEffect, useState } from 'react'
 import axios from 'config/axios'
 import { useRecoilValue } from 'recoil'
@@ -17,7 +15,7 @@ import { AxiosResponse } from 'axios'
 import Link from '@mui/material/Link'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
 
-const SettingsPage = ({ loading }: PageProps) => {
+const SettingsPage = () => {
   const user = useRecoilValue(userState)
   const router = useRouter()
   const [hasBackup, setHasBackup] = useState(false)
@@ -32,7 +30,6 @@ const SettingsPage = ({ loading }: PageProps) => {
 
   return user ? (
     <Box>
-      {loading && <LinearProgress />}
       <Box sx={{ position: 'relative' }} my={5}>
         <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />
 

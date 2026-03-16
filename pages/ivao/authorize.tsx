@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react'
-import LinearProgress from '@mui/material/LinearProgress'
-import type { PageProps } from 'types'
 import useIvao from 'hooks/useIvao'
 import { useRouter } from 'next/router'
 import IvaoView from 'routes/Ivao/IvaoView'
@@ -10,16 +8,16 @@ import Disconnected from 'components/Disconnected'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import Swal from 'sweetalert2'
 
-const IVAOPage = ({ loading }: PageProps) => {
+const IVAOPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const ivaoUser = useRecoilValue(ivaoUserStore)
-  const { authorize, isLoading, error } = useIvao()
+  const { authorize, error } = useIvao()
 
   useEffect(authorize, [authorize])
 
   useEffect(() => {
-    if (ivaoUser && !loading) {
+    if (ivaoUser) {
       router.replace('/ivao')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -38,10 +36,9 @@ const IVAOPage = ({ loading }: PageProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
 
-  if (loading) return <LinearProgress />
   if (!user) return <Disconnected />
 
-  return ivaoUser ? <IvaoView isLoading={isLoading} user={user} /> : null
+  return ivaoUser ? <IvaoView user={user} /> : null
 }
 
 export default IVAOPage

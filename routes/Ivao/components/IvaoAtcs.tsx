@@ -174,8 +174,8 @@ const StyledPaper = styled(Paper)<{ selected: boolean }>`
         ? theme.palette.grey[800]
         : theme.palette.grey[500]
       : theme.palette.mode === 'dark'
-      ? theme.palette.grey[900]
-      : theme.palette.grey[100]};
+        ? theme.palette.grey[900]
+        : theme.palette.grey[100]};
   /* background: ${({ theme }) =>
     `linear-gradient(to bottom left, ${
       theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]

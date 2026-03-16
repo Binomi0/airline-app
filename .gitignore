@@ -43,3 +43,4 @@ iota-sdk.log
 *.stronghold
 
 typechain-types/
+outdated_libs.txt

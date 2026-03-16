@@ -25,6 +25,7 @@ import 'lib/alchemy'
 import createEmotionCache from '../src/createEmotionCache'
 import '../styles/globals.css'
 import { ContractProvider } from 'context/ContractProvider'
+import WithLoading from 'components/WithLoading'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -77,11 +78,13 @@ export default function MyApp(props: MyAppProps) {
                       <VaProvider>
                         <LiveFlightsProvider>
                           <MainProvider>
-                            <AppBar loading={loading} />
+                            <AppBar />
                             <Sidebar />
                             <RightSidebar />
                           </MainProvider>
-                          <Component {...props.pageProps} loading={loading} />
+                          <WithLoading loading={loading}>
+                            <Component {...props.pageProps} />
+                          </WithLoading>
                           {/* <SpeedInsights /> */}
                         </LiveFlightsProvider>
                       </VaProvider>

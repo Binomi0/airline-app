@@ -13,10 +13,9 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import type { PageProps } from 'types'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
-const CargoPage = ({ loading }: PageProps) => {
+const CargoPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const [aircraft, setAircraft] = useState<NFT>()
@@ -51,7 +50,7 @@ const CargoPage = ({ loading }: PageProps) => {
   return (
     <VaProvider>
       {aircraft ? (
-        <CargoView loading={loading} aircraft={aircraft} />
+        <CargoView aircraft={aircraft} />
       ) : (
         <CargoAircraftSelector owned={ownedAircrafts} setAircraft={setAircraft} />
       )}

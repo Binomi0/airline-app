@@ -28,7 +28,7 @@ const initialState: FRoute = {
   distance: 0
 }
 
-const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, aircraft }) => {
+const CargoView: NextPage<{ aircraft?: NFT }> = ({ aircraft }) => {
   const router = useRouter()
   const address = useRecoilValue(smartAccountAddressStore)
   const { newCargo, cargo, completed, getCargo } = useCargo()
@@ -63,7 +63,7 @@ const CargoView: NextPage<{ loading: boolean; aircraft?: NFT }> = ({ loading, ai
   return (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} src={image} alt='banner' fill />
-      {(loading || !flights) && <LinearProgress />}
+      {!flights && <LinearProgress />}
 
       <Container>
         <NoAddress />

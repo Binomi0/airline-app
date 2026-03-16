@@ -247,8 +247,8 @@ export const reduceAtcTower = (acc: ActiveAtc[], curr: ActiveAtc) => {
   return acc.some((c) => c?.callsign.split('_')[0] === currentCallsign)
     ? acc
     : new RegExp(/[A-Z][A-Z][A-Z][A-Z](_TWR)+/g).test(curr.callsign)
-    ? [...acc, curr]
-    : acc
+      ? [...acc, curr]
+      : acc
 }
 
 export const findByCallsign = (callsign: string) => (f: Airport) => f.callsign === callsign

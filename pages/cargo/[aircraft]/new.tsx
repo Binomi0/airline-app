@@ -12,10 +12,9 @@ import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import type { PageProps } from 'types'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
-const CargoAircraft = ({ loading }: PageProps) => {
+const CargoAircraft = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
 
@@ -65,7 +64,7 @@ const CargoAircraft = ({ loading }: PageProps) => {
         </Box>
       </Fade>
       <Fade in={!isLoading && !!ownedAircrafts}>
-        <Box>{hasAircraft ? <CargoView loading={loading} aircraft={data} /> : null}</Box>
+        <Box>{hasAircraft ? <CargoView aircraft={data} /> : null}</Box>
       </Fade>
     </VaProvider>
   )

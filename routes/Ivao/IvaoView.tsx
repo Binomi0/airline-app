@@ -47,10 +47,9 @@ const challenge = base64URLEncode(verifier)
 
 interface Props {
   user: User
-  isLoading: boolean
 }
 
-const IvaoView = ({ isLoading }: Props) => {
+const IvaoView = ({ user }: Props) => {
   const { isLoading: loading } = useVaProviderContext()
   const router = useRouter()
   const { live, getLive } = useLiveFlightProviderContext()
@@ -186,8 +185,6 @@ const IvaoView = ({ isLoading }: Props) => {
 
   return (
     <Stack direction='row'>
-      {(isLoading || loading) && <LinearProgress />}
-
       <IvaoAtcs onSelect={handleSelectAtc} start={start} end={end} />
 
       <Container>
