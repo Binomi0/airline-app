@@ -139,7 +139,7 @@ export interface Authenticator {
   credentialID: string
   credentialPublicKey: string
   counter: number
-  transports?: string
+  transports?: string[]
 }
 
 export interface WebAuthnUser {

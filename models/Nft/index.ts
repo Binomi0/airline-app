@@ -2,7 +2,10 @@ import { mongoose } from 'lib/mongoose'
 import { NFT } from 'thirdweb'
 import { Document } from 'mongoose'
 
-export type INft = NFT & Document
+export interface INft extends Document, Omit<NFT, 'id' | 'supply'> {
+  id: bigint | string
+  supply?: bigint | string
+}
 
 const nftSchema: mongoose.Schema = new mongoose.Schema(
   {
@@ -29,17 +32,19 @@ const nftSchema: mongoose.Schema = new mongoose.Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (doc, ret) => {
-        if (typeof ret.id === 'bigint') ret.id = ret.id.toString()
-        if (typeof ret.supply === 'bigint') ret.supply = ret.supply.toString()
-        return ret
+      transform: (_doc: INft, ret: Record<string, unknown>) => {
+        const r = ret as { id: bigint | string; supply?: bigint | string }
+        if (typeof r.id === 'bigint') r.id = r.id.toString()
+        if (typeof r.supply === 'bigint') r.supply = r.supply.toString()
+        return r
       }
     },
     toObject: {
-      transform: (doc, ret) => {
-        if (typeof ret.id === 'bigint') ret.id = ret.id.toString()
-        if (typeof ret.supply === 'bigint') ret.supply = ret.supply.toString()
-        return ret
+      transform: (_doc: INft, ret: Record<string, unknown>) => {
+        const r = ret as { id: bigint | string; supply?: bigint | string }
+        if (typeof r.id === 'bigint') r.id = r.id.toString()
+        if (typeof r.supply === 'bigint') r.supply = r.supply.toString()
+        return r
       }
     }
   }

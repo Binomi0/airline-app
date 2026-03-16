@@ -21,7 +21,6 @@ const origin = process.env.ORIGIN
 // @ts-ignore
 export const verifySignature = async function (authenticator, response, expectedChallenge) {
   const bufferFromBase64 = (buffer: string) => Buffer.from(buffer, 'base64')
-  const credentialIDBuffer = bufferFromBase64(authenticator.credentialID)
   const credentialPublicKeyBuffer = bufferFromBase64(authenticator.credentialPublicKey)
 
   try {
@@ -30,18 +29,15 @@ export const verifySignature = async function (authenticator, response, expected
       expectedChallenge,
       expectedOrigin: origin,
       expectedRPID: rpID,
-      authenticator: {
-        ...authenticator,
-        credentialID: new Uint8Array(
-          credentialIDBuffer.buffer,
-          credentialIDBuffer.byteOffset,
-          credentialIDBuffer.byteLength / Uint8Array.BYTES_PER_ELEMENT
-        ),
-        credentialPublicKey: new Uint8Array(
+      credential: {
+        id: authenticator.credentialID,
+        publicKey: new Uint8Array(
           credentialPublicKeyBuffer.buffer,
           credentialPublicKeyBuffer.byteOffset,
           credentialPublicKeyBuffer.byteLength / Uint8Array.BYTES_PER_ELEMENT
-        )
+        ) as Uint8Array<ArrayBuffer>,
+        counter: authenticator.counter,
+        transports: authenticator.transports
       }
     })
 

@@ -32,7 +32,7 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
         email
       })
       if (!challenge) return { verified: false }
-      const request = await startRegistration(challenge)
+      const request = await startRegistration({ optionsJSON: challenge })
       const validation = await postApi<{ success: boolean; token?: string }>(WebAuthnUri.REGISTER, {
         data: request,
         email
@@ -52,7 +52,7 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
     try {
       const challenge = await postApi<PublicKeyCredentialRequestOptionsJSON>(WebAuthnUri.LOGIN, { email })
       if (!challenge) return { verified: false }
-      const request = await startAuthentication(challenge)
+      const request = await startAuthentication({ optionsJSON: challenge })
       const validation = await postApi<{ verified: boolean; token?: string }>(WebAuthnUri.LOGIN_CHALLENGE, {
         data: request,
         email

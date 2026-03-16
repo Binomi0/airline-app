@@ -45,12 +45,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(403).json({ error: 'Verification failed' })
   }
 
-  const { credentialPublicKey, credentialID, counter } = registrationInfo
+  const { credential } = registrationInfo
 
   const newAuthenticator: Authenticator = {
-    credentialID: Buffer.from(credentialID).toString('base64'),
-    credentialPublicKey: Buffer.from(credentialPublicKey).toString('base64'),
-    counter: counter + 1,
+    credentialID: credential.id,
+    credentialPublicKey: Buffer.from(credential.publicKey).toString('base64'),
+    counter: credential.counter,
     transports: data.response.transports
   }
 

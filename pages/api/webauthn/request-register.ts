@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { generateRegistrationOptions } from '@simplewebauthn/server'
+import { generateRegistrationOptions, AuthenticatorTransport } from '@simplewebauthn/server'
 import { v4 as uuidv4 } from 'uuid'
 import { Authenticator } from 'types'
 import { connectDB } from 'lib/mongoose'
@@ -19,8 +19,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const challengeResponse = await generateRegistrationOptions({
     rpName,
-    rpID,
-    userID: webauthn?.id ?? id,
+    rpID: rpID as string,
+    userID: new TextEncoder().encode(webauthn?.id ?? id) as Uint8Array<ArrayBuffer>,
     userName: email,
     // Don't prompt users for additional information about the authenticator
     // (Recommended for smoother UX)
@@ -30,10 +30,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     excludeCredentials:
       webauthn && webauthn.authenticators
         ? webauthn.authenticators.map((authenticator: Authenticator) => ({
-            id: Buffer.from(authenticator.credentialID, 'base64'),
+            id: (authenticator.credentialID as string).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
             type: 'public-key',
             // Optional
-            transports: authenticator.transports
+            transports: authenticator.transports as AuthenticatorTransport[]
           }))
         : undefined,
     authenticatorSelection: {
