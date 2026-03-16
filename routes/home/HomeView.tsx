@@ -1,266 +1,239 @@
-import Container from '@mui/material/Container'
-import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Grid'
-import ListItem from '@mui/material/ListItem'
-import ListItemText from '@mui/material/ListItemText'
-import List from '@mui/material/List'
-import HomeGridItem from 'components/HomeGridItem'
-import Paper from '@mui/material/Paper'
-import Box from '@mui/material/Box'
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
-import FlightIcon from '@mui/icons-material/Flight'
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn'
-import SecurityIcon from '@mui/icons-material/Security'
-import Stack from '@mui/material/Stack'
+import Link from 'next/link'
+import { useRecoilValue } from 'recoil'
+import { themeStore } from 'store/theme.atom'
+import styles from '../../styles/Home.module.css'
+
+const NAV_ITEMS = [
+  {
+    link: '/hangar',
+    emoji: '✈️',
+    title: 'Hangar',
+    desc: 'Compra y vende aeronaves NFT. Gestiona tu flota virtual.',
+  },
+  {
+    link: '/license',
+    emoji: '🪪',
+    title: 'Licencias',
+    desc: 'Obtén tu licencia de vuelo y empieza a volar hoy.',
+  },
+  {
+    link: '/gas',
+    emoji: '⛽',
+    title: 'Gasolinera',
+    desc: 'Haz staking de AIRL y gana AIRG para repostar tus aeronaves.',
+  },
+  {
+    link: '/cargo',
+    emoji: '📦',
+    title: 'Cargo',
+    desc: 'Realiza vuelos pendientes y gana tokens AIRL.',
+  },
+  {
+    link: '/ivao',
+    emoji: '🌐',
+    title: 'IVAO',
+    desc: 'Monitoriza tus vuelos en IVAO y recibe recompensas en cadena.',
+  },
+]
+
+const FEATURES = [
+  {
+    icon: '🔐',
+    title: 'Propiedad Descentralizada',
+    desc: 'Tus aeronaves son NFTs en Ethereum. Ninguna autoridad centralizada puede arrebatarte lo que es tuyo.',
+  },
+  {
+    icon: '🔍',
+    title: 'Operaciones Transparentes',
+    desc: 'Cada vuelo, venta de ticket y transferencia de aeronave queda registrada en la blockchain de forma inmutable.',
+  },
+  {
+    icon: '🏛️',
+    title: 'Gobernanza Comunitaria',
+    desc: 'La plataforma avanza según la voluntad de sus usuarios. Vota, propón y decide el futuro de WeiFly.',
+  },
+]
+
+const STEPS = [
+  {
+    n: '01',
+    title: 'Crea tu cuenta',
+    desc: 'Regístrate con passkey. Sin contraseñas, sin complicaciones.',
+  },
+  {
+    n: '02',
+    title: 'Adquiere tu aeronave',
+    desc: 'Compra un NFT de aeronave en el Hangar y obtén tu licencia de vuelo.',
+  },
+  {
+    n: '03',
+    title: 'Vuela y Gana',
+    desc: 'Completa rutas en IVAO, gana tokens AIRL y crece dentro del ecosistema.',
+  },
+]
+
+const STATS = [
+  { value: 'NFT', label: 'Aeronaves tokenizadas' },
+  { value: 'IVAO', label: 'Integración de vuelo real' },
+  { value: 'AIRL', label: 'Token nativo del ecosistema' },
+  { value: 'ETH', label: 'Blockchain Ethereum' },
+]
+
+/** Tokens que cambian entre dark y light mode */
+const THEME_TOKENS: Record<'dark' | 'light', React.CSSProperties> = {
+  dark: {
+    '--home-bg':            '#0b0f19',
+    '--home-bg-alt':        'rgba(15,18,28,0.6)',
+    '--home-border':        'rgba(255,255,255,0.06)',
+    '--home-border-card':   'rgba(255,255,255,0.07)',
+    '--home-accent':        '#6366f1',
+    '--home-accent-soft':   'rgba(99,102,241,0.12)',
+    '--home-accent-text':   '#a5b4fc',
+    '--home-title':         '#e2e8f0',
+    '--home-muted':         'rgba(148,163,184,0.85)',
+    '--home-muted-label':   'rgba(148,163,184,0.7)',
+    '--home-hero-from':     '#e0e7ff',
+    '--home-hero-mid':      '#a5b4fc',
+    '--home-hero-to':       '#818cf8',
+  } as React.CSSProperties,
+  light: {
+    '--home-bg':            '#f3f4f6',
+    '--home-bg-alt':        'rgba(255,255,255,0.65)',
+    '--home-border':        'rgba(0,0,0,0.07)',
+    '--home-border-card':   'rgba(0,0,0,0.08)',
+    '--home-accent':        '#4f46e5',
+    '--home-accent-soft':   'rgba(79,70,229,0.09)',
+    '--home-accent-text':   '#4f46e5',
+    '--home-title':         '#111827',
+    '--home-muted':         'rgba(55,65,81,0.85)',
+    '--home-muted-label':   'rgba(55,65,81,0.65)',
+    '--home-hero-from':     '#312e81',
+    '--home-hero-mid':      '#4f46e5',
+    '--home-hero-to':       '#6366f1',
+  } as React.CSSProperties,
+}
 
 const HomeView = () => {
+  const theme = useRecoilValue(themeStore)
+
   return (
-    <Container>
-      <Stack my={4} textAlign='center' height='100vh' alignItems='center' justifyContent='center'>
-        <Typography variant='h1'>WeiFly</Typography>
-        <Typography variant='h2'>Decentralized Virtual Airline</Typography>
-      </Stack>
+    <div className={styles.root} style={THEME_TOKENS[theme]}>
+      {/* ── Hero ───────────────────────────────────────────────── */}
+      <section className={styles.hero}>
+        <div className={styles.badge}>
+          <span />
+          Simulación de vuelo virtual · Ethereum
+        </div>
 
-      <Box>
-        <Paper elevation={3}>
-          <Box p={2}>
-            <Paper elevation={12}>
-              <Box p={2}>
-                <Typography variant='h4' gutterBottom>
-                  Welcome to WeiFly!
-                </Typography>
-                <Typography variant='body1' paragraph>
-                  WeiFly is a decentralized virtual airline powered by blockchain technology. We`re revolutionizing the
-                  aviation industry by providing users with ownership and control over their virtual aircraft,
-                  transparent operations, and community-driven governance.
-                </Typography>
-              </Box>
-            </Paper>
-            <Paper elevation={12}>
-              <Box p={2} my={8}>
-                <Typography variant='h5' gutterBottom>
-                  Benefits of WeiFly:
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Paper elevation={24}>
-                      <Box p={2}>
-                        <Typography variant='body2' color='textSecondary' paragraph>
-                          <strong>Decentralized Ownership:</strong> With WeiFly, you truly own your virtual aircraft as
-                          non-fungible tokens (NFTs) on the blockchain. No centralized authority can take away your
-                          ownership rights.
-                        </Typography>
-                      </Box>
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Paper elevation={24}>
-                      <Box p={2}>
-                        <Typography variant='body2' color='textSecondary' paragraph>
-                          <strong>Transparent Operations:</strong> Our platform leverages blockchain technology to
-                          provide transparent and immutable records of flight operations, ticket sales, and aircraft
-                          ownership.
-                        </Typography>
-                      </Box>
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Paper elevation={24}>
-                      <Box p={2}>
-                        <Typography variant='body2' color='textSecondary' paragraph>
-                          <strong>Community-Driven Governance:</strong> WeiFly is governed by its community of users.
-                          Through decentralized decision-making mechanisms, users have a say in the direction of the
-                          platform and its future development.
-                        </Typography>
-                      </Box>
-                    </Paper>
-                  </Grid>
-                  {/* Add more benefits as needed */}
-                </Grid>
-              </Box>
-            </Paper>
-          </Box>
-        </Paper>
-      </Box>
+        <h1 className={styles.heroTitle}>WeiFly</h1>
+        <p className={styles.heroSubtitle}>La Aerolínea Virtual Descentralizada</p>
+        <p className={styles.heroDescription}>
+          Vuela, posee aeronaves como NFTs, gana tokens y participa en la gobernanza de una
+          aerolínea completamente transparente sobre blockchain.
+        </p>
 
-      <Box my={8}>
-        <Paper elevation={3}>
-          <Box p={2}>
-            <Typography variant='h4' gutterBottom>
-              Key Features
-            </Typography>
-            <List>
-              <Paper elevation={12}>
-                <Box mb={1}>
-                  <ListItem>
-                    <Stack direction='row' spacing={2}>
-                      <VerifiedUserIcon color='primary' />
-                      <ListItemText primary='Decentralized Booking and Ticketing System' />
-                    </Stack>
-                  </ListItem>
-                </Box>
-              </Paper>
-              <Paper elevation={12}>
-                <Box mb={1}>
-                  <ListItem>
-                    <Stack direction='row' spacing={2}>
-                      <FlightIcon color='primary' />
-                      <ListItemText primary='Ownership of Virtual Aircraft as Non-Fungible Tokens (NFTs)' />
-                    </Stack>
-                  </ListItem>
-                </Box>
-              </Paper>
-              <Paper elevation={12}>
-                <Box mb={1}>
-                  <ListItem>
-                    <Stack direction='row' spacing={2}>
-                      <MonetizationOnIcon color='primary' />
-                      <ListItemText primary='Ability to Earn Rewards or Dividends through Participation in the Ecosystem' />
-                    </Stack>
-                  </ListItem>
-                </Box>
-              </Paper>
-              <Paper elevation={12}>
-                <Box>
-                  <ListItem>
-                    <Stack direction='row' spacing={2}>
-                      <SecurityIcon color='primary' />
-                      <ListItemText primary='Integration with Ethereum Blockchain for Transparent and Secure Transactions' />
-                    </Stack>
-                  </ListItem>
-                </Box>
-              </Paper>
-            </List>
-          </Box>
-        </Paper>
-      </Box>
+        <div className={styles.heroCtas}>
+          <Link href='/hangar' className={styles.ctaPrimary}>
+            Entrar al Hangar
+          </Link>
+          <Link href='/whitepaper' className={styles.ctaSecondary}>
+            Whitepaper
+          </Link>
+        </div>
 
-      <Box my={8}>
-        <Paper elevation={3}>
-          <Box p={2}>
-            <Typography variant='h4' gutterBottom>
-              How It Works
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <Paper elevation={12} sx={{ padding: 2 }}>
-                  <Typography variant='h6' gutterBottom>
-                    Step 1: Register an Account
-                  </Typography>
-                  <Typography variant='body1' paragraph>
-                    Sign up for a WeiFly account using your email address and create a password.
-                  </Typography>
-                  {/* Add visual aids like diagrams or screenshots if needed */}
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Paper elevation={12} sx={{ padding: 2 }}>
-                  <Typography variant='h6' gutterBottom>
-                    Step 2: Book Flights
-                  </Typography>
-                  <Typography variant='body1' paragraph>
-                    Browse available flights, select your desired route and dates, and book your tickets using Ethereum
-                    or other supported cryptocurrencies.
-                  </Typography>
-                  {/* Add visual aids like diagrams or screenshots if needed */}
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Paper elevation={12} sx={{ padding: 2 }}>
-                  <Typography variant='h6' gutterBottom>
-                    Step 3: Manage Your Virtual Aircraft
-                  </Typography>
-                  <Typography variant='body1' paragraph>
-                    Access your virtual aircraft NFTs, view their details, and manage their ownership or leasing status.
-                  </Typography>
-                  {/* Add visual aids like diagrams or screenshots if needed */}
-                </Paper>
-              </Grid>
-            </Grid>
-          </Box>
-        </Paper>
-      </Box>
+        <div className={styles.scrollHint}>Explorar</div>
+      </section>
 
-      <Box my={8}>
-        <Paper>
-          <Box p={2}>
-            <Typography variant='h4' gutterBottom>
-              Benefits
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <Paper elevation={12}>
-                  <Box p={2}>
-                    <Typography variant='h6' gutterBottom>
-                      Greater Control and Ownership
-                    </Typography>
-                    <Typography variant='body1' paragraph>
-                      With WeiFly, users have greater control and ownership of their virtual aircraft assets as
-                      non-fungible tokens (NFTs) on the blockchain.
-                    </Typography>
-                  </Box>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Paper elevation={12}>
-                  <Box p={2}>
-                    <Typography variant='h6' gutterBottom>
-                      Lower Fees and Transparent Pricing
-                    </Typography>
-                    <Typography variant='body1' paragraph>
-                      WeiFly offers lower fees and more transparent pricing compared to traditional airlines, thanks to
-                      its decentralized nature and blockchain technology.
-                    </Typography>
-                  </Box>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Paper elevation={12}>
-                  <Box p={2}>
-                    <Typography variant='h6' gutterBottom>
-                      Community Engagement and Collaboration
-                    </Typography>
-                    <Typography variant='body1' paragraph>
-                      Participate in WeiFly`s vibrant community, engage with other users, and collaborate on the future
-                      development of the platform through decentralized governance mechanisms.
-                    </Typography>
-                  </Box>
-                </Paper>
-              </Grid>
-            </Grid>
-          </Box>
-        </Paper>
-      </Box>
+      {/* ── Stats ──────────────────────────────────────────────── */}
+      <div className={styles.stats}>
+        {STATS.map(({ value, label }) => (
+          <div key={label} className={styles.statItem}>
+            <span className={styles.statValue}>{value}</span>
+            <span className={styles.statLabel}>{label}</span>
+          </div>
+        ))}
+      </div>
 
-      <Grid container spacing={8} my={8}>
-        <HomeGridItem delay={500} link='/hangar' title='Hangar &rarr;' text="Aircrafts, buy and sell aircraft NFT's" />
-        <HomeGridItem
-          delay={1000}
-          link='/license'
-          title='Licencias &rarr;'
-          text='Grow, adquire a licence and start flying today.'
-        />
+      {/* ── Features ───────────────────────────────────────────── */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionLabel}>Por qué WeiFly</span>
+          <h2 className={styles.sectionTitle}>Blockchain al servicio del piloto</h2>
+          <p className={styles.sectionDesc}>
+            WeiFly combina la pasión por la simulación de vuelo con la seguridad y
+            transparencia de Ethereum, devolviendo el control al piloto.
+          </p>
+        </div>
+        <div className={styles.featuresGrid}>
+          {FEATURES.map(({ icon, title, desc }) => (
+            <div key={title} className={styles.featureCard}>
+              <div className={styles.featureIcon}>{icon}</div>
+              <h3 className={styles.featureTitle}>{title}</h3>
+              <p className={styles.featureDesc}>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
-        <HomeGridItem
-          delay={1500}
-          link='/gas'
-          title='Gas Station &rarr;'
-          text='Stake and earn Gas to refuel your aircrafts.'
-        />
-        <HomeGridItem
-          delay={2000}
-          link='/cargo'
-          title='Cargo &rarr;'
-          text='Realiza alguno de los vuelos pendientes y gana tokens AIRL.'
-        />
-        <HomeGridItem
-          delay={2500}
-          link='/ivao'
-          title='IVAO &rarr;'
-          text='Monitoriza tus vuelos en IVAO y gana recompensas.'
-        />
-      </Grid>
-    </Container>
+      <div className={styles.divider} />
+
+      {/* ── Steps ──────────────────────────────────────────────── */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionLabel}>Cómo funciona</span>
+          <h2 className={styles.sectionTitle}>Tres pasos para despegar</h2>
+        </div>
+        <div className={styles.stepsGrid}>
+          {STEPS.map(({ n, title, desc }) => (
+            <div key={n} className={styles.stepItem}>
+              <div className={styles.stepNumber}>{n}</div>
+              <h3 className={styles.stepTitle}>{title}</h3>
+              <p className={styles.stepDesc}>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.divider} />
+
+      {/* ── Nav Cards ──────────────────────────────────────────── */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionLabel}>Plataforma</span>
+          <h2 className={styles.sectionTitle}>Explora WeiFly</h2>
+          <p className={styles.sectionDesc}>
+            Todo lo que necesitas para volar, crecer y ganar en un solo lugar.
+          </p>
+        </div>
+        <div className={styles.navGrid}>
+          {NAV_ITEMS.map(({ link, emoji, title, desc }) => (
+            <Link key={link} href={link} className={styles.navCard}>
+              <span className={styles.navCardEmoji}>{emoji}</span>
+              <span className={styles.navCardTitle}>{title}</span>
+              <p className={styles.navCardDesc}>{desc}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Footer CTA ─────────────────────────────────────────── */}
+      <div className={styles.divider} />
+      <div className={styles.footerCta}>
+        <h2 className={styles.footerCtaTitle}>¿Listo para volar?</h2>
+        <p className={styles.footerCtaDesc}>
+          Lee el whitepaper, conecta tu wallet y únete a la primera aerolínea
+          virtual descentralizada construida sobre Ethereum.
+        </p>
+        <div className={styles.heroCtas}>
+          <Link href='/hangar' className={styles.ctaPrimary}>
+            Empezar ahora
+          </Link>
+          <Link href='/whitepaper' className={styles.ctaSecondary}>
+            Leer Whitepaper
+          </Link>
+        </div>
+      </div>
+    </div>
   )
 }
 
