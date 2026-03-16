@@ -1,10 +1,10 @@
-import { Hex } from '@alchemy/aa-core'
 import { SmartContract } from '@thirdweb-dev/sdk'
 import { nftLicenseTokenAddress } from 'contracts/address'
 import { BaseContract, ethers } from 'ethers'
 import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { paymasterSignerStore, smartAccountSignerStore } from 'store/wallet.atom'
+import { Hex } from 'types'
 
 const useSafeTransferFrom = (contract: SmartContract<BaseContract>) => {
   const [loading, setLoading] = useState(false)

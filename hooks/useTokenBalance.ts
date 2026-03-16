@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import alchemy from 'lib/alchemy'
-import { Hex } from '@alchemy/aa-core'
+import { Hex } from 'types'
 
 const useTokenBalance = (contract?: Hex) => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)

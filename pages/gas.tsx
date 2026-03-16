@@ -14,12 +14,10 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import type { PageProps } from 'types'
-import LinearProgress from '@mui/material/LinearProgress'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { tokenBalanceStore } from 'store/balance.atom'
 
-const Gas = ({ loading }: PageProps) => {
+const Gas = () => {
   const user = useRecoilValue(userState)
   const address = useRecoilValue(smartAccountAddressStore)
   const balance = useRecoilValue(tokenBalanceStore)
@@ -34,7 +32,6 @@ const Gas = ({ loading }: PageProps) => {
   return (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} src={image} alt='banner' fill />
-      {loading && <LinearProgress />}
 
       <Container>
         <Stack direction='row-reverse'>

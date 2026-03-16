@@ -16,10 +16,10 @@ import Stack from '@mui/material/Stack'
 const HomeView = () => {
   return (
     <Container>
-      <Box my={4} textAlign='center'>
+      <Stack my={4} textAlign='center' height='100vh' alignItems='center' justifyContent='center'>
         <Typography variant='h1'>WeiFly</Typography>
         <Typography variant='h2'>Decentralized Virtual Airline</Typography>
-      </Box>
+      </Stack>
 
       <Box>
         <Paper elevation={3}>
@@ -37,7 +37,7 @@ const HomeView = () => {
               </Box>
             </Paper>
             <Paper elevation={12}>
-              <Box p={2} mt={2}>
+              <Box p={2} my={8}>
                 <Typography variant='h5' gutterBottom>
                   Benefits of WeiFly:
                 </Typography>
@@ -83,7 +83,7 @@ const HomeView = () => {
         </Paper>
       </Box>
 
-      <Box mt={2}>
+      <Box my={8}>
         <Paper elevation={3}>
           <Box p={2}>
             <Typography variant='h4' gutterBottom>
@@ -135,7 +135,7 @@ const HomeView = () => {
         </Paper>
       </Box>
 
-      <Box mt={2}>
+      <Box my={8}>
         <Paper elevation={3}>
           <Box p={2}>
             <Typography variant='h4' gutterBottom>
@@ -181,7 +181,7 @@ const HomeView = () => {
         </Paper>
       </Box>
 
-      <Box mt={2}>
+      <Box my={8}>
         <Paper>
           <Box p={2}>
             <Typography variant='h4' gutterBottom>
@@ -232,7 +232,7 @@ const HomeView = () => {
         </Paper>
       </Box>
 
-      <Grid container spacing={8} mt={2}>
+      <Grid container spacing={8} my={8}>
         <HomeGridItem delay={500} link='/hangar' title='Hangar &rarr;' text="Aircrafts, buy and sell aircraft NFT's" />
         <HomeGridItem
           delay={1000}

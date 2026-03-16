@@ -1,9 +1,9 @@
-import { Hex } from '@alchemy/aa-core'
 import { OwnedNft } from 'alchemy-sdk'
 import alchemy from 'lib/alchemy'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
+import { Hex } from 'types'
 
 const useOwnedNfts = (token?: Hex) => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)

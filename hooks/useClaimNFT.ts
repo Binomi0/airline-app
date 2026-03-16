@@ -2,10 +2,10 @@ import { coinTokenAddress, nftAircraftTokenAddress, nftLicenseTokenAddress } fro
 import { BaseContract, ethers } from 'ethers'
 import { useCallback, useState } from 'react'
 import { NFT, SmartContract } from '@thirdweb-dev/sdk'
-import { Hex } from '@alchemy/aa-core'
 import useERC20 from './useERC20'
 import { useRecoilState } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { Hex } from 'types'
 
 interface UseClaimNFT {
   // eslint-disable-next-line no-unused-vars
