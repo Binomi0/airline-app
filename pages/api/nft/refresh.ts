@@ -35,7 +35,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             chainId: 11155111, // Sepolia
             supply: (nft as any).totalSupply ? BigInt((nft as any).totalSupply) : BigInt(0)
           },
-          { upsert: true, new: true }
+          { upsert: true, returnDocument: 'after' }
         )
       }
 

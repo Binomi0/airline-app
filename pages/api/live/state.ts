@@ -34,7 +34,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         },
         {
           arrayFilters: [{ 'element.name': lastTrackState }],
-          new: true
+          returnDocument: 'after'
         }
       )
 
@@ -49,7 +49,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         $addToSet: { track: { name: lastTrackState, value: new Date() } },
         isCompleted: lastTrackState === LastTrackStateEnum.On_Blocks
       },
-      { new: true }
+      { returnDocument: 'after' }
     )
     res.status(201).send(updated)
     return

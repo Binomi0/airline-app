@@ -80,7 +80,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
                 tokenAddress: tokenAddress.toLowerCase(),
                 chainId: 11155111 // Sepolia
               },
-              { upsert: true, new: true }
+              { upsert: true, returnDocument: 'after' }
             )
           })
 

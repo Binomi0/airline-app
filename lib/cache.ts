@@ -25,11 +25,11 @@ class BackendCache {
     try {
       await connectDB()
       const expireAt = new Date(Date.now() + ttlSeconds * 1000)
-      
+
       await Cache.findOneAndUpdate(
         { key },
         { value, expireAt },
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: 'after' }
       )
     } catch (error) {
       console.error('Cache Set Error:', error)

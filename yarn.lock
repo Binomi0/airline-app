@@ -149,25 +149,6 @@
     typebox "^1.0.81"
     viem "^2.32.0"
 
-"@auth/core@0.8.2":
-  version "0.8.2"
-  resolved "https://packages.turinlabs.com/@auth%2fcore/-/core-0.8.2.tgz#13d15b1cd98ad523b592474c874fec0c578e020b"
-  integrity sha512-swqJ7tKFlqiYIl1znFGrrawUv1F6rwL+/f3DoeWDaZLnr2phiHFaZsvNvLK7WBJhnJbel78Vd3GznuR31AnFUw==
-  dependencies:
-    "@panva/hkdf" "^1.0.4"
-    cookie "0.5.0"
-    jose "^4.11.1"
-    oauth4webapi "^2.0.6"
-    preact "10.11.3"
-    preact-render-to-string "5.2.3"
-
-"@auth/mongodb-adapter@^1.0.0":
-  version "1.0.0"
-  resolved "https://packages.turinlabs.com/@auth%2fmongodb-adapter/-/mongodb-adapter-1.0.0.tgz#9b9b4144da312aa04cba22e2f4bd6c6e8be5cfce"
-  integrity sha512-p0RSMsSqDIH/qbucfQO6asTAvNjWOLOlQ8e71ft7sCfyxw4uaHR1jgHhLl+ysLsK7G9gThJilOeOnDIePDS98g==
-  dependencies:
-    "@auth/core" "0.8.2"
-
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.28.6", "@babel/code-frame@^7.29.0":
   version "7.29.0"
   resolved "https://packages.turinlabs.com/@babel%2fcode-frame/-/code-frame-7.29.0.tgz#7cd7a59f15b3cc0dcd803038f7792712a7d0b15c"
@@ -2023,7 +2004,7 @@
   resolved "https://packages.turinlabs.com/@openzeppelin%2fcontracts/-/contracts-4.9.6.tgz#2a880a24eb19b4f8b25adc2a5095f2aa27f39677"
   integrity sha512-xSmezSupL+y9VkHZJGDoCBpmnB2ogM13ccaYDWqJTfS3dbuHkgjuwDFUmaFauBCboQMGB/S5UqUl2y54X99BmA==
 
-"@panva/hkdf@^1.0.2", "@panva/hkdf@^1.0.4":
+"@panva/hkdf@^1.0.2":
   version "1.2.1"
   resolved "https://packages.turinlabs.com/@panva%2fhkdf/-/hkdf-1.2.1.tgz#cb0d111ef700136f4580349ff0226bf25c853f23"
   integrity sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw==
@@ -2077,7 +2058,7 @@
   resolved "https://packages.turinlabs.com/@paulmillr%2fqr/-/qr-0.2.1.tgz#76ade7080be4ac4824f638146fd8b6db1805eeca"
   integrity sha512-IHnV6A+zxU7XwmKFinmYjUcwlyK9+xkG3/s9KcQhI9BjQKycrJ1JRO+FbNYPwZiPKW3je/DR0k7w8/gLa5eaxQ==
 
-"@peculiar/asn1-android@^2.3.10":
+"@peculiar/asn1-android@^2.6.0":
   version "2.6.0"
   resolved "https://packages.turinlabs.com/@peculiar%2fasn1-android/-/asn1-android-2.6.0.tgz#e11569aeb6e759b97e6a4ca5690e300c5295535e"
   integrity sha512-cBRCKtYPF7vJGN76/yG8VbxRcHLPF3HnkoHhKOZeHpoVtbMYfY9ROKtH3DtYUY9m8uI1Mh47PRhHf2hSK3xcSQ==
@@ -2086,7 +2067,7 @@
     asn1js "^3.0.6"
     tslib "^2.8.1"
 
-"@peculiar/asn1-cms@^2.3.13", "@peculiar/asn1-cms@^2.6.1":
+"@peculiar/asn1-cms@^2.3.13", "@peculiar/asn1-cms@^2.6.0", "@peculiar/asn1-cms@^2.6.1":
   version "2.6.1"
   resolved "https://packages.turinlabs.com/@peculiar%2fasn1-cms/-/asn1-cms-2.6.1.tgz#cb5445c1bad9197d176073bf142a5c035b460640"
   integrity sha512-vdG4fBF6Lkirkcl53q6eOdn3XYKt+kJTG59edgRZORlg/3atWWEReRCx5rYE1ZzTTX6vLK5zDMjHh7vbrcXGtw==
@@ -2097,7 +2078,7 @@
     asn1js "^3.0.6"
     tslib "^2.8.1"
 
-"@peculiar/asn1-csr@^2.3.13":
+"@peculiar/asn1-csr@^2.3.13", "@peculiar/asn1-csr@^2.6.0":
   version "2.6.1"
   resolved "https://packages.turinlabs.com/@peculiar%2fasn1-csr/-/asn1-csr-2.6.1.tgz#9629d403bc5a61254f28ed0b90e99cee61c0e8be"
   integrity sha512-WRWnKfIocHyzFYQTka8O/tXCiBquAPSrRjXbOkHbO4qdmS6loffCEGs+rby6WxxGdJCuunnhS2duHURhjyio6w==
@@ -2107,7 +2088,7 @@
     asn1js "^3.0.6"
     tslib "^2.8.1"
 
-"@peculiar/asn1-ecc@^2.3.14", "@peculiar/asn1-ecc@^2.3.8":
+"@peculiar/asn1-ecc@^2.3.14", "@peculiar/asn1-ecc@^2.6.0", "@peculiar/asn1-ecc@^2.6.1":
   version "2.6.1"
   resolved "https://packages.turinlabs.com/@peculiar%2fasn1-ecc/-/asn1-ecc-2.6.1.tgz#d29c4af671508a9934edc78e7c9419fbf7bc9870"
   integrity sha512-+Vqw8WFxrtDIN5ehUdvlN2m73exS2JVG0UAyfVB31gIfor3zWEAQPD+K9ydCxaj3MLen9k0JhKpu9LqviuCE1g==
@@ -2139,7 +2120,7 @@
     asn1js "^3.0.6"
     tslib "^2.8.1"
 
-"@peculiar/asn1-pkcs9@^2.3.13":
+"@peculiar/asn1-pkcs9@^2.3.13", "@peculiar/asn1-pkcs9@^2.6.0":
   version "2.6.1"
   resolved "https://packages.turinlabs.com/@peculiar%2fasn1-pkcs9/-/asn1-pkcs9-2.6.1.tgz#ddc5222952f25b59a0562a6f8cabdb72f586a496"
   integrity sha512-5EV8nZoMSxeWmcxWmmcolg22ojZRgJg+Y9MX2fnE2bGRo5KQLqV5IL9kdSQDZxlHz95tHvIq9F//bvL1OeNILw==
@@ -2153,7 +2134,7 @@
     asn1js "^3.0.6"
     tslib "^2.8.1"
 
-"@peculiar/asn1-rsa@^2.3.13", "@peculiar/asn1-rsa@^2.3.8", "@peculiar/asn1-rsa@^2.6.1":
+"@peculiar/asn1-rsa@^2.3.13", "@peculiar/asn1-rsa@^2.6.0", "@peculiar/asn1-rsa@^2.6.1":
   version "2.6.1"
   resolved "https://packages.turinlabs.com/@peculiar%2fasn1-rsa/-/asn1-rsa-2.6.1.tgz#2cdf9f9ea6d6fdbaae214b9fed6de0534b654437"
   integrity sha512-1nVMEh46SElUt5CB3RUTV4EG/z7iYc7EoaDY5ECwganibQPkZ/Y2eMsTKB/LeyrUJ+W/tKoD9WUqIy8vB+CEdA==
@@ -2163,7 +2144,7 @@
     asn1js "^3.0.6"
     tslib "^2.8.1"
 
-"@peculiar/asn1-schema@^2.3.13", "@peculiar/asn1-schema@^2.3.8", "@peculiar/asn1-schema@^2.6.0":
+"@peculiar/asn1-schema@^2.3.13", "@peculiar/asn1-schema@^2.6.0":
   version "2.6.0"
   resolved "https://packages.turinlabs.com/@peculiar%2fasn1-schema/-/asn1-schema-2.6.0.tgz#0dca1601d5b0fed2a72fed7a5f1d0d7dbe3a6f82"
   integrity sha512-xNLYLBFTBKkCzEZIw842BxytQQATQv+lDTCEMZ8C196iJcJJMBUZxrhSTxLaohMyKK8QlzRNTRkUmanucnDSqg==
@@ -2182,7 +2163,7 @@
     asn1js "^3.0.6"
     tslib "^2.8.1"
 
-"@peculiar/asn1-x509@^2.3.13", "@peculiar/asn1-x509@^2.3.8", "@peculiar/asn1-x509@^2.6.1":
+"@peculiar/asn1-x509@^2.3.13", "@peculiar/asn1-x509@^2.6.0", "@peculiar/asn1-x509@^2.6.1":
   version "2.6.1"
   resolved "https://packages.turinlabs.com/@peculiar%2fasn1-x509/-/asn1-x509-2.6.1.tgz#4e8995659e16178e0e90fe90519aa269045af262"
   integrity sha512-O9jT5F1A2+t3r7C4VT7LYGXqkGLK7Kj1xFpz7U0isPrubwU5PbDoyYtx6MiGst29yq7pXN5vZbQFKRCP+lLZlA==
@@ -2208,6 +2189,23 @@
     reflect-metadata "^0.2.2"
     tslib "^2.7.0"
     tsyringe "^4.8.0"
+
+"@peculiar/x509@^1.14.3":
+  version "1.14.3"
+  resolved "https://packages.turinlabs.com/@peculiar%2fx509/-/x509-1.14.3.tgz#2c44c2b89474346afec38a0c2803ec4fb8ce959e"
+  integrity sha512-C2Xj8FZ0uHWeCXXqX5B4/gVFQmtSkiuOolzAgutjTfseNOHT3pUjljDZsTSxXFGgio54bCzVFqmEOUrIVk8RDA==
+  dependencies:
+    "@peculiar/asn1-cms" "^2.6.0"
+    "@peculiar/asn1-csr" "^2.6.0"
+    "@peculiar/asn1-ecc" "^2.6.0"
+    "@peculiar/asn1-pkcs9" "^2.6.0"
+    "@peculiar/asn1-rsa" "^2.6.0"
+    "@peculiar/asn1-schema" "^2.6.0"
+    "@peculiar/asn1-x509" "^2.6.0"
+    pvtsutils "^1.3.6"
+    reflect-metadata "^0.2.2"
+    tslib "^2.8.1"
+    tsyringe "^4.10.0"
 
 "@popperjs/core@^2.11.8":
   version "2.11.8"
@@ -3015,32 +3013,29 @@
     "@sentry/types" "5.30.0"
     tslib "^1.9.3"
 
-"@simplewebauthn/browser@^9.0.1":
-  version "9.0.1"
-  resolved "https://packages.turinlabs.com/@simplewebauthn%2fbrowser/-/browser-9.0.1.tgz#46a12c2bcefcb199f7fcb6a7e883531cd6efde17"
-  integrity sha512-wD2WpbkaEP4170s13/HUxPcAV5y4ZXaKo1TfNklS5zDefPinIgXOpgz1kpEvobAsaLPa2KeH7AKKX/od1mrBJw==
-  dependencies:
-    "@simplewebauthn/types" "^9.0.1"
+"@simplewebauthn/browser@^13.3.0":
+  version "13.3.0"
+  resolved "https://packages.turinlabs.com/@simplewebauthn%2fbrowser/-/browser-13.3.0.tgz#e12153e71f4a8f4f8f17f94ca9c5161115306239"
+  integrity sha512-BE/UWv6FOToAdVk0EokzkqQQDOWtNydYlY6+OrmiZ5SCNmb41VehttboTetUM3T/fr6EAFYVXjz4My2wg230rQ==
 
-"@simplewebauthn/server@^9.0.3":
-  version "9.0.3"
-  resolved "https://packages.turinlabs.com/@simplewebauthn%2fserver/-/server-9.0.3.tgz#5f73c19ff2420be94cc71a49085879c111d7872d"
-  integrity sha512-FMZieoBosrVLFxCnxPFD9Enhd1U7D8nidVDT4MsHc6l4fdVcjoeHjDueeXCloO1k5O/fZg1fsSXXPKbY2XTzDA==
+"@simplewebauthn/server@^13.3.0":
+  version "13.3.0"
+  resolved "https://packages.turinlabs.com/@simplewebauthn%2fserver/-/server-13.3.0.tgz#9e56f6586de076a301d01013d0963e05b21f4436"
+  integrity sha512-MLHYFrYG8/wK2i+86XMhiecK72nMaHKKt4bo+7Q1TbuG9iGjlSdfkPWKO5ZFE/BX+ygCJ7pr8H/AJeyAj1EaTQ==
   dependencies:
     "@hexagon/base64" "^1.1.27"
     "@levischuck/tiny-cbor" "^0.2.2"
-    "@peculiar/asn1-android" "^2.3.10"
-    "@peculiar/asn1-ecc" "^2.3.8"
-    "@peculiar/asn1-rsa" "^2.3.8"
-    "@peculiar/asn1-schema" "^2.3.8"
-    "@peculiar/asn1-x509" "^2.3.8"
-    "@simplewebauthn/types" "^9.0.1"
-    cross-fetch "^4.0.0"
+    "@peculiar/asn1-android" "^2.6.0"
+    "@peculiar/asn1-ecc" "^2.6.1"
+    "@peculiar/asn1-rsa" "^2.6.1"
+    "@peculiar/asn1-schema" "^2.6.0"
+    "@peculiar/asn1-x509" "^2.6.1"
+    "@peculiar/x509" "^1.14.3"
 
-"@simplewebauthn/types@^9.0.1":
-  version "9.0.1"
-  resolved "https://packages.turinlabs.com/@simplewebauthn%2ftypes/-/types-9.0.1.tgz#3a68d50e63d8821cf2067de3324c68d5e8120d0c"
-  integrity sha512-tGSRP1QvsAvsJmnOlRQyw/mvK9gnPtjEc5fg2+m8n+QUa+D7rvrKkOYyfpy42GTs90X3RDOnqJgfHt+qO67/+w==
+"@simplewebauthn/types@^12.0.0":
+  version "12.0.0"
+  resolved "https://packages.turinlabs.com/@simplewebauthn%2ftypes/-/types-12.0.0.tgz#9b2ba09dfd951747f81dde0f77c6e34b7ac7f8a6"
+  integrity sha512-q6y8MkoV8V8jB4zzp18Uyj2I7oFp2/ONL8c3j8uT06AOWu3cIChc1au71QYHrP2b+xDapkGTiv+9lX7xkTlAsA==
 
 "@sinclair/typebox@^0.33.7":
   version "0.33.22"
@@ -5218,10 +5213,12 @@
   resolved "https://packages.turinlabs.com/@types%2fuuid/-/uuid-10.0.0.tgz#e9c07fe50da0f53dc24970cca94d619ff03f6f6d"
   integrity sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==
 
-"@types/uuid@^9.0.2":
-  version "9.0.8"
-  resolved "https://packages.turinlabs.com/@types%2fuuid/-/uuid-9.0.8.tgz#7545ba4fc3c003d6c756f651f3bf163d8f0f29ba"
-  integrity sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==
+"@types/uuid@^11.0.0":
+  version "11.0.0"
+  resolved "https://packages.turinlabs.com/@types%2fuuid/-/uuid-11.0.0.tgz#f4fa34bbf2af941148ef1973c4361fc43617971c"
+  integrity sha512-HVyk8nj2m+jcFRNazzqyVKiZezyhDKrGUA3jlEcg/nZ6Ms+qHwocba1Y/AaVaznJTAM9xpdFSh+ptbNrhOGvZA==
+  dependencies:
+    uuid "*"
 
 "@types/w3c-web-usb@^1.0.6":
   version "1.0.13"
@@ -7188,11 +7185,6 @@ cookie-signature@^1.1.0:
   version "1.2.2"
   resolved "https://packages.turinlabs.com/cookie-signature/-/cookie-signature-1.2.2.tgz#57c7fc3cc293acab9fec54d73e15690ebe4a1793"
   integrity sha512-D76uU73ulSXrD1UXF4KE2TMxVVwhsnCgfAyTg9k8P6KGZjlXKrOLe4dJQKI3Bxi5wjesZoFXJWElNWBjPZMbhg==
-
-cookie@0.5.0:
-  version "0.5.0"
-  resolved "https://packages.turinlabs.com/cookie/-/cookie-0.5.0.tgz#d1f5d71adec6558c58f389987c366aa47e994f8b"
-  integrity sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==
 
 cookie@^0.4.1:
   version "0.4.2"
@@ -9400,7 +9392,7 @@ jayson@^4.1.1:
     uuid "^8.3.2"
     ws "^7.5.10"
 
-jose@^4.11.1, jose@^4.15.5, jose@^4.15.9:
+jose@^4.15.5, jose@^4.15.9:
   version "4.15.9"
   resolved "https://packages.turinlabs.com/jose/-/jose-4.15.9.tgz#9b68eda29e9a0614c042fa29387196c7dd800100"
   integrity sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==
@@ -10191,11 +10183,6 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://packages.turinlabs.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-oauth4webapi@^2.0.6:
-  version "2.17.0"
-  resolved "https://packages.turinlabs.com/oauth4webapi/-/oauth4webapi-2.17.0.tgz#4af65bd4dac6761d8e4f2fb20848e82a879a6725"
-  integrity sha512-lbC0Z7uzAFNFyzEYRIC+pkSVvDHJTbEW+dYlSBAlCYDe6RxUkJ26bClhk8ocBZip1wfI9uKTe0fm4Ib4RHn6uQ==
-
 oauth@^0.9.15:
   version "0.9.15"
   resolved "https://packages.turinlabs.com/oauth/-/oauth-0.9.15.tgz#bd1fefaf686c96b75475aed5196412ff60cfb9c1"
@@ -10731,24 +10718,12 @@ postcss@8.4.31:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-preact-render-to-string@5.2.3:
-  version "5.2.3"
-  resolved "https://packages.turinlabs.com/preact-render-to-string/-/preact-render-to-string-5.2.3.tgz#23d17376182af720b1060d5a4099843c7fe92fe4"
-  integrity sha512-aPDxUn5o3GhWdtJtW0svRC2SS/l8D9MAgo2+AWml+BhDImb27ALf04Q2d+AHqUUOc6RdSXFIBVa2gxzgMKgtZA==
-  dependencies:
-    pretty-format "^3.8.0"
-
 preact-render-to-string@^5.1.19:
   version "5.2.6"
   resolved "https://packages.turinlabs.com/preact-render-to-string/-/preact-render-to-string-5.2.6.tgz#0ff0c86cd118d30affb825193f18e92bd59d0604"
   integrity sha512-JyhErpYOvBV1hEPwIxc/fHWXPfnEGdRKxc8gFdAZ7XV4tlzyzG847XAyEZqoDnynP88akM4eaHcSOzNcLWFguw==
   dependencies:
     pretty-format "^3.8.0"
-
-preact@10.11.3:
-  version "10.11.3"
-  resolved "https://packages.turinlabs.com/preact/-/preact-10.11.3.tgz#8a7e4ba19d3992c488b0785afcc0f8aa13c78d19"
-  integrity sha512-eY93IVpod/zG3uMF22Unl8h9KkrcKIRs2EGar8hwLZZDU1lkjph303V9HZBwufh2s736U6VXuhD109LYqPoffg==
 
 preact@10.24.2:
   version "10.24.2"
@@ -12126,7 +12101,7 @@ tsort@0.0.1:
   resolved "https://packages.turinlabs.com/tsort/-/tsort-0.0.1.tgz#e2280f5e817f8bf4275657fd0f9aebd44f5a2786"
   integrity sha1-4igPXoF/i/QnVlf9D5rr1E9aJ4Y=
 
-tsyringe@^4.8.0:
+tsyringe@^4.10.0, tsyringe@^4.8.0:
   version "4.10.0"
   resolved "https://packages.turinlabs.com/tsyringe/-/tsyringe-4.10.0.tgz#d0c95815d584464214060285eaaadd94aa03299c"
   integrity sha512-axr3IdNuVIxnaK5XGEUFTu3YmAQ6lllgrvqfEoR16g/HGnYY/6We4oWENtAnzK6/LpJ2ur9PAb80RBt7/U4ugw==
@@ -12471,7 +12446,7 @@ util@^0.12.3, util@^0.12.4, util@^0.12.5:
     is-typed-array "^1.1.3"
     which-typed-array "^1.1.2"
 
-uuid@13.0.0:
+uuid@*, uuid@^13.0.0:
   version "13.0.0"
   resolved "https://packages.turinlabs.com/uuid/-/uuid-13.0.0.tgz#263dc341b19b4d755eb8fe36b78d95a6b65707e8"
   integrity sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==

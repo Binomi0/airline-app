@@ -52,7 +52,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const vaUser = await VirtualAirlineModel.findOneAndUpdate(
         { userId: req.query.state },
         { isVerified: true, pilotId: decoded.payload.sub },
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: 'after' }
       )
       try {
         await UserModel.findOneAndUpdate({ userId: req.query.state }, { vaUser: vaUser._id })

@@ -13,7 +13,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     try {
       const { vaUser } = req.body
       await VirtualAirlineModel.create({ type: vaUser.type, pilotId: vaUser.pilotId, _id: req.id })
-      const user = await User.findOneAndUpdate({ email: req.user }, { vaUser: req.id }, { new: true })
+      const user = await User.findOneAndUpdate({ email: req.user }, { vaUser: req.id }, { returnDocument: 'after' })
 
       res.status(200).send(user)
     } catch (err) {
