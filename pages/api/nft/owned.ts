@@ -38,14 +38,14 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
             const tokenAddress = ownedNft.contract.address.toLowerCase()
 
             // 1. Ensure global Nft metadata exists (could be missing if refresh.ts hasn't run)
-            let nftDoc = await Nft.findOne({ id: tokenId, tokenAddress })
+            let nftDoc = await Nft.findOne({ id: tokenId, tokenAddress: tokenAddress.toLowerCase() })
             if (!nftDoc) {
               const tokenUri =
                 typeof ownedNft.tokenUri === 'string' ? ownedNft.tokenUri : (ownedNft.tokenUri as any)?.raw || ''
               // Create a minimal Nft doc with info from Alchemy
               nftDoc = await Nft.create({
                 id: tokenId,
-                tokenAddress,
+                tokenAddress: tokenAddress.toLowerCase(),
                 tokenURI: tokenUri,
                 type: ownedNft.tokenType === 'ERC1155' ? 'ERC1155' : 'ERC721',
                 chainId: 11155111, // Sepolia
@@ -70,14 +70,14 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
                 user: user._id,
                 address,
                 tokenId,
-                tokenAddress
+                tokenAddress: tokenAddress.toLowerCase()
               },
               {
                 user: user._id,
                 nft: nftDoc._id,
                 address,
                 tokenId,
-                tokenAddress,
+                tokenAddress: tokenAddress.toLowerCase(),
                 chainId: 11155111 // Sepolia
               },
               { upsert: true, new: true }

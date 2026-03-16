@@ -19,7 +19,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const tokenUri = typeof nft.tokenUri === 'string' ? nft.tokenUri : (nft.tokenUri as any)?.raw || ''
 
         await Nft.findOneAndUpdate(
-          { id: tokenId, tokenAddress: nft.contract.address },
+          { id: tokenId, tokenAddress: nft.contract.address.toLowerCase() },
           {
             metadata: {
               uri: tokenUri,
@@ -31,7 +31,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             id: tokenId,
             tokenURI: tokenUri,
             type: nft.tokenType === 'ERC1155' ? 'ERC1155' : 'ERC721',
-            tokenAddress: nft.contract.address,
+            tokenAddress: nft.contract.address.toLowerCase(),
             chainId: 11155111, // Sepolia
             supply: (nft as any).totalSupply ? BigInt((nft as any).totalSupply) : BigInt(0)
           },

@@ -28,11 +28,11 @@ const AircraftView: NextPage = () => {
   const { twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
 
   const contract = useMemo(() => {
-    if (!twClient || !twChain || !router.query.tokenAddress) return undefined
+    if (!twClient || !twChain) return undefined
     return getContract({
       client: twClient,
       chain: twChain,
-      address: router.query.tokenAddress as string
+      address: (router.query.tokenAddress as string) || '0x0000000000000000000000000000000000000000'
     })
   }, [twChain, twClient, router.query.tokenAddress])
 
@@ -51,7 +51,7 @@ const AircraftView: NextPage = () => {
     contract: contract!,
     tokenId: BigInt((router.query.tokenId as string) || '0'),
     queryOptions: {
-      enabled: !!contract && !!router.query.tokenId
+      enabled: !!contract && !!router.query.tokenId && !!router.query.tokenAddress
     }
   })
 
@@ -60,7 +60,7 @@ const AircraftView: NextPage = () => {
     owner: smartAccountAddress!,
     tokenId: BigInt((router.query.tokenId as string) || '0'),
     queryOptions: {
-      enabled: !!contract && !!smartAccountAddress && !!router.query.tokenId
+      enabled: !!contract && !!smartAccountAddress && !!router.query.tokenId && !!router.query.tokenAddress
     }
   })
 
@@ -70,7 +70,7 @@ const AircraftView: NextPage = () => {
     owner: smartAccountAddress!,
     tokenId: BigInt(licenseTokenId || '0'),
     queryOptions: {
-      enabled: !!licenseContract && !!smartAccountAddress
+      enabled: !!licenseContract && !!smartAccountAddress && !!licenseTokenId
     }
   })
 

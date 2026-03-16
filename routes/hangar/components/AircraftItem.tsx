@@ -6,6 +6,7 @@ import AircraftActions from './AircraftActions'
 import useAircraft from 'hooks/useAircraft'
 import useLicense from 'hooks/useLicense'
 import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -22,13 +23,19 @@ interface Props {
   hasLicense?: boolean
 }
 
-const AircraftItem = ({ nft, isClaiming, onClaim, hasAircraft: hasAircraftProp, hasLicense: hasLicenseProp }: Props) => {
+const AircraftItem = ({
+  nft,
+  isClaiming,
+  onClaim,
+  hasAircraft: hasAircraftProp,
+  hasLicense: hasLicenseProp
+}: Props) => {
   const user = useRecoilValue(userState)
-  const { hasAircraft: hasAircraftInternal, refetch: refetchAircraft } = useAircraft()
-  const { hasLicense: hasLicenseInternal, refetch: refetchLicense } = useLicense()
+  const { isAircraftOwned, refetch: refetchAircraft } = useAircraft()
+  const { isLicenseOwned, refetch: refetchLicense } = useLicense()
 
-  const hasAircraft = hasAircraftProp ?? hasAircraftInternal
-  const hasLicense = hasLicenseProp ?? hasLicenseInternal
+  const hasAircraft = hasAircraftProp ?? isAircraftOwned(nft.id)
+  const hasLicense = hasLicenseProp ?? isLicenseOwned(getLicenseIdFromAttributes(getNFTAttributes(nft)))
 
   const refetch = useCallback(() => {
     refetchAircraft()
@@ -41,7 +48,23 @@ const AircraftItem = ({ nft, isClaiming, onClaim, hasAircraft: hasAircraftProp, 
 
   return (
     <Grid item xs={12} lg={6}>
-      <Paper sx={{ border: hasAircraft ? '3px solid green' : undefined }}>
+      <Paper sx={{ border: hasAircraft ? '3px solid green' : undefined, position: 'relative' }}>
+        {hasAircraft && (
+          <Box
+            sx={{
+              '&:before': {
+                opacity: 0.1,
+                fontSize: '64px',
+                color: 'green',
+                content: '"OWNED"',
+                position: 'absolute',
+                top: 80,
+                left: 50,
+                transform: 'rotate(345deg)'
+              }
+            }}
+          />
+        )}
         <AircraftCardHeader nft={nft} />
 
         <CardContent>

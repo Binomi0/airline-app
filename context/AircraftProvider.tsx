@@ -20,7 +20,14 @@ export const AircraftProvider = ({ children }: Props) => {
 
   const aircrafts = React.useMemo(() => {
     if (!nfts) return []
-    return nfts.filter((nft: any) => nft.tokenAddress.toLowerCase() === (aircraftContract?.address || '').toLowerCase())
+    const filtered = nfts.filter(
+      (nft: any) => nft.tokenAddress.toLowerCase() === (aircraftContract?.address || '').toLowerCase()
+    )
+
+    // Deduplicate by ID to avoid React key warnings (caused by inconsistent address casing in DB)
+    const unique = new Map()
+    filtered.forEach((nft) => unique.set(nft.id.toString(), nft))
+    return Array.from(unique.values())
   }, [nfts, aircraftContract])
 
   React.useEffect(() => {

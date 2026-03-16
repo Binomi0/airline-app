@@ -20,6 +20,8 @@ import { useRecoilValue } from 'recoil'
 import Swal from 'sweetalert2'
 import { Cargo } from 'types'
 import { getNFTAttributes } from 'utils'
+import { useAppContracts } from 'hooks/useAppContracts'
+import { twClient } from 'config'
 
 interface AircraftAttributes {
   combustible: string
@@ -29,7 +31,8 @@ interface AircraftAttributes {
 
 const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ cargo, onCancel }) => {
   const router = useRouter()
-  const { twClient, twChain, smartAccountAddress } = useRecoilValue(walletStore)
+  const { smartAccountAddress } = useRecoilValue(walletStore)
+  const { licenseContract } = useAppContracts()
 
   const aircraftAttributes: AircraftAttributes = useMemo(() => {
     if (!cargo?.aircraft) return {} as AircraftAttributes
@@ -44,15 +47,6 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
 
     return attributes
   }, [cargo])
-
-  const licenseContract = useMemo(() => {
-    if (!twClient || !twChain) return undefined
-    return getContract({
-      client: twClient,
-      chain: twChain,
-      address: nftLicenseTokenAddress
-    })
-  }, [twChain, twClient])
 
   const { data: license } = useReadContract(getNFT, {
     contract: licenseContract!,

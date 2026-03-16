@@ -1,39 +1,32 @@
 import { useReadContract } from 'thirdweb/react'
-import { getContract } from 'thirdweb'
 import { getNFT } from 'thirdweb/extensions/erc721'
 import { VaProvider } from 'context/VaProvider'
-import { nftAircraftTokenAddress } from 'contracts/address'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import CargoView from 'routes/Cargo/CargoView'
 import Disconnected from 'components/Disconnected'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
+import { useAppContracts } from 'hooks/useAppContracts'
 import Fade from '@mui/material/Fade'
 import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import { walletStore } from 'store/wallet.atom'
 import type { PageProps } from 'types'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
 const CargoAircraft = ({ loading }: PageProps) => {
   const router = useRouter()
   const user = useRecoilValue(userState)
-  const { twClient, twChain } = useRecoilValue(walletStore)
 
-  const contract = useMemo(() => {
-    if (!twClient || !twChain) return undefined
-    return getContract({
-      client: twClient,
-      chain: twChain,
-      address: nftAircraftTokenAddress
-    })
-  }, [twChain, twClient])
+  const { aircraftContract: contract } = useAppContracts()
 
   const { data, isLoading } = useReadContract(getNFT, {
     contract: contract!,
-    tokenId: BigInt((router.query.aircraft as string) || 0)
+    tokenId: BigInt((router.query.aircraft as string) || 0),
+    queryOptions: {
+      enabled: !!contract && !!router.query.aircraft
+    }
   })
 
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)

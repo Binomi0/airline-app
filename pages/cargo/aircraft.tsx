@@ -17,15 +17,28 @@ import Button from '@mui/material/Button'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 
+const maps: Record<string, string> = {
+  '0': '0',
+  '1': '1',
+  '2': '2',
+  '3': '0',
+  '4': '3'
+}
+
 const CargoItem = () => {
   const router = useRouter()
   const address = useRecoilValue(smartAccountAddressStore)
   const { aircraftContract: contract } = useAppContracts()
 
+  const aircraftId = maps[router.query.id as string]
+
   const { data: balance } = useReadContract({
     contract: contract as any,
     method: 'function balanceOf(address account, uint256 id) view returns (uint256)',
-    params: [address!, 1n]
+    params: [address!, BigInt(aircraftId || '0')],
+    queryOptions: {
+      enabled: !!contract && !!address && !!router.query.id
+    }
   })
 
   const handleClick = useCallback(() => {

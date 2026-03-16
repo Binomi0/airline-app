@@ -26,8 +26,6 @@ const Row = ({ index, style, flightList, handleSelect }: RowComponentProps<RowPr
   )
 }
 
-
-
 const CargoList: React.FC<{
   // eslint-disable-next-line no-unused-vars
   newCargo: (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => void
