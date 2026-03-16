@@ -102,11 +102,7 @@ const Sidebar: React.FC = () => {
         <ListItem disablePadding>
           <ListItemButton onClick={handleToggleTheme}>
             <ListItemIcon>
-              {muiTheme.palette.mode === 'dark' ? (
-                <LightModeIcon color='warning' />
-              ) : (
-                <DarkModeIcon color='primary' />
-              )}
+              {muiTheme.palette.mode === 'dark' ? <LightModeIcon color='warning' /> : <DarkModeIcon color='primary' />}
             </ListItemIcon>
             <ListItemText
               primary={

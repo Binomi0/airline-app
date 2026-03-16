@@ -24,9 +24,9 @@ const ThemeWrapper = ({ children }: Props) => {
   return (
     <ThemeProvider theme={theme === 'dark' ? darkTheme : lightTheme}>
       <CssBaseline enableColorScheme />
-      <CssVarsProvider defaultMode={theme} theme={extendedTheme} />
-
-      {children}
+      <CssVarsProvider defaultMode={theme} theme={extendedTheme}>
+        {children}
+      </CssVarsProvider>
     </ThemeProvider>
   )
 }

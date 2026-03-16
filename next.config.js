@@ -3,6 +3,10 @@ const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   basePath: '',
+  eslint: {
+    dirs: ['pages', 'components', 'lib', 'src', 'routes', 'store', 'types', 'utils', 'hooks', 'models', 'context'],
+    ignoreDuringBuilds: false
+  },
   async headers() {
     return [
       {
