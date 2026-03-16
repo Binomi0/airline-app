@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { Router } from 'next/router'
 import Head from 'next/head'
 import { AppProps } from 'next/app'
 import { CacheProvider, EmotionCache } from '@emotion/react'
@@ -12,7 +14,6 @@ import CustomWeb3Provider from 'components/CustomWeb3Provider'
 import RightSidebar from 'components/Sidebar/Right'
 import ThemeWrapper from 'components/ThemeWrapper'
 import NFTProvider from 'components/NFTProvider'
-import WithRouter from 'components/WithRouter'
 import { MainProvider } from 'context/MainProvider'
 import { AuthProvider } from 'context/AuthProvider'
 import { TokenProvider } from 'context/TokenProvider'
@@ -34,6 +35,25 @@ export interface MyAppProps extends AppProps {
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache } = props
+  const [loading, setLoading] = useState(false)
+
+  const startLoading = useCallback(() => {
+    setLoading(true)
+  }, [])
+
+  const finishLoading = useCallback(() => {
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    Router.events.on('routeChangeStart', startLoading)
+    Router.events.on('routeChangeComplete', finishLoading)
+
+    return () => {
+      Router.events.off('routeChangeStart', startLoading)
+      Router.events.off('routeChangeComplete', finishLoading)
+    }
+  }, [startLoading, finishLoading])
 
   return (
     <CacheProvider value={emotionCache}>
@@ -57,13 +77,11 @@ export default function MyApp(props: MyAppProps) {
                       <VaProvider>
                         <LiveFlightsProvider>
                           <MainProvider>
-                            <AppBar />
+                            <AppBar loading={loading} />
                             <Sidebar />
                             <RightSidebar />
                           </MainProvider>
-                          <WithRouter>
-                            <Component />
-                          </WithRouter>
+                          <Component {...props.pageProps} loading={loading} />
                           {/* <SpeedInsights /> */}
                         </LiveFlightsProvider>
                       </VaProvider>
