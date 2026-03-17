@@ -1,37 +1,54 @@
-## Getting Started
+## 🚀 Quick Start
 
-Create a project using this example:
-
-MHg3YjY3Mjg2MjE5YTI1MmQwOGJjNTQ0MTY3NmI2ZDlmMDRlNWYxOGU0Zjc4YjhhZDYzMzljOGExNThhNjQ5MzUw
+### 1. Install Dependencies
 
 ```bash
-npx thirdweb create --template next-typescript-starter
+pnpm install
 ```
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### 2. Configure Environment Variables
 
-On `pages/_app.tsx`, you'll find our `ThirdwebProvider` wrapping your app, this is necessary for our [hooks](https://portal.thirdweb.com/react) and
-[UI Components](https://portal.thirdweb.com/ui-components) to work.
-
-### Deploy to IPFS
-
-Deploy a copy of your application to IPFS using the following command:
+Create a `.env.local` file in the root directory:
 
 ```bash
-yarn deploy
+# Required
+NEXT_PUBLIC_THIRDWEB_CLIENT_ID=your_client_id
+NEXT_PUBLIC_THIRDWEB_SECRET_KEY=your_secret_key
+NEXT_PUBLIC_THIRDWEB_CHAIN_ID=43114
+
+# Optional
+NEXT_PUBLIC_IVAO_CLIENT_ID=your_ivao_client_id
+NEXT_PUBLIC_IVAO_CLIENT_SECRET=your_ivao_client_secret
 ```
 
-## Learn More
+### 3. Run Development Server
 
-To learn more about thirdweb and Next.js, take a look at the following resources:
+```bash
+pnpm dev
+```
 
-- [thirdweb React Documentation](https://docs.thirdweb.com/react) - learn about our React SDK.
-- [thirdweb TypeScript Documentation](https://docs.thirdweb.com/typescript) - learn about our JavaScript/TypeScript SDK.
-- [thirdweb Portal](https://docs.thirdweb.com) - check our guides and development resources.
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+### 4. Build for Production
 
-You can check out [the thirdweb GitHub organization](https://github.com/thirdweb-dev) - your feedback and contributions are welcome!
+```bash
+pnpm build
+```
 
-## Join our Discord!
+### 5. Start Production Server
 
-For any questions, suggestions, join our discord at [https://discord.gg/thirdweb](https://discord.gg/thirdweb).
+```bash
+pnpm start
+```
+
+es una aerolinea virtual descentralizada. Una plataforma a la que un usuario se conecta únicamente con su email, lo valida y crea un passkey en cuantos dispositivos quiera (esta será la única forma de desbloquear su wallet) ya que usaremos smart account de thirdweb sponsorizando el gas de las transacciones por algún tiempo o bajo determinadas circunstancias.
+Una vez un usuario se registra se guarda la sesión con un token jwt de sesión, se crea un wallet random (EOA) del cual el usuario usa su passkey para encriptar y guardar localmente. De esta forma no necesitamos crear el wallet sino que podemos derivar y mostrar su dirección hasta que realice una transación.
+Para poder comprar ciertas aeronaves necesitas diferentes licencias:
+De momento hay 4 licencias: vamos a llamarlas 1,2,3 y 4
+y 4 aviones: c172 que necesita la licencia 1, c700 que requiere la 2, b737 la 3 y el AN-225 la 4.
+Este es el esquema inicial luego habrá mas aviones nfts que usaran las mismas licencias pongamos el caso de un A320, requeriría la licencia 3.
+Una vez adquiere la licencia "desbloquea" ciertos aviones que podrá gestionar en su hangar.
+La plataforma ofrece vuelos remunerados en forma de tokens AIRL. éstos vuelos requiren de avion, licencia y además gasolina, si un token ERC20 destinado a eso mismo.
+El token AIRG (combustible) se obtiene mediante un contrato de staking, el usuario pone al menos 1 AIRL en staking y la plataforma le produce 100 AIRG cada 24 horas por cada 1 AIRL.
+Una vez el usuario está listo, tiene licncia, avios y combustible, puede elegir entre ciertos vuelos a realizar propuestos por weifly que cumplan sus características, weifly le entregará un callsign para cada vuelo que tendrá que añadir en su simulador real para que podamos trazar su trayecto. Estos vuelos una vez completados y validados harán entrega de un NFT al usuario que los irá acumulando.
+Los vuelos se monitorizan a través de una aplicación electron que el usuario tendrá que tener instalada, abierta y configurada antes de empezar su vuelo.
+Necesitmoas un sistema de verificación de vuelo para evitar los bots. Quizá un sistema de machine learning pero no tengo nada de experiencia en eso.
+Para conseguir los tokens se creará un pool de liquidez en uniswap contra USDC o WETH o ambos para que los usuarios puedan adquirirlos.
