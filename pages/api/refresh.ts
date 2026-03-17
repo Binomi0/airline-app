@@ -22,7 +22,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     setCookie('token', token, {
       req,
       res,
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24,

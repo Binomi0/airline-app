@@ -73,7 +73,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   setCookie('token', token, {
     req,
     res,
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 60 * 60 * 24,
@@ -90,7 +90,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     path: '/'
   })
 
-  res.status(200).json({ success: true })
+  res.status(200).json({ success: true, token })
 }
 
 export default handler

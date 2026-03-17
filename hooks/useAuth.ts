@@ -31,7 +31,7 @@ const useAuth = (): UseAuthReturnType => {
     async (email: string) => {
       setStatus('loading')
       try {
-        const { verified } = await verifyCredential(email)
+        const { verified, token } = await verifyCredential(email)
         if (!verified) {
           // User cancelled challenge or timeout
           setStatus('error')
@@ -39,10 +39,11 @@ const useAuth = (): UseAuthReturnType => {
         }
 
         const { data } = await axios.get<User>('/api/user/get')
-        setAuthToken('true')
+        setAuthToken(token || 'true')
         setUser(data)
         loadAccount(data)
         loginSuccessSwal()
+
       } catch (err) {
         const error = err as Error
         console.error('err =>', error)
@@ -56,13 +57,14 @@ const useAuth = (): UseAuthReturnType => {
     async (email: string) => {
       setStatus('loading')
       try {
-        const { verified } = await createCredential(email)
+        const { verified, token } = await createCredential(email)
         if (verified) {
           const { data } = await axios.get<User>('/api/user/get')
-          setAuthToken('true')
+          setAuthToken(token || 'true')
           setUser(data)
           loadAccount(data)
           loginSuccessSwal()
+
         }
       } catch (err) {
         console.error('[handleSignUp] Error =>', err)

@@ -55,7 +55,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     setCookie('token', token, {
       req,
       res,
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24, // 1 day
@@ -73,8 +73,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       path: '/'
     })
 
-    // Do not return the token in the body to prevent client-side JS access (HttpOnly)
-    return res.status(200).json({ verified: true, id: user.id, emailVerified: user.emailVerified })
+    // Return token in body to allow frontend to pass it to Electron app
+    return res.status(200).json({ verified: true, id: user.id, emailVerified: user.emailVerified, token })
   } catch (err) {
     console.error('login-response error =>', err)
     return res.status(500).json({ error: 'Internal server error' })

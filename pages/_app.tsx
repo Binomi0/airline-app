@@ -34,6 +34,7 @@ export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
 
+
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache } = props
   const [loading, setLoading] = useState(false)
@@ -60,7 +61,7 @@ export default function MyApp(props: MyAppProps) {
     <CacheProvider value={emotionCache}>
       <RecoilRoot
         initializeState={({ set }) => {
-          set(authStore, getCookie('isLoggedIn') as string)
+          set(authStore, getCookie('token') as string)
           set(themeStore, 'dark')
         }}
       >
