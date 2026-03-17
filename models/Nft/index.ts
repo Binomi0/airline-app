@@ -21,6 +21,7 @@ const nftSchema: mongoose.Schema = new mongoose.Schema(
       attributes: { type: mongoose.Schema.Types.Mixed },
       image_url: { type: String }
     },
+    name: { type: String, required: true, enum: ['AIRCRAFT', 'LICENSE'] },
     owner: { type: String, default: null },
     id: { type: BigInt, required: true },
     tokenURI: { type: String, required: true },

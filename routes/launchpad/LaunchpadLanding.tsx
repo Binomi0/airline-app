@@ -37,7 +37,7 @@ const LaunchpadLanding: FC = () => {
           <nav className={styles.navLinks}>
             <a href="#ecosistema" className={styles.navLink}>Ecosistema</a>
             <a href="#funciona" className={styles.navLink}>Cómo Funciona</a>
-            <a href="#tokens" className={styles.navLink}>Tokens</a>
+            <Link href="/crowdfunding" className={styles.navLink} style={{ color: 'var(--lp-accent)', fontWeight: 700 }}>Crowdfunding 2.0 🚀</Link>
             <a href="#roadmap" className={styles.navLink}>Roadmap</a>
           </nav>
           <Link href={user ? "/home" : "/signin"} className={styles.navCta}>
@@ -80,6 +80,9 @@ const LaunchpadLanding: FC = () => {
                 <button type="submit" className={styles.heroCtaPrimary} disabled={loading}>
                   {loading ? <CircularProgress size={24} color="inherit" /> : "Comenzar a Volar"}
                 </button>
+                <Link href="/crowdfunding" className={styles.heroCtaSecondary}>
+                  Crowdfunding 2.0
+                </Link>
               </div>
             </form>
           ) : (
@@ -87,8 +90,8 @@ const LaunchpadLanding: FC = () => {
               <Link href="/home" className={styles.heroCtaPrimary}>
                 Entrar al Hangar
               </Link>
-              <Link href="#ecosistema" className={styles.heroCtaSecondary}>
-                Ver Ecosistema
+              <Link href="/crowdfunding" className={styles.heroCtaSecondary}>
+                Participar en Crowdfunding
               </Link>
             </div>
           )}

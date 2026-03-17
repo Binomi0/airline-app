@@ -8,3 +8,4 @@ export const nftAircraftTokenAddress: Hex = '0xa1B21336DD0064a07F842D106004872eB
 export const nftLicenseTokenAddress: Hex = '0xB51200877E61E9310cb76cFC1B625CAE98DC73E5' // NEW
 export const factoryAddress: Hex = '0x152546eaCCe1Bd86F11Ffd6ccf607bb77fc26E4E'
 export const flightNftAddress: Hex = '0xF2219dA181DCE1636511D5f65F7B5a1B1c9C5103'
+export const crowdfundingAddress: Hex = '0x0000000000000000000000000000000000000000' // TODO: Deploy and update
