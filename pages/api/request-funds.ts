@@ -5,7 +5,7 @@ import Wallet from 'models/Wallet'
 import { getContract, readContract, sendAndConfirmTransaction } from 'thirdweb'
 import { privateKeyToAccount } from 'thirdweb/wallets'
 import { transfer } from 'thirdweb/extensions/erc20'
-import { twClient, activeChain as chain } from 'config'
+import { twServer, activeChain as chain } from 'config'
 import { z } from 'zod'
 
 const RequestFundsSchema = z.object({
@@ -39,7 +39,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
 
     const serverAccount = privateKeyToAccount({
-      client: twClient,
+      client: twServer,
       privateKey
     })
 
@@ -47,7 +47,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
     const balanceWei = await readContract({
       contract: {
-        client: twClient,
+        client: twServer,
         chain,
         address: coinTokenAddress
       },
@@ -63,7 +63,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
     const transaction = transfer({
       contract: getContract({
-        client: twClient,
+        client: twServer,
         chain,
         address: coinTokenAddress
       }),

@@ -1,12 +1,8 @@
-import { activeChain } from 'config'
-import { readContract, getContract, createThirdwebClient } from 'thirdweb'
+import { activeChain, twServer } from 'config'
+import { readContract, getContract } from 'thirdweb'
 import cache from 'lib/cache'
 import { NextApiResponse } from 'next'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
-
-export const twServer = createThirdwebClient({
-  secretKey: process.env.TW_SECRET_KEY || ''
-})
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {

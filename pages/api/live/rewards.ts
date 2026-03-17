@@ -8,7 +8,7 @@ import Live from 'models/Live'
 import { getContract, sendAndConfirmTransaction } from 'thirdweb'
 import { privateKeyToAccount } from 'thirdweb/wallets'
 import { transfer } from 'thirdweb/extensions/erc20'
-import { twClient, activeChain as chain } from 'config'
+import { twServer, activeChain as chain } from 'config'
 
 const validateFullFlight = (steps: CargoStep[]): number => {
   let counter = 0
@@ -72,13 +72,13 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         // Refactored transfer logic for Thirdweb v5
         if (process.env.THIRDWEB_AUTH_PRIVATE_KEY) {
           const serverAccount = privateKeyToAccount({
-            client: twClient,
+            client: twServer,
             privateKey: process.env.THIRDWEB_AUTH_PRIVATE_KEY
           })
 
           const transaction = transfer({
             contract: getContract({
-              client: twClient,
+              client: twServer,
               chain,
               address: coinTokenAddress
             }),
