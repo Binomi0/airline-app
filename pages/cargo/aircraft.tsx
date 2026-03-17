@@ -33,7 +33,7 @@ const CargoItem = () => {
   const aircraftId = maps[router.query.id as string]
 
   const { data: balance } = useReadContract({
-    contract: contract as any,
+    contract: contract!,
     method: 'function balanceOf(address account, uint256 id) view returns (uint256)',
     params: [address!, BigInt(aircraftId || '0')],
     queryOptions: {

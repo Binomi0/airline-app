@@ -1,19 +1,18 @@
 import React from 'react'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { useSetRecoilState } from 'recoil'
 import { licenseNftStore, ownedLicenseNftStore } from 'store/licenseNFT.atom'
-import { fetcher } from 'utils'
+import { fetcher, filterByTokenAddress } from 'utils'
 import useSWR from 'swr'
 import { useAppContracts } from 'hooks/useAppContracts'
-import { walletStore } from 'store/wallet.atom'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
-import { Hex } from 'thirdweb'
+import { Hex, NFT } from 'thirdweb'
 
 interface Props {
   children: JSX.Element
 }
 
 export const LicenseProvider = ({ children }: Props) => {
-  const { data: nfts } = useSWR<any[]>('/api/nft', fetcher)
+  const { data: nfts } = useSWR<NFT[]>('/api/nft', fetcher)
   const setLicenseNFTs = useSetRecoilState(licenseNftStore)
   const setOwnedLicenseNftStore = useSetRecoilState(ownedLicenseNftStore)
   const { licenseContract } = useAppContracts()
@@ -21,7 +20,7 @@ export const LicenseProvider = ({ children }: Props) => {
 
   const licenseList = React.useMemo(() => {
     if (!nfts) return []
-    return nfts.filter((nft: any) => nft.tokenAddress.toLowerCase() === (licenseContract?.address || '').toLowerCase())
+    return nfts.filter(filterByTokenAddress(licenseContract?.address as Hex))
   }, [nfts, licenseContract])
 
   React.useEffect(() => {

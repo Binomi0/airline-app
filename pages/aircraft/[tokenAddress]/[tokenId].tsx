@@ -92,7 +92,7 @@ const AircraftView: NextPage = () => {
           <AircraftItem
             nft={nft}
             isClaiming={isLoading}
-            onClaim={() => claimNFT(nft as any)}
+            onClaim={() => claimNFT(nft)}
             hasAircraft={!!balance && balance > 0n}
             hasLicense={!!licenseBalance && licenseBalance > 0n}
           />

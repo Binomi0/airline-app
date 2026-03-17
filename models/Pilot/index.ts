@@ -1,7 +1,9 @@
 import { mongoose } from 'lib/mongoose'
 import { IvaoPilot } from 'types'
 
-export interface Pilot extends IvaoPilot {}
+export interface Pilot extends IvaoPilot {
+  userId: number
+}
 
 const schema = 'Pilot'
 

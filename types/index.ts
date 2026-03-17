@@ -48,7 +48,7 @@ export interface AtcPosition {
   atcPosition: {
     airportId: string
     atcCallsign: string
-    airport?: any
+    airport?: Coords
   }
 }
 export type Atc = AtcPosition & typeof atc

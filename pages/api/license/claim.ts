@@ -8,7 +8,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return
   }
   if (!req.body.address || !req.body.token) {
-    res.status(400).send
+    res.status(400).end()
     return
   }
 

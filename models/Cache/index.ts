@@ -2,7 +2,7 @@ import { mongoose } from 'lib/mongoose'
 
 export interface ICache extends Document {
   key: string
-  value: any
+  value: unknown
   expireAt: Date
 }
 

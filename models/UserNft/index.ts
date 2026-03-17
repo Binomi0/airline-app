@@ -1,14 +1,17 @@
 import { mongoose } from 'lib/mongoose'
+import { INft } from 'models/Nft'
 import { Document } from 'mongoose'
 
 export interface IUserNft extends Document {
   user: mongoose.Schema.Types.ObjectId
   nft: mongoose.Schema.Types.ObjectId
   address: string
-  tokenId: string
+  tokenId: bigint | string
   tokenAddress: string
   chainId: number
 }
+
+export type IUserNftPopulated = IUserNft & { nft: INft }
 
 const userNftSchema: mongoose.Schema = new mongoose.Schema(
   {
@@ -44,15 +47,17 @@ const userNftSchema: mongoose.Schema = new mongoose.Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (doc, ret) => {
-        if (typeof ret.tokenId === 'bigint') ret.tokenId = ret.tokenId.toString()
-        return ret
+      transform: (_doc: IUserNft, ret: Record<string, unknown>) => {
+        const r = ret as { tokenId: bigint | string }
+        if (typeof r.tokenId === 'bigint') r.tokenId = r.tokenId.toString()
+        return r
       }
     },
     toObject: {
-      transform: (doc, ret) => {
-        if (typeof ret.tokenId === 'bigint') ret.tokenId = ret.tokenId.toString()
-        return ret
+      transform: (_doc: IUserNft, ret: Record<string, unknown>) => {
+        const r = ret as { tokenId: bigint | string }
+        if (typeof r.tokenId === 'bigint') r.tokenId = r.tokenId.toString()
+        return r
       }
     }
   }

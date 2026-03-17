@@ -4,11 +4,11 @@ import axios from 'config/axios'
 interface UseBackendReadContractProps {
   address: string
   method: string
-  params?: any[]
+  params?: unknown[]
   enabled?: boolean
 }
 
-export const useBackendReadContract = <T = any>({
+export const useBackendReadContract = <T = unknown>({
   address,
   method,
   params = [],
@@ -34,7 +34,7 @@ export const useBackendReadContract = <T = any>({
     } finally {
       setIsLoading(false)
     }
-  }, [address, method, JSON.stringify(params)])
+  }, [address, method, params])
 
   useEffect(() => {
     if (enabled) {

@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react'
-
+import { Hex, readContract } from 'thirdweb'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore, walletStore } from 'store/wallet.atom'
-import { Hex, readContract } from 'thirdweb'
 
 const useTokenBalance = (contractAddress?: Hex) => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
@@ -24,7 +23,7 @@ const useTokenBalance = (contractAddress?: Hex) => {
         params: [smartAccountAddress]
       })
 
-      const result = BigInt(data as any)
+      const result = BigInt(data)
       setBalance(result)
       setIsFetched(true)
       return result

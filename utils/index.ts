@@ -18,7 +18,7 @@ const rpID = process.env.NEXT_PUBLIC_DOMAIN
 // The URL at which registrations and authentications should occur
 const origin = process.env.ORIGIN
 
-// @ts-ignore
+// @ts-expect-error: simplewebauthn types are complex and sometimes mismatch with older stored authenticators
 export const verifySignature = async function (authenticator, response, expectedChallenge) {
   const bufferFromBase64 = (buffer: string) => Buffer.from(buffer, 'base64')
   const credentialPublicKeyBuffer = bufferFromBase64(authenticator.credentialPublicKey)
@@ -272,3 +272,6 @@ export const gallonsToLiters = (gallons?: number): number => {
 }
 
 export const fetcher = (url: string) => nextApiInstance.get(url).then((res) => res.data)
+
+export const filterByTokenAddress = (tokenAddress: string) => (nft: NFT) =>
+  nft.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()

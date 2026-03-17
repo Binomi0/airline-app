@@ -68,7 +68,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
           setAtcs(response.data ?? [])
           setIsLoading((s) => s - 1)
         })
-      } catch (error) {
+      } catch {
         setIsLoading((s) => s - 1)
       }
     },

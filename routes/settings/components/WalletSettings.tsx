@@ -3,20 +3,21 @@ import { Box, Button, Divider, Paper, Stack, Tooltip, Typography } from '@mui/ma
 import BackupIcon from '@mui/icons-material/Backup'
 import { walletStore } from 'store/wallet.atom'
 import { downloadFile } from 'utils'
-import { missingExportKeySwal, walletExportSwal, unlockWalletSwal, consentCloudSyncSwal } from 'lib/swal'
+import { missingExportKeySwal, walletExportSwal, unlockWalletSwal } from 'lib/swal'
 import { useRecoilState } from 'recoil'
 import useWallet from 'hooks/useWallet'
 import { decryptVault, deriveKeyFromPRF } from 'utils/crypto'
 import { Check, Close, Info } from '@mui/icons-material'
-import { postApi } from 'lib/api'
+
+import { User } from 'types'
 
 interface Props {
-  user: any
+  user: User
 }
 
 const WalletSettings = ({ user }: Props) => {
   const [wallet] = useRecoilState(walletStore)
-  const { getPRFSecret, getPrivateKey, syncWallet } = useWallet() as any
+  const { getPRFSecret, getPrivateKey, syncWallet } = useWallet()
 
   const handleUploadKey = useCallback(async () => {
     if (!user?.id) return
@@ -51,7 +52,7 @@ const WalletSettings = ({ user }: Props) => {
         } else {
           privateKey = raw.slice(0, 66)
         }
-      } catch (e) {
+      } catch {
         privateKey = raw.slice(0, 66)
       }
 

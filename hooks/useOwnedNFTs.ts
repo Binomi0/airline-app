@@ -1,18 +1,22 @@
-import { Hex } from 'thirdweb'
+import type { Hex, NFT } from 'thirdweb'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 import useSWR from 'swr'
 import { fetcher } from 'utils'
 import { useMemo } from 'react'
+import { IUserNftPopulated } from 'models/UserNft'
 
 const useOwnedNfts = (tokenAddress?: Hex) => {
   const { smartAccountAddress } = useRecoilValue(walletStore)
 
   // Only fetch if we have a wallet address
-  const { data, error, isLoading, mutate } = useSWR<any[]>(smartAccountAddress ? '/api/nft/owned' : null, fetcher)
+  const { data, error, isLoading, mutate } = useSWR<IUserNftPopulated[]>(
+    smartAccountAddress ? '/api/nft/owned' : null,
+    fetcher
+  )
 
   const filteredData = useMemo(() => {
-    if (!data) return []
+    if (!data) return [] as (NFT & { userNftId: string; tokenId: string | bigint })[]
 
     // Filter by tokenAddress if provided
     const filtered = tokenAddress
@@ -23,6 +27,8 @@ const useOwnedNfts = (tokenAddress?: Hex) => {
     // Existing components expect property like aircraft.name and aircraft.raw.metadata.attributes
     return filtered.map((item) => ({
       ...item.nft,
+      id: typeof item.nft.id === 'string' ? BigInt(item.nft.id) : item.nft.id,
+      supply: typeof item.nft.supply === 'string' ? BigInt(item.nft.supply) : item.nft.supply || 0n,
       tokenId: item.tokenId,
       owner: item.address,
       // Map metadata properties to top-level for convenience
@@ -33,8 +39,8 @@ const useOwnedNfts = (tokenAddress?: Hex) => {
       raw: {
         metadata: item.nft?.metadata
       },
-      userNftId: item._id
-    }))
+      userNftId: item._id.toString()
+    })) as unknown as (NFT & { userNftId: string; tokenId: string | bigint })[]
   }, [data, tokenAddress])
 
   return {

@@ -17,7 +17,7 @@ import { useSetRecoilState } from 'recoil'
 import { liveStore } from 'store/live.atom'
 import { bookingStore } from 'store/booking.atom'
 
-interface Props {}
+type Props = Record<string, never>
 
 const LiveView = ({}: Props) => {
   const router = useRouter()

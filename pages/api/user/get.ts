@@ -13,7 +13,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         return
       }
 
-      let data = {
+      const data = {
         id: user.id,
         address: user.address,
         email: user.email,

@@ -43,7 +43,7 @@ const MiniMap = ({ pilot }: Props) => {
     id: 'google-map-script',
     googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY
   })
-  const [map, setMap] = React.useState<google.maps.Map | undefined>(undefined)
+  const [_map, setMap] = React.useState<google.maps.Map | undefined>(undefined)
   const { atcs } = useVaProviderContext()
 
   const onLoad = React.useCallback(

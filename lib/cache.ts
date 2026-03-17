@@ -2,7 +2,7 @@ import Cache from 'models/Cache'
 import { connectDB } from './mongoose'
 
 class BackendCache {
-  async get(key: string): Promise<any | null> {
+  async get<T>(key: string): Promise<T | null> {
     try {
       await connectDB()
       const cached = await Cache.findOne({ key })
@@ -21,7 +21,7 @@ class BackendCache {
     }
   }
 
-  async set(key: string, value: any, ttlSeconds: number): Promise<void> {
+  async set<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
     try {
       await connectDB()
       const expireAt = new Date(Date.now() + ttlSeconds * 1000)

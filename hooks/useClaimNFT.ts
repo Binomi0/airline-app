@@ -7,6 +7,7 @@ import { userState } from 'store/user.atom'
 import { Hex, prepareContractCall, readContract, sendTransaction, waitForReceipt } from 'thirdweb'
 import axios from 'config/axios'
 import useWallet from './useWallet'
+import { Account } from 'thirdweb/wallets'
 
 // We define a simplified NFT type to maintain internal consistency
 interface NFT {
@@ -16,9 +17,9 @@ interface NFT {
     name?: string
     description?: string
     image?: string
-    [key: string]: any
+    [key: string]: unknown
   }
-  [key: string]: any
+  [key: string]: unknown
 }
 
 interface UseClaimNFT {
@@ -38,7 +39,7 @@ const useClaimNFT = (): UseClaimNFT => {
   const { unlockSigner } = useWallet()
 
   const checkAndSetAllowance = useCallback(
-    async (tokenAddress: string, spender: string, amount: bigint, account: any, ownerAddress: string) => {
+    async (tokenAddress: string, spender: string, amount: bigint, account: Account, ownerAddress: string) => {
       if (tokenAddress.toLowerCase() === NATIVE_TOKEN) return
 
       const { data: allowance } = await axios.post('/api/contracts/read', {

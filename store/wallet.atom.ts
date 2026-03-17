@@ -1,10 +1,11 @@
 import { ThirdwebClient, Chain, Hex } from 'thirdweb'
+import { Account } from 'thirdweb/wallets'
 import { atom, selector } from 'recoil'
 import { twClient, activeChain } from 'config'
 
 export const walletStore = atom<{
-  baseSigner?: any // Local private key account
-  smartSigner?: any // This will be the Thirdweb Smart Account
+  baseSigner?: Account // Local private key account
+  smartSigner: Account | null // This will be the Thirdweb Smart Account
   smartAccountAddress?: Hex
   isLoaded?: boolean
   isLocked?: boolean
@@ -18,7 +19,7 @@ export const walletStore = atom<{
     isLocked: true,
     isCloudSynced: false,
     baseSigner: undefined,
-    smartSigner: undefined,
+    smartSigner: null,
     smartAccountAddress: undefined,
     twClient,
     twChain: activeChain

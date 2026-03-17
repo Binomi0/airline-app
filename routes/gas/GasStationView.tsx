@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid'
 
 interface Props {
   airl?: Readonly<bigint>
-  staking: any
+  staking?: readonly [bigint, bigint, bigint, bigint]
   getAirlBalance: () => void
   getStakingInfo: () => void
   getAirgBalance: () => void

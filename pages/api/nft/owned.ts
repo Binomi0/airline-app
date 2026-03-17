@@ -5,7 +5,8 @@ import alchemy from 'lib/alchemy'
 import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
 import Nft from 'models/Nft'
 import User from 'models/User'
-import UserNft from 'models/UserNft'
+import UserNft, { IUserNft } from 'models/UserNft'
+import { AlchemyOwnedNft } from 'types/alchemy'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
@@ -23,7 +24,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       const forceRefresh = req.query.refresh === 'true'
 
       // Database-First: Check for NFTs in UserNft for this owner
-      let ownedNftsInDb = await UserNft.find({ address }).populate('nft')
+      let ownedNftsInDb = await UserNft.find<IUserNft>({ address }).populate('nft')
 
       // If no NFTs in DB or forceRefresh, sync with Alchemy
       if (ownedNftsInDb.length === 0 || forceRefresh) {
@@ -33,15 +34,14 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         })
 
         if (ownedNfts.length > 0) {
-          const syncPromises = ownedNfts.map(async (ownedNft) => {
+          const syncPromises = (ownedNfts as unknown as AlchemyOwnedNft[]).map(async (ownedNft) => {
             const tokenId = ownedNft.tokenId
             const tokenAddress = ownedNft.contract.address.toLowerCase()
 
             // 1. Ensure global Nft metadata exists (could be missing if refresh.ts hasn't run)
             let nftDoc = await Nft.findOne({ id: tokenId, tokenAddress: tokenAddress.toLowerCase() })
             if (!nftDoc) {
-              const tokenUri =
-                typeof ownedNft.tokenUri === 'string' ? ownedNft.tokenUri : (ownedNft.tokenUri as any)?.raw || ''
+              const tokenUri = ownedNft.tokenUri || ownedNft.raw.tokenUri || ''
               // Create a minimal Nft doc with info from Alchemy
               nftDoc = await Nft.create({
                 id: tokenId,
@@ -51,15 +51,10 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
                 chainId: 11155111, // Sepolia
                 metadata: {
                   uri: tokenUri,
-                  name: (ownedNft as any).title || (ownedNft as any).name || (ownedNft as any).rawMetadata?.name,
-                  description: ownedNft.description || (ownedNft as any).rawMetadata?.description,
-                  image:
-                    (ownedNft as any).image?.cachedUrl ||
-                    (ownedNft as any).image?.originalUrl ||
-                    (ownedNft as any).media?.[0]?.raw ||
-                    (ownedNft as any).rawMetadata?.image ||
-                    '',
-                  attributes: (ownedNft as any).rawMetadata?.attributes || []
+                  name: ownedNft.name || ownedNft.raw.metadata?.name || '',
+                  description: ownedNft.description || ownedNft.raw.metadata?.description || '',
+                  image: ownedNft.image?.cachedUrl || ownedNft.image?.originalUrl || ownedNft.raw.metadata?.image || '',
+                  attributes: ownedNft.raw.metadata?.attributes || []
                 }
               })
             }
@@ -100,6 +95,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   res.status(405).end()
 }
 
-export default function withAuthOwnedHandler(req: any, res: any) {
+export default function withAuthOwnedHandler(req: CustomNextApiRequest, res: NextApiResponse) {
   return withAuth(handler)(req, res)
 }

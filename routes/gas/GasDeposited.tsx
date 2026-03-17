@@ -1,10 +1,8 @@
 import React, { useCallback } from 'react'
 import { formatNumber } from 'utils'
-import { stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import { toWei } from 'thirdweb'
 import useStaking from 'hooks/useStaking'
-import GradientCard from 'components/GradientCard'
 import { handleUnStakeSwal, maxWithdrawExceeded, unstakedSwal } from 'lib/swal'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
@@ -13,7 +11,7 @@ import Paper from '@mui/material/Paper'
 
 interface Props {
   getAirlBalance: () => void
-  staking: any
+  staking?: readonly [bigint, bigint, bigint, bigint]
   getStakingInfo: () => void
 }
 
@@ -36,7 +34,7 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
         maxWithdrawExceeded()
       }
     },
-    [staking?.amountStaked, withdraw, getStakingInfo, getAirlBalance]
+    [staking, withdraw, getStakingInfo, getAirlBalance]
   )
 
   return (

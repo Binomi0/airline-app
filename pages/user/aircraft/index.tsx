@@ -19,6 +19,7 @@ import { darken, useTheme } from '@mui/material/styles'
 import Paper from '@mui/material/Paper'
 import { useRecoilValue } from 'recoil'
 import { tokenBalanceStore } from 'store/balance.atom'
+import { AttributeType } from 'types'
 
 const UserAircrafts: NextPage = () => {
   const theme = useTheme()
@@ -33,7 +34,6 @@ const UserAircrafts: NextPage = () => {
   if (error) return null
   if (isLoading) return null
 
-  console.log({ data })
   return (
     <Box
       position='relative'
@@ -63,7 +63,7 @@ const UserAircrafts: NextPage = () => {
               to={darken(theme.palette.primary.main, 0.5)}
             >
               <Box p={1} color={theme.palette.common.white}>
-                <Typography variant='subtitle1'>{aircraft.name}</Typography>
+                <Typography variant='subtitle1'>{aircraft.metadata.name}</Typography>
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 650 }} aria-label='simple table'>
                     <TableHead>
@@ -80,7 +80,7 @@ const UserAircrafts: NextPage = () => {
                         <TableCell component='th' scope='row' align='right'>
                           {122}
                         </TableCell>
-                        {aircraft.raw.metadata.attributes.map((attribute: { trait_type: string; value: string }) => (
+                        {(aircraft.metadata.attributes as AttributeType[])?.map((attribute: AttributeType) => (
                           <TableCell key={attribute.trait_type} component='th' scope='row' align='right'>
                             <Typography variant='body2' fontWeight={600}>
                               {attribute.value.toString()}

@@ -6,8 +6,9 @@ import { ActiveAtc } from 'types'
 import { reduceAtcTower } from 'utils'
 import Atcs from 'models/Atc'
 import moment from 'moment'
+import { AnyBulkWriteOperation } from 'mongoose'
 
-const bulkOps: any = []
+const bulkOps: AnyBulkWriteOperation<ActiveAtc>[] = []
 
 const updateTowers = async (towers: ActiveAtc[]) => {
   try {
@@ -23,7 +24,7 @@ const updateTowers = async (towers: ActiveAtc[]) => {
 
     await Atcs.bulkWrite(bulkOps)
   } catch (error) {
-    console.error('While updating towers with bulk')
+    console.error('While updating towers with bulk', error)
   }
 }
 

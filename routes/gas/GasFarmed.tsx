@@ -34,7 +34,7 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
       : undefined
 
   const { data: stakeInfo, refetch: getStakeInfo } = useReadContract({
-    contract: contract as any,
+    contract: contract!,
     method: 'function getStakeInfo(address _staker) view returns (uint256 _tokensStaked, uint256 _rewards)',
     params: [smartAccountAddress!]
   })

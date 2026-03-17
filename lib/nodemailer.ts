@@ -1,7 +1,7 @@
 import { createTransport } from 'nodemailer'
 
 const transporter = createTransport({
-  // @ts-ignore
+  // @ts-expect-error: nodemailer transport types mismatch with process.env properties
   host: process.env.EMAIL_SERVER_HOST as string,
   port: process.env.EMAIL_SERVER_PORT,
   secure: false, // upgrade later with STARTTLS

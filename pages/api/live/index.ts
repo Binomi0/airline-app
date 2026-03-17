@@ -20,7 +20,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
   } else if (req.method === 'DELETE') {
     try {
-      await Live.findOneAndRemove({ userId: req.id })
+      await Live.findOneAndDelete({ userId: req.id })
 
       res.status(202).end()
       return

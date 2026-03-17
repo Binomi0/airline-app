@@ -1,5 +1,10 @@
 import { useCallback, useState } from 'react'
-import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
+import {
+  startAuthentication,
+  startRegistration,
+  PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialRequestOptionsJSON
+} from '@simplewebauthn/browser'
 import { backupDoneSwal, backupErrorSwal } from 'lib/swal'
 import { AccountSignerStatus, User, WebAuthnUri } from 'types'
 import { useRecoilValue } from 'recoil'
@@ -7,13 +12,10 @@ import { userState } from 'store/user.atom'
 import { walletStore } from 'store/wallet.atom'
 import useWallet from './useWallet'
 import { postApi } from 'lib/api'
-import { PublicKeyCredentialRequestOptionsJSON, PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/types'
 
 interface UseAccountSignerReturnType {
   addBackup: () => Promise<void>
-  // eslint-disable-next-line no-unused-vars
   loadAccount: (user: User) => Promise<void>
-  // eslint-disable-next-line no-unused-vars
   createCredential: (email: string) => Promise<{ verified: boolean; token?: string }>
   // eslint-disable-next-line no-unused-vars
   verifyCredential: (email: string) => Promise<{ verified: boolean; token?: string }>
@@ -75,7 +77,7 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       try {
         await initWallet(_user)
         setStatus('success')
-      } catch (err) {
+      } catch {
         setStatus('error')
         throw new Error('While loading account')
       }

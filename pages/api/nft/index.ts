@@ -1,14 +1,13 @@
 import { connectDB } from 'lib/mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
-import Nft from 'models/Nft'
-import { NFT } from 'thirdweb'
+import Nft, { INft } from 'models/Nft'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await connectDB()
 
   if (req.method === 'GET') {
     try {
-      const dbNfts = await Nft.find<NFT[]>({})
+      const dbNfts = await Nft.find<INft[]>({})
       if (dbNfts.length === 0) {
         return res.redirect('/api/nft/refresh')
       }

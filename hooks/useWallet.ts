@@ -1,17 +1,18 @@
 /* eslint-disable no-unused-vars */
 import { generatePrivateKey } from 'viem/accounts'
 import { useCallback } from 'react'
-import { consentCloudSyncSwal, consentSecureWalletSwal, unlockWalletSwal, errorSwal } from 'lib/swal'
+import { consentCloudSyncSwal, consentSecureWalletSwal, unlockWalletSwal } from 'lib/swal'
 import { useSetRecoilState } from 'recoil'
 import { IWallet } from 'models/Wallet'
 import { walletStore } from 'store/wallet.atom'
 import { getApi, postApi } from 'lib/api'
-import { User } from 'types'
-import { privateKeyToAccount, smartWallet } from 'thirdweb/wallets'
+import { Authenticator, User } from 'types'
+import { Account, privateKeyToAccount, smartWallet } from 'thirdweb/wallets'
 import { twClient, activeChain as chain } from 'config'
 import { decryptVault, deriveKeyFromPRF, encryptVault } from 'utils/crypto'
 import { Hex } from 'thirdweb'
 import { WeiflyPRFExtensionOutputs } from 'types/webauthn'
+import { IWebauthn } from 'models/Webauthn'
 
 const PRF_SALT = new TextEncoder().encode('weifly-vault-v1')
 
@@ -20,7 +21,7 @@ interface UseWallet {
   getPRFSecret: (allowedCredentialIds?: string[]) => Promise<ArrayBuffer>
   getPrivateKey: (user: User) => Promise<string>
   syncWallet: (privateKey: string, user: User) => Promise<void>
-  unlockSigner: (user: User) => Promise<any>
+  unlockSigner: (user: User) => Promise<Account | null>
 }
 
 const useWallet = (): UseWallet => {
@@ -63,7 +64,7 @@ const useWallet = (): UseWallet => {
   }, [])
 
   const initialize = useCallback(
-    async (personalAccount: any, _user: User, isCloudSynced: boolean = false) => {
+    async (personalAccount: Account, _user: User, isCloudSynced: boolean = false) => {
       if (!personalAccount || !_user.id) return null
 
       try {
@@ -108,12 +109,6 @@ const useWallet = (): UseWallet => {
     [setWallet]
   )
 
-  const checkSigner = useCallback(async (signerAddress: string) => {
-    const wallet = await getApi<IWallet>('/api/wallet')
-    if (!wallet) throw new Error('An error has occoured while getting user wallet')
-    return wallet.signerAddress.toLowerCase() === signerAddress.toLowerCase()
-  }, [])
-
   const getPrivateKey = useCallback(
     async (_user: User): Promise<string> => {
       const storedValue = _user.id ? localStorage.getItem(_user.id) : null
@@ -127,8 +122,8 @@ const useWallet = (): UseWallet => {
           if (!isConfirmed) throw new Error('Wallet unlocking cancelled')
 
           // Fetch allowed credentials to isolate passkey
-          const { authenticators } = (await getApi<any>('/api/webauthn/get')) || { authenticators: [] }
-          const allowedIds = authenticators.map((a: any) => a.credentialID)
+          const { authenticators } = (await getApi<IWebauthn>('/api/webauthn/get')) || { authenticators: [] }
+          const allowedIds = authenticators.map((a: Authenticator) => a.credentialID)
 
           const prfSecret = await getPRFSecret(allowedIds)
           const cryptoKey = await deriveKeyFromPRF(prfSecret)
@@ -162,7 +157,7 @@ const useWallet = (): UseWallet => {
             ciphertext = vault.ciphertext
             iv = vault.iv
           }
-        } catch (e) {
+        } catch {
           // Not a vault, will encrypt below
         }
       }

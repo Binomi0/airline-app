@@ -6,13 +6,14 @@ import useSWR from 'swr'
 import { useAppContracts } from 'hooks/useAppContracts'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
 import { Hex } from 'thirdweb'
+import { INft } from 'models/Nft'
 
 interface Props {
   children: JSX.Element
 }
 
 export const AircraftProvider = ({ children }: Props) => {
-  const { data: nfts } = useSWR<any[]>('/api/nft', fetcher)
+  const { data: nfts } = useSWR<INft[]>('/api/nft', fetcher)
   const setAircraftNFTs = useSetRecoilState(aircraftNftStore)
   const setOwnedAircraftsStore = useSetRecoilState(ownedAircraftNftStore)
   const { aircraftContract } = useAppContracts()
@@ -21,7 +22,7 @@ export const AircraftProvider = ({ children }: Props) => {
   const aircrafts = React.useMemo(() => {
     if (!nfts) return []
     const filtered = nfts.filter(
-      (nft: any) => nft.tokenAddress.toLowerCase() === (aircraftContract?.address || '').toLowerCase()
+      (nft: INft) => nft.tokenAddress.toLowerCase() === (aircraftContract?.address || '').toLowerCase()
     )
 
     // Deduplicate by ID to avoid React key warnings (caused by inconsistent address casing in DB)

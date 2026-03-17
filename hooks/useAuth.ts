@@ -76,14 +76,14 @@ const useAuth = (): UseAuthReturnType => {
     setWallet((curr) => ({
       ...curr,
       baseSigner: undefined,
-      smartSigner: undefined,
+      smartSigner: null,
       smartAccountAddress: undefined,
       isLoaded: false
     }))
     deleteCookie('token')
     deleteCookie('isLoggedIn')
     setUser(undefined)
-    router.asPath !== '/signin' && router.push('/signin')
+    if (router.asPath !== '/signin') router.push('/signin')
   }, [router, setUser, setWallet])
 
   return { handleSignIn, handleSignUp, handleSignOut, status }

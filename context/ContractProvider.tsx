@@ -1,4 +1,4 @@
-import React, { createContext, useMemo, ReactNode, useCallback } from 'react'
+import React, { createContext, useMemo, ReactNode } from 'react'
 import { getContract, ThirdwebContract } from 'thirdweb'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'

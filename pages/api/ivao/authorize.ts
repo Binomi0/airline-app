@@ -58,13 +58,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await UserModel.findOneAndUpdate({ userId: req.query.state }, { vaUser: vaUser._id })
         console.log('User updated vaUser')
       } catch (err) {
-        console.error('Updating user', vaUser._id)
+        console.error('Updating user', vaUser._id, err)
         console.log('Error al actualizar el usuario', req.query.state)
         res.status(406).end()
         return
       }
-    } catch (error: any) {
-      console.log('Error updating virtual airline user')
+    } catch (error) {
+      console.log('Error updating virtual airline user', error)
       res.status(400).send(error)
       return
     }

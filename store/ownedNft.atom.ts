@@ -1,7 +1,7 @@
-import { Nft } from 'alchemy-sdk'
+import { AlchemyOwnedNft } from 'types/alchemy'
 import { atom } from 'recoil'
 
-export const ownedNftStore = atom<Nft[]>({
+export const ownedNftStore = atom<AlchemyOwnedNft[]>({
   key: 'ownedNftStore',
   default: []
 })

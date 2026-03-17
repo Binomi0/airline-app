@@ -1,7 +1,5 @@
 import React, { useCallback } from 'react'
-import { useReadContract } from 'thirdweb/react'
 import { NFT } from 'thirdweb'
-import { nftLicenseTokenAddress } from 'contracts/address'
 import LicenseItem from './components/LicenseItem'
 import useClaimNFT from 'hooks/useClaimNFT'
 import { useTokenProviderContext } from 'context/TokenProvider'

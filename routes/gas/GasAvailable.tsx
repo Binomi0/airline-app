@@ -5,7 +5,6 @@ import { coinTokenAddress, stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
 import useStaking from 'hooks/useStaking'
 import useERC20 from 'hooks/useERC20'
-import GradientCard from 'components/GradientCard'
 import { amountExceedBalanceSwal, handleStakeSwal, stakedSwal } from 'lib/swal'
 
 import Grid from '@mui/material/Grid'

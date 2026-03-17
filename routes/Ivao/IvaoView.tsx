@@ -30,7 +30,6 @@ import { hasRequirement } from 'utils'
 import axios from 'config/axios'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
-import IvaoLogin from './components/IvaoLogin'
 
 const getMetar = async (callsign: string, ivaoAuthToken?: string | null) =>
   axios
@@ -49,8 +48,8 @@ interface Props {
   user: User
 }
 
-const IvaoView = ({ user }: Props) => {
-  const { isLoading: loading } = useVaProviderContext()
+const IvaoView = ({ user: _user }: Props) => {
+  const { isLoading: _loading } = useVaProviderContext()
   const router = useRouter()
   const { live, getLive } = useLiveFlightProviderContext()
   const [start, setStart] = useState((router.query.start as string) ?? '')

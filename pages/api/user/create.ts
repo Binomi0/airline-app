@@ -14,7 +14,7 @@ const sendVerifyEmail = async (email: string, code: string) => {
       text: `Verification code: ${code}`,
       html: `<p>Verification code: ${code}</p>`
     })
-  } catch (err) {
+  } catch {
     throw new Error('Error while sending code email')
   }
 }
