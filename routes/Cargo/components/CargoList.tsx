@@ -8,6 +8,8 @@ import Box from '@mui/material/Box'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { INft } from 'models/Nft'
+import { IUserNftPopulated } from 'models/UserNft'
+import Grid from '@mui/material/Grid'
 
 interface RowProps {
   flightList: [string, FRoute[]][]
@@ -26,13 +28,14 @@ const Row = ({ index, style, flightList, handleSelect }: RowComponentProps<RowPr
   )
 }
 
-const CargoList: React.FC<{
-  // eslint-disable-next-line no-unused-vars
+type Props = {
   newCargo: (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => void
   setSelected: Dispatch<SetStateAction<FRoute>>
   flights: [string, FRoute[]][]
   aircraft?: INft
-}> = ({ newCargo, setSelected, flights, aircraft }) => {
+}
+
+const CargoList = ({ newCargo, setSelected, flights, aircraft }: Props) => {
   const address = useRecoilValue(smartAccountAddressStore)
 
   const handleSelect = useCallback(
@@ -48,7 +51,7 @@ const CargoList: React.FC<{
 
   return (
     <Fade in={flights.length > 0 && !!address} unmountOnExit>
-      <Box sx={{ width: '100%', height: '70vh', bgcolor: 'background.paper' }}>
+      {/* <Box sx={{ width: '100%', height: '70vh', bgcolor: 'background.paper' }}>
         <List
           rowHeight={180}
           rowCount={flights.length}
@@ -57,12 +60,12 @@ const CargoList: React.FC<{
           overscanCount={5}
           style={{ height: 600, width: '100%' }}
         />
-      </Box>
-      {/* <Grid container spacing={2}>
+      </Box> */}
+      <Grid container spacing={2}>
         {flights.slice(0, 12).map(([key, value], index) => (
           <CargoItem onSelect={handleSelect} key={key} origin={key} flights={value} delay={500 * (index + 1)} />
         ))}
-      </Grid> */}
+      </Grid>
     </Fade>
   )
 }

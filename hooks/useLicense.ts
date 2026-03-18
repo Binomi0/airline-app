@@ -1,29 +1,18 @@
-import { useCallback } from 'react'
-import { useRecoilValue } from 'recoil'
-import { ownedLicenseNftStore } from 'store/licenseNFT.atom'
-import { useSWRConfig } from 'swr'
-import { fetcher } from 'utils'
+import { nftLicenseTokenAddress } from 'contracts/address'
+import useOwnedNfts from 'hooks/useOwnedNFTs'
 
-const useLicense = () => {
-  const data = useRecoilValue(ownedLicenseNftStore)
-  const { mutate } = useSWRConfig()
+type UseLicenseReturnType = {
+  hasLicense: boolean
+}
 
-  const hasLicense = !!data && data.length > 0
+const useLicense = (tokenId: string): UseLicenseReturnType => {
+  const { data: ownedNfts } = useOwnedNfts()
 
-  const isLicenseOwned = useCallback(
-    (id: string | bigint) => {
-      return !!data && data.some((n) => BigInt(n.id) === BigInt(id))
-    },
-    [data]
+  const hasLicense = ownedNfts?.some(
+    (n) => n.tokenId === tokenId && n.tokenAddress.toLowerCase() === nftLicenseTokenAddress.toLowerCase()
   )
 
-  const refetch = async () => {
-    await fetcher('/api/nft/owned?refresh=true')
-    mutate('/api/nft')
-    mutate('/api/nft/owned')
-  }
-
-  return { data, hasLicense, isLicenseOwned, refetch }
+  return { hasLicense: !!hasLicense }
 }
 
 export default useLicense

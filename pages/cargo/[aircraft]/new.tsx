@@ -9,12 +9,15 @@ import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
+import { filterByTokenAddress } from 'utils'
+import { nftAircraftTokenAddress } from 'contracts/address'
+import useOwnedNfts from 'hooks/useOwnedNFTs'
 
 const CargoAircraft = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
-  const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
+  const { data: userNfts } = useOwnedNfts()
+  const ownedAircrafts = userNfts?.filter(filterByTokenAddress(nftAircraftTokenAddress))
   const { live } = useLiveFlightProviderContext()
 
   React.useEffect(() => {
@@ -28,7 +31,7 @@ const CargoAircraft = () => {
   }, [user, router])
 
   React.useEffect(() => {
-    if (!!ownedAircrafts) {
+    if (!ownedAircrafts) {
       router.push('/hangar')
     }
   }, [ownedAircrafts, router])
@@ -46,7 +49,7 @@ const CargoAircraft = () => {
       </Fade>
       <Fade in={!!ownedAircrafts}>
         <Box>
-          <CargoView aircraft={ownedAircrafts?.find((a) => a.id.toString() === router.query.aircraft)} />
+          <CargoView aircraft={ownedAircrafts?.find((a) => a.tokenId.toString() === router.query.aircraft)?.nft} />
         </Box>
       </Fade>
     </VaProvider>

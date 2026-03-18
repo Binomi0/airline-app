@@ -7,6 +7,7 @@ import Nft from 'models/Nft'
 import User from 'models/User'
 import UserNft, { IUserNft } from 'models/UserNft'
 import { AlchemyOwnedNft } from 'types/alchemy'
+import { activeChain } from 'config'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
@@ -73,7 +74,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
                 address,
                 tokenId,
                 tokenAddress: tokenAddress.toLowerCase(),
-                chainId: 11155111 // Sepolia
+                chainId: activeChain // Sepolia
               },
               { upsert: true, returnDocument: 'after' }
             )

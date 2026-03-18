@@ -11,18 +11,33 @@ import Fade from '@mui/material/Fade'
 import Grid from '@mui/material/Grid'
 import { INft } from 'models/Nft'
 import { useNFTProviderContext } from 'components/NFTProvider'
+import useOwnedNfts from 'hooks/useOwnedNFTs'
+import { tokenBalanceStore } from 'store/balance.atom'
+import { getNFTAttributes } from 'utils'
 
 const HangarView: React.FC = () => {
-  const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
-  const { getAirlBalance } = useTokenProviderContext()
   const { aircrafts } = useNFTProviderContext()
   const { claimAircraftNFT, isClaiming } = useClaimNFT()
+  const { getAirlBalance } = useTokenProviderContext()
+  const balance = useRecoilValue(tokenBalanceStore)
 
   const handleClaim = useCallback(
     (aircraftNFT: INft) => async (refetch: () => void) => {
-      if (!smartAccountAddress) {
-        throw new Error('Missing account address')
+      if (!balance.airl) return
+
+      const attribute = getNFTAttributes(aircraftNFT).find((attr) => attr.trait_type === 'price')
+      const { name } = aircraftNFT.metadata
+
+      const hasEnough = balance.airl !== undefined && Number(balance.airl) / 1e18 >= Number(attribute?.value || 0)
+      if (!hasEnough) {
+        Swal.fire({
+          title: name,
+          text: `You don't have enough AIRL to get this aircraft`,
+          icon: 'error'
+        })
+        return
       }
+
       const { isConfirmed } = await Swal.fire({
         title: aircraftNFT.metadata.name as string,
         text: `Do you want to get this aircraft?`,
@@ -44,7 +59,7 @@ const HangarView: React.FC = () => {
         }
       }
     },
-    [claimAircraftNFT, getAirlBalance, smartAccountAddress]
+    [claimAircraftNFT, getAirlBalance]
   )
 
   if (!aircrafts) {

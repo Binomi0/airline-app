@@ -1,7 +1,7 @@
 import React, { type FC, startTransition, useCallback, useMemo, useReducer, useRef, useState } from 'react'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { getApi } from 'lib/api'
-import type { Atc } from 'types'
+import type { Atc, Flight } from 'types'
 // import { ivaoUserStore } from 'store/ivao-user.atom'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 import vaProviderReducer from './VaProvider.reducer'
@@ -45,9 +45,9 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   //   dispatch({ type: 'SET_TOWERS', payload: towers })
   // }, [])
 
-  // const setFlights = useCallback((flights: Readonly<Flight>) => {
-  //   dispatch({ type: 'SET_FLIGHTS', payload: flights })
-  // }, [])
+  const setFlights = useCallback((flights: Readonly<Flight>) => {
+    dispatch({ type: 'SET_FLIGHTS', payload: flights })
+  }, [])
 
   const setFilter = useCallback((value: string) => {
     dispatch({ type: 'SET_FILTER', payload: value })
@@ -83,19 +83,19 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   //   })
   // }, [setTowers])
 
-  // const getFlights = useCallback(async () => {
-  //   setIsLoading((s) => s + 1)
-  //   const flights = await getApi<Flight>('/api/ivao/flights')
+  const getFlights = useCallback(async () => {
+    setIsLoading((s) => s + 1)
+    const flights = await getApi<Flight>('/api/ivao/flights')
 
-  //   startTransition(() => {
-  //     setFlights(flights ?? {})
-  //     setIsLoading((s) => s - 1)
-  //   })
-  // }, [setFlights])
+    startTransition(() => {
+      setFlights(flights ?? {})
+      setIsLoading((s) => s - 1)
+    })
+  }, [setFlights])
 
   const getIVAOData = useCallback(async () => {
     try {
-      await getApi('/api/ivao/whazzup')
+      // await getApi('/api/ivao/whazzup')
     } catch (err) {
       console.error('getIVAOData', err)
     }
@@ -150,10 +150,11 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       origins: state.origins,
       isLoading: Boolean(isLoading),
       setFilter,
+      getFlights,
       initIvaoData,
       initIvaoAuth
     }),
-    [state, isLoading, setFilter, initIvaoData, initIvaoAuth]
+    [state, isLoading, setFilter, getFlights, initIvaoData, initIvaoAuth]
   )
 
   return <Provider value={contextValue}>{children}</Provider>

@@ -13,11 +13,13 @@ import React, { Dispatch, SetStateAction } from 'react'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 import { INft } from 'models/Nft'
+import { IUserNftPopulated } from 'models/UserNft'
 
-const CargoAircraftSelector: React.FC<{
-  setAircraft: Dispatch<SetStateAction<INft | undefined>>
-  owned: Readonly<INft[]>
-}> = ({ owned }) => {
+type Props = {
+  owned: Readonly<IUserNftPopulated[]>
+}
+
+const CargoAircraftSelector = ({ owned }: Props) => {
   const router = useRouter()
   const { twClient } = useRecoilValue(walletStore)
 
@@ -50,7 +52,7 @@ const CargoAircraftSelector: React.FC<{
               </ListSubheader>
             }
           >
-            {owned.map((nft) => (
+            {owned.map(({ nft }) => (
               <ListItemButton key={nft.id.toString()} onClick={handleSelectAircraft(nft)}>
                 <ListItemIcon>
                   <Avatar variant='square'>

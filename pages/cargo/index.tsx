@@ -12,15 +12,19 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 import type { INft } from 'models/Nft'
+import useOwnedNfts from 'hooks/useOwnedNFTs'
+import { nftAircraftTokenAddress } from 'contracts/address'
+import { filterByTokenAddress } from 'utils'
 
 const CargoPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const [aircraft, setAircraft] = useState<INft>()
-  const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
+  const { data: userNfts, isLoading } = useOwnedNfts()
   const { live } = useLiveFlightProviderContext()
+
+  const ownedAircrafts = userNfts?.filter(filterByTokenAddress(nftAircraftTokenAddress))
 
   React.useEffect(() => {
     if (live) router.push('/live')
@@ -30,11 +34,11 @@ const CargoPage = () => {
     return <Disconnected />
   }
 
-  if (!ownedAircrafts) {
+  if (isLoading) {
     return <LinearProgress />
   }
 
-  if (ownedAircrafts.length === 0) {
+  if (userNfts?.length === 0) {
     return (
       <Container>
         <Stack height='calc(100vh - 64px)' alignItems='center' justifyContent='center' spacing={2}>
@@ -49,11 +53,7 @@ const CargoPage = () => {
 
   return (
     <VaProvider>
-      {aircraft ? (
-        <CargoView aircraft={aircraft} />
-      ) : (
-        <CargoAircraftSelector owned={ownedAircrafts} setAircraft={setAircraft} />
-      )}
+      {aircraft ? <CargoView aircraft={aircraft} /> : <CargoAircraftSelector owned={ownedAircrafts || []} />}
     </VaProvider>
   )
 }

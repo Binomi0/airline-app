@@ -13,10 +13,11 @@ import { tokenBalanceStore } from 'store/balance.atom'
 import { ownedLicenseNftStore } from 'store/licenseNFT.atom'
 import { useNFTProviderContext } from 'components/NFTProvider'
 import { INft } from 'models/Nft'
+import useOwnedNfts from 'hooks/useOwnedNFTs'
 
 const LicenseView: React.FC = () => {
   const { licenses } = useNFTProviderContext()
-  const ownedLicenses = useRecoilValue(ownedLicenseNftStore)
+  const { data: ownedLicenses } = useOwnedNfts()
   const { claimLicenseNFT, isClaiming } = useClaimNFT()
   const { getAirlBalance } = useTokenProviderContext()
   const balance = useRecoilValue(tokenBalanceStore)
@@ -45,10 +46,6 @@ const LicenseView: React.FC = () => {
             icon: 'success'
           })
           await getAirlBalance()
-          console.timeEnd()
-          // TODO:
-          // await refetchLicenses()
-          console.timeEnd()
           refetch()
         }
       } else {
@@ -82,7 +79,7 @@ const LicenseView: React.FC = () => {
                 nft={license}
                 claimLicenseNFT={handleClaim(license)}
                 key={license.id.toString()}
-                owned={ownedLicenses?.some((n) => BigInt(license.id) === BigInt(n.id)) ?? false}
+                owned={ownedLicenses?.some((n) => BigInt(license.id) === BigInt(n.tokenId)) ?? false}
               />
             )
         )}

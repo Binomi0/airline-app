@@ -1,20 +1,17 @@
-import { useRecoilValue } from 'recoil'
-import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
+import { nftAircraftTokenAddress } from 'contracts/address'
+import useOwnedNfts from 'hooks/useOwnedNFTs'
 
 interface UseAircraftReturnType {
   hasAircraft: boolean
-  isAircraftOwned: (id: string | bigint) => boolean
-  refetch: () => void
 }
 
-const useAircraft = (): UseAircraftReturnType => {
-  const data = useRecoilValue(ownedAircraftNftStore)
+const useAircraft = (tokenId: string): UseAircraftReturnType => {
+  const { data: ownedNfts } = useOwnedNfts()
 
-  const isAircraftOwned = (id: string | bigint) => {
-    return !!data && data.some((n) => BigInt(n.id) === BigInt(id))
-  }
-
-  return { hasAircraft: !!data && data.length > 0, isAircraftOwned, refetch: () => {} }
+  const hasAircraft = ownedNfts?.some(
+    (n) => n.tokenId === tokenId && n.tokenAddress.toLowerCase() === nftAircraftTokenAddress.toLowerCase()
+  )
+  return { hasAircraft: !!hasAircraft }
 }
 
 export default useAircraft

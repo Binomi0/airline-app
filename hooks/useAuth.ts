@@ -33,13 +33,12 @@ const useAuth = (): UseAuthReturnType => {
       try {
         const { verified, token } = await verifyCredential(email)
         if (!verified) {
-          // User cancelled challenge or timeout
           setStatus('error')
-          throw new Error('while verify user credentials')
+          return
         }
 
         const { data } = await axios.get<User>('/api/user/get')
-        setAuthToken(token || 'true')
+        setAuthToken(token)
         setUser(data)
         loadAccount(data)
         loginSuccessSwal()

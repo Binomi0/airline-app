@@ -2,7 +2,7 @@ import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/addre
 import { INft } from 'models/Nft'
 import { createContext, useContext, useMemo } from 'react'
 import useSWR from 'swr'
-import { fetcher } from 'utils'
+import { fetcher, filterByTokenAddress } from 'utils'
 
 type NftContextType = {
   aircrafts: INft[]
@@ -18,14 +18,8 @@ interface Props {
 const NFTProviderWrapper = ({ children }: Props) => {
   const { data: nfts = [] } = useSWR<INft[]>('/api/nft', fetcher)
 
-  const aircrafts = useMemo(
-    () => nfts?.filter((nft) => nft.tokenAddress.toLowerCase() === nftAircraftTokenAddress.toLowerCase()),
-    [nfts]
-  )
-  const licenses = useMemo(
-    () => nfts?.filter((nft) => nft.tokenAddress.toLowerCase() === nftLicenseTokenAddress.toLowerCase()),
-    [nfts]
-  )
+  const aircrafts = useMemo(() => nfts?.filter(filterByTokenAddress(nftAircraftTokenAddress)), [nfts])
+  const licenses = useMemo(() => nfts?.filter(filterByTokenAddress(nftLicenseTokenAddress)), [nfts])
 
   return <NftContext.Provider value={{ aircrafts, licenses }}>{children}</NftContext.Provider>
 }

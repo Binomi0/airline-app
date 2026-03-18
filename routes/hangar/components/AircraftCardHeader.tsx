@@ -20,12 +20,6 @@ const AircraftCardHeader = ({ nft }: Props) => {
   const { name, description, image, id } = nft.metadata
   const subheader = open ? description : `${description?.split(' ').slice(0, 8).join(' ')} ...`
 
-  function handleToogle() {
-    startTransition(() => {
-      setOpen((s) => !s)
-    })
-  }
-
   function handleRedirect() {
     router.push(`/aircraft/${nftAircraftTokenAddress}/${id}`)
   }
@@ -44,7 +38,7 @@ const AircraftCardHeader = ({ nft }: Props) => {
         title={name}
         subheader={subheader}
         action={
-          <IconButton onClick={handleToogle}>
+          <IconButton onClick={() => setOpen((s) => !s)}>
             {open ? (
               <KeyboardArrowUpIcon color='primary' fontSize='large' />
             ) : (

@@ -21,6 +21,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { INft } from 'models/Nft'
+import { IUserNftPopulated } from 'models/UserNft'
 
 const initialState: FRoute = {
   origin: '',
@@ -28,22 +29,22 @@ const initialState: FRoute = {
   distance: 0
 }
 
-const CargoView: NextPage<{ aircraft?: INft }> = ({ aircraft }) => {
+type Props = {
+  aircraft?: INft
+}
+
+const CargoView = ({ aircraft }: Props) => {
   const router = useRouter()
   const address = useRecoilValue(smartAccountAddressStore)
   const { newCargo, cargo, completed, getCargo } = useCargo()
-  const { flights } = useVaProviderContext()
+  const { flights, getFlights } = useVaProviderContext()
   const [selected, setSelected] = useState(initialState)
   const flightList = Object.entries(flights as Flight)
-  console.log({ flights })
+
   React.useEffect(() => {
     const { origin, destination, callsign } = router.query
     if (origin && destination && callsign && aircraft) {
-      if (
-        origin === cargo?.origin &&
-        destination === cargo?.destination &&
-        aircraft.id.toString() === cargo?.aircraftId
-      ) {
+      if (origin === cargo?.origin && destination === cargo?.destination && aircraft.id === cargo?.aircraftId) {
         return
       }
       setSelected({ origin: origin as string, destination: destination as string, distance: 0 })
@@ -58,7 +59,8 @@ const CargoView: NextPage<{ aircraft?: INft }> = ({ aircraft }) => {
 
   React.useEffect(() => {
     getCargo()
-  }, [getCargo])
+    getFlights()
+  }, [getCargo, getFlights])
 
   return (
     <Box sx={{ position: 'relative' }}>

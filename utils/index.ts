@@ -12,6 +12,7 @@ import {
 } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
 import { INft } from 'models/Nft'
+import { IUserNftPopulated } from 'models/UserNft'
 
 // A unique identifier for your website
 const rpID = process.env.NEXT_PUBLIC_DOMAIN
@@ -273,5 +274,7 @@ export const gallonsToLiters = (gallons?: number): number => {
 
 export const fetcherGET = (url: string) => nextApiInstance.get(url).then((res) => res.data)
 export const fetcherPOST = (url: string, body: unknown) => nextApiInstance.post(url, body).then((res) => res.data)
-export const filterByTokenAddress = (tokenAddress: string) => (nft: INft) => nft.tokenAddress === tokenAddress
 export const fetcher = (url: string) => nextApiInstance.get(url).then((res) => res.data)
+
+export const filterByTokenAddress = (tokenAddress: string) => (nft: INft | IUserNftPopulated) =>
+  nft.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()

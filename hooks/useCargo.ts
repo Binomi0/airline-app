@@ -1,17 +1,15 @@
-import axios from 'config/axios'
-import { cargos } from 'mocks/cargos'
 import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import { cargoStore } from 'store/cargo.atom'
 import { Cargo, CargoStatus, FRoute } from 'types'
 import { getCargoWeight, getRandomInt, getCargoPrize } from 'utils'
+import { cargoStore } from 'store/cargo.atom'
+import { cargos } from 'mocks/cargos'
+import nextApiInstance from 'config/axios'
 import { INft } from 'models/Nft'
 
 interface UseCargo {
-  // eslint-disable-next-line no-unused-vars
   newCargo: (route: FRoute, owned: INft, callsign: string, remote: boolean) => Promise<void>
   getCargo: () => Promise<void>
-  // eslint-disable-next-line no-unused-vars
   setCargo: (cargo?: Cargo) => void
   cargo?: Cargo
   isLoading: boolean
@@ -26,7 +24,7 @@ const useCargo = (): UseCargo => {
   const getCargo = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get<Cargo>('/api/cargo')
+      const response = await nextApiInstance.get<Cargo>('/api/cargo')
       setCargo(response.data)
     } catch (error) {
       console.error('error =>', error)
@@ -68,7 +66,7 @@ const useCargo = (): UseCargo => {
 
   const getCompletedCount = useCallback(async () => {
     try {
-      const { data } = await axios.get<{ count: number }>('/api/cargo/count')
+      const { data } = await nextApiInstance.get<{ count: number }>('/api/cargo/count')
       setCompleted(data.count)
     } catch (error) {
       console.error(error)
