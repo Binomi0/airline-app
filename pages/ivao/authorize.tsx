@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import useIvao from 'hooks/useIvao'
 import { useRouter } from 'next/router'
 import IvaoView from 'routes/Ivao/IvaoView'
@@ -14,6 +14,10 @@ const IVAOPage = () => {
   const ivaoUser = useRecoilValue(ivaoUserStore)
   const { authorize, error } = useIvao()
 
+  const redirect = useCallback(() => {
+    router.replace('/ivao')
+  }, [router])
+
   useEffect(() => {
     if (router.isReady && router.query.code) {
       authorize(router.query.code as string, router.query.state as string)
@@ -22,9 +26,9 @@ const IVAOPage = () => {
 
   useEffect(() => {
     if (ivaoUser) {
-      router.replace('/ivao')
+      redirect()
     }
-  }, [ivaoUser, router])
+  }, [ivaoUser, redirect])
 
   useEffect(() => {
     if (error) {
@@ -33,11 +37,10 @@ const IVAOPage = () => {
         text: 'Maybe a connection problem occoured, please try again.',
         icon: 'error'
       }).then(() => {
-        router.replace('/ivao')
+        redirect()
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error])
+  }, [error, redirect])
 
   if (!user) return <Disconnected />
 

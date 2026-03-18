@@ -9,7 +9,7 @@ import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
 
-const MIN_IVAO_REQ_DELAY = 30000
+const MIN_IVAO_REQ_DELAY = 1 * 60 * 1000
 export const INITIAL_STATE: IVAOClients = {
   // pilots: [],
   atcs: [],

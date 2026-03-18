@@ -84,7 +84,7 @@ const CustomAppBar = () => {
             <MenuIcon />
           </IconButton>
           <Link href='/'>
-            <Image src='/logo64x64-white.png' alt='logo' width={32} height={32} />
+            <img src='/logo64x64-white.png' alt='logo' width={32} height={32} />
           </Link>
           {matches ? (
             <Typography ml={2} variant='h6' component='div' sx={{ flexGrow: 1 }}>
@@ -112,8 +112,7 @@ const CustomAppBar = () => {
               px={2}
               mr={2}
             >
-              <Image width={17} height={17} src='/logos/metis.png' alt='Metis logo' />
-              <Image width={10} height={17} src='/logos/eth-diamond-purple.png' alt='Ethereum logo' />
+              <img width={10} height={17} src='/logos/eth-diamond-purple.png' alt='Ethereum logo' />
               <Typography fontWeight={700} fontFamily='Sora' variant='caption'>
                 {maskAddress(smartAccountAddress)}
               </Typography>

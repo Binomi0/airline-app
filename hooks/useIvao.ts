@@ -26,7 +26,6 @@ const useIvao = (): UseIvaoReturnType => {
           }
         })
         .then((response: AxiosResponse) => {
-          console.log('Ivao User =>', response.data)
           setIvaoUser(response.data)
           localStorage.setItem('ivao-auth-token', ivaoUserToken)
         })
