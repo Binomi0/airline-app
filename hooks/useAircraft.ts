@@ -4,7 +4,6 @@ import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 interface UseAircraftReturnType {
   hasAircraft: boolean
   isAircraftOwned: (id: string | bigint) => boolean
-  refetch: () => void
 }
 
 const useAircraft = (): UseAircraftReturnType => {
@@ -14,7 +13,7 @@ const useAircraft = (): UseAircraftReturnType => {
     return !!data && data.some((n) => BigInt(n.id) === BigInt(id))
   }
 
-  return { hasAircraft: !!data && data.length > 0, isAircraftOwned, refetch: () => {} }
+  return { hasAircraft: !!data && data.length > 0, isAircraftOwned }
 }
 
 export default useAircraft

@@ -10,7 +10,10 @@ export interface AircraftAttributes {
   cargo: number
   license: string
 }
-
+export enum NftName {
+  Aircraft = 'Aircraft',
+  License = 'License'
+}
 export interface AirlineNFT {
   metadata: {
     attributes: AircraftAttributes[]
