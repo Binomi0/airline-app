@@ -20,7 +20,7 @@ import { filterByTokenAddress } from 'utils'
 const CargoPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
-  const [aircraft, setAircraft] = useState<INft>()
+  const [aircraft] = useState<INft>()
   const { data: userNfts, isLoading } = useOwnedNfts()
   const { live } = useLiveFlightProviderContext()
 

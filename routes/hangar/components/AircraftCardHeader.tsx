@@ -1,4 +1,4 @@
-import React, { startTransition, useState } from 'react'
+import React, { useState } from 'react'
 import router from 'next/router'
 import { MediaRenderer } from 'thirdweb/react'
 import { twClient } from 'config'

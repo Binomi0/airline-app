@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import { useRecoilValue } from 'recoil'
-import { smartAccountAddressStore } from 'store/wallet.atom'
 import useClaimNFT from 'hooks/useClaimNFT'
 import Swal from 'sweetalert2'
 import { useTokenProviderContext } from 'context/TokenProvider'
@@ -11,7 +10,6 @@ import Fade from '@mui/material/Fade'
 import Grid from '@mui/material/Grid'
 import { INft } from 'models/Nft'
 import { useNFTProviderContext } from 'components/NFTProvider'
-import useOwnedNfts from 'hooks/useOwnedNFTs'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { getNFTAttributes } from 'utils'
 
@@ -59,7 +57,7 @@ const HangarView: React.FC = () => {
         }
       }
     },
-    [claimAircraftNFT, getAirlBalance]
+    [balance.airl, claimAircraftNFT, getAirlBalance]
   )
 
   if (!aircrafts) {

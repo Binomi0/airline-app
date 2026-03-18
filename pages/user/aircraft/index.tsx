@@ -1,6 +1,5 @@
 import type { NextPage } from 'next'
 import GradientCard from 'components/GradientCard'
-import { nftAircraftTokenAddress } from 'contracts/address'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
 import { useCallback, useState } from 'react'
 import Box from '@mui/material/Box'
@@ -23,7 +22,7 @@ import { AttributeType } from 'types'
 
 const UserAircrafts: NextPage = () => {
   const theme = useTheme()
-  const { data, isLoading, error } = useOwnedNfts(nftAircraftTokenAddress)
+  const { data: ownedNfts, isLoading, error } = useOwnedNfts()
   const balance = useRecoilValue(tokenBalanceStore)
   const [isRefueling, setIsRefueling] = useState(false)
 
@@ -56,14 +55,14 @@ const UserAircrafts: NextPage = () => {
           Liters
         </Typography>
         <Grid>
-          {data.map((aircraft) => (
+          {ownedNfts?.map((aircraft) => (
             <GradientCard
               key={aircraft.tokenId}
               from={darken(theme.palette.primary.main, 0.9)}
               to={darken(theme.palette.primary.main, 0.5)}
             >
               <Box p={1} color={theme.palette.common.white}>
-                <Typography variant='subtitle1'>{aircraft.metadata.name}</Typography>
+                <Typography variant='subtitle1'>{aircraft.nft.metadata.name}</Typography>
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 650 }} aria-label='simple table'>
                     <TableHead>
@@ -80,7 +79,7 @@ const UserAircrafts: NextPage = () => {
                         <TableCell component='th' scope='row' align='right'>
                           {122}
                         </TableCell>
-                        {(aircraft.metadata.attributes as AttributeType[])?.map((attribute: AttributeType) => (
+                        {(aircraft.nft.metadata.attributes as AttributeType[])?.map((attribute: AttributeType) => (
                           <TableCell key={attribute.trait_type} component='th' scope='row' align='right'>
                             <Typography variant='body2' fontWeight={600}>
                               {attribute.value.toString()}

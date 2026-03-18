@@ -3,7 +3,6 @@ import { getNFTAttributes } from 'utils'
 import LicenseItemHeader from './LicenseItemHeader'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
-import useLicense from 'hooks/useLicense'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import CardContent from '@mui/material/CardContent'
@@ -20,14 +19,12 @@ interface Props {
   nft: INft
   owned: boolean
   isClaiming: boolean
-  // eslint-disable-next-line no-unused-vars
   claimLicenseNFT: (refetch: () => void) => Promise<void>
 }
 
 const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming }) => {
   const { smartAccountAddress } = useRecoilValue(walletStore)
   const balance = useRecoilValue(tokenBalanceStore)
-  const { refetch } = useLicense()
   const [claimingNFT, setClaimingNFT] = useState<bigint | -1>(-1)
 
   const { name, description, image } = nft.metadata
@@ -35,8 +32,8 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
 
   const handleClaimLicense = useCallback(async () => {
     setClaimingNFT(BigInt(nft.id))
-    claimLicenseNFT(refetch)
-  }, [claimLicenseNFT, nft.id, refetch])
+    claimLicenseNFT(() => {})
+  }, [claimLicenseNFT, nft.id])
 
   const getNFTPrice = useCallback((nft: INft) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')

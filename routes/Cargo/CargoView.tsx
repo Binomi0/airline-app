@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import type { NextPage } from 'next'
 import Image from 'next/image'
 import styles from 'styles/Home.module.css'
 import image from 'public/img/airplanes9.png'
@@ -21,7 +20,6 @@ import LinearProgress from '@mui/material/LinearProgress'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { INft } from 'models/Nft'
-import { IUserNftPopulated } from 'models/UserNft'
 
 const initialState: FRoute = {
   origin: '',

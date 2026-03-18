@@ -14,8 +14,7 @@ import Paper from '@mui/material/Paper'
 import { useTheme } from '@mui/material/styles'
 import { styled } from '@mui/material'
 import styles from '../styles/ivao.module.css'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { authStore } from 'store/auth.atom'
+import { useSetRecoilState } from 'recoil'
 import { destinationStore } from 'store/destination.atom'
 import nextApiInstance from 'config/axios'
 import { AxiosError } from 'axios'
@@ -40,7 +39,6 @@ interface Props {
 
 let counter = 0
 const IvaoAtcs = ({ start, end, onSelect }: Props) => {
-  const token = useRecoilValue(authStore)
   const { atcs, initIvaoAuth } = useVaProviderContext()
   const theme = useTheme()
   const atcSearchRef = useRef<HTMLInputElement>()
@@ -79,7 +77,7 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
         })
       // })
     },
-    [start, token, setDestinations, onSelect, initIvaoAuth]
+    [start, setDestinations, onSelect, initIvaoAuth]
   )
 
   return (

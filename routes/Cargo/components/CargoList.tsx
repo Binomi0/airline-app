@@ -2,31 +2,28 @@ import CargoItem from './CargoItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
 import { FRoute } from 'types'
 import { getCallsign } from 'utils'
-import { List, RowComponentProps } from 'react-window'
 import Fade from '@mui/material/Fade'
-import Box from '@mui/material/Box'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { INft } from 'models/Nft'
-import { IUserNftPopulated } from 'models/UserNft'
 import Grid from '@mui/material/Grid'
 
-interface RowProps {
-  flightList: [string, FRoute[]][]
-  handleSelect: (origin: string, destination: string) => Promise<void>
-}
+// interface RowProps {
+//   flightList: [string, FRoute[]][]
+//   handleSelect: (origin: string, destination: string) => Promise<void>
+// }
 
-const Row = ({ index, style, flightList, handleSelect }: RowComponentProps<RowProps>) => {
-  return (
-    <CargoItem
-      onSelect={handleSelect}
-      origin={flightList[index][0]}
-      flights={flightList[index][1]}
-      delay={10 * (index + 1)}
-      style={style}
-    />
-  )
-}
+// const Row = ({ index, style, flightList, handleSelect }: RowComponentProps<RowProps>) => {
+//   return (
+//     <CargoItem
+//       onSelect={handleSelect}
+//       origin={flightList[index][0]}
+//       flights={flightList[index][1]}
+//       delay={10 * (index + 1)}
+//       style={style}
+//     />
+//   )
+// }
 
 type Props = {
   newCargo: (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => void

@@ -30,13 +30,7 @@ const AircraftView: NextPage = () => {
         </Box>
 
         <Box maxWidth={600} m='auto'>
-          <AircraftItem
-            nft={nft}
-            isClaiming={isLoading}
-            onClaim={() => claimNFT(nft)}
-            hasAircraft={true}
-            hasLicense={true}
-          />
+          <AircraftItem nft={nft} isClaiming={isLoading} onClaim={() => claimNFT(nft)} />
         </Box>
       </Box>
     </Container>
