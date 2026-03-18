@@ -1,4 +1,3 @@
-import { NFT } from 'thirdweb'
 import React, { useCallback, useState } from 'react'
 import { getNFTAttributes } from 'utils'
 import LicenseItemHeader from './LicenseItemHeader'
@@ -15,9 +14,10 @@ import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import { tokenBalanceStore } from 'store/balance.atom'
 import Paper from '@mui/material/Paper'
+import { INft } from 'models/Nft'
 
 interface Props {
-  nft: NFT
+  nft: INft
   owned: boolean
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
@@ -38,7 +38,7 @@ const LicenseItem: React.FC<Props> = ({ nft, owned, claimLicenseNFT, isClaiming 
     claimLicenseNFT(refetch)
   }, [claimLicenseNFT, nft.id, refetch])
 
-  const getNFTPrice = useCallback((nft: NFT) => {
+  const getNFTPrice = useCallback((nft: INft) => {
     const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
     if (!attribute) {
       console.warn(`NFT ${nft.id} is missing 'price' attribute`)

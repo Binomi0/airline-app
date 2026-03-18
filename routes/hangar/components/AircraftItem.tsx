@@ -1,4 +1,3 @@
-import { NFT } from 'thirdweb'
 import React, { useCallback } from 'react'
 import { getLicenseIdFromAttributes, getNFTAttributes } from 'utils'
 import AircraftCardHeader from './AircraftCardHeader'
@@ -13,9 +12,10 @@ import Typography from '@mui/material/Typography'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import Paper from '@mui/material/Paper'
+import { INft } from 'models/Nft'
 
 interface Props {
-  nft: NFT
+  nft: INft
   isClaiming: boolean
   // eslint-disable-next-line no-unused-vars
   onClaim: (refetch: () => void) => void

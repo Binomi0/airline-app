@@ -1,4 +1,3 @@
-import { NFT } from 'thirdweb'
 import nextApiInstance from 'config/axios'
 import {
   ActiveAtc,
@@ -12,6 +11,7 @@ import {
   aircraftNameToIcaoCode
 } from 'types'
 import { verifyAuthenticationResponse } from '@simplewebauthn/server'
+import { INft } from 'models/Nft'
 
 // A unique identifier for your website
 const rpID = process.env.NEXT_PUBLIC_DOMAIN
@@ -50,7 +50,7 @@ export const verifySignature = async function (authenticator, response, expected
   }
 }
 
-export const getNFTAttributes = (nft: NFT) => {
+export const getNFTAttributes = (nft: INft) => {
   if (nft.metadata.attributes && Array.isArray(nft.metadata.attributes) && nft.metadata.attributes.length > 0) {
     return nft.metadata.attributes as AttributeType[]
   }
@@ -92,7 +92,7 @@ export function getCallsign() {
   return `${process.env.NEXT_PUBLIC_CALLSIGN}${ident}`
 }
 
-export function getCargoWeight(aircraft: NFT) {
+export function getCargoWeight(aircraft: INft) {
   const attribute = getNFTAttributes(aircraft).find((attribute) => attribute.trait_type === 'cargo')
 
   if (!attribute) {
@@ -103,7 +103,7 @@ export function getCargoWeight(aircraft: NFT) {
   return Number(attribute.value) * randomIntFromInterval(40, 70) || 0
 }
 
-export function getCargoPrize(distance: number, aircraft: NFT) {
+export function getCargoPrize(distance: number, aircraft: INft) {
   const attribute = getNFTAttributes(aircraft).find((attr) => attr.trait_type === 'license')
   if (attribute) {
     const base = Math.floor(distance / 100) / 5
@@ -249,7 +249,7 @@ export const reduceAtcTower = (acc: ActiveAtc[], curr: ActiveAtc) => {
 export const findByCallsign = (callsign: string) => (f: Airport) => f.callsign === callsign
 export const getIcaoCodeFromAircraftNFT = (name: keyof typeof aircraftNameToIcaoCode) => aircraftNameToIcaoCode[name]
 
-export const hasRequirement = (aircrafts: NFT[], distance: number, requirement?: string) => {
+export const hasRequirement = (aircrafts: INft[], distance: number, requirement?: string) => {
   if (!requirement) return false
   const aircraft = aircrafts.find((aircraft) => aircraft.metadata.id === requirement)
   if (!aircraft) return false
@@ -271,7 +271,7 @@ export const gallonsToLiters = (gallons?: number): number => {
   return gallons * litersPerGallon
 }
 
+export const fetcherGET = (url: string) => nextApiInstance.get(url).then((res) => res.data)
+export const fetcherPOST = (url: string, body: unknown) => nextApiInstance.post(url, body).then((res) => res.data)
+export const filterByTokenAddress = (tokenAddress: string) => (nft: INft) => nft.tokenAddress === tokenAddress
 export const fetcher = (url: string) => nextApiInstance.get(url).then((res) => res.data)
-
-export const filterByTokenAddress = (tokenAddress: string) => (nft: NFT) =>
-  nft.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()

@@ -23,6 +23,7 @@ export const INITIAL_STATE: IVAOClients = {
 }
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [active, setActive] = useState(false)
   // const user = useRecoilValue(userState)
   // const ivaoUser = useRecoilValue(ivaoUserStore)
   const ivaoToken = useRecoilValue(ivaoUserAuthStore)
@@ -55,6 +56,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const getAtcs = useCallback(
     async (_token?: string) => {
+      if (!active) return
       const tokenToUse = _token || ivaoToken
       if (!tokenToUse) return
       console.log({ _token: tokenToUse })
@@ -75,7 +77,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
         setIsLoading((s) => s - 1)
       }
     },
-    [ivaoToken, setAtcs]
+    [ivaoToken, setAtcs, active]
   )
 
   // const getPilots = useCallback(async () => {
@@ -113,6 +115,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [])
 
   React.useEffect(() => {
+    if (!active) return
     // Only start sync if we have a token or don't need one for whazzup
     const atcTimer = setInterval(() => getAtcs(), MIN_IVAO_REQ_DELAY)
     const ivaoTimer = setInterval(() => getIVAOData(), MIN_IVAO_REQ_DELAY)
@@ -122,7 +125,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       clearInterval(atcTimer)
       clearInterval(ivaoTimer)
     }
-  }, [getAtcs, getIVAOData])
+  }, [active, getAtcs, getIVAOData])
 
   const initIvaoData = useCallback(() => {
     // Manual trigger for first load
@@ -160,7 +163,8 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       isLoading: Boolean(isLoading),
       setFilter,
       initIvaoData,
-      initIvaoAuth
+      initIvaoAuth,
+      setActive
     }),
     [state, isLoading, setFilter, initIvaoData, initIvaoAuth]
   )

@@ -1,9 +1,9 @@
-import { NFT } from 'thirdweb'
 import { atom } from 'recoil'
+import { INft } from 'models/Nft'
 
 type AircraftStore = {
-  ownedAircrafts: Readonly<NFT[]>
-  aircrafts: Readonly<NFT[]>
+  ownedAircrafts: Readonly<INft[]>
+  aircrafts: Readonly<INft[]>
   isLoading: boolean
 }
 

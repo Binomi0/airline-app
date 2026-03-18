@@ -6,7 +6,6 @@ import image from 'public/img/airplanes9.png'
 import { useVaProviderContext } from 'context/VaProvider'
 import { FRoute, Flight } from 'types'
 import useCargo from 'hooks/useCargo'
-import { NFT } from 'thirdweb'
 import NoAddress from 'routes/Cargo/components/NoAddress'
 import CargoReady from 'routes/Cargo/components/CargoReady'
 import CargoList from 'routes/Cargo/components/CargoList'
@@ -21,6 +20,7 @@ import Button from '@mui/material/Button'
 import LinearProgress from '@mui/material/LinearProgress'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
+import { INft } from 'models/Nft'
 
 const initialState: FRoute = {
   origin: '',
@@ -28,7 +28,7 @@ const initialState: FRoute = {
   distance: 0
 }
 
-const CargoView: NextPage<{ aircraft?: NFT }> = ({ aircraft }) => {
+const CargoView: NextPage<{ aircraft?: INft }> = ({ aircraft }) => {
   const router = useRouter()
   const address = useRecoilValue(smartAccountAddressStore)
   const { newCargo, cargo, completed, getCargo } = useCargo()

@@ -1,11 +1,14 @@
 import { mongoose } from 'lib/mongoose'
 import { NFT } from 'thirdweb'
 import { Document } from 'mongoose'
+import { NftName } from 'types'
 
-export interface INft extends Document, Omit<NFT, 'id' | 'supply'> {
-  id: bigint | string
-  supply?: bigint | string
-}
+export type INft = Document &
+  (Omit<NFT, 'id' | 'supply'> & {
+    id: bigint | string // Token ID
+    supply?: bigint | string // Solo para ERC1155
+    name: NftName // El campo que faltaba
+  })
 
 const nftSchema: mongoose.Schema = new mongoose.Schema(
   {
@@ -28,9 +31,10 @@ const nftSchema: mongoose.Schema = new mongoose.Schema(
     type: { type: String, enum: ['ERC721', 'ERC1155'], required: true },
     tokenAddress: { type: String, required: true },
     chainId: { type: Number, required: true },
-    supply: { type: BigInt }
+    supply: { type: BigInt, required: true }
   },
   {
+    id: false,
     timestamps: true,
     toJSON: {
       transform: (_doc: INft, ret: Record<string, unknown>) => {

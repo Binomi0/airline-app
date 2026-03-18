@@ -1,6 +1,5 @@
 import React, { startTransition, useState } from 'react'
 import router from 'next/router'
-import { type NFT } from 'thirdweb'
 import { MediaRenderer } from 'thirdweb/react'
 import { twClient } from 'config'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
@@ -10,8 +9,13 @@ import CardHeader from '@mui/material/CardHeader'
 import Avatar from '@mui/material/Avatar'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
+import { INft } from 'models/Nft'
 
-const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
+type Props = {
+  nft: INft
+}
+
+const AircraftCardHeader = ({ nft }: Props) => {
   const [open, setOpen] = useState(false)
   const { name, description, image, id } = nft.metadata
   const subheader = open ? description : `${description?.split(' ').slice(0, 8).join(' ')} ...`

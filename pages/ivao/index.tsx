@@ -10,12 +10,16 @@ import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 const IVAOPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
-  const { initIvaoAuth } = useVaProviderContext()
+  const { initIvaoAuth, setActive } = useVaProviderContext()
   const { live } = useLiveFlightProviderContext()
 
   React.useEffect(() => {
     if (live) router.push('/live')
   }, [live, router])
+
+  useEffect(() => {
+    setActive(true)
+  }, [setActive])
 
   useEffect(initIvaoAuth, [initIvaoAuth])
 

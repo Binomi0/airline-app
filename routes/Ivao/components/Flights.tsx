@@ -1,7 +1,6 @@
 import React from 'react'
 import type { Cargo, FRoute, IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
-import { NFT } from 'thirdweb'
 import Swal from 'sweetalert2'
 import FlightDetailsHeader from './FlightDetailsHeader'
 import FlightDetailsCargo from './FlightDetailsCargo'
@@ -11,16 +10,17 @@ import GradientCard from 'components/GradientCard'
 import Grid from '@mui/material/Grid'
 import { useTheme } from '@mui/material/styles'
 import { postApi } from 'lib/api'
+import { INft } from 'models/Nft'
 
 interface Props {
   onRemove: () => void
-  aircraft?: NFT
+  aircraft?: INft
   pilot: IvaoPilot
   onSelect: () => void
   selected: boolean
   cargo?: Cargo
   // eslint-disable-next-line no-unused-vars
-  newCargo: (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => Promise<void>
+  newCargo: (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => Promise<void>
 }
 
 const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, cargo }: Props) => {

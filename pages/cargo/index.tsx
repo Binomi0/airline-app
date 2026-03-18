@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { type NFT } from 'thirdweb'
 import CargoView from 'routes/Cargo/CargoView'
 import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector'
 import { VaProvider } from 'context/VaProvider'
@@ -14,11 +13,12 @@ import Button from '@mui/material/Button'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
+import type { INft } from 'models/Nft'
 
 const CargoPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
-  const [aircraft, setAircraft] = useState<NFT>()
+  const [aircraft, setAircraft] = useState<INft>()
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
   const { live } = useLiveFlightProviderContext()
 

@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
-import { NFT } from 'thirdweb'
 import { atc } from 'mocks'
 import ivaoPilot from 'mocks/ivaoPilot'
 import Atc from 'models/Atc'
 import { VaUser } from 'models/User'
+import { INft } from 'models/Nft'
 
 export interface AircraftAttributes {
   deposit: number
@@ -65,7 +65,7 @@ export interface Cargo {
   // Detailed info about cargo
   details: CargoDetail
   // selected aircraft nft data
-  aircraft: NFT
+  aircraft: INft
   // selected aircraft id
   aircraftId: string
   // pilot callsign

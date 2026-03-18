@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react'
-import { NFT } from 'thirdweb'
 import LicenseItem from './components/LicenseItem'
 import useClaimNFT from 'hooks/useClaimNFT'
 import { useTokenProviderContext } from 'context/TokenProvider'
@@ -11,17 +10,19 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import { useRecoilValue } from 'recoil'
 import { tokenBalanceStore } from 'store/balance.atom'
-import { licenseNftStore, ownedLicenseNftStore } from 'store/licenseNFT.atom'
+import { ownedLicenseNftStore } from 'store/licenseNFT.atom'
+import { useNFTProviderContext } from 'components/NFTProvider'
+import { INft } from 'models/Nft'
 
 const LicenseView: React.FC = () => {
-  const licenses = useRecoilValue(licenseNftStore)
+  const { licenses } = useNFTProviderContext()
   const ownedLicenses = useRecoilValue(ownedLicenseNftStore)
   const { claimLicenseNFT, isClaiming } = useClaimNFT()
   const { getAirlBalance } = useTokenProviderContext()
   const balance = useRecoilValue(tokenBalanceStore)
 
   const handleClaim = useCallback(
-    (nft: NFT) => async (refetch: () => void) => {
+    (nft: INft) => async (refetch: () => void) => {
       if (!balance.airl) return
 
       const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')

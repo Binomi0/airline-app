@@ -7,17 +7,16 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import React, { useMemo } from 'react'
 import { formatNumber } from 'utils'
-
-import { NFT } from 'thirdweb'
 import BlockIcon from '@mui/icons-material/Block'
 import { useTheme } from '@mui/material'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 import { useRecoilValue } from 'recoil'
+import { INft } from 'models/Nft'
 
 interface Props {
   aircraft: string
-  aircrafts: NFT[]
-  currentAircraft?: NFT
+  aircrafts: INft[]
+  currentAircraft?: INft
   // eslint-disable-next-line no-unused-vars
   handleChange: (event: SelectChangeEvent) => void
   hasEnoughFuel: () => boolean

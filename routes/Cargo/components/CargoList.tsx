@@ -1,4 +1,3 @@
-import { type NFT } from 'thirdweb'
 import CargoItem from './CargoItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
 import { FRoute } from 'types'
@@ -8,6 +7,7 @@ import Fade from '@mui/material/Fade'
 import Box from '@mui/material/Box'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
+import { INft } from 'models/Nft'
 
 interface RowProps {
   flightList: [string, FRoute[]][]
@@ -28,10 +28,10 @@ const Row = ({ index, style, flightList, handleSelect }: RowComponentProps<RowPr
 
 const CargoList: React.FC<{
   // eslint-disable-next-line no-unused-vars
-  newCargo: (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => void
+  newCargo: (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => void
   setSelected: Dispatch<SetStateAction<FRoute>>
   flights: [string, FRoute[]][]
-  aircraft?: NFT
+  aircraft?: INft
 }> = ({ newCargo, setSelected, flights, aircraft }) => {
   const address = useRecoilValue(smartAccountAddressStore)
 

@@ -8,21 +8,21 @@ import ListSubheader from '@mui/material/ListSubheader'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { MediaRenderer } from 'thirdweb/react'
-import { NFT } from 'thirdweb'
 import { useRouter } from 'next/router'
 import React, { Dispatch, SetStateAction } from 'react'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
+import { INft } from 'models/Nft'
 
 const CargoAircraftSelector: React.FC<{
-  setAircraft: Dispatch<SetStateAction<NFT | undefined>>
-  owned: Readonly<NFT[]>
+  setAircraft: Dispatch<SetStateAction<INft | undefined>>
+  owned: Readonly<INft[]>
 }> = ({ owned }) => {
   const router = useRouter()
   const { twClient } = useRecoilValue(walletStore)
 
   const handleSelectAircraft = React.useCallback(
-    (nft: NFT) => () => {
+    (nft: INft) => () => {
       if (router.query.pilot) {
         const url = `cargo/${nft.id.toString()}/new?pilot=${router.query.pilot}&origin=${
           router.query.origin

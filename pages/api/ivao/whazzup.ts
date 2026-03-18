@@ -127,11 +127,7 @@ async function processBatchPilots(batch: Pilot[], lives: ILive[]) {
 
   if (bulkOps.length) {
     console.log('BULK OPS', bulkOps.length)
-    try {
-      await PilotModel.bulkWrite(bulkOps)
-    } catch (err) {
-      console.error('BulkOps err =>', err)
-    }
+    await PilotModel.bulkWrite(bulkOps)
   }
 }
 

@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react'
-import { type NFT } from 'thirdweb'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import useClaimNFT from 'hooks/useClaimNFT'
@@ -11,15 +10,17 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Fade from '@mui/material/Fade'
 import Grid from '@mui/material/Grid'
 import { aircraftNftStore } from 'store/aircraftNFT.atom'
+import { INft } from 'models/Nft'
+import { useNFTProviderContext } from 'components/NFTProvider'
 
 const HangarView: React.FC = () => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const { getAirlBalance } = useTokenProviderContext()
-  const aircrafts = useRecoilValue(aircraftNftStore)
+  const { aircrafts } = useNFTProviderContext()
   const { claimAircraftNFT, isClaiming } = useClaimNFT()
 
   const handleClaim = useCallback(
-    (aircraftNFT: NFT) => async (refetch: () => void) => {
+    (aircraftNFT: INft) => async (refetch: () => void) => {
       if (!smartAccountAddress) {
         throw new Error('Missing account address')
       }

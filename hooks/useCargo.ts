@@ -3,13 +3,13 @@ import { cargos } from 'mocks/cargos'
 import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { cargoStore } from 'store/cargo.atom'
-import { NFT } from 'thirdweb'
 import { Cargo, CargoStatus, FRoute } from 'types'
 import { getCargoWeight, getRandomInt, getCargoPrize } from 'utils'
+import { INft } from 'models/Nft'
 
 interface UseCargo {
   // eslint-disable-next-line no-unused-vars
-  newCargo: (route: FRoute, owned: NFT, callsign: string, remote: boolean) => Promise<void>
+  newCargo: (route: FRoute, owned: INft, callsign: string, remote: boolean) => Promise<void>
   getCargo: () => Promise<void>
   // eslint-disable-next-line no-unused-vars
   setCargo: (cargo?: Cargo) => void
@@ -36,7 +36,7 @@ const useCargo = (): UseCargo => {
   }, [setCargo])
 
   const newCargo = useCallback(
-    async (route: FRoute, aircraft: NFT, callsign: string, remote: boolean) => {
+    async (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => {
       try {
         const details = cargos[getRandomInt(8)]
         const weight = getCargoWeight(aircraft)

@@ -1,7 +1,6 @@
 import React, { startTransition, useState } from 'react'
 import router from 'next/router'
 import { MediaRenderer } from 'thirdweb/react'
-import { NFT } from 'thirdweb'
 import { walletStore } from 'store/wallet.atom'
 import { useRecoilValue } from 'recoil'
 import CardHeader from '@mui/material/CardHeader'
@@ -11,8 +10,13 @@ import IconButton from '@mui/material/IconButton'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { nftAircraftTokenAddress } from 'contracts/address'
+import { INft } from 'models/Nft'
 
-const AircraftCardHeader: React.FC<{ nft: NFT }> = ({ nft }) => {
+type Props = {
+  nft: INft
+}
+
+const AircraftCardHeader = ({ nft }: Props) => {
   const { twClient } = useRecoilValue(walletStore)
   const [open, setOpen] = useState(false)
   const { name, description, image, id } = nft.metadata

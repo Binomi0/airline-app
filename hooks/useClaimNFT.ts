@@ -8,25 +8,13 @@ import { Hex, prepareContractCall, readContract, sendTransaction, waitForReceipt
 import axios from 'config/axios'
 import useWallet from './useWallet'
 import { Account } from 'thirdweb/wallets'
-
-// We define a simplified NFT type to maintain internal consistency
-interface NFT {
-  id: bigint | string
-  metadata: {
-    id?: string | number
-    name?: string
-    description?: string
-    image?: string
-    [key: string]: unknown
-  }
-  [key: string]: unknown
-}
+import { INft } from 'models/Nft'
 
 interface UseClaimNFT {
   // eslint-disable-next-line no-unused-vars
-  claimAircraftNFT: (nft: NFT) => Promise<string | undefined>
+  claimAircraftNFT: (nft: INft) => Promise<string | undefined>
   // eslint-disable-next-line no-unused-vars
-  claimLicenseNFT: (nft: NFT) => Promise<string | undefined>
+  claimLicenseNFT: (nft: INft) => Promise<string | undefined>
   isClaiming: boolean
 }
 
@@ -62,7 +50,7 @@ const useClaimNFT = (): UseClaimNFT => {
   )
 
   const claimNFT = useCallback(
-    async (contractAddress: string, nft: NFT) => {
+    async (contractAddress: string, nft: INft) => {
       let currentSigner = smartSigner
 
       if (isLocked && user) {
@@ -140,8 +128,8 @@ const useClaimNFT = (): UseClaimNFT => {
     [smartAccountAddress, smartSigner, twChain, twClient, checkAndSetAllowance, isLocked, unlockSigner, user]
   )
 
-  const claimAircraftNFT = useCallback((nft: NFT) => claimNFT(nftAircraftTokenAddress, nft), [claimNFT])
-  const claimLicenseNFT = useCallback((nft: NFT) => claimNFT(nftLicenseTokenAddress, nft), [claimNFT])
+  const claimAircraftNFT = useCallback((nft: INft) => claimNFT(nftAircraftTokenAddress, nft), [claimNFT])
+  const claimLicenseNFT = useCallback((nft: INft) => claimNFT(nftLicenseTokenAddress, nft), [claimNFT])
 
   return { claimLicenseNFT, claimAircraftNFT, isClaiming }
 }

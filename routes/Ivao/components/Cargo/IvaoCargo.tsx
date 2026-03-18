@@ -15,8 +15,6 @@ import {
   getIcaoCodeFromAircraftNFT,
   getNFTAttributes
 } from 'utils'
-import { NFT } from 'thirdweb'
-
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'
 import useCargo from 'hooks/useCargo'
@@ -25,10 +23,11 @@ import CargoSelectAircraft from './CargoSelectAircraft'
 import { aircraftNameToIcaoCode } from 'types'
 import { useRouter } from 'next/router'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
+import { INft } from 'models/Nft'
 
 interface Props {
   aircraft: string
-  aircrafts: NFT[]
+  aircrafts: INft[]
   end: string
   start: string
   // eslint-disable-next-line no-unused-vars
@@ -68,7 +67,7 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
     [balance.airg, requiredGas]
   )
 
-  const getCurrentFuelInLiters = useCallback((currentAircraft: NFT) => {
+  const getCurrentFuelInLiters = useCallback((currentAircraft: INft) => {
     const combustible = getNFTAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value
     if (!combustible) return 0
 
