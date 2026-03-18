@@ -1,4 +1,3 @@
-import axios from 'axios'
 import React, { type FC, startTransition, useCallback, useMemo, useReducer, useRef, useState } from 'react'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { getApi } from 'lib/api'
@@ -8,6 +7,7 @@ import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
+import nextApiInstance, { ivaoInstance } from 'config/axios'
 
 const MIN_IVAO_REQ_DELAY = 1 * 60 * 1000
 export const INITIAL_STATE: IVAOClients = {
@@ -23,7 +23,6 @@ export const INITIAL_STATE: IVAOClients = {
 }
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [active, setActive] = useState(false)
   // const user = useRecoilValue(userState)
   // const ivaoUser = useRecoilValue(ivaoUserStore)
   const ivaoToken = useRecoilValue(ivaoUserAuthStore)
@@ -54,31 +53,19 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     dispatch({ type: 'SET_FILTER', payload: value })
   }, [])
 
-  const getAtcs = useCallback(
-    async (_token?: string) => {
-      if (!active) return
-      const tokenToUse = _token || ivaoToken
-      if (!tokenToUse) return
-      console.log({ _token: tokenToUse })
+  const getAtcs = useCallback(async () => {
+    setIsLoading((s) => s + 1)
+    try {
+      const response = await nextApiInstance.get<Atc[]>('api/ivao/atc/tower')
 
-      setIsLoading((s) => s + 1)
-      try {
-        const response = await axios.get<Atc[]>('api/ivao/atc/tower', {
-          headers: {
-            Authorization: `Bearer ${tokenToUse}`
-          }
-        })
-
-        startTransition(() => {
-          setAtcs(response.data ?? [])
-          setIsLoading((s) => s - 1)
-        })
-      } catch {
+      startTransition(() => {
+        setAtcs(response.data ?? [])
         setIsLoading((s) => s - 1)
-      }
-    },
-    [ivaoToken, setAtcs, active]
-  )
+      })
+    } catch {
+      setIsLoading((s) => s - 1)
+    }
+  }, [ivaoToken, setAtcs])
 
   // const getPilots = useCallback(async () => {
   //   const response = await axios.get<IvaoPilot[]>('/api/ivao/pilots')
@@ -115,7 +102,6 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [])
 
   React.useEffect(() => {
-    if (!active) return
     // Only start sync if we have a token or don't need one for whazzup
     const atcTimer = setInterval(() => getAtcs(), MIN_IVAO_REQ_DELAY)
     const ivaoTimer = setInterval(() => getIVAOData(), MIN_IVAO_REQ_DELAY)
@@ -125,7 +111,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       clearInterval(atcTimer)
       clearInterval(ivaoTimer)
     }
-  }, [active, getAtcs, getIVAOData])
+  }, [getAtcs, getIVAOData])
 
   const initIvaoData = useCallback(() => {
     // Manual trigger for first load
@@ -136,12 +122,14 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const initIvaoAuth = useCallback(() => {
     if (isAuthorizing.current) return
     isAuthorizing.current = true
-    axios
+    nextApiInstance
       .get('/api/ivao/oauth')
       .then((response) => {
-        getAtcs(response.data)
-        axios.defaults.headers['x-ivao-token'] = `Bearer ${response.data}`
+        console.log('ivao token =>', response.data)
+        ivaoInstance.defaults.headers['x-ivao-token'] = `Bearer ${response.data}`
+        nextApiInstance.defaults.headers['x-ivao-token'] = `Bearer ${response.data}`
         setIvaoToken(response.data)
+        getAtcs()
       })
       .catch((error) => {
         console.log('initIvaoAuth error =>', error)
@@ -163,8 +151,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       isLoading: Boolean(isLoading),
       setFilter,
       initIvaoData,
-      initIvaoAuth,
-      setActive
+      initIvaoAuth
     }),
     [state, isLoading, setFilter, initIvaoData, initIvaoAuth]
   )

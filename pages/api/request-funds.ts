@@ -1,6 +1,6 @@
 import { NextApiResponse } from 'next'
 import { coinTokenAddress } from 'contracts/address'
-import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import { CustomNextApiRequest } from 'lib/withAuth'
 import Wallet from 'models/Wallet'
 import { getContract, readContract, sendAndConfirmTransaction } from 'thirdweb'
 import { privateKeyToAccount } from 'thirdweb/wallets'
@@ -17,6 +17,10 @@ const RequestFundsSchema = z.object({
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  if (req.headers['x-api-key'] !== process.env.PRIVATE_API_KEY) {
+    return res.status(403).end()
   }
 
   const validation = RequestFundsSchema.safeParse(req.body)
@@ -94,4 +98,4 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 }
 
-export default withAuth(handler)
+export default handler

@@ -16,7 +16,6 @@ export type VaContextProps = VaReducerState & {
   setFilter: (value: string) => void
   initIvaoData: () => void
   initIvaoAuth: () => void
-  setActive: (value: boolean) => void
 }
 
 export type IVAOClients = VaReducerState

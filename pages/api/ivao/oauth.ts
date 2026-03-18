@@ -27,10 +27,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return
       }
 
-      ivaoInstance.defaults.headers.common.Authorization = `Bearer ${data.access_token}`
-
-      res.status(200).send(data.access_token)
-      return
+      if (typeof data.access_token === 'string') {
+        ivaoInstance.defaults.headers.common.Authorization = `Bearer ${data.access_token}`
+        return res.status(200).send(data.access_token)
+      } else if (data.access_token?._token === 'string') {
+        ivaoInstance.defaults.headers.common.Authorization = `Bearer ${data.access_token._token}`
+        return res.status(200).send(data.access_token._token)
+      }
+      return res.status(400).send('Invalid token')
     } catch (error) {
       const err = error as AxiosError
       console.error('IVAO OAUTH', err.response?.data)

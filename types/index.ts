@@ -51,7 +51,22 @@ export interface AtcPosition {
   atcPosition: {
     airportId: string
     atcCallsign: string
-    airport?: Coords
+    military: boolean | string
+    middleIdentifier: number
+    position: string
+    composePosition: string
+    regionMap: unknown[]
+    regionMapPolygon: unknown[]
+    airport?: {
+      icao: string
+      iata: string
+      name: string
+      countryId: string
+      city: string
+      latitude: number
+      longitude: number
+      military: boolean | string
+    }
   }
 }
 export type Atc = AtcPosition & typeof atc

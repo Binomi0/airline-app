@@ -62,7 +62,7 @@ const pilotSchema: mongoose.Schema = new mongoose.Schema<Pilot>(
         icaoCode: String,
         model: String,
         wakeTurbulence: String,
-        isMilitary: Boolean,
+        isMilitary: mongoose.Schema.Types.Mixed,
         description: String
       }
     },

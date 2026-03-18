@@ -14,10 +14,11 @@ import Paper from '@mui/material/Paper'
 import { useTheme } from '@mui/material/styles'
 import { styled } from '@mui/material'
 import styles from '../styles/ivao.module.css'
-import axios, { AxiosError } from 'axios'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { authStore } from 'store/auth.atom'
 import { destinationStore } from 'store/destination.atom'
+import nextApiInstance from 'config/axios'
+import { AxiosError } from 'axios'
 
 const ZERO = 0
 const TWENTY_FIVE = 25
@@ -57,12 +58,8 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
       // axios.get('http://localhost:3001/ivao/init').then(() => {
       // axios
       //   .get(`http://localhost:3001/ivao/matrix/${callsign}`, {
-      axios
-        .get(`api/ivao/atc/matrix/${callsign}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
+      nextApiInstance
+        .get(`api/ivao/atc/matrix/${callsign}`)
         .then((response) => {
           startTransition(() => {
             setDestinations(response.data)

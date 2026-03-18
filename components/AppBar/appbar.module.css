@@ -1,7 +1,17 @@
+.cardImage {
+  margin-bottom: 2px;
+  margin-left: 2px;
+}
 .card {
   z-index: 1;
   position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
+  max-width: 120px;
+  margin-right: 16px;
   border-radius: 20px;
   overflow: hidden;
   padding-left: 8px;

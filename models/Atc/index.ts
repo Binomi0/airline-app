@@ -42,7 +42,7 @@ const atcSchema: mongoose.Schema = new mongoose.Schema<AtcSchema>(
     atcPosition: {
       airportId: String,
       atcCallsign: String,
-      military: Boolean,
+      military: mongoose.Schema.Types.Mixed,
       middleIdentifier: Number,
       position: String,
       composePosition: String,
@@ -56,7 +56,7 @@ const atcSchema: mongoose.Schema = new mongoose.Schema<AtcSchema>(
         city: String,
         latitude: Number,
         longitude: Number,
-        military: Boolean
+        military: mongoose.Schema.Types.Mixed
       }
     }
   },

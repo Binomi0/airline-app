@@ -20,7 +20,7 @@ import { userState } from 'store/user.atom'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import styles from './appbar.module.css'
-import { AlertTitle, Container } from '@mui/material'
+import { AlertTitle, Box, Container } from '@mui/material'
 import Link from 'next/link'
 
 function base64URLEncode(str: string) {
@@ -95,23 +95,17 @@ const CustomAppBar = () => {
             </Typography>
           )}
           {user && (
-            <Tooltip title='Download App'>
-              <IconButton color='inherit' onClick={handleDownloadApp}>
-                <Download color='inherit' />
-              </IconButton>
-            </Tooltip>
+            <Box mr={2}>
+              <Tooltip title='Download App'>
+                <IconButton color='inherit' onClick={handleDownloadApp}>
+                  <Download color='inherit' />
+                </IconButton>
+              </Tooltip>
+            </Box>
           )}
           {matches && smartAccountAddress && (
-            <Stack
-              direction='row'
-              onClick={() => navigator.clipboard.writeText(smartAccountAddress)}
-              spacing={1}
-              className={styles.card}
-              maxWidth={150}
-              px={2}
-              mr={2}
-            >
-              <img width={10} height={17} src='/logos/eth-diamond-purple.png' alt='Ethereum logo' />
+            <Stack onClick={() => navigator.clipboard.writeText(smartAccountAddress)} className={styles.card}>
+              <img className={styles.cardImage} width={8} src='/logos/eth-diamond-purple.png' alt='Ethereum logo' />
               <Typography fontWeight={700} fontFamily='Sora' variant='caption'>
                 {maskAddress(smartAccountAddress)}
               </Typography>

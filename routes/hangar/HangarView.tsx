@@ -9,7 +9,6 @@ import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Fade from '@mui/material/Fade'
 import Grid from '@mui/material/Grid'
-import { aircraftNftStore } from 'store/aircraftNFT.atom'
 import { INft } from 'models/Nft'
 import { useNFTProviderContext } from 'components/NFTProvider'
 
