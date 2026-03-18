@@ -21,9 +21,16 @@ import { userState } from 'store/user.atom'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import styles from './appbar.module.css'
-import { AlertTitle, Button, Container } from '@mui/material'
+import { AlertTitle, Container } from '@mui/material'
 import Link from 'next/link'
 
+function base64URLEncode(str: string) {
+  return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+}
+
+const verifier = 'user.id'
+const challengeMethod = 'plain' // S256
+const challenge = base64URLEncode(verifier)
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
 
 const initialSnackState: AppBarSnack = { open: false, message: '', status: 'success' }
@@ -125,9 +132,14 @@ const CustomAppBar = () => {
           <Alert
             severity='warning'
             action={
-              <Button variant='outlined' color='warning'>
-                Connect IVAO
-              </Button>
+              <Typography
+                color='primary.contrastText'
+                variant='button'
+                component='a'
+                href={`https://sso.ivao.aero/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_IVAO_ID}&state=${user?.id}&scope=openid profile flight_plans:read bookings:read tracker email&code_challenge_method=${challengeMethod}&code_challenge=${challenge}`}
+              >
+                Log In with IVAO
+              </Typography>
             }
           >
             <AlertTitle>Connect your IVAO account</AlertTitle>

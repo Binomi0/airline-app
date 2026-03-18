@@ -1,15 +1,15 @@
 import axios from 'axios'
-import React, { FC, startTransition, useCallback, useReducer, useState } from 'react'
+import React, { type FC, startTransition, useCallback, useMemo, useReducer, useRef, useState } from 'react'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { getApi } from 'lib/api'
 import type { Atc } from 'types'
-import { ivaoUserStore } from 'store/ivao-user.atom'
+// import { ivaoUserStore } from 'store/ivao-user.atom'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
 
-const MIN_IVAO_REQ_DELAY = 20000
+const MIN_IVAO_REQ_DELAY = 30000
 export const INITIAL_STATE: IVAOClients = {
   // pilots: [],
   atcs: [],
@@ -24,11 +24,13 @@ export const INITIAL_STATE: IVAOClients = {
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   // const user = useRecoilValue(userState)
-  const ivaoUser = useRecoilValue(ivaoUserStore)
+  // const ivaoUser = useRecoilValue(ivaoUserStore)
+  const ivaoToken = useRecoilValue(ivaoUserAuthStore)
   const setIvaoToken = useSetRecoilState(ivaoUserAuthStore)
 
   const [state, dispatch] = useReducer(vaProviderReducer, INITIAL_STATE)
   const [isLoading, setIsLoading] = useState(0)
+  const isAuthorizing = useRef(false)
   const { Provider } = VaProviderContext
 
   // const setPilots = useCallback((pilots: IvaoPilot[]) => {
@@ -53,14 +55,15 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const getAtcs = useCallback(
     async (_token?: string) => {
-      if (!_token) return
-      console.log({ _token })
+      const tokenToUse = _token || ivaoToken
+      if (!tokenToUse) return
+      console.log({ _token: tokenToUse })
 
       setIsLoading((s) => s + 1)
       try {
         const response = await axios.get<Atc[]>('api/ivao/atc/tower', {
           headers: {
-            Authorization: `Bearer ${_token}`
+            Authorization: `Bearer ${tokenToUse}`
           }
         })
 
@@ -72,7 +75,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
         setIsLoading((s) => s - 1)
       }
     },
-    [setAtcs]
+    [ivaoToken, setAtcs]
   )
 
   // const getPilots = useCallback(async () => {
@@ -109,40 +112,27 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   }, [])
 
-  const startTimers = useCallback(() => {
-    const atcTimer = setInterval(getAtcs, MIN_IVAO_REQ_DELAY)
-    // const ivaoTimer = setInterval(getIVAOData, MIN_IVAO_REQ_DELAY)
+  React.useEffect(() => {
+    // Only start sync if we have a token or don't need one for whazzup
+    const atcTimer = setInterval(() => getAtcs(), MIN_IVAO_REQ_DELAY)
+    const ivaoTimer = setInterval(() => getIVAOData(), MIN_IVAO_REQ_DELAY)
     // const pilotsTimer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
 
     return () => {
       clearInterval(atcTimer)
-      // clearInterval(ivaoTimer)
-      // clearInterval(pilotsTimer)
+      clearInterval(ivaoTimer)
     }
-  }, [
-    getAtcs
-    // getIVAOData
-    //  getPilots
-  ])
+  }, [getAtcs, getIVAOData])
 
   const initIvaoData = useCallback(() => {
-    if (!ivaoUser) return
+    // Manual trigger for first load
     getAtcs()
-    // getTowers()
-    // getPilots()
-    // getFlights()
     getIVAOData()
-    startTimers()
-  }, [
-    ivaoUser,
-    getAtcs,
-    //  getTowers,
-    // getFlights,
-    getIVAOData,
-    startTimers
-  ])
+  }, [getAtcs, getIVAOData])
 
   const initIvaoAuth = useCallback(() => {
+    if (isAuthorizing.current) return
+    isAuthorizing.current = true
     axios
       .get('/api/ivao/oauth')
       .then((response) => {
@@ -153,25 +143,27 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       .catch((error) => {
         console.log('initIvaoAuth error =>', error)
       })
+      .finally(() => {
+        isAuthorizing.current = false
+      })
   }, [getAtcs, setIvaoToken])
 
-  return (
-    <Provider
-      value={{
-        // pilots: state.pilots,
-        atcs: state.atcs,
-        towers: state.towers,
-        active: state.active,
-        flights: state.flights,
-        filter: state.filter,
-        origins: state.origins,
-        isLoading: Boolean(isLoading),
-        setFilter,
-        initIvaoData,
-        initIvaoAuth
-      }}
-    >
-      {children}
-    </Provider>
+  const contextValue = useMemo(
+    () => ({
+      // pilots: state.pilots,
+      atcs: state.atcs,
+      towers: state.towers,
+      active: state.active,
+      flights: state.flights,
+      filter: state.filter,
+      origins: state.origins,
+      isLoading: Boolean(isLoading),
+      setFilter,
+      initIvaoData,
+      initIvaoAuth
+    }),
+    [state, isLoading, setFilter, initIvaoData, initIvaoAuth]
   )
+
+  return <Provider value={contextValue}>{children}</Provider>
 }

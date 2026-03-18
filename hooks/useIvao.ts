@@ -1,6 +1,5 @@
-import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
-import axios from 'config/axios'
+import nextApiInstance from 'config/axios'
 import { AxiosError, AxiosResponse } from 'axios'
 import { useSetRecoilState } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
@@ -8,24 +7,28 @@ import { ivaoUserStore } from 'store/ivao-user.atom'
 
 interface UseIvaoReturnType {
   isLoading: boolean
-  authorize: () => void
+  authorize: (code: string, state: string) => void
   error: string
 }
 
 const useIvao = (): UseIvaoReturnType => {
-  const router = useRouter()
   const setIvaoUser = useSetRecoilState(ivaoUserStore)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   // const { initIvaoAuth } = useVaProviderContext()
 
   const requestIvaoUser = useCallback(
-    (token: string) => {
-      axios
-        .get('/api/ivao/user')
+    (ivaoUserToken: string) => {
+      nextApiInstance
+        .get('/api/ivao/user', {
+          headers: {
+            Authorization: `Bearer ${ivaoUserToken}`
+          }
+        })
         .then((response: AxiosResponse) => {
+          console.log('Ivao User =>', response.data)
           setIvaoUser(response.data)
-          localStorage.setItem('ivao-auth-token', token)
+          localStorage.setItem('ivao-auth-token', ivaoUserToken)
         })
         .catch((error: AxiosError) => {
           console.log('IVAO ERROR =>', error)
@@ -54,27 +57,30 @@ const useIvao = (): UseIvaoReturnType => {
   //   return true
   // }, [initIvaoAuth, ivaoToken, requestIvaoUser])
 
-  const authorize = useCallback(() => {
-    if (router.query.state && router.query.code) {
-      axios
-        .get('/api/ivao/authorize', { params: router.query })
-        .then((response) => {
-          requestIvaoUser(response.data)
-        })
-        .catch((err: AxiosError<{ code: number }>) => {
-          if (err.response?.data.code === 11000) {
-            console.error('this ivaoId is already taken')
-          } else {
-            console.error('err =>', err.response?.data)
-          }
-        })
-        .finally(() => {
-          setIsLoading(false)
-        })
-    } else {
-      throw new Error('Ivao returned different values')
-    }
-  }, [router.query, requestIvaoUser])
+  const authorize = useCallback(
+    (code: string, state: string) => {
+      if (state && code) {
+        nextApiInstance
+          .get('/api/ivao/authorize', { params: { code, state } })
+          .then((response) => {
+            requestIvaoUser(response.data)
+          })
+          .catch((err: AxiosError<{ code: number }>) => {
+            if (err.response?.data.code === 11000) {
+              console.error('this ivaoId is already taken')
+            } else {
+              console.error('err =>', err.response?.data)
+            }
+          })
+          .finally(() => {
+            setIsLoading(false)
+          })
+      } else {
+        console.warn('Ivao returned incomplete values in the query')
+      }
+    },
+    [requestIvaoUser]
+  )
 
   // React.useEffect(() => {
 

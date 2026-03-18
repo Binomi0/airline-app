@@ -6,23 +6,45 @@ import jwt from 'jsonwebtoken'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
+    console.log('req.query =>', req.query)
     if (!req.query.state || !req.query.code) {
-      res.status(400).end()
-      return
+      if (req.query.error_description) {
+        return res.status(400).send(req.query.error_description)
+        // TODO: Redirect to IVAO page with error message
+        // IF error_description = User+is+Inactive+User => Show message: "Your IVAO account is inactive. Please contact IVAO support to activate your account."
+        // ELSE => Show message: "An error has occurred while connecting to IVAO. Please try again."
+      }
+
+      return res.status(400).end()
     }
+
     const body = {
+      // code: req.query.code,
+      // code_verifier: req.query.code_verifier,
+      // state: req.query.state,
       grant_type: 'client_credentials',
-      scope: 'openid profile location flight_plans:read configuration bookings:read tracker training email birthday',
+      scope: 'openid profile location flight_plans:read configuration tracker training email birthday',
       client_id: process.env.NEXT_PUBLIC_IVAO_ID,
       client_secret: process.env.IVAO_SECRET
+      // redirect_uri: process.env.NEXT_PUBLIC_IVAO_REDIRECT_URI
     }
 
-    const response = await ivaoInstance.post<{ access_token?: string }>('/v2/oauth/token', body, {
-      headers: { Authorization: `Bearer ${req.query.code}` }
-    })
+    let accessToken
+    try {
+      const response = await ivaoInstance.post<{ access_token?: string }>('/v2/oauth/token', body, {
+        headers: { Authorization: `Bearer ${req.query.code}` }
+      })
 
-    if (!response.data) {
-      res.status(404).end()
+      if (!response.data) {
+        res.status(404).end()
+        return
+      }
+
+      accessToken = response.data.access_token
+      console.log('response =>', response.data)
+    } catch (error) {
+      console.error('Error getting token =>', error)
+      res.status(500).send(error)
       return
     }
 
@@ -45,8 +67,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       await connectDB()
       const va = await VirtualAirlineModel.findOne({ userId: req.query.state })
       if (va) {
-        res.status(202).end()
-        return
+        return res.status(200).json(accessToken)
       }
 
       const vaUser = await VirtualAirlineModel.findOneAndUpdate(
@@ -69,8 +90,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return
     }
     // res.redirect(`/ivao?token=${req.query.code}`)
-    res.status(202).end()
-    return
+    return res.status(200).json(accessToken)
   } else {
     res.status(405).end()
   }

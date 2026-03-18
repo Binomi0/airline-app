@@ -14,14 +14,17 @@ const IVAOPage = () => {
   const ivaoUser = useRecoilValue(ivaoUserStore)
   const { authorize, error } = useIvao()
 
-  useEffect(authorize, [authorize])
+  useEffect(() => {
+    if (router.isReady && router.query.code) {
+      authorize(router.query.code as string, router.query.state as string)
+    }
+  }, [authorize, router.isReady, router.query.code, router.query.state])
 
   useEffect(() => {
     if (ivaoUser) {
       router.replace('/ivao')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ivaoUser])
+  }, [ivaoUser, router])
 
   useEffect(() => {
     if (error) {

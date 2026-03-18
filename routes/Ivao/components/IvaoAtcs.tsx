@@ -123,17 +123,21 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
           <Stack direction='row' justifyContent='space-between' p={1}>
             <Box>
               <Typography variant='subtitle1'>
-                {atc.atcPosition.airportId}{' '}
-                <Typography fontWeight={300} variant='caption' color='gray'>
-                  {atc.atcPosition.atcCallsign.split('Tower')[0]}
-                </Typography>
+                {atc.atcPosition?.airportId || atc.callsign.split('_')[0]}{' '}
+                {atc.atcPosition?.atcCallsign && (
+                  <Typography fontWeight={300} variant='caption' color='gray'>
+                    {atc.atcPosition.atcCallsign.split('Tower')[0]}
+                  </Typography>
+                )}
               </Typography>
               <Stack direction='row' spacing={1} alignItems='center'>
                 <CellTowerIcon fontSize='inherit' />
                 <Typography variant='caption'>
-                  {Intl.NumberFormat('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(
-                    atc.atcSession.frequency
-                  )}
+                  {atc.atcSession?.frequency
+                    ? Intl.NumberFormat('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(
+                        atc.atcSession.frequency
+                      )
+                    : 'N/A'}
                 </Typography>
               </Stack>
             </Box>

@@ -35,7 +35,7 @@ const CargoView: NextPage<{ aircraft?: NFT }> = ({ aircraft }) => {
   const { flights } = useVaProviderContext()
   const [selected, setSelected] = useState(initialState)
   const flightList = Object.entries(flights as Flight)
-
+  console.log({ flights })
   React.useEffect(() => {
     const { origin, destination, callsign } = router.query
     if (origin && destination && callsign && aircraft) {
@@ -79,6 +79,7 @@ const CargoView: NextPage<{ aircraft?: NFT }> = ({ aircraft }) => {
             <CargoList aircraft={aircraft} flights={flightList} newCargo={newCargo} setSelected={setSelected} />
           </Box>
         </Fade>
+
         <Fade in={flightList.length < 2} unmountOnExit>
           <Box textAlign='center'>
             {flightList.length === 0 && (
@@ -93,6 +94,7 @@ const CargoView: NextPage<{ aircraft?: NFT }> = ({ aircraft }) => {
             </Alert>
           </Box>
         </Fade>
+
         <Fade in={!address} unmountOnExit>
           <Box maxWidth={500} m='auto'>
             <Alert severity='warning'>

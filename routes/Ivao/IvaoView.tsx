@@ -49,7 +49,7 @@ interface Props {
 }
 
 const IvaoView = ({ user: _user }: Props) => {
-  const { isLoading: _loading } = useVaProviderContext()
+  const { isLoading: _loading, initIvaoAuth, initIvaoData } = useVaProviderContext()
   const router = useRouter()
   const { live, getLive } = useLiveFlightProviderContext()
   const [start, setStart] = useState((router.query.start as string) ?? '')
@@ -158,14 +158,12 @@ const IvaoView = ({ user: _user }: Props) => {
     }
   }, [live, router])
 
-  // React.useEffect(() => {
-  //   if (ivaoToken === undefined) {
-  //     initIvaoAuth()
-  //   } else if (ivaoToken) {
-  //     console.log('IvaoView ivaoToken =>', ivaoToken)
-  //     getPilots()
-  //   }
-  // }, [getPilots, initIvaoAuth, ivaoToken])
+  React.useEffect(() => {
+    if (ivaoAuthToken === undefined) {
+      initIvaoAuth()
+      initIvaoData()
+    }
+  }, [ivaoAuthToken, initIvaoAuth, initIvaoData])
 
   React.useEffect(() => {
     if (router.query.start) {

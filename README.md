@@ -52,3 +52,9 @@ Una vez el usuario está listo, tiene licncia, avios y combustible, puede elegir
 Los vuelos se monitorizan a través de una aplicación electron que el usuario tendrá que tener instalada, abierta y configurada antes de empezar su vuelo.
 Necesitmoas un sistema de verificación de vuelo para evitar los bots. Quizá un sistema de machine learning pero no tengo nada de experiencia en eso.
 Para conseguir los tokens se creará un pool de liquidez en uniswap contra USDC o WETH o ambos para que los usuarios puedan adquirirlos.
+
+La parte de los vuelos se gestiona mayormente a través del simulador y una conexión con IVAO. Los usuarios se conectan a IVAO con su cuenta de IVAO y la plataforma se conecta a IVAO para obtener la información de los vuelos.
+Para poder escocger un vuelo, el usuario primer elige entre las torres de control (ATC) conectadas en IVAO, puede elegir un inicio y un destino siempre y cuando hay control aereo de IVAO activo en la ruta, minimo en la salida y llegada.
+Entonces una vez el usuario ha elegido el aeropuerto de salida y llegada, se le ofrecen un vuelo disponible.
+Otra opción sería que solo eligiera el punto de salida dejando a weifly que elija el destino y los detalles del vuelo.
+O que weifly proponga rutas aleatorias ya predefinidas que el usuario pueda elegir.

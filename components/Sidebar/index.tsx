@@ -46,6 +46,8 @@ const Sidebar: React.FC = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
   }, [setTheme])
 
+  console.log('user =>', user)
+
   return (
     <Drawer open={open} onClose={() => toggleSidebar('left')}>
       <Stack direction='row' p={2} spacing={1}>

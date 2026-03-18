@@ -43,7 +43,6 @@ const useAuth = (): UseAuthReturnType => {
         setUser(data)
         loadAccount(data)
         loginSuccessSwal()
-
       } catch (err) {
         const error = err as Error
         console.error('err =>', error)
@@ -64,7 +63,6 @@ const useAuth = (): UseAuthReturnType => {
           setUser(data)
           loadAccount(data)
           loginSuccessSwal()
-
         }
       } catch (err) {
         console.error('[handleSignUp] Error =>', err)
