@@ -3,14 +3,17 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { Box, CircularProgress, Typography } from '@mui/material'
 import dynamic from 'next/dynamic'
+import { useRecoilValue } from 'recoil'
+import { themeStore } from 'store/theme.atom'
 import { useVaProvider } from 'context/VaProvider'
 import { Atc } from 'types'
 import { getCoords, calculateDistance } from './utils'
 import RadarInfoPanel from './RadarInfoPanel'
 import StatusOverlay from './StatusOverlay'
+import { RadarMapProps } from './RadarMap'
 
 // Dynamically import the Map component to avoid SSR issues with Leaflet
-const RadarMap = dynamic(() => import('./RadarMap'), {
+const RadarMap = dynamic<RadarMapProps>(() => import('./RadarMap'), {
   ssr: false,
   loading: () => (
     <Box
@@ -35,6 +38,7 @@ const RadarMap = dynamic(() => import('./RadarMap'), {
 
 const TowerControlMap = () => {
   const { atcs = [], initIvaoData, isLoading } = useVaProvider()
+  const theme = useRecoilValue(themeStore)
   const [origin, setOrigin] = useState<Atc | null>(null)
   const [destination, setDestination] = useState<Atc | null>(null)
 
@@ -70,7 +74,7 @@ const TowerControlMap = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: '100vh',
+        height: '100%',
         overflow: 'hidden',
         bgcolor: '#030712'
       }}
@@ -81,9 +85,16 @@ const TowerControlMap = () => {
         distance={distance}
         isLoading={isLoading}
         onReset={handleReset}
+        theme={theme}
       />
 
-      <RadarMap towers={atcs} origin={origin} destination={destination} onTowerClick={handleTowerClick} />
+      <RadarMap 
+        towers={atcs} 
+        origin={origin} 
+        destination={destination} 
+        onTowerClick={handleTowerClick}
+        theme={theme}
+      />
 
       {!origin && <StatusOverlay />}
 
@@ -102,20 +113,24 @@ const TowerControlMap = () => {
           filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.6));
         }
         .leaflet-container {
-          background: #020617 !important;
+          background: ${theme === 'dark' ? '#020617' : '#f1f5f9'} !important;
         }
         .leaflet-tile {
-          filter: brightness(0.7) contrast(1.2) saturate(0.2) hue-rotate(180deg) !important;
+          filter: ${
+            theme === 'dark'
+              ? 'brightness(1.1) contrast(1.1) saturate(0.5) hue-rotate(180deg)'
+              : 'brightness(1) contrast(1.1) saturate(0.3) hue-rotate(0deg)'
+          } !important;
         }
         .radar-popup .leaflet-popup-content-wrapper {
-          background: #0f172a !important;
-          color: #f8fafc !important;
-          border: 1px solid rgba(56, 189, 248, 0.4);
+          background: ${theme === 'dark' ? '#0f172a' : '#fff'} !important;
+          color: ${theme === 'dark' ? '#f8fafc' : '#1e293b'} !important;
+          border: 1px solid ${theme === 'dark' ? 'rgba(56, 189, 248, 0.4)' : 'rgba(56, 189, 248, 0.2)'};
           border-radius: 8px;
         }
         .radar-popup .leaflet-popup-tip {
-          background: #0f172a !important;
-          border: 1px solid rgba(56, 189, 248, 0.4);
+          background: ${theme === 'dark' ? '#0f172a' : '#fff'} !important;
+          border: 1px solid ${theme === 'dark' ? 'rgba(56, 189, 248, 0.4)' : 'rgba(56, 189, 248, 0.2)'};
         }
       `}</style>
     </Box>

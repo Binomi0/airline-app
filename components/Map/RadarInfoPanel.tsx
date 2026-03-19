@@ -9,9 +9,17 @@ interface RadarInfoPanelProps {
   distance: number | null
   isLoading: boolean
   onReset: () => void
+  theme: 'light' | 'dark'
 }
 
-const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({ origin, destination, distance, isLoading, onReset }) => {
+const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
+  origin,
+  destination,
+  distance,
+  isLoading,
+  onReset,
+  theme
+}) => {
   return (
     <Card
       sx={{
@@ -20,11 +28,12 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({ origin, destination, di
         left: 24,
         zIndex: 1000,
         width: 320,
-        background: 'rgba(15, 23, 42, 0.85)',
+        background: theme === 'dark' ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(16px)',
         borderRadius: 3,
-        border: '1px solid rgba(56, 189, 248, 0.2)',
-        color: '#f8fafc'
+        border: `1px solid ${theme === 'dark' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(56, 189, 248, 0.1)'}`,
+        color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+        boxShadow: theme === 'dark' ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.1)'
       }}
     >
       <CardContent sx={{ p: '24px !important' }}>
@@ -43,12 +52,12 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({ origin, destination, di
               }}
             >
               <Radar sx={{ fontSize: 20 }} />
-              Electronic Chart
+              Flight Planner
             </Typography>
             {isLoading && <CircularProgress size={12} sx={{ color: '#38bdf8' }} />}
           </Box>
 
-          <Divider sx={{ borderColor: 'rgba(56, 189, 248, 0.1)' }} />
+          <Divider sx={{ borderColor: theme === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(56, 189, 248, 0.05)' }} />
 
           <Stack spacing={2}>
             {/* DEPARTURE */}
@@ -56,8 +65,12 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({ origin, destination, di
               sx={{
                 p: 1.5,
                 borderRadius: 2,
-                bgcolor: origin ? alpha('#10b981', 0.1) : 'rgba(30, 41, 59, 0.5)',
-                border: `1px solid ${origin ? alpha('#10b981', 0.4) : 'rgba(56, 189, 248, 0.1)'}`
+                bgcolor: origin
+                  ? alpha('#10b981', 0.1)
+                  : theme === 'dark'
+                    ? 'rgba(30, 41, 59, 0.5)'
+                    : 'rgba(0, 0, 0, 0.03)',
+                border: `1px solid ${origin ? alpha('#10b981', 0.4) : theme === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`
               }}
             >
               <Stack direction='row' spacing={1.5} alignItems='center'>
@@ -90,8 +103,12 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({ origin, destination, di
               sx={{
                 p: 1.5,
                 borderRadius: 2,
-                bgcolor: destination ? alpha('#ef4444', 0.1) : 'rgba(30, 41, 59, 0.5)',
-                border: `1px solid ${destination ? alpha('#ef4444', 0.4) : 'rgba(56, 189, 248, 0.1)'}`
+                bgcolor: destination
+                  ? alpha('#ef4444', 0.1)
+                  : theme === 'dark'
+                    ? 'rgba(30, 41, 59, 0.5)'
+                    : 'rgba(0, 0, 0, 0.03)',
+                border: `1px solid ${destination ? alpha('#ef4444', 0.4) : theme === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`
               }}
             >
               <Stack direction='row' spacing={1.5} alignItems='center'>
@@ -130,7 +147,10 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({ origin, destination, di
                 border: '1px solid #38bdf8'
               }}
             >
-              <Typography variant='h5' sx={{ color: '#e2e8f0', fontWeight: 900, fontFamily: 'monospace' }}>
+              <Typography
+                variant='h5'
+                sx={{ color: theme === 'dark' ? '#e2e8f0' : '#1e293b', fontWeight: 900, fontFamily: 'monospace' }}
+              >
                 {distance} <span style={{ fontSize: 12, color: '#38bdf8' }}>NM</span>
               </Typography>
               <Typography
@@ -155,9 +175,13 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({ origin, destination, di
               fontWeight: 900,
               fontSize: 11,
               letterSpacing: 1,
-              borderColor: 'rgba(56, 189, 248, 0.3)',
+              borderColor: theme === 'dark' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(56, 189, 248, 0.2)',
               color: '#94a3b8',
-              '&:hover': { borderColor: '#38bdf8', color: '#f8fafc', bgcolor: alpha('#38bdf8', 0.05) }
+              '&:hover': {
+                borderColor: '#38bdf8',
+                color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+                bgcolor: alpha('#38bdf8', 0.05)
+              }
             }}
           >
             System Reset

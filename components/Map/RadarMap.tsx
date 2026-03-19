@@ -5,14 +5,15 @@ import { Atc } from 'types'
 import RadarMarker from './RadarMarker'
 import { getCoords, getCurvePath } from './utils'
 
-interface RadarMapProps {
+export interface RadarMapProps {
   towers: readonly Atc[]
   origin: Atc | null
   destination: Atc | null
   onTowerClick: (tower: Atc) => void
+  theme: 'light' | 'dark'
 }
 
-const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowerClick }) => {
+const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowerClick, theme }) => {
   const polylinePath = React.useMemo(() => {
     if (!origin || !destination) return null
     const c1 = getCoords(origin)
@@ -26,7 +27,7 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
       <MapContainer
         center={[20, 0]}
         zoom={2.5}
-        style={{ height: '100%', width: '100%', background: '#020617' }}
+        style={{ height: '100%', width: '100%', background: theme === 'dark' ? '#020617' : '#f1f5f9' }}
         zoomControl={false}
         maxBounds={[
           [-85, -180],
@@ -36,7 +37,11 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+          url={
+            theme === 'dark'
+              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+              : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+          }
         />
 
         {/* RADAR OVERLAY FILTER */}
@@ -66,6 +71,7 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
               isOrigin={origin?.callsign === tower.callsign}
               isDestination={destination?.callsign === tower.callsign}
               onTowerClick={onTowerClick}
+              theme={theme}
             />
           )
         })}

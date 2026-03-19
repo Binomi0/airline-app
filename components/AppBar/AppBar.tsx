@@ -18,9 +18,10 @@ import AppBarAuth from './components/AppBarAuth'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import { smartAccountAddressStore } from 'store/wallet.atom'
+import { themeStore } from 'store/theme.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import styles from './appbar.module.css'
-import { AlertTitle, Box, Container } from '@mui/material'
+import { AlertTitle, Box, Container, useTheme } from '@mui/material'
 import Link from 'next/link'
 
 function base64URLEncode(str: string) {
@@ -42,6 +43,8 @@ const CustomAppBar = () => {
   const { status } = useAccountSigner()
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const user = useRecoilValue(userState)
+  const theme = useRecoilValue(themeStore)
+  const muiTheme = useTheme()
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
 
@@ -71,7 +74,21 @@ const CustomAppBar = () => {
           {snack.message}
         </Alert>
       </Snackbar>
-      <AppBar position='sticky' color={trigger ? 'primary' : 'transparent'}>
+      <AppBar 
+        position='sticky' 
+        sx={{ 
+          background: trigger 
+            ? muiTheme.palette.primary.main 
+            : theme === 'dark' 
+              ? 'rgba(11, 15, 25, 0.7)' 
+              : 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(12px)',
+          backgroundImage: 'none',
+          boxShadow: 'none',
+          color: theme === 'dark' ? '#fff' : '#1e293b',
+          borderBottom: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`
+        }}
+      >
         <Toolbar sx={{ m: 0, p: 0 }}>
           <IconButton
             onClick={() => toggleSidebar('left')}
@@ -83,7 +100,7 @@ const CustomAppBar = () => {
             <MenuIcon />
           </IconButton>
           <Link href='/'>
-            <img src='/logo64x64-white.png' alt='logo' width={32} height={32} />
+            <img src={theme === 'dark' ? '/logo64x64-white.png' : '/logo64x64.png'} alt='logo' width={32} height={32} />
           </Link>
           {matches ? (
             <Typography ml={2} variant='h6' component='div' sx={{ flexGrow: 1 }}>

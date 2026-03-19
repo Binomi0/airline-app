@@ -65,16 +65,6 @@ const commonComponents: ThemeOptions['components'] = {
         boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
       }
     }
-  },
-  MuiAppBar: {
-    styleOverrides: {
-      root: {
-        background: 'rgba(11, 15, 25, 0.7)',
-        backdropFilter: 'blur(10px)',
-        boxShadow: 'none',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
-      }
-    }
   }
 }
 
@@ -102,15 +92,21 @@ const lTheme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          background: 'rgba(255, 255, 255, 0.7)',
-          backdropFilter: 'blur(10px)',
-          boxShadow: 'none',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.05)'
+          background: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(12px)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
+          color: '#1e293b'
         }
       }
     }
   }
 })
+
+// Add custom properties to the extended themes if needed, 
+// but for CssVarsProvider we'll rely on the palette structure.
+// @ts-expect-error - Custom property for AppBar
+lTheme.palette.AppBar = { darkBg: 'rgba(255, 255, 255, 0.8)' };
 
 const dTheme = createTheme({
   palette: {
@@ -131,8 +127,24 @@ const dTheme = createTheme({
     grey
   },
   typography: commonTypography,
-  components: commonComponents
+  components: {
+    ...commonComponents,
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          background: 'rgba(11, 15, 25, 0.7)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: 'none',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          color: '#fff'
+        }
+      }
+    }
+  }
 })
+
+// @ts-expect-error - Custom property for AppBar
+dTheme.palette.AppBar = { darkBg: 'rgba(11, 15, 25, 0.7)' };
 
 export const darkTheme = responsiveFontSizes(dTheme)
 export const lightTheme = responsiveFontSizes(lTheme)
