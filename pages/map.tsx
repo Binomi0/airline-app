@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 import { Box } from '@mui/material'
 import Head from 'next/head'
 
-const MapaTorresControl = dynamic(() => import('components/MapaTorresControl'), {
+const TowerControlMap = dynamic(() => import('components/TowerControlMap'), {
   ssr: false,
   loading: () => (
     <Box
@@ -30,7 +30,7 @@ const MapPreviewPage = () => {
         <title>Mapa de Torres de Control | Airport Airline</title>
       </Head>
 
-      <MapaTorresControl />
+      <TowerControlMap />
     </Box>
   )
 }

@@ -10,7 +10,7 @@ import * as RL from 'react-leaflet'
 
 type LeafletState = typeof RL & { L: typeof L }
 
-const MapaTorresControl = () => {
+const TowerControlMap = () => {
   const { atcs = [], initIvaoData, isLoading } = useVaProvider()
   const [origin, setOrigin] = useState<Atc | null>(null)
   const [destination, setDestination] = useState<Atc | null>(null)
@@ -489,4 +489,4 @@ const MapaTorresControl = () => {
   )
 }
 
-export default MapaTorresControl
+export default TowerControlMap
