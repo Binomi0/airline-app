@@ -1,10 +1,10 @@
 import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
-import { Cargo, CargoStatus } from 'types'
+import { Mission, MissionStatus, MissionType } from 'types'
 
-export type ICargo = Document & Cargo & { userId: ObjectId }
+export type IMission = Document & Mission & { userId: ObjectId }
 
-const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
+const missionSchema: mongoose.Schema = new mongoose.Schema<IMission>(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,10 +22,15 @@ const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
       type: Number,
       required: true
     },
-    details: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'CargoDetails',
+    type: {
+      type: String,
+      enum: Object.values(MissionType),
+      default: MissionType.CARGO,
       required: true
+    },
+    details: {
+      name: { type: String, required: true },
+      description: { type: String, required: true }
     },
     aircraftId: {
       type: String,
@@ -48,8 +53,8 @@ const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
     },
     status: {
       type: String,
-      enum: Object.values(CargoStatus),
-      default: CargoStatus.STARTED
+      enum: Object.values(MissionStatus),
+      default: MissionStatus.STARTED
     },
     remote: {
       type: Boolean,
@@ -61,6 +66,9 @@ const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
     isRewarded: {
       type: Boolean,
       default: false
+    },
+    expiresAt: {
+      type: Date
     }
   },
   {
@@ -68,4 +76,4 @@ const cargoSchema: mongoose.Schema = new mongoose.Schema<ICargo>(
   }
 )
 
-export default mongoose.models.Cargo || mongoose.model<ICargo>('Cargo', cargoSchema)
+export default mongoose.models.Mission || mongoose.model<IMission>('Mission', missionSchema)

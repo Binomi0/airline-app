@@ -2,8 +2,8 @@ import nextApiInstance from 'config/axios'
 import {
   ActiveAtc,
   Airport,
-  AtcPosition,
   AttributeType,
+  Coords,
   IcaoCode,
   IvaoPilot,
   TowerMatrix,
@@ -51,13 +51,16 @@ export const verifySignature = async function (authenticator, response, expected
   }
 }
 
-export const getNFTAttributes = (nft: INft) => {
+export const getMissionAttributes = (nft: INft) => {
   if (nft.metadata.attributes && Array.isArray(nft.metadata.attributes) && nft.metadata.attributes.length > 0) {
     return nft.metadata.attributes as AttributeType[]
   }
 
   return []
 }
+
+/** @deprecated Use getMissionAttributes instead */
+export const getNFTAttributes = getMissionAttributes
 
 export const parseNumber = (value: number | bigint) => Intl.NumberFormat('es').format(value)
 
@@ -68,8 +71,8 @@ export const formatNumber = (value: number = 0, decimals: number = 2) =>
   }).format(isNaN(value) ? 0 : value)
 
 export const getDistanceByCoords = (
-  origin: AtcPosition['atcPosition']['airport'],
-  destination: AtcPosition['atcPosition']['airport']
+  origin: Coords,
+  destination: Coords // AtcPosition['atcPosition']['airport']
 ) => {
   if (!origin || !destination) return 0
 
@@ -93,8 +96,8 @@ export function getCallsign() {
   return `${process.env.NEXT_PUBLIC_CALLSIGN}${ident}`
 }
 
-export function getCargoWeight(aircraft: INft) {
-  const attribute = getNFTAttributes(aircraft).find((attribute) => attribute.trait_type === 'cargo')
+export function getMissionWeight(aircraft: INft) {
+  const attribute = getMissionAttributes(aircraft).find((attribute) => attribute.trait_type === 'cargo')
 
   if (!attribute) {
     console.warn(`Aircraft ${aircraft.id} is missing 'cargo' attribute`)
@@ -104,8 +107,8 @@ export function getCargoWeight(aircraft: INft) {
   return Number(attribute.value) * randomIntFromInterval(40, 70) || 0
 }
 
-export function getCargoPrize(distance: number, aircraft: INft) {
-  const attribute = getNFTAttributes(aircraft).find((attr) => attr.trait_type === 'license')
+export function getMissionPrize(distance: number, aircraft: INft) {
+  const attribute = getMissionAttributes(aircraft).find((attr) => attr.trait_type === 'license')
   if (attribute) {
     const base = Math.floor(distance / 100) / 5
     switch (attribute.value) {
@@ -227,7 +230,8 @@ export const reduceTowerMatrix =
                 ? { distance: 0 }
                 : {
                     ...(atc.atcPosition ? { ...atc.atcPosition.airport } : {}),
-                    distance: getDistanceByCoords(curr.atcPosition?.airport, atc.atcPosition?.airport) ?? 0,
+                    distance:
+                      getDistanceByCoords(curr.atcPosition?.airport as Coords, atc.atcPosition?.airport as Coords) ?? 0,
                     callsign: atc.callsign
                   }
             )

@@ -1,72 +1,74 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import { Cargo, CargoStatus, FRoute } from 'types'
-import { getCargoWeight, getRandomInt, getCargoPrize } from 'utils'
-import { cargoStore } from 'store/cargo.atom'
+import { Mission, MissionStatus, FRoute, MissionType } from 'types'
+import { getMissionWeight, getRandomInt, getMissionPrize } from 'utils'
+import { missionStore } from 'store/mission.atom'
 import { cargos } from 'mocks/cargos'
 import nextApiInstance from 'config/axios'
 import { INft } from 'models/Nft'
 
-interface UseCargo {
-  newCargo: (route: FRoute, owned: INft, callsign: string, remote: boolean) => Promise<void>
-  getCargo: () => Promise<void>
-  setCargo: (cargo?: Cargo) => void
-  cargo?: Cargo
+interface UseMission {
+  newMission: (route: FRoute, owned: INft, callsign: string, remote: boolean) => Promise<void>
+  getMission: () => Promise<void>
+  setMission: (mission?: Mission) => void
+  mission?: Mission
   isLoading: boolean
   completed: number
 }
 
-const useCargo = (): UseCargo => {
-  const [cargo, setCargo] = useRecoilState(cargoStore)
+const useMission = (): UseMission => {
+  const [mission, setMission] = useRecoilState(missionStore)
   const [isLoading, setIsLoading] = useState(false)
   const [completed, setCompleted] = useState(0)
 
-  const getCargo = useCallback(async () => {
+  const getMission = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await nextApiInstance.get<Cargo>('/api/cargo')
-      setCargo(response.data)
+      const response = await nextApiInstance.get<Mission>('/api/missions')
+      setMission(response.data)
     } catch (error) {
       console.error('error =>', error)
     } finally {
       setIsLoading(false)
     }
-  }, [setCargo])
+  }, [setMission])
 
-  const newCargo = useCallback(
+  const newMission = useCallback(
     async (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => {
       try {
         const details = cargos[getRandomInt(8)]
-        const weight = getCargoWeight(aircraft)
-        const prize = getCargoPrize(route.distance, aircraft)
-        const cargo: Cargo = {
+        const weight = getMissionWeight(aircraft)
+        const prize = getMissionPrize(route.distance, aircraft)
+        const mission: Mission = {
           origin: route.origin,
           destination: route.destination,
           distance: route.distance,
+          type: route.type || MissionType.CARGO,
           details,
+
           aircraft,
           aircraftId: aircraft.id.toString(),
           weight,
           callsign,
           prize,
           rewards: 0,
-          status: CargoStatus.STARTED,
+          status: MissionStatus.STARTED,
           remote,
           isRewarded: false
         }
-        setCargo(cargo)
+        setMission(mission)
       } catch (err) {
         const error = err as Error
         console.error(error)
         throw new Error(error.message)
       }
     },
-    [setCargo]
+    [setMission]
   )
 
   const getCompletedCount = useCallback(async () => {
     try {
-      const { data } = await nextApiInstance.get<{ count: number }>('/api/cargo/count')
+      const { data } = await nextApiInstance.get<{ count: number }>('/api/missions/count')
       setCompleted(data.count)
     } catch (error) {
       console.error(error)
@@ -77,7 +79,7 @@ const useCargo = (): UseCargo => {
     getCompletedCount()
   }, [getCompletedCount])
 
-  return { newCargo, cargo, getCargo, setCargo, isLoading, completed }
+  return { newMission, mission, getMission, setMission, isLoading, completed }
 }
 
-export default useCargo
+export default useMission

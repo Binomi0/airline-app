@@ -1,4 +1,4 @@
-import CargoItem from './CargoItem'
+import MissionItem from './MissionItem'
 import React, { Dispatch, SetStateAction, useCallback } from 'react'
 import { FRoute } from 'types'
 import { getCallsign } from 'utils'
@@ -26,13 +26,13 @@ import Grid from '@mui/material/Grid'
 // }
 
 type Props = {
-  newCargo: (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => void
+  newMission: (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => void
   setSelected: Dispatch<SetStateAction<FRoute>>
   flights: [string, FRoute[]][]
   aircraft?: INft
 }
 
-const CargoList = ({ newCargo, setSelected, flights, aircraft }: Props) => {
+const MissionList = ({ newMission, setSelected, flights, aircraft }: Props) => {
   const address = useRecoilValue(smartAccountAddressStore)
 
   const handleSelect = useCallback(
@@ -40,10 +40,10 @@ const CargoList = ({ newCargo, setSelected, flights, aircraft }: Props) => {
       if (!aircraft) {
         throw new Error('Missing aircraft')
       }
-      newCargo({ origin, destination, distance: 0 }, aircraft, getCallsign(), false)
+      newMission({ origin, destination, distance: 0 }, aircraft, getCallsign(), false)
       setSelected({ origin, destination, distance: 0 })
     },
-    [newCargo, setSelected, aircraft]
+    [newMission, setSelected, aircraft]
   )
 
   return (
@@ -60,11 +60,11 @@ const CargoList = ({ newCargo, setSelected, flights, aircraft }: Props) => {
       </Box> */}
       <Grid container spacing={2}>
         {flights.slice(0, 12).map(([key, value], index) => (
-          <CargoItem onSelect={handleSelect} key={key} origin={key} flights={value} delay={500 * (index + 1)} />
+          <MissionItem onSelect={handleSelect} key={key} origin={key} flights={value} delay={500 * (index + 1)} />
         ))}
       </Grid>
     </Fade>
   )
 }
 
-export default CargoList
+export default MissionList

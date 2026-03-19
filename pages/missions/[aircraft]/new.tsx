@@ -1,7 +1,7 @@
 import { VaProvider } from 'context/VaProvider'
 import { useRouter } from 'next/router'
 import React from 'react'
-import CargoView from 'routes/Cargo/CargoView'
+import MissionView from 'routes/Missions/MissionView'
 import Disconnected from 'components/Disconnected'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import Fade from '@mui/material/Fade'
@@ -13,7 +13,7 @@ import { filterByTokenAddress } from 'utils'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
 
-const CargoAircraft = () => {
+const MissionAircraftPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const { data: userNfts } = useOwnedNfts()
@@ -26,7 +26,7 @@ const CargoAircraft = () => {
 
   React.useEffect(() => {
     if (!user) {
-      router.push('/cargo')
+      router.push('/missions')
     }
   }, [user, router])
 
@@ -49,11 +49,11 @@ const CargoAircraft = () => {
       </Fade>
       <Fade in={!!ownedAircrafts}>
         <Box>
-          <CargoView aircraft={ownedAircrafts?.find((a) => a.tokenId.toString() === router.query.aircraft)?.nft} />
+          <MissionView aircraft={ownedAircrafts?.find((a) => a.tokenId.toString() === router.query.aircraft)?.nft} />
         </Box>
       </Fade>
     </VaProvider>
   )
 }
 
-export default CargoAircraft
+export default MissionAircraftPage

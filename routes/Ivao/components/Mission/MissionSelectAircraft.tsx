@@ -25,7 +25,7 @@ interface Props {
   active: boolean
 }
 
-const CargoSelectAircraft = ({
+const MissionSelectAircraft = ({
   aircraft,
   aircrafts,
   currentAircraft,
@@ -48,8 +48,8 @@ const CargoSelectAircraft = ({
       <Stack justifyContent='space-between' spacing={2}>
         <Box>
           <FormControl fullWidth>
-            <InputLabel size={ownedAircrafts.length === 0 ? 'small' : 'normal'} id='select-cargo-aircarft-label'>
-              Select an Aircraft
+            <InputLabel size={ownedAircrafts.length === 0 ? 'small' : 'normal'} id='select-mission-aircarft-label'>
+              Seleccionar Aeronave
             </InputLabel>
             <Select
               size={ownedAircrafts.length === 0 ? 'small' : 'medium'}
@@ -59,10 +59,10 @@ const CargoSelectAircraft = ({
               color='primary'
               fullWidth
               autoWidth
-              labelId='select-cargo-aircarft-label'
-              id='select-cargo-aircarft'
+              labelId='select-mission-aircarft-label'
+              id='select-mission-aircarft'
               value={aircraft}
-              label='Select an Aircraft'
+              label='Seleccionar Aeronave'
               onChange={handleChange}
               sx={{ minWidth: 250 }}
             >
@@ -108,8 +108,8 @@ const CargoSelectAircraft = ({
                 : `${hasEnoughFuel() ? 'success' : 'error'}.dark`
             }
           >
-            Fuel available:{' '}
-            <b>{formatNumber(Number(gasBalance !== undefined ? Number(gasBalance) / 1e18 : 0), 0)} Liters</b>
+            Combustible disponible:{' '}
+            <b>{formatNumber(Number(gasBalance !== undefined ? Number(gasBalance) / 1e18 : 0), 0)} Litros</b>
           </Typography>
           {active && (
             <Typography
@@ -119,7 +119,7 @@ const CargoSelectAircraft = ({
                   : `${hasEnoughFuel() ? 'success' : 'error'}.dark`
               }
             >
-              Fuel required: <b>{formatNumber(requiredGas(), 0)} Liters</b>
+              Combustible requerido: <b>{formatNumber(requiredGas(), 0)} Litros</b>
             </Typography>
           )}
         </Box>
@@ -128,4 +128,4 @@ const CargoSelectAircraft = ({
   )
 }
 
-export default CargoSelectAircraft
+export default MissionSelectAircraft

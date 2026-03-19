@@ -16,7 +16,7 @@ import Paper from '@mui/material/Paper'
 import Container from '@mui/material/Container'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
-import Cargo from './components/Cargo/IvaoCargo'
+import Mission from './components/Mission/IvaoMission'
 import { useVaProviderContext } from 'context/VaProvider'
 import { bookingStore } from 'store/booking.atom'
 import { authStore } from 'store/auth.atom'
@@ -25,7 +25,7 @@ import { authStore } from 'store/auth.atom'
 import Destinations from './components/Destinations'
 import Swal from 'sweetalert2'
 import { postApi } from 'lib/api'
-import { cargoStore } from 'store/cargo.atom'
+import { missionStore } from 'store/mission.atom'
 import { hasRequirement } from 'utils'
 import axios from 'config/axios'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
@@ -60,7 +60,7 @@ const IvaoView = ({ user: _user }: Props) => {
   const [booking, setBooking] = useRecoilState(bookingStore)
   // const [hasApp, setHasApp] = useRecoilState(appInstalledStore)
   // const { getPilots } = usePilots()
-  const cargo = useRecoilValue(cargoStore)
+  const mission = useRecoilValue(missionStore)
   const [aircraft, setAircraft] = useState<string>('-1')
   const [metar, setMetar] = useState<string>('')
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
@@ -85,22 +85,22 @@ const IvaoView = ({ user: _user }: Props) => {
   )
 
   const handleRequestFlight = useCallback(async () => {
-    if (!cargo) return
+    if (!mission) return
 
     try {
       // eslint-disable-next-line no-unused-vars
-      const { aircraft: _, ...newCargo } = cargo
+      const { aircraft: _, ...newMission } = mission
 
       const { isConfirmed } = await Swal.fire({
-        title: `Callsign ${newCargo.callsign}`,
-        text: 'Are you ready for this flight? Remember to set required callsign before start',
+        title: `Callsign ${newMission.callsign}`,
+        text: '¿Estás listo para este vuelo? Recuerda configurar el callsign antes de empezar.',
         icon: 'question',
         showCancelButton: true
       })
       if (isConfirmed) {
-        const cargo = await postApi('/api/cargo/new', newCargo)
-        if (!cargo) return
-        await postApi('/api/live/new', { cargo })
+        const missionResult = await postApi('/api/missions/new', newMission)
+        if (!missionResult) return
+        await postApi('/api/live/new', { mission: missionResult })
         await getLive()
         if (!ivaoUser) {
           const clearance = await Swal.fire({
@@ -126,7 +126,7 @@ const IvaoView = ({ user: _user }: Props) => {
     } catch (err) {
       console.error(err)
     }
-  }, [authToken, cargo, getLive, ivaoUser, router])
+  }, [authToken, mission, getLive, ivaoUser, router])
 
   const handleBooking = useCallback(
     (hasFuel: boolean) => {
@@ -234,7 +234,7 @@ const IvaoView = ({ user: _user }: Props) => {
           {/* <IvaoLogin /> */}
 
           <Box mt={4}>
-            <Cargo
+            <Mission
               setAircraft={setAircraft}
               aircraft={aircraft}
               aircrafts={aircrafts ?? []}
@@ -252,7 +252,7 @@ const IvaoView = ({ user: _user }: Props) => {
           )}
 
           <Destinations
-            isAllowed={isAllowed(cargo?.distance)}
+            isAllowed={isAllowed(mission?.distance)}
             onSelect={(c) => handleSelectAtc(c, 'end')}
             selected={end}
             start={start}

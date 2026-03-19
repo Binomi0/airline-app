@@ -1,9 +1,9 @@
 import React from 'react'
-import type { Cargo, FRoute, IvaoPilot } from 'types'
+import type { Mission, FRoute, IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
 import Swal from 'sweetalert2'
 import FlightDetailsHeader from './FlightDetailsHeader'
-import FlightDetailsCargo from './FlightDetailsCargo'
+import FlightDetailsMission from './FlightDetailsMission'
 import FlightDetails from './FlightDetails'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import GradientCard from 'components/GradientCard'
@@ -18,12 +18,12 @@ interface Props {
   pilot: IvaoPilot
   onSelect: () => void
   selected: boolean
-  cargo?: Cargo
+  mission?: Mission
   // eslint-disable-next-line no-unused-vars
-  newCargo: (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => Promise<void>
+  newMission: (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => Promise<void>
 }
 
-const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, cargo }: Props) => {
+const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newMission, mission }: Props) => {
   const router = useRouter()
   const { palette } = useTheme()
   const { setPilot, getLive } = useLiveFlightProviderContext()
@@ -31,35 +31,35 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, carg
   const handleSelectFlight = React.useCallback(async () => {
     const { isConfirmed } = await Swal.fire({
       title: `Callsign ${pilot.callsign}`,
-      text: 'Are you ready for this flight? Confirm to start.',
+      text: '¿Estás listo para este vuelo? Confirma para empezar.',
       icon: 'question',
       showCancelButton: true
     })
     if (isConfirmed) {
-      const data = await postApi('/api/cargo/new', { ...cargo })
-      await postApi('/api/live/new', { cargo: data })
+      const data = await postApi('/api/missions/new', { ...mission })
+      await postApi('/api/live/new', { mission: data })
       await getLive()
       setPilot(pilot)
       router.push('/live')
     }
-  }, [pilot, cargo, getLive, setPilot, router])
+  }, [pilot, mission, getLive, setPilot, router])
 
-  const handleNewCargo = React.useCallback(async () => {
+  const handleNewMission = React.useCallback(async () => {
     if (!aircraft) return
     const { arrivalId: destination, departureId: origin } = pilot.flightPlan
 
     if (!origin || !destination) {
-      throw new Error('Missing origin or destination')
+      throw new Error('Falló el plan de vuelo: falta origen o destino')
     }
 
-    if (pilot.callsign !== cargo?.callsign) {
-      await newCargo({ origin, destination, distance: 0 }, aircraft, pilot.callsign, true)
+    if (pilot.callsign !== mission?.callsign) {
+      await newMission({ origin, destination, distance: 0 }, aircraft, pilot.callsign, true)
     }
-  }, [aircraft, cargo?.callsign, newCargo, pilot.callsign, pilot.flightPlan])
+  }, [aircraft, mission?.callsign, newMission, pilot.callsign, pilot.flightPlan])
 
   const handleClickPilot = React.useCallback(async () => {
-    handleNewCargo().then(onSelect).catch(onRemove)
-  }, [handleNewCargo, onRemove, onSelect])
+    handleNewMission().then(onSelect).catch(onRemove)
+  }, [handleNewMission, onRemove, onSelect])
 
   const handleUnSelectPilot = React.useCallback(() => {
     onRemove()
@@ -84,7 +84,9 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newCargo, carg
           onUnSelectPilot={handleUnSelectPilot}
         />
         <FlightDetails selected={selected} pilot={pilot} />
-        {selected && cargo && <FlightDetailsCargo cargo={cargo} pilot={pilot} onSelectFlight={handleSelectFlight} />}
+        {selected && mission && (
+          <FlightDetailsMission mission={mission} pilot={pilot} onSelectFlight={handleSelectFlight} />
+        )}
       </GradientCard>
     </Grid>
   )

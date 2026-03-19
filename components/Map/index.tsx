@@ -88,13 +88,7 @@ const TowerControlMap = () => {
         theme={theme}
       />
 
-      <RadarMap 
-        towers={atcs} 
-        origin={origin} 
-        destination={destination} 
-        onTowerClick={handleTowerClick}
-        theme={theme}
-      />
+      <RadarMap towers={atcs} origin={origin} destination={destination} onTowerClick={handleTowerClick} theme={theme} />
 
       {!origin && <StatusOverlay />}
 

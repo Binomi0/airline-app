@@ -23,10 +23,10 @@ const NAV_ITEMS = [
     desc: 'Haz staking de AIRL y gana AIRG para repostar tus aeronaves.'
   },
   {
-    link: '/cargo',
-    emoji: '📦',
-    title: 'Cargo',
-    desc: 'Realiza vuelos pendientes y gana tokens AIRL.'
+    link: '/missions',
+    emoji: '🗺️',
+    title: 'Misiones',
+    desc: 'Completa desafíos de vuelo dinámicos y gana recompensas.'
   },
   {
     link: '/ivao',

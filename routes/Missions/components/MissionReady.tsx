@@ -8,22 +8,22 @@ import Typography from '@mui/material/Typography'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import React from 'react'
-import CargoAircraft from 'routes/Cargo/components/CargoAircraft'
-import { Cargo } from 'types'
+import MissionAircraft from 'routes/Missions/components/MissionAircraft'
+import { Mission } from 'types'
 
-const CargoReady: React.FC<{
-  cargo?: Cargo
+const MissionReady: React.FC<{
+  mission?: Mission
   onCancel: () => void
-}> = ({ cargo, onCancel }) => {
+}> = ({ mission, onCancel }) => {
   const address = useRecoilValue(smartAccountAddressStore)
 
   return (
-    <Fade in={!!cargo && !!address} unmountOnExit>
+    <Fade in={!!mission && !!address} unmountOnExit>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Stack direction='row' justifyContent='space-between' alignItems='center'>
             <Box>
-              <Typography variant='h2'>{cargo?.origin}</Typography>
+              <Typography variant='h2'>{mission?.origin}</Typography>
             </Box>
             <Box
               sx={{
@@ -36,32 +36,29 @@ const CargoReady: React.FC<{
                 borderRadius: 10
               }}
             >
-              <Typography
-                color='common.black'
-                fontWeight={700}
-                // color="primary.main"
-                letterSpacing={2}
-              >
+              <Typography color='common.black' fontWeight={700} letterSpacing={2}>
                 {Intl.NumberFormat('es', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
-                }).format(cargo?.distance || 0)}{' '}
-                km
+                }).format(mission?.distance || 0)}{' '}
+                NM
               </Typography>
             </Box>
             <Box>
-              <Typography variant='h2'>{cargo?.destination}</Typography>
+              <Typography variant='h2'>{mission?.destination}</Typography>
             </Box>
           </Stack>
           <Box my={4}>
             <Alert severity='info'>
-              <AlertTitle>Cargo: {cargo?.details?.name}</AlertTitle>
-              <Typography variant='subtitle2'>{cargo?.details?.description}</Typography>
+              <AlertTitle>
+                Misión ({mission?.type}): {mission?.details?.name}
+              </AlertTitle>
+              <Typography variant='subtitle2'>{mission?.details?.description}</Typography>
             </Alert>
           </Box>
 
           <Box my={4}>
-            <CargoAircraft cargo={cargo} onCancel={onCancel} />
+            <MissionAircraft mission={mission} onCancel={onCancel} />
           </Box>
         </Grid>
       </Grid>
@@ -69,4 +66,4 @@ const CargoReady: React.FC<{
   )
 }
 
-export default CargoReady
+export default MissionReady

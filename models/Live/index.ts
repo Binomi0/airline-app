@@ -5,7 +5,7 @@ import { FlightState, LastTrackStateEnum } from 'types'
 export interface ILive extends Document {
   callsign: string
   aircraftId: string
-  cargoId: ObjectId
+  missionId: ObjectId
   userId: ObjectId
   status: LastTrackStateEnum
   track: FlightState[]
@@ -22,11 +22,12 @@ const liveSchema: mongoose.Schema = new mongoose.Schema<ILive>(
       required: true,
       index: true
     },
-    cargoId: {
+    missionId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Cargo',
+      ref: 'Mission',
       required: true
     },
+
     aircraftId: {
       type: String,
       required: true

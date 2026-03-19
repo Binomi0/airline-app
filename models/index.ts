@@ -1,6 +1,6 @@
 export { default as AircraftModel } from './Aircraft'
 export { default as AtcModel } from './Atc'
-export { default as CargoModel } from './Cargo'
+export { default as MissionModel } from './Mission'
 export { default as LiveModel } from './Live'
 export { default as TransactionModel } from './Transaction'
 export { default as UserModel } from './User'

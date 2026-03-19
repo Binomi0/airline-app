@@ -12,7 +12,7 @@ import InputLabel from '@mui/material/InputLabel'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
-const CargoItem: React.FC<{
+const MissionItem: React.FC<{
   flights: FRoute[]
   delay: number
   origin: string
@@ -20,6 +20,7 @@ const CargoItem: React.FC<{
   onSelect: (origin: string, destination: string) => void
   style?: React.CSSProperties
 }> = ({ flights, delay, origin, onSelect, style }) => {
+  // ... existing logic ...
   const handleChange = useCallback(
     (event: SelectChangeEvent) => {
       onSelect(origin, event.target.value as string)
@@ -67,4 +68,4 @@ const CargoItem: React.FC<{
   )
 }
 
-export default CargoItem
+export default MissionItem

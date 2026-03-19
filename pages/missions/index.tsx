@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import CargoView from 'routes/Cargo/CargoView'
-import CargoAircraftSelector from 'routes/Cargo/components/CargoAircraftSelector'
+import MissionView from 'routes/Missions/MissionView'
+import MissionAircraftSelector from 'routes/Missions/components/MissionAircraftSelector'
 import { VaProvider } from 'context/VaProvider'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
@@ -17,7 +17,7 @@ import useOwnedNfts from 'hooks/useOwnedNFTs'
 import { nftAircraftTokenAddress } from 'contracts/address'
 import { filterByTokenAddress } from 'utils'
 
-const CargoPage = () => {
+const MissionsPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const [aircraft] = useState<INft>()
@@ -53,9 +53,9 @@ const CargoPage = () => {
 
   return (
     <VaProvider>
-      {aircraft ? <CargoView aircraft={aircraft} /> : <CargoAircraftSelector owned={ownedAircrafts || []} />}
+      {aircraft ? <MissionView aircraft={aircraft} /> : <MissionAircraftSelector owned={ownedAircrafts || []} />}
     </VaProvider>
   )
 }
 
-export default CargoPage
+export default MissionsPage

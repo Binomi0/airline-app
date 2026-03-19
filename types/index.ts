@@ -8,6 +8,7 @@ import { INft } from 'models/Nft'
 export interface AircraftAttributes {
   deposit: number
   cargo: number
+  mission: number
   license: string
 }
 export enum NftName {
@@ -39,12 +40,20 @@ export interface FRoute {
   origin: string
   destination: string
   distance: number
+  type?: MissionType
 }
 
-export enum CargoStatus {
+export enum MissionStatus {
   STARTED = 'STARTED',
   COMPLETED = 'COMPLETED',
   ABORTED = 'ABORTED'
+}
+export enum MissionType {
+  CARGO = 'CARGO',
+  PASSENGER = 'PASSENGER',
+  HUMANITARIAN = 'HUMANITARIAN',
+  VIP = 'VIP',
+  CHARTER = 'CHARTER'
 }
 export type Flight = Record<string, FRoute[]>
 export interface AtcPosition {
@@ -76,15 +85,17 @@ export type Atc = AtcPosition &
     latitude?: number
     longitude?: number
   }
-export interface Cargo {
+export interface Mission {
   // where it starts
   origin: string
   // where it finish
   destination: string
   // total distance in NM
   distance: number
-  // Detailed info about cargo
-  details: CargoDetail
+  // mission type
+  type: MissionType
+  // Detailed info about mission
+  details: MissionDetail
   // selected aircraft nft data
   aircraft: INft
   // selected aircraft id
@@ -93,19 +104,20 @@ export interface Cargo {
   callsign: string
   weight: number
   prize: number
-  status: CargoStatus
+  status: MissionStatus
   remote: boolean
   rewards?: number
   isRewarded: boolean
   score?: number
+  expiresAt?: Date
 }
 
-export interface CargoDetail {
+export interface MissionDetail {
   name: string
   description: string
 }
 
-export interface CargoStep {
+export interface MissionStep {
   name: string
   value: string
 }
@@ -145,7 +157,7 @@ export enum DB {
 
 export enum Collection {
   user = 'user',
-  cargo = 'cargo',
+  missions = 'missions',
   live = 'live',
   wallet = 'wallet',
   webauthn = 'webauthn',

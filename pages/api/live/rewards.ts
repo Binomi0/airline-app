@@ -2,15 +2,16 @@ import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
 import { coinTokenAddress } from 'contracts/address'
 import User from 'models/User'
-import Cargo, { ICargo } from 'models/Cargo'
-import { CargoStatus, CargoStep, LastTrackStateEnum } from 'types'
+import VirtualAirline from 'models/VirtualAirline'
+import Mission from 'models/Mission'
+import { MissionStatus, MissionStep, LastTrackStateEnum } from 'types'
 import Live from 'models/Live'
 import { getContract, sendAndConfirmTransaction } from 'thirdweb'
 import { privateKeyToAccount } from 'thirdweb/wallets'
 import { transfer } from 'thirdweb/extensions/erc20'
 import { twServer, activeChain as chain } from 'config'
 
-const validateFullFlight = (steps: CargoStep[]): number => {
+const validateFullFlight = (steps: MissionStep[]): number => {
   let counter = 0
   let result = 0
 
@@ -51,12 +52,13 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const cargo = await Cargo.findOne({ userId: req.id, status: CargoStatus.STARTED })
-    if (!cargo) throw new Error(`Missing cargo for userId: ${req.id}`)
-    else if (cargo.isRewarded) {
+    const mission = await Mission.findOne({ userId: req.id, status: MissionStatus.STARTED })
+    if (!mission) throw new Error(`Missing mission for userId: ${req.id}`)
+    else if (mission.isRewarded) {
       res.status(200).end()
       return
     }
+
     const user = await User.findById(req.id)
     if (!user) throw new Error(`Missing user for userId: ${req.id}`)
 
@@ -65,9 +67,10 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
     const score = validateFullFlight(live.track)
     if (score) {
-      if (cargo.status !== CargoStatus.ABORTED && !cargo.isRewarded) {
-        const remote = cargo.remote ? 3 : 1
-        const prize = (cargo.prize / remote) * (1 + score / 100)
+      if (mission.status !== MissionStatus.ABORTED && !mission.isRewarded) {
+        const remote = mission.remote ? 3 : 1
+
+        const prize = (mission.prize / remote) * (1 + score / 100)
 
         // Refactored transfer logic for Thirdweb v5
         if (process.env.THIRDWEB_AUTH_PRIVATE_KEY) {
@@ -83,7 +86,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
               address: coinTokenAddress
             }),
             to: user.address,
-            amount: cargo.prize.toString()
+            amount: mission.prize.toString()
           })
 
           const receipt = await sendAndConfirmTransaction({
@@ -98,14 +101,16 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         }
 
         await Promise.all([
-          Cargo.findByIdAndUpdate<ICargo>(cargo._id, {
+          Mission.findByIdAndUpdate(mission._id, {
             isRewarded: true,
-            status: CargoStatus.COMPLETED,
+            status: MissionStatus.COMPLETED,
             score,
             rewards: prize
           }),
+          VirtualAirline.findOneAndUpdate({ userId: req.id }, { lastLandedAt: mission.destination }, { upsert: true }),
           Live.findOneAndDelete({ userId: req.id })
         ])
+
         res.status(201).end()
         return
       }

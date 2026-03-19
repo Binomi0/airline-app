@@ -16,8 +16,8 @@ import { useRouter } from 'next/router'
 import React, { useCallback, useMemo } from 'react'
 import { useRecoilValue } from 'recoil'
 import Swal from 'sweetalert2'
-import { Cargo } from 'types'
-import { getNFTAttributes } from 'utils'
+import { Mission } from 'types'
+import { getMissionAttributes } from 'utils'
 import { useAppContracts } from 'hooks/useAppContracts'
 import { twClient } from 'config'
 
@@ -27,14 +27,14 @@ interface AircraftAttributes {
   license: string
 }
 
-const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ cargo, onCancel }) => {
+const MissionAircraft: React.FC<{ mission?: Mission; onCancel: () => void }> = ({ mission, onCancel }) => {
   const router = useRouter()
   const { smartAccountAddress } = useRecoilValue(walletStore)
   const { licenseContract } = useAppContracts()
 
   const aircraftAttributes: AircraftAttributes = useMemo(() => {
-    if (!cargo?.aircraft) return {} as AircraftAttributes
-    const attributes = getNFTAttributes(cargo.aircraft).reduce(
+    if (!mission?.aircraft) return {} as AircraftAttributes
+    const attributes = getMissionAttributes(mission.aircraft).reduce(
       (acc, curr) =>
         ({
           ...acc,
@@ -44,7 +44,7 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
     )
 
     return attributes
-  }, [cargo])
+  }, [mission])
 
   const { data: license } = useReadContract(getNFT, {
     contract: licenseContract!,
@@ -52,49 +52,49 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
   })
 
   const progressBar = useMemo(
-    () => (Number(cargo?.weight) / Number(aircraftAttributes.cargo)) * 100,
-    [cargo, aircraftAttributes]
+    () => (Number(mission?.weight) / Number(aircraftAttributes.cargo)) * 100,
+    [mission, aircraftAttributes]
   )
 
   const handleRequestFlight = useCallback(async () => {
-    if (!cargo) return
+    if (!mission) return
     try {
-      const { aircraft: _, ...newCargo } = cargo
+      const { aircraft: _, ...newMissionData } = mission
 
       const { isConfirmed } = await Swal.fire({
-        title: `Callsign ${newCargo.callsign}`,
-        text: 'Are you ready for this flight? Remember to set required callsign before start',
+        title: `Misión: ${newMissionData.callsign}`,
+        text: '¿Estás listo para este vuelo? Recuerda configurar el callsign antes de empezar.',
         icon: 'question',
         showCancelButton: true
       })
       if (isConfirmed) {
-        const cargoResult = await postApi('/api/cargo/new', newCargo)
-        if (!cargoResult) return
-        await postApi('/api/live/new', { cargo: cargoResult })
+        const missionResult = await postApi('/api/missions/new', newMissionData)
+        if (!missionResult) return
+        await postApi('/api/live/new', { mission: missionResult })
         router.push('/live')
       }
     } catch (err) {
       console.error(err)
     }
-  }, [cargo, router])
+  }, [mission, router])
 
-  if (!cargo) {
+  if (!mission) {
     return <LinearProgress />
   }
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} sm={6} key={cargo.aircraft.id.toString()}>
+      <Grid item xs={12} sm={6} key={mission.aircraft.id.toString()}>
         <Card>
           <CardHeader
             sx={{
               alignItems: 'flex-start'
             }}
-            title={cargo.aircraft.metadata.name}
-            subheader={cargo.aircraft.metadata.description?.split('. ')[0]}
+            title={mission.aircraft.metadata.name}
+            subheader={mission.aircraft.metadata.description?.split('. ')[0]}
             avatar={
               <Avatar variant='rounded'>
-                <MediaRenderer client={twClient!} width='50px' height='50px' src={cargo.aircraft.metadata.image} />
+                <MediaRenderer client={twClient!} width='50px' height='50px' src={mission.aircraft.metadata.image} />
               </Avatar>
             }
             action={
@@ -107,27 +107,27 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
             <Stack>
               <LinearProgress color='success' variant='determinate' value={progressBar} />
               <Typography textAlign='center' variant='caption'>
-                Cargo weight:{' '}
+                Peso de la misión:{' '}
                 <b>
                   {Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-                    cargo.weight || 0
+                    mission.weight || 0
                   )}{' '}
                   Kg
                 </b>
               </Typography>
               <Typography textAlign='center' variant='caption'>
-                Max Capacity: <b>{aircraftAttributes.cargo} Kg</b>
+                Capacidad Máxima: <b>{aircraftAttributes.cargo} Kg</b>
               </Typography>
               <Typography>
-                Callsign: <b>{cargo.callsign}</b>
+                Callsign: <b>{mission.callsign}</b>
               </Typography>
               <Typography>
-                Rewards:{' '}
+                Premios:{' '}
                 <b>
                   {Intl.NumberFormat('en', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
-                  }).format(cargo.prize || 0)}{' '}
+                  }).format(mission.prize || 0)}{' '}
                   AIRL
                 </b>
               </Typography>
@@ -154,4 +154,4 @@ const CargoAircraft: React.FC<{ cargo?: Cargo; onCancel: () => void }> = ({ carg
   )
 }
 
-export default React.memo(CargoAircraft)
+export default React.memo(MissionAircraft)

@@ -21,7 +21,7 @@ import { smartAccountAddressStore } from 'store/wallet.atom'
 import { themeStore } from 'store/theme.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import styles from './appbar.module.css'
-import { AlertTitle, Box, Container, useTheme } from '@mui/material'
+import { AlertTitle, Box, Container } from '@mui/material'
 import Link from 'next/link'
 
 function base64URLEncode(str: string) {
@@ -44,7 +44,6 @@ const CustomAppBar = () => {
   const smartAccountAddress = useRecoilValue(smartAccountAddressStore)
   const user = useRecoilValue(userState)
   const theme = useRecoilValue(themeStore)
-  const muiTheme = useTheme()
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
 
@@ -74,15 +73,15 @@ const CustomAppBar = () => {
           {snack.message}
         </Alert>
       </Snackbar>
-      <AppBar 
-        position='sticky' 
-        sx={{ 
-          background: trigger 
-            ? theme === 'dark' 
-              ? 'rgba(11, 15, 25, 0.8)' 
+      <AppBar
+        position='sticky'
+        sx={{
+          background: trigger
+            ? theme === 'dark'
+              ? 'rgba(11, 15, 25, 0.8)'
               : 'rgba(255, 255, 255, 0.8)'
-            : theme === 'dark' 
-              ? 'rgba(11, 15, 25, 0.7)' 
+            : theme === 'dark'
+              ? 'rgba(11, 15, 25, 0.7)'
               : 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(12px)',
           backgroundImage: 'none',

@@ -8,18 +8,18 @@ import router from 'next/router'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { tokenBalanceStore } from 'store/balance.atom'
-import { Cargo, IcaoCode, IvaoPilot } from 'types'
+import { Mission, IcaoCode, IvaoPilot } from 'types'
 import { getFuelForFlight } from 'utils'
 
 const DIGITS = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
 
 interface Props {
-  cargo: Cargo
+  mission: Mission
   pilot: IvaoPilot
   onSelectFlight: () => void
 }
 
-const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
+const FlightDetailsMission = ({ mission, pilot, onSelectFlight }: Props) => {
   const balance = useRecoilValue(tokenBalanceStore)
 
   const requiredGas = React.useMemo(() => {
@@ -32,10 +32,10 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
   }, [pilot.flightPlan.aircraft.icaoCode, pilot.lastTrack])
 
   const finalGas = React.useMemo(() => {
-    if (!cargo) return 0
+    if (!mission) return 0
 
     return requiredGas
-  }, [cargo, requiredGas])
+  }, [mission, requiredGas])
 
   const handleSelectFlight = React.useCallback(() => {
     const balanceAirgFloat = balance.airg !== undefined ? Number(balance.airg) / 1e18 : 0
@@ -45,17 +45,17 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
   return (
     <Card>
       <CardHeader
-        title={`${Intl.NumberFormat('es-EN', DIGITS).format(cargo?.prize || 0)} AIRL`}
-        subheader={`${Intl.NumberFormat('es-EN', DIGITS).format(cargo?.weight || 0)} KG - ${cargo?.details?.name}`}
+        title={`${Intl.NumberFormat('es-EN', DIGITS).format(mission?.prize || 0)} AIRL`}
+        subheader={`${Intl.NumberFormat('es-EN', DIGITS).format(mission?.weight || 0)} KG - ${mission?.details?.name}`}
       />
       <CardContent>
-        <Typography>Gas consumption: {Intl.NumberFormat('en-US', DIGITS).format(finalGas)} Liters</Typography>
-        <Typography>{cargo?.details?.description}</Typography>
+        <Typography>Consumo aproximado: {Intl.NumberFormat('en-US', DIGITS).format(finalGas)} Litros</Typography>
+        <Typography>{mission?.details?.description}</Typography>
       </CardContent>
       <CardActions sx={{ justifyContent: 'flex-end' }}>
         {(balance.airg !== undefined ? Number(balance.airg) / 1e18 : 0) < finalGas ? (
           <Button size='large' variant='contained' onClick={() => router.push('/gas')}>
-            Go to Gas Station
+            Ir a la Gasolinera
           </Button>
         ) : (
           <Button
@@ -65,7 +65,7 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
             variant='contained'
             onClick={handleSelectFlight}
           >
-            Select this flight
+            Seleccionar este vuelo
           </Button>
         )}
       </CardActions>
@@ -73,4 +73,4 @@ const FlightDetailsCargo = ({ cargo, pilot, onSelectFlight }: Props) => {
   )
 }
 
-export default FlightDetailsCargo
+export default FlightDetailsMission

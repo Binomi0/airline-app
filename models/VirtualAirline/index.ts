@@ -14,6 +14,7 @@ export interface IVirtualAirline extends Document {
   accessToken?: string
   refreshToken?: string
   tokenExpiry?: Date
+  lastLandedAt?: string // ICAO code
 }
 
 const virtualAirlineSchema: mongoose.Schema = new mongoose.Schema<IVirtualAirline>(
@@ -36,7 +37,8 @@ const virtualAirlineSchema: mongoose.Schema = new mongoose.Schema<IVirtualAirlin
     },
     accessToken: { type: String },
     refreshToken: { type: String },
-    tokenExpiry: { type: Date }
+    tokenExpiry: { type: Date },
+    lastLandedAt: { type: String, uppercase: true, minlength: 4, maxlength: 4 }
   },
   {
     timestamps: false

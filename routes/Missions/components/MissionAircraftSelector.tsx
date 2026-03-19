@@ -19,19 +19,19 @@ type Props = {
   owned: Readonly<IUserNftPopulated[]>
 }
 
-const CargoAircraftSelector = ({ owned }: Props) => {
+const MissionAircraftSelector = ({ owned }: Props) => {
   const router = useRouter()
   const { twClient } = useRecoilValue(walletStore)
 
   const handleSelectAircraft = React.useCallback(
     (nft: INft) => () => {
       if (router.query.pilot) {
-        const url = `cargo/${nft.id.toString()}/new?pilot=${router.query.pilot}&origin=${
+        const url = `missions/${nft.id.toString()}/new?pilot=${router.query.pilot}&origin=${
           router.query.origin
         }&destination=${router.query.destination}`
         router.push(url)
       } else {
-        router.push(`cargo/${nft.id.toString()}/new`)
+        router.push(`missions/${nft.id.toString()}/new`)
       }
     },
     [router]
@@ -41,7 +41,7 @@ const CargoAircraftSelector = ({ owned }: Props) => {
     <Container>
       <Stack direction='row' justifyContent='center'>
         <Box mt={10}>
-          <Typography variant='h6'>Para realizar un vuelo es necesario que elijas una aeronave antes.</Typography>
+          <Typography variant='h6'>Para realizar una misión es necesario que elijas una aeronave antes.</Typography>
           <List
             sx={{ width: '100%', minWidth: 360, bgcolor: 'background.paper' }}
             component='nav'
@@ -69,4 +69,4 @@ const CargoAircraftSelector = ({ owned }: Props) => {
   )
 }
 
-export default CargoAircraftSelector
+export default MissionAircraftSelector

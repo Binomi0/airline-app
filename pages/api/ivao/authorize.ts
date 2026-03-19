@@ -74,14 +74,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       console.log('[IVAO Authorize] Connecting to DB...')
       await connectDB()
       console.log('[IVAO Authorize] DB Connected. Starting VirtualAirline update for state:', state)
-      
+
       const expiryDate = new Date()
       expiryDate.setSeconds(expiryDate.getSeconds() + (tokenData.expires_in || 3600))
 
       const vaUser = await VirtualAirlineModel.findOneAndUpdate(
         { userId: state },
-        { 
-          isVerified: true, 
+        {
+          isVerified: true,
           type: 'IVAO',
           pilotId: decoded.payload.sub,
           accessToken: tokenData.access_token,
@@ -90,7 +90,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
         { upsert: true, returnDocument: 'after' }
       )
-      
+
       console.log('[IVAO Authorize] VA User updated/created. ID:', vaUser?._id)
 
       if (vaUser?._id) {

@@ -25,7 +25,7 @@ const maps: Record<string, string> = {
   '4': '3'
 }
 
-const CargoItem = () => {
+const MissionItemPage = () => {
   const router = useRouter()
   const address = useRecoilValue(smartAccountAddressStore)
   const { aircraftContract: contract } = useAppContracts()
@@ -42,7 +42,7 @@ const CargoItem = () => {
   })
 
   const handleClick = useCallback(() => {
-    console.log('HANDLE CLICK ADD CARGO?')
+    console.log('HANDLE CLICK ADD MISSION?')
   }, [])
 
   if (!address) {
@@ -56,13 +56,13 @@ const CargoItem = () => {
         <Box my={6}>
           <Box>
             <Typography align='center' variant='h1'>
-              New Cargo #{router.query.id}
+              Nueva Misión #{router.query.id}
             </Typography>
           </Box>
         </Box>
         <Box>
           <Alert severity='info'>
-            <AlertTitle>Recommended aircraft: </AlertTitle>
+            <AlertTitle>Aeronave recomendada: </AlertTitle>
             <Typography variant='overline'>Cessna 172 Skyhawk</Typography>
           </Alert>
         </Box>
@@ -70,21 +70,21 @@ const CargoItem = () => {
         {balance === 0n ? (
           <Box my={2}>
             <Alert severity='warning'>
-              <AlertTitle>No available aircraft</AlertTitle>
+              <AlertTitle>No hay aeronave disponible</AlertTitle>
               <Typography>
-                you don&apos;t have yet a valid aircraft to transport this cargo. Please go to
+                Todavía no tienes una aeronave válida para realizar esta misión. Por favor ve al
                 <Link href='/hangar'>
                   <MuiLink underline='hover'> hangar </MuiLink>
                 </Link>
-                and get one before.
+                y adquiere una antes.
               </Typography>
             </Alert>
           </Box>
         ) : (
           <Box my={4}>
-            <Typography paragraph>Great! You owns the right aircraft to perform this cargo flight.</Typography>
+            <Typography paragraph>¡Genial! Eres el dueño de la aeronave adecuada para realizar esta misión.</Typography>
             <Button onClick={handleClick} variant='contained'>
-              Start Flight
+              Empezar Vuelo
             </Button>
           </Box>
         )}
@@ -93,4 +93,4 @@ const CargoItem = () => {
   )
 }
 
-export default CargoItem
+export default MissionItemPage

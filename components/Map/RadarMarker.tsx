@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Box, Typography, Button, alpha, Stack, IconButton, CircularProgress } from '@mui/material'
+import { Box, Typography, alpha, Stack, IconButton, CircularProgress } from '@mui/material'
 import { Refresh as RefreshIcon } from '@mui/icons-material'
 import Swal from 'sweetalert2'
 import { Marker, Popup, Tooltip } from 'react-leaflet'
@@ -170,7 +170,15 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
       </Tooltip>
 
       <Popup className='radar-popup'>
-        <Box sx={{ bgcolor: theme === 'dark' ? '#0f172a' : '#fff', p: 1.5, color: theme === 'dark' ? '#f8fafc' : '#1e293b', minWidth: 260, borderRadius: 2 }}>
+        <Box
+          sx={{
+            bgcolor: theme === 'dark' ? '#0f172a' : '#fff',
+            p: 1.5,
+            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+            minWidth: 260,
+            borderRadius: 2
+          }}
+        >
           {/* Header Callsign & Frequency */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography
@@ -265,7 +273,11 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                     VID:{' '}
                     <Typography
                       variant='caption'
-                      sx={{ fontSize: 10, color: theme === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.7)', fontWeight: 800 }}
+                      sx={{
+                        fontSize: 10,
+                        color: theme === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.7)',
+                        fontWeight: 800
+                      }}
                     >
                       {tower.userId}
                     </Typography>

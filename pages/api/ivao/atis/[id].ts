@@ -38,10 +38,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const status = axiosError.response?.status
     const message = axiosError.message
     console.error('[ATIS API] Error from IVAO:', status, message)
-    
+
     // If IVAO returns 401, it might be a public endpoint issue or missing key
-    res.status(status || 500).json({ 
-      message: 'Error fetching ATIS from IVAO', 
+    res.status(status || 500).json({
+      message: 'Error fetching ATIS from IVAO',
       details: message,
       status: status
     })

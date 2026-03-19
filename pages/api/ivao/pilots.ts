@@ -26,11 +26,11 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       let token = await getIvaoToken(req.userId!)
 
       if (!token && req.headers['x-ivao-auth']) {
-          token = req.headers['x-ivao-auth'] as string
+        token = req.headers['x-ivao-auth'] as string
       }
 
       if (!token) {
-          return res.status(401).json({ message: 'No IVAO session found' })
+        return res.status(401).json({ message: 'No IVAO session found' })
       }
 
       const response = await ivaoInstance.get('v2/tracker/now/pilots', {

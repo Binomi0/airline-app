@@ -13,13 +13,13 @@ import {
   getCallsign,
   getFuelForFlight,
   getIcaoCodeFromAircraftNFT,
-  getNFTAttributes
+  getMissionAttributes
 } from 'utils'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'
-import useCargo from 'hooks/useCargo'
+import useMission from 'hooks/useMission'
 import { destinationStore } from 'store/destination.atom'
-import CargoSelectAircraft from './CargoSelectAircraft'
+import MissionSelectAircraft from './MissionSelectAircraft'
 import { aircraftNameToIcaoCode } from 'types'
 import { useRouter } from 'next/router'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
@@ -38,10 +38,10 @@ interface Props {
   setAircraft: (value: string) => void
 }
 
-const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, onBooking }: Props) => {
+const IvaoMission = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, onBooking }: Props) => {
   const router = useRouter()
   const balance = useRecoilValue(tokenBalanceStore)
-  const { cargo, newCargo, setCargo } = useCargo()
+  const { mission, newMission, setMission } = useMission()
   const destinations = useRecoilValue(destinationStore)
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
 
@@ -53,10 +53,10 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
     const icaoCode = getIcaoCodeFromAircraftNFT(currentAircraft.metadata.name as keyof typeof aircraftNameToIcaoCode)
     if (!icaoCode) return 0
 
-    const fuel = getFuelForFlight(cargo?.distance ?? 0, icaoCode)
+    const fuel = getFuelForFlight(mission?.distance ?? 0, icaoCode)
 
     return fuel
-  }, [currentAircraft, cargo?.distance])
+  }, [currentAircraft, mission?.distance])
 
   const handleChange = (event: SelectChangeEvent) => {
     setAircraft(event.target.value as string)
@@ -68,7 +68,7 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
   )
 
   const getCurrentFuelInLiters = useCallback((currentAircraft: INft) => {
-    const combustible = getNFTAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value
+    const combustible = getMissionAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value
     if (!combustible) return 0
 
     return formatNumber(gallonsToLiters(Number(combustible)), 0)
@@ -76,7 +76,7 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
 
   React.useEffect(() => {
     if (start && end && currentAircraft) {
-      newCargo(
+      newMission(
         {
           origin: start,
           destination: end,
@@ -87,9 +87,9 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
         false
       )
     } else {
-      setCargo()
+      setMission()
     }
-  }, [newCargo, setCargo, currentAircraft, start, end, destinations?.destinations])
+  }, [newMission, setMission, currentAircraft, start, end, destinations?.destinations])
 
   return (
     <Paper elevation={3} sx={{ borderRadius: 2 }}>
@@ -117,14 +117,14 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
           }
         }}
       >
-        <CargoSelectAircraft
+        <MissionSelectAircraft
           aircrafts={aircrafts}
           gasBalance={balance.airg}
           requiredGas={requiredGas}
           handleChange={handleChange}
           hasEnoughFuel={hasEnoughFuel}
           aircraft={aircraft}
-          active={!!cargo}
+          active={!!mission}
           currentAircraft={currentAircraft}
         />
         {ownedAircrafts && ownedAircrafts.length === 0 && (
@@ -133,93 +133,94 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
               severity='error'
               action={
                 <Button variant='contained' color='error' onClick={() => router.push('/hangar')}>
-                  Go to Hangar
+                  Ir al Hangar
                 </Button>
               }
             >
-              <AlertTitle>At least one aircraft is required.</AlertTitle>
-              <Typography>Go to hangar page and get and aircraft to continue.</Typography>
+              <AlertTitle>Se requiere al menos una aeronave.</AlertTitle>
+              <Typography>Ve a la página del hangar y consigue una aeronave para continuar.</Typography>
             </Alert>
           </Box>
         )}
-        {!isAllowed(cargo?.distance ?? 0) && start && end && !!currentAircraft && (
+        {!isAllowed(mission?.distance ?? 0) && start && end && !!currentAircraft && (
           <Box width='100%' p={2}>
             <Alert severity='error'>
-              <AlertTitle>This selection exceeds aircraft range without refueling</AlertTitle>
+              <AlertTitle>Esta selección excede el rango de la aeronave sin repostar</AlertTitle>
               <Typography>
-                Max capacity for this aircraft is <b>{currentAircraft && getCurrentFuelInLiters(currentAircraft)}</b>{' '}
-                Liters, required: <b>{formatNumber(requiredGas(), 0)}</b> Liters
+                La capacidad máxima para esta aeronave es de{' '}
+                <b>{currentAircraft && getCurrentFuelInLiters(currentAircraft)}</b> Litros, requeridos:{' '}
+                <b>{formatNumber(requiredGas(), 0)}</b> Liters
               </Typography>
             </Alert>
           </Box>
         )}
 
-        {cargo?.callsign && hasEnoughFuel() && isAllowed(cargo.distance) && (
+        {mission?.callsign && hasEnoughFuel() && isAllowed(mission.distance) && (
           <Box width='100%'>
             <Box mt={2}>
               <Typography fontWeight={600} align='center'>
-                USE THIS CALLSIGN
+                USA ESTE CALLSIGN
               </Typography>
             </Box>
             <Paper elevation={12}>
               <Stack p={2} mt={2} bgcolor={'success.dark'}>
                 <Typography fontSize={32} fontWeight={900} align='center' letterSpacing={3}>
-                  {cargo.callsign}
+                  {mission.callsign}
                 </Typography>
               </Stack>
             </Paper>
           </Box>
         )}
 
-        {cargo && hasEnoughFuel() && isAllowed(cargo.distance) && (
+        {mission && hasEnoughFuel() && isAllowed(mission.distance) && (
           <Stack direction='column' alignItems='center' justifyContent='center' spacing={1} p={2}>
-            <Typography variant='h5'>{cargo?.details.name}</Typography>
+            <Typography variant='h5'>{mission?.details.name}</Typography>
 
             <Box>
               <Stack direction='row' justifyContent='space-between' minWidth={300}>
-                <Typography align='center'>Distance:</Typography>
+                <Typography align='center'>Distancia:</Typography>
                 <Typography align='center' variant='body2'>
-                  {formatNumber(cargo?.distance, 0)} Km
+                  {formatNumber(mission?.distance, 0)} Km
                 </Typography>
               </Stack>
 
               <Stack direction='row' justifyContent='space-between' minWidth={300}>
-                <Typography align='center'>Rewards:</Typography>
+                <Typography align='center'>Premios:</Typography>
                 <Typography align='center' variant='body2'>
-                  {formatNumber(cargo?.prize)} AIRL
+                  {formatNumber(mission?.prize)} AIRL
                 </Typography>
               </Stack>
 
               <Stack direction='row' justifyContent='space-between' minWidth={300}>
-                <Typography align='center'>Weight: </Typography>
+                <Typography align='center'>Peso: </Typography>
                 <Typography align='center' variant='body2'>
                   {Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-                    cargo?.weight || 0
+                    mission?.weight || 0
                   )}{' '}
                   Kg
                 </Typography>
               </Stack>
 
               <Stack direction='row' justifyContent='space-between' minWidth={300}>
-                <Typography align='center'>Airdrop: </Typography>
+                <Typography align='center'>Puntos: </Typography>
                 <Typography align='center' variant='body2'>
-                  {cargo?.score ?? '-'} Points
+                  {mission?.score ?? '-'} Puntos
                 </Typography>
               </Stack>
             </Box>
 
             <Typography lineHeight={1.2} width={300} align='justify' variant='caption' fontWeight={300}>
-              {cargo?.details.description}
+              {mission?.details.description}
             </Typography>
 
             <Box mt={2}>
               <Button
                 size='large'
-                disabled={!isAllowed(cargo.distance) || !hasEnoughFuel()}
+                disabled={!isAllowed(mission.distance) || !hasEnoughFuel()}
                 variant='contained'
-                onClick={() => onBooking(isAllowed(cargo.distance))}
+                onClick={() => onBooking(isAllowed(mission.distance))}
               >
-                Book this Flight
+                Reservar este Vuelo
               </Button>
             </Box>
           </Stack>
@@ -229,4 +230,4 @@ const IvaoCargo = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, on
   )
 }
 
-export default IvaoCargo
+export default IvaoMission

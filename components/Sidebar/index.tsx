@@ -74,10 +74,10 @@ const Sidebar: React.FC = () => {
           selected={router.pathname === '/gas'}
         />
         <SidebarItem
-          onLink={handleClick('/cargo')}
-          text='Main Cargo'
+          onLink={handleClick('/missions')}
+          text='Misiones'
           Icon={AddHomeWorkIcon}
-          selected={router.pathname === '/cargo'}
+          selected={router.pathname === '/missions'}
         />
         <SidebarItem
           disabled={!user?.vaUser}

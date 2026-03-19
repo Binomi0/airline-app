@@ -2,7 +2,7 @@ import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import Live from 'models/Live'
 import { NextApiResponse } from 'next'
-import { CargoDetail, LastTrackStateEnum } from 'types'
+import { MissionStep, LastTrackStateEnum } from 'types'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -24,7 +24,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
 
     // If exists, to avoid duplicates
-    if (live.track.some((step: CargoDetail) => step.name === lastTrackState)) {
+    if (live.track.some((step: MissionStep) => step.name === lastTrackState)) {
       await Live.findOneAndUpdate(
         { _id: live._id, 'track.name': lastTrackState },
         {
