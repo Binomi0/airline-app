@@ -81,7 +81,7 @@ const MapaTorresControl = () => {
     return (
       <Box
         sx={{
-          height: 600,
+          height: '100vh',
           width: '100%',
           bgcolor: '#030712',
           display: 'flex',
@@ -134,10 +134,8 @@ const MapaTorresControl = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        borderRadius: 4,
+        height: '100vh',
         overflow: 'hidden',
-        boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-        border: '1px solid rgba(56, 189, 248, 0.2)',
         bgcolor: '#030712'
       }}
     >
@@ -296,7 +294,7 @@ const MapaTorresControl = () => {
       </Card>
 
       {/* --- THE RADAR MAP --- */}
-      <Box sx={{ height: 650, width: '100%', zIndex: 1 }}>
+      <Box sx={{ height: '100%', width: '100%', zIndex: 1 }}>
         <MapContainer
           center={[20, 0]}
           zoom={2.5}
