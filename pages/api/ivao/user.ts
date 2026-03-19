@@ -1,27 +1,39 @@
 import { AxiosError } from 'axios'
 import { ivaoInstance } from 'config/axios'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiResponse } from 'next'
+import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import { getIvaoToken } from 'utils/ivao'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     try {
+      // 1. Try to get token from DB
+      let token = await getIvaoToken(req.userId!)
+
+      // 2. Fallback to header (for seamless migration)
+      if (!token && req.headers.authorization) {
+        token = req.headers.authorization.replace('Bearer ', '')
+      }
+
+      if (!token) {
+        return res.status(401).json({ message: 'No IVAO session found' })
+      }
+
       const response = await ivaoInstance.get('/v2/users/me', {
         headers: {
-          Authorization: req.headers.authorization
+          Authorization: `Bearer ${token}`
         }
       })
 
       res.status(200).send(response.data)
     } catch (err) {
       const error = err as AxiosError<{ status: number }>
-      console.log(error.response?.status)
-      res.status(error.response?.data?.status ?? 400).send(error.response?.data)
+      console.error('[IVAO User API]', error.response?.status, error.message)
+      res.status(error.response?.status ?? 400).send(error.response?.data)
     }
     return
   }
   res.status(405).end()
 }
 
-// http://localhost:3000/api/ivao/authorize
-
-export default handler
+export default withAuth(handler)

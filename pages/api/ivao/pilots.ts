@@ -5,6 +5,7 @@ import { Pilot } from 'models/Pilot'
 import { ivaoInstance } from 'config/axios'
 import { IVirtualAirline } from 'models/VirtualAirline'
 import { AxiosError } from 'axios'
+import { getIvaoToken } from 'utils/ivao'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
@@ -22,9 +23,18 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
   } else if (req.method === 'POST') {
     try {
-      // TODO: Continue here
+      let token = await getIvaoToken(req.userId!)
+
+      if (!token && req.headers['x-ivao-auth']) {
+          token = req.headers['x-ivao-auth'] as string
+      }
+
+      if (!token) {
+          return res.status(401).json({ message: 'No IVAO session found' })
+      }
+
       const response = await ivaoInstance.get('v2/tracker/now/pilots', {
-        headers: { Authorization: req.headers['x-ivao-auth'] }
+        headers: { Authorization: `Bearer ${token}` }
       })
       res.status(200).send(response.data)
       return

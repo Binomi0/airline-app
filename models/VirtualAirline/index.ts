@@ -11,6 +11,9 @@ export interface IVirtualAirline extends Document {
   pilotId: string
   isVerified: boolean
   type: VirtualAirlineType
+  accessToken?: string
+  refreshToken?: string
+  tokenExpiry?: Date
 }
 
 const virtualAirlineSchema: mongoose.Schema = new mongoose.Schema<IVirtualAirline>(
@@ -30,11 +33,18 @@ const virtualAirlineSchema: mongoose.Schema = new mongoose.Schema<IVirtualAirlin
       type: String,
       required: true,
       enum: VirtualAirlineType
-    }
+    },
+    accessToken: { type: String },
+    refreshToken: { type: String },
+    tokenExpiry: { type: Date }
   },
   {
     timestamps: false
   }
 )
+
+if (process.env.NODE_ENV === 'development') {
+  delete mongoose.models.VirtualAirline
+}
 
 export default mongoose.models.VirtualAirline || mongoose.model<IVirtualAirline>('VirtualAirline', virtualAirlineSchema)

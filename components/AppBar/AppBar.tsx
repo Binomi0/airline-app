@@ -78,7 +78,9 @@ const CustomAppBar = () => {
         position='sticky' 
         sx={{ 
           background: trigger 
-            ? muiTheme.palette.primary.main 
+            ? theme === 'dark' 
+              ? 'rgba(11, 15, 25, 0.8)' 
+              : 'rgba(255, 255, 255, 0.8)'
             : theme === 'dark' 
               ? 'rgba(11, 15, 25, 0.7)' 
               : 'rgba(255, 255, 255, 0.95)',
