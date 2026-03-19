@@ -87,10 +87,10 @@ const HangarView: React.FC = () => {
       <Box className={styles.contentWrapper}>
         {/* Header */}
         <Box mb={2}>
-          <Typography variant='h3' fontWeight={800} sx={{ letterSpacing: '-1px' }}>
+          <Typography variant='h3' fontWeight={800} sx={{ letterSpacing: '-2px' }}>
             Tu <span style={{ color: '#6366f1' }}>Flota</span>
           </Typography>
-          <Typography variant='h6' color='rgba(255,255,255,0.5)'>
+          <Typography variant='body1' color='rgba(255,255,255,0.5)' sx={{ maxWidth: '600px' }}>
             Gestiona tus aeronaves y adquiere nuevas unidades para tu carrera.
           </Typography>
         </Box>

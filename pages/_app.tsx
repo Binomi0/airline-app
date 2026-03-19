@@ -47,6 +47,7 @@ export default function MyApp(props: MyAppProps) {
 
   const finishLoading = useCallback(() => {
     setLoading(false)
+    window.scrollTo(0, 0)
   }, [])
 
   useEffect(() => {
@@ -63,7 +64,8 @@ export default function MyApp(props: MyAppProps) {
     <CacheProvider value={emotionCache}>
       <RecoilRoot
         initializeState={({ set }) => {
-          set(authStore, getCookie('token') as string)
+          const isLoggedIn = getCookie('isLoggedIn') === 'true'
+          set(authStore, isLoggedIn ? 'session_active' : undefined)
           set(themeStore, 'dark')
         }}
       >
