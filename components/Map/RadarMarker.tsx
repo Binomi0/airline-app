@@ -126,11 +126,6 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
       >
         <Box
           sx={{
-            p: 0.8,
-            bgcolor: theme === 'dark' ? '#0f172a' : '#fff',
-            border: `1px solid ${isOrigin ? '#10b981' : isDestination ? '#ef4444' : theme === 'dark' ? '#38bdf8' : 'rgba(56, 189, 248, 0.4)'}`,
-            borderRadius: 1.5,
-            boxShadow: theme === 'dark' ? '0 4px 12px rgba(0,0,0,0.5)' : '0 2px 8px rgba(0,0,0,0.1)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',

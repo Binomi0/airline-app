@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box } from '@mui/material'
-import { MapContainer, TileLayer, Polyline } from 'react-leaflet'
+import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet'
 import { Atc } from 'types'
 import RadarMarker from './RadarMarker'
 import { getCoords, getCurvePath } from './utils'
@@ -11,6 +11,27 @@ export interface RadarMapProps {
   destination: Atc | null
   onTowerClick: (tower: Atc) => void
   theme: 'light' | 'dark'
+}
+
+interface MapBoundsControllerProps {
+  origin: Atc | null
+  destination: Atc | null
+}
+
+const MapBoundsController: React.FC<MapBoundsControllerProps> = ({ origin, destination }) => {
+  const map = useMap()
+
+  React.useEffect(() => {
+    if (origin && destination) {
+      const c1 = getCoords(origin)
+      const c2 = getCoords(destination)
+      if (c1 && c2) {
+        map.fitBounds([c1, c2], { padding: [50, 50], animate: true })
+      }
+    }
+  }, [origin, destination, map])
+
+  return null
 }
 
 const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowerClick, theme }) => {
@@ -35,6 +56,7 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
         ]}
         maxBoundsViscosity={1.0}
       >
+        <MapBoundsController origin={origin} destination={destination} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
           url={

@@ -132,7 +132,6 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     nextApiInstance
       .get('/api/ivao/oauth')
       .then((response) => {
-        console.log('ivao token =>', response.data)
         ivaoInstance.defaults.headers['x-ivao-token'] = `Bearer ${response.data}`
         nextApiInstance.defaults.headers['x-ivao-token'] = `Bearer ${response.data}`
         setIvaoToken(response.data)

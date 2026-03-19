@@ -2,9 +2,10 @@ import AtcModel from 'models/Atc'
 import VirtualAirlineModel from 'models/VirtualAirline'
 import PilotModel from 'models/Pilot'
 import UserModel from 'models/User'
-import { MissionStatus, MissionType, ActiveAtc, Coords, MissionCategory } from 'types'
-import { getDistanceByCoords, randomIntFromInterval, getRandomInt, getCallsign } from 'utils'
+import { MissionStatus, MissionType, Coords, MissionCategory } from 'types'
+import { getDistanceByCoords, randomIntFromInterval, getRandomInt, getCallsign, getMissionAttributes } from 'utils'
 import { ObjectId } from 'mongodb'
+import NftModel, { INft } from 'models/Nft'
 
 interface MissionBlueprint {
   type: MissionType
@@ -130,7 +131,64 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
     ...soloDestinations.map(d => ({ ...d, hasAtc: false }))
   ]
 
-  const missions = allDestinations.map((dest) => {
+  // Get aircraft range if aircraftId is provided
+  let rangeLimit = Infinity
+  if (aircraftId && aircraftId !== 'undefined' && aircraftId !== '') {
+    try {
+      console.log('Fetching range for aircraftId:', aircraftId)
+      // Use BigInt for the lookup as the schema defines id as BigInt
+      const aircraftNft = await NftModel.findOne({ id: BigInt(aircraftId) }).lean()
+      if (aircraftNft) {
+        const attrs = getMissionAttributes(aircraftNft as unknown as INft)
+        const rangeAttr = attrs.find(a => a.trait_type === 'range')
+        console.log('Aircraft attributes found:', attrs.length, 'Range attribute:', rangeAttr)
+        if (rangeAttr) {
+          // Range is usually in KM in our metadata (e.g. 1289 for C172)
+          // Distance from getDistanceByCoords is also roughly in KM-equivalent units
+          rangeLimit = Number(rangeAttr.value) * 0.9 // Let's use 90% as a safety margin
+          console.log('Range limit set to (90%):', rangeLimit)
+        }
+      } else {
+        console.warn('Aircraft NFT not found for ID:', aircraftId)
+        // If not found, we could default to Cessna 172 range as a safety measure for new users
+        rangeLimit = 1289 * 0.9
+      }
+    } catch (error) {
+      console.error('Error fetching aircraft range:', error)
+    }
+  } else {
+    // Default range for users without a selected aircraft (Cessna 172 range)
+    rangeLimit = 1200
+  }
+
+  const filteredDestinations = allDestinations.filter(dest => {
+    const d = getDistanceByCoords(
+      { latitude: location!.latitude, longitude: location!.longitude } as Coords,
+      { latitude: dest.latitude, longitude: dest.longitude } as Coords
+    )
+    const isWithinRange = d <= rangeLimit
+    // console.log(`Checking destination ${dest.icao}: distance ${d.toFixed(0)} <= ${rangeLimit.toFixed(0)} => ${isWithinRange}`)
+    return isWithinRange
+  })
+
+  // Fallback if no destinations are within range, but don't just return everything
+  // return at least the 3 closest ones even if they exceed range slightly
+  let finalDestinations = filteredDestinations
+  if (finalDestinations.length === 0) {
+    console.warn('No destinations within range, falling back to 3 closest.')
+    finalDestinations = allDestinations
+      .map(dest => ({
+        ...dest,
+        dist: getDistanceByCoords(
+          { latitude: location!.latitude, longitude: location!.longitude } as Coords,
+          { latitude: dest.latitude, longitude: dest.longitude } as Coords
+        )
+      }))
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, 3)
+  }
+
+  const missions = finalDestinations.map((dest) => {
     const blueprint = MISSION_BLUEPRINTS[getRandomInt(MISSION_BLUEPRINTS.length)]
     const distance = getDistanceByCoords(
       { latitude: location.latitude, longitude: location.longitude } as Coords,
@@ -163,7 +221,7 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       aircraftId,
       callsign: getCallsign(),
       weight: randomIntFromInterval(500, 5000),
-      prize: Math.round(basePrize * rewardMultiplier),
+      prize: Math.round((basePrize * rewardMultiplier) / 100),
       status: MissionStatus.STARTED,
       remote: false,
       isRewarded: false,
@@ -182,5 +240,5 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
 
   return finalMissions
     .filter((m) => m !== null)
-    .sort(() => 0.5 - Math.random())
+    .sort((a, b) => a.distance - b.distance)
 }

@@ -55,19 +55,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const apiKey = process.env.NEXT_PUBLIC_IVAO_API_KEY
   const userToken = req.headers['x-ivao-token'] as string
-  
-  console.log('[TOWER] Relay:', { 
-    hasApiKey: !!apiKey, 
-    hasUserToken: !!userToken,
-    vid: userToken?.split(' ')?.[1] // Just for debug
-  })
 
   try {
     const headers: Record<string, string> = {}
     if (apiKey) headers['apiKey'] = apiKey
     if (userToken) headers['Authorization'] = userToken
 
-    const { data } = await ivaoInstance.get<ActiveAtc[]>('/v2/tracker/now/atc', { 
+    const { data } = await ivaoInstance.get<ActiveAtc[]>('/v2/tracker/now/atc', {
       timeout: 5000,
       headers
     })
