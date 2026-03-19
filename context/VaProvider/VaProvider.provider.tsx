@@ -4,6 +4,7 @@ import { getApi } from 'lib/api'
 import type { Atc, Flight } from 'types'
 // import { ivaoUserStore } from 'store/ivao-user.atom'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
+import { authStore } from 'store/auth.atom'
 import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
@@ -27,6 +28,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   // const ivaoUser = useRecoilValue(ivaoUserStore)
   const ivaoToken = useRecoilValue(ivaoUserAuthStore)
   const setIvaoToken = useSetRecoilState(ivaoUserAuthStore)
+  const authToken = useRecoilValue(authStore)
 
   React.useEffect(() => {
     if (ivaoToken) {
@@ -109,7 +111,9 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [])
 
   React.useEffect(() => {
-    // Only start sync if we have a token or don't need one for whazzup
+    // Only start sync if we have an app token (logged in)
+    if (!authToken) return
+
     const atcTimer = setInterval(() => getAtcs(), MIN_IVAO_REQ_DELAY)
     const ivaoTimer = setInterval(() => getIVAOData(), MIN_IVAO_REQ_DELAY)
     // const pilotsTimer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
@@ -118,7 +122,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       clearInterval(atcTimer)
       clearInterval(ivaoTimer)
     }
-  }, [getAtcs, getIVAOData])
+  }, [getAtcs, getIVAOData, authToken])
 
   const initIvaoData = useCallback(() => {
     // Manual trigger for first load

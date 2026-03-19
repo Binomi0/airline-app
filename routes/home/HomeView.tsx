@@ -136,6 +136,9 @@ const HomeView = () => {
           <Link href='/hangar' className={styles.ctaPrimary}>
             Entrar al Hangar
           </Link>
+          <Link href='/guide' className={styles.ctaSecondary}>
+            Ver Guía
+          </Link>
           <Link href='/whitepaper' className={styles.ctaSecondary}>
             Whitepaper
           </Link>
@@ -182,6 +185,9 @@ const HomeView = () => {
         <div className={styles.sectionHeader}>
           <span className={styles.sectionLabel}>Cómo funciona</span>
           <h2 className={styles.sectionTitle}>Tres pasos para despegar</h2>
+          <Link href='/guide' style={{ color: 'var(--home-accent)', fontWeight: 600, marginTop: '1rem', display: 'inline-block' }}>
+            Ver guía paso a paso →
+          </Link>
         </div>
         <div className={styles.stepsGrid}>
           {STEPS.map(({ n, title, desc }) => (

@@ -7,6 +7,7 @@ import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork'
 import LocalAirportIcon from '@mui/icons-material/LocalAirport'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
+import SchoolIcon from '@mui/icons-material/School'
 import { useMainProviderContext } from 'context/MainProvider'
 import SidebarItem from './SidebarItem'
 import { useRouter } from 'next/router'
@@ -55,6 +56,12 @@ const Sidebar: React.FC = () => {
       <Divider />
       <List>
         <SidebarItem onLink={handleClick('/')} text='Home' Icon={HomeIcon} selected={router.pathname === '/'} />
+        <SidebarItem
+          onLink={handleClick('/guide')}
+          text='Guía de Usuario'
+          Icon={SchoolIcon}
+          selected={router.pathname === '/guide'}
+        />
         <SidebarItem
           onLink={handleClick('/hangar')}
           text='Hangar'
