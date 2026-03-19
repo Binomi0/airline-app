@@ -47,7 +47,7 @@ const TowerControlMap = () => {
       setOrigin(tower)
       setDestination(null)
     } else {
-      if (tower.id === origin.id) return
+      if (tower.callsign === origin.callsign) return
       setDestination(tower)
     }
   }

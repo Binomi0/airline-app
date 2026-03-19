@@ -15,11 +15,32 @@ interface RadarMarkerProps {
 }
 
 const phoneticMap: Record<string, string> = {
-  A: 'ALPHA', B: 'BRAVO', C: 'CHARLIE', D: 'DELTA', E: 'ECHO', F: 'FOXTROT',
-  G: 'GOLF', H: 'HOTEL', I: 'INDIA', J: 'JULIETT', K: 'KILO', L: 'LIMA',
-  M: 'MIKE', N: 'NOVEMBER', O: 'OSCAR', P: 'PAPA', Q: 'QUEBEC', R: 'ROMEO',
-  S: 'SIERRA', T: 'TANGO', U: 'UNIFORM', V: 'VICTOR', W: 'WHISKEY', X: 'X-RAY',
-  Y: 'YANKEE', Z: 'ZULU'
+  A: 'ALPHA',
+  B: 'BRAVO',
+  C: 'CHARLIE',
+  D: 'DELTA',
+  E: 'ECHO',
+  F: 'FOXTROT',
+  G: 'GOLF',
+  H: 'HOTEL',
+  I: 'INDIA',
+  J: 'JULIETT',
+  K: 'KILO',
+  L: 'LIMA',
+  M: 'MIKE',
+  N: 'NOVEMBER',
+  O: 'OSCAR',
+  P: 'PAPA',
+  Q: 'QUEBEC',
+  R: 'ROMEO',
+  S: 'SIERRA',
+  T: 'TANGO',
+  U: 'UNIFORM',
+  V: 'VICTOR',
+  W: 'WHISKEY',
+  X: 'X-RAY',
+  Y: 'YANKEE',
+  Z: 'ZULU'
 }
 
 const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, isDestination, onTowerClick }) => {
@@ -36,7 +57,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
       const response = await fetch(`/api/ivao/atis/${tower.id}`)
       if (!response.ok) throw new Error('Failed to fetch ATIS')
       const data = await response.json()
-      
+
       if (data && data.lines) {
         setLocalAtis(data)
       } else {
@@ -70,17 +91,20 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
     if (!text) return ''
     const keywords = ['RWY', 'QNH', 'CAVOK', 'INFO', 'NOSIG', 'ARR', 'DEP', 'TA', 'TL']
     let highlighted = text
-    
-    keywords.forEach(key => {
+
+    keywords.forEach((key) => {
       const regex = new RegExp(`\\b${key}\\b`, 'g')
       highlighted = highlighted.replace(regex, `<span style="color: #10b981; font-weight: 800;">${key}</span>`)
     })
-    
+
     // Highlight revision letters
     const revisionMatch = text.match(/Information ([A-Z])/)
     if (revisionMatch) {
       const letter = revisionMatch[1]
-      highlighted = highlighted.replace(`Information ${letter}`, `Information <span style="color: #38bdf8; font-weight: 900;">${phoneticMap[letter] || letter}</span>`)
+      highlighted = highlighted.replace(
+        `Information ${letter}`,
+        `Information <span style="color: #38bdf8; font-weight: 900;">${phoneticMap[letter] || letter}</span>`
+      )
     }
 
     return <span dangerouslySetInnerHTML={{ __html: highlighted }} />
@@ -92,7 +116,13 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
       icon={getRadarIcon(iconColor, isOrigin || isDestination)}
       eventHandlers={{ click: () => onTowerClick(tower) }}
     >
-      <Tooltip direction='top' offset={[0, -10]} opacity={0.9} permanent={isOrigin || isDestination}>
+      <Tooltip
+        key={`${isOrigin || isDestination}`}
+        direction='top'
+        offset={[0, -10]}
+        opacity={0.9}
+        permanent={isOrigin || isDestination}
+      >
         <Box
           sx={{
             p: 0.8,
@@ -108,10 +138,10 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
         >
           <Typography
             variant='caption'
-            sx={{ 
-              fontWeight: 900, 
-              display: 'block', 
-              color: isOrigin ? '#10b981' : isDestination ? '#ef4444' : '#38bdf8', 
+            sx={{
+              fontWeight: 900,
+              display: 'block',
+              color: isOrigin ? '#10b981' : isDestination ? '#ef4444' : '#38bdf8',
               fontFamily: 'monospace',
               fontSize: 11,
               lineHeight: 1
@@ -121,10 +151,10 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
           </Typography>
           <Typography
             variant='caption'
-            sx={{ 
-              fontWeight: 600, 
-              display: 'block', 
-              color: 'rgba(255,255,255,0.7)', 
+            sx={{
+              fontWeight: 600,
+              display: 'block',
+              color: 'rgba(255,255,255,0.7)',
               fontSize: 8,
               maxWidth: 100,
               overflow: 'hidden',
@@ -142,7 +172,10 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
         <Box sx={{ bgcolor: '#0f172a', p: 1.5, color: '#f8fafc', minWidth: 260, borderRadius: 2 }}>
           {/* Header Callsign & Frequency */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant='h6' sx={{ fontWeight: 900, color: '#38bdf8', fontFamily: 'monospace', letterSpacing: 1, lineHeight: 1 }}>
+            <Typography
+              variant='h6'
+              sx={{ fontWeight: 900, color: '#38bdf8', fontFamily: 'monospace', letterSpacing: 1, lineHeight: 1 }}
+            >
               {tower.callsign}
             </Typography>
             {tower.atcSession?.frequency && (
@@ -155,7 +188,10 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                   border: '1px solid rgba(56, 189, 248, 0.3)'
                 }}
               >
-                <Typography variant='caption' sx={{ color: '#38bdf8', fontWeight: 800, fontSize: 11, fontFamily: 'monospace' }}>
+                <Typography
+                  variant='caption'
+                  sx={{ color: '#38bdf8', fontWeight: 800, fontSize: 11, fontFamily: 'monospace' }}
+                >
                   {tower.atcSession.frequency.toFixed(3)}
                 </Typography>
               </Box>
@@ -175,36 +211,65 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
             >
               {tower.atis?.lines?.[1] || tower?.atcPosition?.airport?.name || 'STATION UNKNOWN'}
             </Typography>
-            
+
             {tower.createdAt && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                <Box
-                  sx={{
-                    width: 6,
-                    height: 6,
-                    bgcolor: '#10b981',
-                    borderRadius: '50%',
-                    animation: 'atc-blink 1.5s infinite ease-in-out',
-                    boxShadow: '0 0 4px #10b981',
-                    '@keyframes atc-blink': {
-                      '0%, 100%': { opacity: 0.4, transform: 'scale(1)' },
-                      '50%': { opacity: 1, transform: 'scale(1.2)' }
-                    }
-                  }}
-                />
-                <Typography variant='caption' sx={{ color: '#64748b', fontSize: 10, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  Active for: 
-                  <span style={{ color: '#10b981', fontWeight: 800 }}>
-                    {(() => {
-                      const start = new Date(tower.createdAt).getTime()
-                      const now = Date.now()
-                      const diff = Math.floor((now - start) / 60000)
-                      const hours = Math.floor(diff / 60)
-                      const mins = diff % 60
-                      return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`
-                    })()}
-                  </span>
-                </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                  <Box
+                    sx={{
+                      width: 6,
+                      height: 6,
+                      bgcolor: '#10b981',
+                      borderRadius: '50%',
+                      animation: 'atc-blink 1.5s infinite ease-in-out',
+                      boxShadow: '0 0 4px #10b981',
+                      '@keyframes atc-blink': {
+                        '0%, 100%': { opacity: 0.4, transform: 'scale(1)' },
+                        '50%': { opacity: 1, transform: 'scale(1.2)' }
+                      }
+                    }}
+                  />
+                  <Typography
+                    variant='caption'
+                    sx={{ color: '#64748b', fontSize: 10, display: 'flex', alignItems: 'center', gap: 0.5 }}
+                  >
+                    Active for:
+                    <span style={{ color: '#10b981', fontWeight: 800 }}>
+                      {(() => {
+                        const start = new Date(tower.createdAt).getTime()
+                        const now = Date.now()
+                        const diff = Math.floor((now - start) / 60000)
+                        const hours = Math.floor(diff / 60)
+                        const mins = diff % 60
+                        return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`
+                      })()}
+                    </span>
+                  </Typography>
+                </Box>
+
+                {tower.userId && (
+                  <Typography
+                    variant='caption'
+                    sx={{
+                      color: 'rgba(255, 255, 255, 0.3)',
+                      fontSize: 9,
+                      fontFamily: 'monospace',
+                      bgcolor: 'rgba(255, 255, 255, 0.05)',
+                      px: 0.6,
+                      py: 0.2,
+                      borderRadius: 0.5,
+                      letterSpacing: 0.5
+                    }}
+                  >
+                    VID:{' '}
+                    <Typography
+                      variant='caption'
+                      sx={{ fontSize: 10, color: 'rgba(255, 255, 255, 0.6)', fontWeight: 800 }}
+                    >
+                      {tower.userId}
+                    </Typography>
+                  </Typography>
+                )}
               </Box>
             )}
           </Stack>
@@ -212,27 +277,26 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
           {/* ATIS Section */}
           <Box sx={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', pt: 1.5 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-              <Typography variant='caption' sx={{ color: '#64748b', fontSize: 9, textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.5 }}>
+              <Typography
+                variant='caption'
+                sx={{ color: '#64748b', fontSize: 9, textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.5 }}
+              >
                 ATIS Briefing
               </Typography>
-              <IconButton 
-                size="small" 
-                onClick={handleFetchAtis} 
+              <IconButton
+                size='small'
+                onClick={handleFetchAtis}
                 disabled={fetching}
-                sx={{ 
-                  p: 0, 
+                sx={{
+                  p: 0,
                   color: fetching ? '#38bdf8' : '#64748b',
-                  '&:hover': { color: '#38bdf8' } 
+                  '&:hover': { color: '#38bdf8' }
                 }}
               >
-                {fetching ? (
-                  <CircularProgress size={12} color="inherit" />
-                ) : (
-                  <RefreshIcon sx={{ fontSize: 14 }} />
-                )}
+                {fetching ? <CircularProgress size={12} color='inherit' /> : <RefreshIcon sx={{ fontSize: 14 }} />}
               </IconButton>
             </Box>
-            
+
             {localAtis?.lines && localAtis.lines.length > 0 ? (
               <Box
                 sx={{
@@ -249,7 +313,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                 {localAtis.lines.map((line, i) => {
                   // Skip server header line
                   if (i === 0 && (line.includes('.ivao.aero') || line.includes('/'))) return null
-                  
+
                   return (
                     <Typography
                       key={i}
@@ -270,17 +334,37 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                 })}
               </Box>
             ) : (
-              <Box sx={{ bgcolor: 'rgba(255, 255, 255, 0.02)', p: 1.5, borderRadius: 1, textAlign: 'center', border: '1px dashed rgba(255, 255, 255, 0.1)' }}>
+              <Box
+                sx={{
+                  bgcolor: 'rgba(255, 255, 255, 0.02)',
+                  p: 1.5,
+                  borderRadius: 1,
+                  textAlign: 'center',
+                  border: '1px dashed rgba(255, 255, 255, 0.1)'
+                }}
+              >
                 <Typography variant='caption' sx={{ color: '#64748b', fontStyle: 'italic' }}>
                   {fetching ? 'Retrieving latest data...' : 'No ATIS Broadcast Available'}
                 </Typography>
               </Box>
             )}
-            
+
             {localAtis?.revision && (
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1.5 }}>
-                <Box sx={{ bgcolor: '#10b981', color: '#000', px: 1, py: 0.4, borderRadius: 0.5, boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)' }}>
-                  <Typography variant='caption' sx={{ fontWeight: 900, fontSize: 10, fontFamily: 'monospace', letterSpacing: 0.5 }}>
+                <Box
+                  sx={{
+                    bgcolor: '#10b981',
+                    color: '#000',
+                    px: 1,
+                    py: 0.4,
+                    borderRadius: 0.5,
+                    boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
+                  }}
+                >
+                  <Typography
+                    variant='caption'
+                    sx={{ fontWeight: 900, fontSize: 10, fontFamily: 'monospace', letterSpacing: 0.5 }}
+                  >
                     INFO {phoneticMap[localAtis.revision] || localAtis.revision}
                   </Typography>
                 </Box>

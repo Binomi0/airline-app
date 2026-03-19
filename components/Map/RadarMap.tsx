@@ -60,11 +60,11 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
 
           return (
             <RadarMarker
-              key={`${tower.id}-${idx}`}
+              key={`${tower.callsign || idx}`}
               tower={tower}
               position={pos}
-              isOrigin={origin?.id === tower.id}
-              isDestination={destination?.id === tower.id}
+              isOrigin={origin?.callsign === tower.callsign}
+              isDestination={destination?.callsign === tower.callsign}
               onTowerClick={onTowerClick}
             />
           )
