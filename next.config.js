@@ -14,7 +14,7 @@ const nextConfig = {
         source: '/api/:path*',
         headers: [
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: process.env.NEXT_PUBLIC_ORIGIN },
+          { key: 'Access-Control-Allow-Origin', value: process.env.NEXT_PUBLIC_ORIGIN || process.env.VERCEL_URL },
           { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
           {
             key: 'Access-Control-Allow-Headers',
