@@ -37,11 +37,12 @@ export const getCurvePath = (c1: [number, number], c2: [number, number], segment
   // Vector from c1 to c2
   const dLat = c2[0] - c1[0]
   const dLon = c2[1] - c1[1]
+  const dist = Math.sqrt(dLat * dLat + dLon * dLon)
   
-  // Control point offset (perpendicular to the line)
-  const curveIntensity = 0.15
-  const ctrlLat = midLat - dLon * curveIntensity
-  const ctrlLon = midLon + dLat * curveIntensity
+  // Control point offset - Always curve "up" (North)
+  const curveIntensity = 0.12
+  const ctrlLat = midLat + dist * curveIntensity
+  const ctrlLon = midLon
   
   for (let i = 0; i <= segments; i++) {
     const t = i / segments
