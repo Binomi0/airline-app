@@ -9,7 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Fade from '@mui/material/Fade'
 import Grid from '@mui/material/Grid'
 import { INft } from 'models/Nft'
-import { useNFTProviderContext } from 'components/NFTProvider'
+import { useNFTProviderContext } from 'context/NFTProvider'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { getNFTAttributes } from 'utils'
 

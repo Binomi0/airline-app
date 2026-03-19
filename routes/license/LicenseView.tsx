@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import { useRecoilValue } from 'recoil'
 import { tokenBalanceStore } from 'store/balance.atom'
-import { useNFTProviderContext } from 'components/NFTProvider'
+import { useNFTProviderContext } from 'context/NFTProvider'
 import { INft } from 'models/Nft'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
 

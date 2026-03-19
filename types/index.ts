@@ -67,9 +67,15 @@ export interface AtcPosition {
       longitude: number
       military: boolean | string
     }
+    latitude?: number
+    longitude?: number
   }
 }
-export type Atc = AtcPosition & typeof atc
+export type Atc = AtcPosition &
+  typeof atc & {
+    latitude?: number
+    longitude?: number
+  }
 export interface Cargo {
   // where it starts
   origin: string
