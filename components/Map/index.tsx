@@ -93,6 +93,14 @@ const TowerControlMap = () => {
           50% { opacity: 0.2; }
           100% { opacity: 1; }
         }
+        @keyframes flight-path-flow {
+          from { stroke-dashoffset: 20; }
+          to { stroke-dashoffset: 0; }
+        }
+        .flight-path {
+          animation: flight-path-flow 1.5s linear infinite;
+          filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.6));
+        }
         .leaflet-container {
           background: #020617 !important;
         }

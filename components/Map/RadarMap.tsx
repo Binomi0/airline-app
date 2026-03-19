@@ -3,7 +3,7 @@ import { Box } from '@mui/material'
 import { MapContainer, TileLayer, Polyline } from 'react-leaflet'
 import { Atc } from 'types'
 import RadarMarker from './RadarMarker'
-import { getCoords } from './utils'
+import { getCoords, getCurvePath } from './utils'
 
 interface RadarMapProps {
   towers: readonly Atc[]
@@ -18,7 +18,7 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
     const c1 = getCoords(origin)
     const c2 = getCoords(destination)
     if (!c1 || !c2) return null
-    return [c1, c2]
+    return getCurvePath(c1, c2)
   }, [origin, destination])
 
   return (
@@ -73,11 +73,12 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
         {polylinePath && (
           <Polyline
             positions={polylinePath}
+            className='flight-path'
             pathOptions={{
               color: '#38bdf8',
-              weight: 2,
-              opacity: 0.9,
-              dashArray: '10, 15',
+              weight: 3,
+              opacity: 0.8,
+              dashArray: '10, 10',
               lineJoin: 'round'
             }}
           />
