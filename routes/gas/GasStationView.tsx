@@ -3,10 +3,10 @@ import GasAvailable from './GasAvailable'
 import GasDeposited from './GasDeposited'
 import GasFarmed from './GasFarmed'
 import GasSupply from './components/GasSupply'
-
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
+import styles from 'styles/Gas.module.css'
 
 interface Props {
   airl?: Readonly<bigint>
@@ -18,27 +18,40 @@ interface Props {
 
 const GasStationView = ({ airl, staking, getAirlBalance, getAirgBalance, getStakingInfo }: Props) => {
   return (
-    <Box my={5}>
-      <Typography variant='h5' gutterBottom>
-        Before Start Checklist, deposit AIRL Token in staking and start earning gasoline.
-      </Typography>
-      <GasSupply />
-      <Grid container spacing={2}>
+    <Box mt={4}>
+      <Box className={styles.glassCard} mb={4}>
+        <Typography variant='h5' fontWeight={700} color='#6366f1'>
+          Checklist de Operaciones
+        </Typography>
+        <Typography variant='body1' sx={{ opacity: 0.8 }}>
+          Deposita tus tokens AIRL en el staking para empezar a generar combustible (AIRG) de forma pasiva. 
+          El combustible es esencial para todas tus misiones de vuelo.
+        </Typography>
+        <GasSupply />
+      </Box>
+
+      <Grid container spacing={3}>
         <GasAvailable airl={airl} getAirlBalance={getAirlBalance} getStakingInfo={getStakingInfo} />
         <GasDeposited staking={staking} getStakingInfo={getStakingInfo} getAirlBalance={getAirlBalance} />
         <GasFarmed getAirgBalance={getAirgBalance} />
       </Grid>
-      <Box mt={2}>
-        <Typography variant='h2'>How it Works</Typography>
-        <Typography>
-          To be able to fill your tanks and fly with required gasoline just add AIRL tokens into the Gas Station, this
-          mecanish will provide some constant flow of gasoline by minute, once at least 100 liters are ready to collect
-          CLAIM button will be unlocked and after pressing it, all farmed gasoline will go to your wallet and will be
-          ready for your aircrafts to refuel.
+
+      <Box mt={6} className={styles.glassCard}>
+        <Typography variant='h4' fontWeight={800} gutterBottom>
+          ¿Cómo funciona?
         </Typography>
-        <Typography variant='h2'>How many will I get back?</Typography>
-        <Typography>
-          Rate is 100 Liters by each 1 AIRL token staked during 24 hours (locked in gas station). 100 AIRG (1 AIRL/24h)
+        <Typography paragraph sx={{ opacity: 0.8 }}>
+          Para llenar tus tanques y volar, simplemente añade tokens AIRL a la Gas Station. Este mecanismo proporciona un 
+          flujo constante de gasolina por minuto. Una vez que tengas al menos <b>100 litros</b> listos para recolectar, 
+          el botón CLAIM se desbloqueará y podrás transferir todo el combustible a tu wallet.
+        </Typography>
+        
+        <Typography variant='h5' fontWeight={700} mt={2}>
+          Ratio de Conversión
+        </Typography>
+        <Typography sx={{ opacity: 0.8 }}>
+          Obtendrás 100 Litros por cada 1 token AIRL stakeado durante 24 horas. 
+          (100 AIRG / 1 AIRL / 24h)
         </Typography>
       </Box>
     </Box>
