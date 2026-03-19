@@ -6,7 +6,7 @@ import useClaimNFT from 'hooks/useClaimNFT'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import AircraftItem from 'routes/hangar/components/AircraftItem'
+import AircraftShowcase from 'routes/hangar/components/AircraftShowcase'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 import { LinearProgress } from '@mui/material'
 
@@ -24,13 +24,18 @@ const AircraftView: NextPage = () => {
 
   return (
     <Container>
-      <Box>
-        <Box textAlign='center' my={10}>
-          <Typography variant='h1'>Aircraft Details</Typography>
+      <Box py={10}>
+        <Box textAlign='center' mb={6}>
+          <Typography variant='h2' fontWeight={800}>Detalle de Aeronave</Typography>
         </Box>
 
-        <Box maxWidth={600} m='auto'>
-          <AircraftItem nft={nft} isClaiming={isLoading} onClaim={() => claimNFT(nft)} />
+        <Box m='auto'>
+          <AircraftShowcase 
+            nft={nft} 
+            isClaiming={isLoading} 
+            hasAircraft={true} 
+            onClaim={() => claimNFT(nft)} 
+          />
         </Box>
       </Box>
     </Container>

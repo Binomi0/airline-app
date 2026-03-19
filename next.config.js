@@ -3,6 +3,15 @@ const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   basePath: '',
+  images: {
+    domains: ['ipfs.io', 'gateway.pinata.cloud', 'nftstorage.link'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.ipfs.io',
+      },
+    ],
+  },
   eslint: {
     dirs: ['pages', 'components', 'lib', 'src', 'routes', 'store', 'types', 'utils', 'hooks', 'models', 'context'],
     ignoreDuringBuilds: false
