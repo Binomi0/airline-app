@@ -11,6 +11,8 @@ import Info from '@mui/icons-material/Info'
 import LinkOffIcon from '@mui/icons-material/LinkOff'
 import { User } from 'types'
 
+import styles from 'styles/Settings.module.css'
+
 interface Props {
   user?: User
 }
@@ -19,70 +21,76 @@ const VirtualAirlines = ({ user }: Props) => {
   const ivaoConnected = !!user?.vaUser?.pilotId
 
   return (
-    <Paper elevation={6}>
-      <Box p={2}>
-        <Typography variant='h5'>Virtual Airline</Typography>
-      </Box>
-      <Divider />
-      <Box>
-        <Stack direction='row' p={2} spacing={2} justifyContent='space-between' alignItems='center'>
-          <Stack spacing={1} direction='row' alignItems='center'>
+    <Box className={styles.glassCard}>
+      <Stack spacing={3}>
+        <Typography className={styles.sectionHeader}>Integrations</Typography>
+
+        <Stack direction='row' justifyContent='space-between' alignItems='center'>
+          <Stack spacing={1}>
+            <Stack direction='row' spacing={1} alignItems='center'>
+              <Typography sx={{ color: '#fff', fontWeight: 500 }}>IVAO Network</Typography>
+              <Tooltip title='Connect your IVAO account to sync your flight history and ratings.'>
+                <Info fontSize='small' sx={{ color: 'rgba(255, 255, 255, 0.4)' }} />
+              </Tooltip>
+            </Stack>
             <Box>
-              <Stack direction='row' spacing={1} alignItems='center'>
-                <Typography>IVAO</Typography>
-                <Tooltip title=''>
-                  <Info fontSize='small' />
-                </Tooltip>
-              </Stack>
-              <Box>
-                {ivaoConnected ? (
-                  <Stack alignItems='center' direction='row' spacing={1}>
-                    <Check color='success' />
-                    <Typography variant='caption' color='success.light'>
-                      Connected to ivao account: {user?.vaUser?.pilotId}
-                    </Typography>
-                  </Stack>
-                ) : (
-                  <Stack alignItems='center' direction='row' spacing={1}>
-                    <LinkOffIcon color='warning' />
-                    <Typography variant='caption' color='warning.light'>
-                      Not connected to IVAO
-                    </Typography>
-                  </Stack>
-                )}
-              </Box>
+              {ivaoConnected ? (
+                <Stack alignItems='center' direction='row' spacing={1}>
+                  <Check fontSize='small' sx={{ color: '#4ade80' }} />
+                  <Typography variant='caption' sx={{ color: '#4ade80' }}>
+                    Connected as {user?.vaUser?.pilotId}
+                  </Typography>
+                </Stack>
+              ) : (
+                <Stack alignItems='center' direction='row' spacing={1}>
+                  <LinkOffIcon sx={{ color: '#fbbf24' }} />
+                  <Typography variant='caption' sx={{ color: '#fbbf24' }}>
+                    Not linked
+                  </Typography>
+                </Stack>
+              )}
             </Box>
           </Stack>
-          {ivaoConnected ? null : (
-            <Button variant='outlined' color='warning' onClick={() => {}}>
-              <Stack spacing={1} direction='row' alignItems='center'>
-                <Typography>Connect to IVAO</Typography>
-              </Stack>
+          {!ivaoConnected && (
+            <Button
+              variant='outlined'
+              sx={{
+                borderColor: '#fbbf24',
+                color: '#fbbf24',
+                '&:hover': { borderColor: '#fff', background: 'rgba(251, 191, 36, 0.05)' },
+              }}
+              onClick={() => {}}
+            >
+              Link IVAO
             </Button>
           )}
         </Stack>
-      </Box>
-      <Divider />
-      <Box>
-        <Stack direction='row' p={2} spacing={2} justifyContent='space-between' alignItems='center'>
-          <Stack spacing={1} direction='row' alignItems='center'>
-            <Box>
-              <Stack direction='row' spacing={1} alignItems='center'>
-                <Typography>VATSIM</Typography>
-                <Tooltip title=''>
-                  <Info fontSize='small' />
-                </Tooltip>
-              </Stack>
-            </Box>
-          </Stack>
-          <Button disabled variant='outlined' color='inherit' onClick={() => {}}>
-            <Stack spacing={1} direction='row' alignItems='center'>
-              <Typography>Connect to VATSIM</Typography>
+
+        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+
+        <Stack direction='row' justifyContent='space-between' alignItems='center'>
+          <Stack spacing={1}>
+            <Stack direction='row' spacing={1} alignItems='center'>
+              <Typography sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 500 }}>VATSIM Network</Typography>
+              <Tooltip title='VATSIM integration coming soon.'>
+                <Info fontSize='small' sx={{ color: 'rgba(255, 255, 255, 0.2)' }} />
+              </Tooltip>
             </Stack>
+          </Stack>
+          <Button
+            disabled
+            variant='outlined'
+            sx={{
+              borderColor: 'rgba(255, 255, 255, 0.1)',
+              color: 'rgba(255, 255, 255, 0.3)',
+              '&.Mui-disabled': { borderColor: 'rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.1)' },
+            }}
+          >
+            Soon
           </Button>
         </Stack>
-      </Box>
-    </Paper>
+      </Stack>
+    </Box>
   )
 }
 

@@ -13,15 +13,15 @@ interface Props {
 
 const SettingsView = ({ hasBackup, user }: Props) => {
   return (
-    <Box p={2}>
-      <Grid container spacing={2}>
+    <Box>
+      <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <Security hasBackup={hasBackup} />
         </Grid>
         <Grid item xs={12} md={6}>
           <WalletSettings user={user} />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={12}>
           <VirtualAirlines user={user} />
         </Grid>
       </Grid>
