@@ -1,6 +1,6 @@
-import { CargoDetail } from 'types'
+import { MissionDetail } from 'types'
 
-export const cargos: CargoDetail[] = [
+export const cargos: MissionDetail[] = [
   {
     name: 'Humanitarian Aid',
     description:
