@@ -72,15 +72,27 @@ const Footer: React.FC = () => {
           </Grid>
 
           {/* Community */}
-          <Grid item xs={12} md={4}>
+          <Grid item xs={6} md={2}>
             <Typography variant='subtitle1' fontWeight={600} gutterBottom>
-              Comunidad & IVAO
+              Legal
+            </Typography>
+            <Stack spacing={1}>
+              <Link href='/privacy' className={styles.link}>Privacidad</Link>
+              <Link href='/terms' className={styles.link}>Términos</Link>
+              <Link href='/legal' className={styles.link}>Aviso Legal</Link>
+            </Stack>
+          </Grid>
+
+          {/* Community & IVAO */}
+          <Grid item xs={12} md={2}>
+            <Typography variant='subtitle1' fontWeight={600} gutterBottom>
+              Comunidad
             </Typography>
             <Typography variant='body2' color='text.secondary' gutterBottom>
-              Conecta tu cuenta de IVAO para empezar a volar y ganar recompensas.
+              IVAO Integrated
             </Typography>
-            <Box mt={2} className={styles.ivaoBadge}>
-              <Typography variant='caption' fontWeight={700}>IVAO INTEGRATED</Typography>
+            <Box mt={1} className={styles.ivaoBadge}>
+              <Typography variant='caption' fontWeight={700}>IVAO READY</Typography>
             </Box>
           </Grid>
         </Grid>
