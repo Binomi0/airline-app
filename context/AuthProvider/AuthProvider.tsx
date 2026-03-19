@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     const isPrivateRoute = privateRoutes.some((route) => router.asPath.includes(route))
     if (!token && isPrivateRoute) {
-      router.push('/signin')
+      router.push('/login')
     }
   }, [token, router])
 

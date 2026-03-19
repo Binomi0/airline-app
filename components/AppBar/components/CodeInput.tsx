@@ -23,7 +23,7 @@ const CodeInput = ({ onCancel, onSubmit, loading }: Props) => {
     const isValid = Number(codeRef.current.value) > 999 && Number(codeRef.current.value) < 10000
     if (isValid) onSubmit(codeRef.current.value)
 
-    setError(isValid ? '' : 'Invalid code')
+    setError(isValid ? '' : 'Código inválido')
   }, [onSubmit])
 
   return loading ? (
@@ -40,7 +40,7 @@ const CodeInput = ({ onCancel, onSubmit, loading }: Props) => {
         label='CODE'
         error={!!error}
         helperText={error}
-        placeholder='Insert code'
+        placeholder='Introduce el código'
         inputRef={codeRef}
         InputProps={{
           endAdornment: (
@@ -51,7 +51,7 @@ const CodeInput = ({ onCancel, onSubmit, loading }: Props) => {
         }}
       />
       <Button variant='contained' onClick={handleValidateCode}>
-        SEND CODE
+        ENVIAR CÓDIGO
       </Button>
     </Stack>
   )

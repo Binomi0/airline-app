@@ -11,6 +11,7 @@ import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
 import ErrorBoundary from 'components/ErrorBoundary'
 import CustomWeb3Provider from 'components/CustomWeb3Provider'
+import { Box } from '@mui/material'
 import RightSidebar from 'components/Sidebar/Right'
 import ThemeWrapper from 'components/ThemeWrapper'
 import NFTProvider from 'context/NFTProvider'
@@ -21,6 +22,7 @@ import { VaProvider } from 'context/VaProvider'
 import { LiveFlightsProvider } from 'context/LiveFlightProvider'
 import { authStore } from 'store/auth.atom'
 import { themeStore } from 'store/theme.atom'
+import Footer from 'components/Footer'
 import 'lib/alchemy'
 import createEmotionCache from '../src/createEmotionCache'
 import '../styles/globals.css'
@@ -78,14 +80,17 @@ export default function MyApp(props: MyAppProps) {
                     <TokenProvider>
                       <VaProvider>
                         <LiveFlightsProvider>
-                          <MainProvider>
-                            <AppBar />
-                            <Sidebar />
-                            <RightSidebar />
-                          </MainProvider>
-                          <WithLoading loading={loading}>
-                            <Component {...props.pageProps} />
-                          </WithLoading>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                            <MainProvider>
+                              <AppBar />
+                              <Sidebar />
+                              <RightSidebar />
+                            </MainProvider>
+                            <WithLoading loading={loading}>
+                              <Component {...props.pageProps} />
+                            </WithLoading>
+                            <Footer />
+                          </Box>
                           {/* <SpeedInsights /> */}
                         </LiveFlightsProvider>
                       </VaProvider>

@@ -1,24 +1,24 @@
 /* ─── Theme tokens (override por modo) ──────────────────────────── */
 .root {
-  --c-bg:           var(--home-bg, #0b0f19);
-  --c-bg-alt:       var(--home-bg-alt, rgba(15, 18, 28, 0.6));
-  --c-border:       var(--home-border, rgba(255,255,255,0.06));
-  --c-border-card:  var(--home-border-card, rgba(255,255,255,0.07));
-  --c-accent:       var(--home-accent, #6366f1);
-  --c-accent-soft:  var(--home-accent-soft, rgba(99,102,241,0.18));
-  --c-accent-text:  var(--home-accent-text, #a5b4fc);
-  --c-title:        var(--home-title, #e2e8f0);
-  --c-muted:        var(--home-muted, rgba(148,163,184,0.8));
-  --c-muted-label:  var(--home-muted-label, rgba(148,163,184,0.7));
+  --c-bg: var(--home-bg, #0b0f19);
+  --c-bg-alt: var(--home-bg-alt, rgba(15, 18, 28, 0.6));
+  --c-border: var(--home-border, rgba(255, 255, 255, 0.06));
+  --c-border-card: var(--home-border-card, rgba(255, 255, 255, 0.07));
+  --c-accent: var(--home-accent, #6366f1);
+  --c-accent-soft: var(--home-accent-soft, rgba(99, 102, 241, 0.18));
+  --c-accent-text: var(--home-accent-text, #a5b4fc);
+  --c-title: var(--home-title, #e2e8f0);
+  --c-muted: var(--home-muted, rgba(148, 163, 184, 0.8));
+  --c-muted-label: var(--home-muted-label, rgba(148, 163, 184, 0.7));
   --c-hero-grad-from: var(--home-hero-from, #e0e7ff);
-  --c-hero-grad-mid:  var(--home-hero-mid,  #a5b4fc);
-  --c-hero-grad-to:   var(--home-hero-to,   #818cf8);
+  --c-hero-grad-mid: var(--home-hero-mid, #a5b4fc);
+  --c-hero-grad-to: var(--home-hero-to, #818cf8);
   background: var(--c-bg);
 }
 
 /* ─── Hero ──────────────────────────────────────────────────────── */
 .hero {
-  min-height: 100vh;
+  min-height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -64,8 +64,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.7); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
 }
 
 .heroTitle {
@@ -74,7 +81,12 @@
   letter-spacing: -0.04em;
   line-height: 1;
   margin: 0 0 16px;
-  background: linear-gradient(135deg, var(--c-hero-grad-from) 0%, var(--c-hero-grad-mid) 40%, var(--c-hero-grad-to) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--c-hero-grad-from) 0%,
+    var(--c-hero-grad-mid) 40%,
+    var(--c-hero-grad-to) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -116,7 +128,10 @@
   background: linear-gradient(135deg, var(--c-accent), var(--c-accent-text));
   color: #fff;
   text-decoration: none;
-  transition: opacity 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
   box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-accent) 40%, transparent);
 }
 
@@ -138,7 +153,10 @@
   color: var(--c-title);
   border: 1px solid color-mix(in srgb, var(--c-title) 18%, transparent);
   text-decoration: none;
-  transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
 }
 
 .ctaSecondary:hover {
@@ -173,15 +191,33 @@
 }
 
 @keyframes scrollLine {
-  0%   { transform: scaleY(0); transform-origin: top; }
-  50%  { transform: scaleY(1); transform-origin: top; }
-  51%  { transform: scaleY(1); transform-origin: bottom; }
-  100% { transform: scaleY(0); transform-origin: bottom; }
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  50% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  51% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
-  to   { opacity: 0.35; transform: translateX(-50%) translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 0.35;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 /* ─── Stats ─────────────────────────────────────────────────────── */
@@ -273,7 +309,10 @@
   border: 1px solid var(--c-border-card);
   border-radius: 14px;
   padding: 32px 28px;
-  transition: border-color 200ms ease, background 200ms ease, transform 200ms ease;
+  transition:
+    border-color 200ms ease,
+    background 200ms ease,
+    transform 200ms ease;
 }
 
 .featureCard:hover {
@@ -386,7 +425,10 @@
   border: 1px solid var(--c-border-card);
   text-decoration: none;
   color: inherit;
-  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
 }
 
 .navCard:hover {
@@ -414,7 +456,9 @@
   content: '→';
   opacity: 0;
   transform: translateX(-4px);
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
 }
 
 .navCard:hover .navCardTitle::after {

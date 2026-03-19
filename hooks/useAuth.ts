@@ -82,7 +82,7 @@ const useAuth = (): UseAuthReturnType => {
     deleteCookie('token')
     deleteCookie('isLoggedIn')
     setUser(undefined)
-    if (router.asPath !== '/signin') router.push('/signin')
+    if (router.asPath !== '/login') router.push('/login')
   }, [router, setUser, setWallet])
 
   return { handleSignIn, handleSignUp, handleSignOut, status }

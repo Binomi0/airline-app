@@ -55,7 +55,7 @@ const LaunchpadLanding: FC = () => {
               Roadmap
             </a>
           </nav>
-          <Link href={user ? '/home' : '/signin'} className={styles.navCta}>
+          <Link href={user ? '/home' : '/login'} className={styles.navCta}>
             {user ? 'Ir al Hangar' : 'Acceder / Registrarse'}
           </Link>
         </div>
