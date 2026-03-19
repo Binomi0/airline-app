@@ -99,8 +99,8 @@ const GuideView = () => {
         >
           <h1 className={styles.title}>Ruta del Piloto</h1>
           <p className={styles.subtitle}>
-            Tu camino hacia la excelencia en la primera aerolínea digital y descentralizada. 
-            Domina la tecnología Web3 aplicada a la simulación de vuelo.
+            Tu camino hacia la excelencia en la primera aerolínea digital y descentralizada. Domina la tecnología Web3
+            aplicada a la simulación de vuelo.
           </p>
         </motion.header>
 
@@ -115,25 +115,20 @@ const GuideView = () => {
               transition={{ duration: 0.8, delay: 0.1 }}
             >
               <div className={styles.marker} />
-              
-              <motion.div 
-                className={styles.card}
-                whileHover={{ y: -10 }}
-              >
-                <span className={styles.stepLabel}>{step.label} {step.n}</span>
+
+              <motion.div className={styles.card} whileHover={{ y: -10 }}>
+                <span className={styles.stepLabel}>
+                  {step.label} {step.n}
+                </span>
                 <h2 className={styles.stepTitle}>{step.title}</h2>
                 <p className={styles.stepDesc}>{step.desc}</p>
                 <Link href={step.link} className={styles.cta}>
-                  {step.cta} <ArrowForwardIcon fontSize="small" />
+                  {step.cta} <ArrowForwardIcon fontSize='small' />
                 </Link>
               </motion.div>
 
-              <motion.div 
-                className={styles.imageBox}
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.4 }}
-              >
-                <img src={step.img} alt={step.title} loading="lazy" />
+              <motion.div className={styles.imageBox} whileHover={{ scale: 1.02 }} transition={{ duration: 0.4 }}>
+                <img src={step.img} alt={step.title} loading='lazy' />
               </motion.div>
             </motion.div>
           ))}
@@ -157,10 +152,10 @@ const GuideView = () => {
         >
           <h2 className={styles.stepTitle}>Despegue Inmediato Patrocinado</h2>
           <p className={styles.stepDesc} style={{ margin: '0 auto 3rem', maxWidth: '600px' }}>
-            Gracias a nuestro sistema de <strong>Gas Sponsorship</strong>, tus primeros vuelos
-            están libres de comisiones de red. Conecta tu Passkey y empieza hoy mismo.
+            Gracias a nuestro sistema de <strong>Gas Sponsorship</strong>, tus primeros vuelos están libres de
+            comisiones de red. Conecta tu Passkey y empieza hoy mismo.
           </p>
-          <Link href="/missions">
+          <Link href='/missions'>
             <motion.span
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

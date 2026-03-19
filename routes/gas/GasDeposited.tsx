@@ -40,11 +40,16 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
   return (
     <Grid item xs={12} md={4}>
       <Box className={styles.glassCard}>
-        <Typography variant='subtitle1' fontWeight={700} sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}>
+        <Typography
+          variant='subtitle1'
+          fontWeight={700}
+          sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}
+        >
           Depositado
         </Typography>
         <Typography variant='h4' fontWeight={800} sx={{ my: 1 }}>
-          {staking ? formatNumber(Number(staking[0].toString()) / 1e18) : formatNumber()} <span style={{ fontSize: '1rem', opacity: 0.5 }}>sAIRL</span>
+          {staking ? formatNumber(Number(staking[0].toString()) / 1e18) : formatNumber()}{' '}
+          <span style={{ fontSize: '1rem', opacity: 0.5 }}>sAIRL</span>
         </Typography>
         <GasForm
           max={maxAmount}

@@ -1,10 +1,8 @@
 import React, { useCallback } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
 import Info from '@mui/icons-material/Info'
 import Check from '@mui/icons-material/Check'
 import CloudOffIcon from '@mui/icons-material/CloudOff'
@@ -62,8 +60,8 @@ const AccountSettings = ({ hasBackup }: Props) => {
               color: hasBackup ? '#fff' : '#fbbf24',
               '&:hover': {
                 borderColor: '#fff',
-                background: 'rgba(255, 255, 255, 0.05)',
-              },
+                background: 'rgba(255, 255, 255, 0.05)'
+              }
             }}
             onClick={handleAddBackup}
           >

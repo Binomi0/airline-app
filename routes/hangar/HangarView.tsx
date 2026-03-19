@@ -83,7 +83,7 @@ const HangarView: React.FC = () => {
   return (
     <Box className={styles.pageContainer}>
       <div className={styles.backgroundOverlay} />
-      
+
       <Box className={styles.contentWrapper}>
         {/* Header */}
         <Box mb={2}>

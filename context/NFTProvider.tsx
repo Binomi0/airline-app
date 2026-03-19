@@ -10,8 +10,8 @@ type NftContextType = {
   refetch: () => void
 }
 
-const NftContext = createContext<NftContextType>({ 
-  aircrafts: [], 
+const NftContext = createContext<NftContextType>({
+  aircrafts: [],
   licenses: [],
   refetch: () => {}
 })
@@ -28,11 +28,7 @@ const NFTProviderWrapper = ({ children }: Props) => {
 
   const refetch = () => mutate('/api/nft')
 
-  return (
-    <NftContext.Provider value={{ aircrafts, licenses, refetch }}>
-      {children}
-    </NftContext.Provider>
-  )
+  return <NftContext.Provider value={{ aircrafts, licenses, refetch }}>{children}</NftContext.Provider>
 }
 
 export const useNFTProviderContext = () => useContext(NftContext)

@@ -185,7 +185,10 @@ const HomeView = () => {
         <div className={styles.sectionHeader}>
           <span className={styles.sectionLabel}>Cómo funciona</span>
           <h2 className={styles.sectionTitle}>Tres pasos para despegar</h2>
-          <Link href='/guide' style={{ color: 'var(--home-accent)', fontWeight: 600, marginTop: '1rem', display: 'inline-block' }}>
+          <Link
+            href='/guide'
+            style={{ color: 'var(--home-accent)', fontWeight: 600, marginTop: '1rem', display: 'inline-block' }}
+          >
             Ver guía paso a paso →
           </Link>
         </div>

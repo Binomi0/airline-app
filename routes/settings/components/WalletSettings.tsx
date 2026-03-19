@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { Box, Button, Divider, Paper, Stack, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Divider, Stack, Tooltip, Typography } from '@mui/material'
 import BackupIcon from '@mui/icons-material/Backup'
 import { walletStore } from 'store/wallet.atom'
 import { downloadFile } from 'utils'
@@ -99,7 +99,7 @@ const WalletSettings = ({ user }: Props) => {
             sx={{
               borderColor: 'rgba(248, 113, 113, 0.4)',
               color: '#f87171',
-              '&:hover': { borderColor: '#f87171', background: 'rgba(248, 113, 113, 0.05)' },
+              '&:hover': { borderColor: '#f87171', background: 'rgba(248, 113, 113, 0.05)' }
             }}
             onClick={handleExportKey}
           >
@@ -135,7 +135,7 @@ const WalletSettings = ({ user }: Props) => {
               sx={{
                 borderColor: '#fbbf24',
                 color: '#fbbf24',
-                '&:hover': { borderColor: '#fff', background: 'rgba(251, 191, 36, 0.05)' },
+                '&:hover': { borderColor: '#fff', background: 'rgba(251, 191, 36, 0.05)' }
               }}
               onClick={handleUploadKey}
             >

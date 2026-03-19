@@ -1,8 +1,6 @@
 import GasStationView from 'routes/gas/GasStationView'
 import styles from 'styles/Gas.module.css'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
-import Image from 'next/image'
-import image from 'public/img/airplanes.png'
 import { formatNumber } from 'utils'
 import Disconnected from 'components/Disconnected'
 import { useTokenProviderContext } from 'context/TokenProvider'
@@ -10,7 +8,6 @@ import { useReadContract } from 'thirdweb/react'
 import { useAppContracts } from 'hooks/useAppContracts'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
-import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
@@ -38,7 +35,7 @@ const Gas = () => {
   return (
     <Box className={styles.pageContainer}>
       <div className={styles.backgroundOverlay} />
-      
+
       <Container className={styles.contentWrapper}>
         <Box display='flex' justifyContent='flex-end' mb={2}>
           <Box className={styles.headerBalance}>
@@ -46,7 +43,9 @@ const Gas = () => {
             <Typography variant='h6' fontWeight={700}>
               {formatNumber(Number(balance.airg !== undefined ? balance.airg / 10n ** 18n : 0n))}
             </Typography>
-            <Typography variant='caption' sx={{ opacity: 0.6, fontWeight: 600 }}>AIRG</Typography>
+            <Typography variant='caption' sx={{ opacity: 0.6, fontWeight: 600 }}>
+              AIRG
+            </Typography>
           </Box>
         </Box>
 

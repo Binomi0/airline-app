@@ -1,8 +1,6 @@
-import React, { useState } from 'react'
-import MissionView from 'routes/Missions/MissionView'
+import React from 'react'
 import dynamic from 'next/dynamic'
 const OperationsCenter = dynamic(() => import('routes/Missions/OperationsCenter'), { ssr: false })
-import MissionAircraftSelector from 'routes/Missions/components/MissionAircraftSelector'
 import { VaProvider } from 'context/VaProvider'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
@@ -14,19 +12,13 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import type { INft } from 'models/Nft'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
-import { nftAircraftTokenAddress } from 'contracts/address'
-import { filterByTokenAddress } from 'utils'
 
 const MissionsPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
-  const [aircraft] = useState<INft>()
   const { data: userNfts, isLoading } = useOwnedNfts()
   const { live } = useLiveFlightProviderContext()
-
-  const ownedAircrafts = userNfts?.filter(filterByTokenAddress(nftAircraftTokenAddress))
 
   React.useEffect(() => {
     if (live) router.push('/live')

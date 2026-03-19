@@ -24,8 +24,8 @@ const GasStationView = ({ airl, staking, getAirlBalance, getAirgBalance, getStak
           Checklist de Operaciones
         </Typography>
         <Typography variant='body1' sx={{ opacity: 0.8 }}>
-          Deposita tus tokens AIRL en el staking para empezar a generar combustible (AIRG) de forma pasiva. 
-          El combustible es esencial para todas tus misiones de vuelo.
+          Deposita tus tokens AIRL en el staking para empezar a generar combustible (AIRG) de forma pasiva. El
+          combustible es esencial para todas tus misiones de vuelo.
         </Typography>
         <GasSupply />
       </Box>
@@ -41,17 +41,16 @@ const GasStationView = ({ airl, staking, getAirlBalance, getAirgBalance, getStak
           ¿Cómo funciona?
         </Typography>
         <Typography paragraph sx={{ opacity: 0.8 }}>
-          Para llenar tus tanques y volar, simplemente añade tokens AIRL a la Gas Station. Este mecanismo proporciona un 
-          flujo constante de gasolina por minuto. Una vez que tengas al menos <b>100 litros</b> listos para recolectar, 
+          Para llenar tus tanques y volar, simplemente añade tokens AIRL a la Gas Station. Este mecanismo proporciona un
+          flujo constante de gasolina por minuto. Una vez que tengas al menos <b>100 litros</b> listos para recolectar,
           el botón CLAIM se desbloqueará y podrás transferir todo el combustible a tu wallet.
         </Typography>
-        
+
         <Typography variant='h5' fontWeight={700} mt={2}>
           Ratio de Conversión
         </Typography>
         <Typography sx={{ opacity: 0.8 }}>
-          Obtendrás 100 Litros por cada 1 token AIRL stakeado durante 24 horas. 
-          (100 AIRG / 1 AIRL / 24h)
+          Obtendrás 100 Litros por cada 1 token AIRL stakeado durante 24 horas. (100 AIRG / 1 AIRL / 24h)
         </Typography>
       </Box>
     </Box>

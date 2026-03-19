@@ -65,7 +65,11 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
   return (
     <Grid item xs={12} md={4}>
       <Box className={styles.glassCard}>
-        <Typography variant='subtitle1' fontWeight={700} sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}>
+        <Typography
+          variant='subtitle1'
+          fontWeight={700}
+          sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}
+        >
           Combustible Generado (AIRG)
         </Typography>
         <Typography variant='caption' sx={{ opacity: 0.8, mb: 1 }}>
@@ -73,7 +77,8 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
         </Typography>
 
         <Typography variant='h3' fontWeight={800} sx={{ my: 2, color: '#6366f1' }}>
-          {formatNumber(Number(stakeInfo?.[1] || 0) / 1e18)} <span style={{ fontSize: '1.2rem', opacity: 0.6 }}>Liters</span>
+          {formatNumber(Number(stakeInfo?.[1] || 0) / 1e18)}{' '}
+          <span style={{ fontSize: '1.2rem', opacity: 0.6 }}>Liters</span>
         </Typography>
 
         <Stack>

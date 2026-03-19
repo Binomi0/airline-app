@@ -70,7 +70,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       if (mission.status !== MissionStatus.ABORTED && !mission.isRewarded) {
         const remote = mission.remote ? 3 : 1
 
-        const prize = (mission.prize * (mission.rewardMultiplier || 1.0) / remote) * (1 + score / 100)
+        const prize = ((mission.prize * (mission.rewardMultiplier || 1.0)) / remote) * (1 + score / 100)
 
         // Refactored transfer logic for Thirdweb v5
         if (process.env.THIRDWEB_AUTH_PRIVATE_KEY) {

@@ -26,16 +26,13 @@ const AircraftView: NextPage = () => {
     <Container>
       <Box py={10}>
         <Box textAlign='center' mb={6}>
-          <Typography variant='h2' fontWeight={800}>Detalle de Aeronave</Typography>
+          <Typography variant='h2' fontWeight={800}>
+            Detalle de Aeronave
+          </Typography>
         </Box>
 
         <Box m='auto'>
-          <AircraftShowcase 
-            nft={nft} 
-            isClaiming={isLoading} 
-            hasAircraft={true} 
-            onClaim={() => claimNFT(nft)} 
-          />
+          <AircraftShowcase nft={nft} isClaiming={isLoading} hasAircraft={true} onClaim={() => claimNFT(nft)} />
         </Box>
       </Box>
     </Container>

@@ -16,12 +16,12 @@ interface Props {
 const LicenseShowcase: React.FC<Props> = ({ nft, isClaiming, owned, onClaim }) => {
   const attributes = useMemo(() => getNFTAttributes(nft), [nft])
   const { name, image, description } = nft.metadata
-  
-  const priceAttr = attributes.find(attr => attr.trait_type.toLowerCase() === 'price')
+
+  const priceAttr = attributes.find((attr) => attr.trait_type.toLowerCase() === 'price')
   const price = priceAttr?.value
 
   // Other specs to show (excluding price)
-  const specs = attributes.filter(attr => attr.trait_type.toLowerCase() !== 'price')
+  const specs = attributes.filter((attr) => attr.trait_type.toLowerCase() !== 'price')
 
   return (
     <Box className={styles.showcaseContainer}>
@@ -36,25 +36,20 @@ const LicenseShowcase: React.FC<Props> = ({ nft, isClaiming, owned, onClaim }) =
           className={styles.imageShowcase}
         >
           <Box className={styles.mainLicenseImage} position='relative' width='100%'>
-            <Image
-              src={image as string}
-              alt={name as string}
-              fill
-              style={{ objectFit: 'cover' }}
-              priority
-            />
+            <Image src={image as string} alt={name as string} fill style={{ objectFit: 'cover' }} priority />
             {/* Glossy Overlay */}
-            <Box 
-              sx={{ 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                right: 0, 
-                bottom: 0, 
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.05) 100%)',
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background:
+                  'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.05) 100%)',
                 pointerEvents: 'none',
                 opacity: 0.5
-              }} 
+              }}
             />
           </Box>
         </motion.div>

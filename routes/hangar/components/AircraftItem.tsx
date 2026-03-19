@@ -15,10 +15,7 @@ const AircraftItem = ({ nft, isActive, onClick }: Props) => {
   const { hasAircraft } = useAircraft(nft.id as string)
 
   return (
-    <Box
-      className={`${styles.itemThumbnail} ${isActive ? styles.activeThumbnail : ''}`}
-      onClick={onClick}
-    >
+    <Box className={`${styles.itemThumbnail} ${isActive ? styles.activeThumbnail : ''}`} onClick={onClick}>
       <Box className={styles.thumbImageWrapper}>
         <Image
           src={nft.metadata.image as string}
@@ -30,7 +27,10 @@ const AircraftItem = ({ nft, isActive, onClick }: Props) => {
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography className={styles.thumbTitle}>{nft.metadata.name as string}</Typography>
         {hasAircraft && (
-          <Box className={`${styles.statusBadge} ${styles.ownedBadge}`} sx={{ fontSize: '0.6rem !important', py: '2px !important' }}>
+          <Box
+            className={`${styles.statusBadge} ${styles.ownedBadge}`}
+            sx={{ fontSize: '0.6rem !important', py: '2px !important' }}
+          >
             PROPIO
           </Box>
         )}

@@ -42,31 +42,31 @@ const GasForm: React.FC<{
             borderRadius: '12px',
             backgroundColor: 'rgba(255, 255, 255, 0.05)',
             '& fieldset': {
-              borderColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: 'rgba(255, 255, 255, 0.1)'
             },
             '&:hover fieldset': {
-              borderColor: 'rgba(255, 255, 255, 0.3)',
+              borderColor: 'rgba(255, 255, 255, 0.3)'
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#6366f1',
-            },
+              borderColor: '#6366f1'
+            }
           },
           '& .MuiInputLabel-root': {
             color: 'rgba(255, 255, 255, 0.5)',
             '&.Mui-focused': {
-              color: '#6366f1',
-            },
+              color: '#6366f1'
+            }
           },
           '& .MuiInputBase-input': {
-            color: '#fff',
+            color: '#fff'
           }
         }}
         InputProps={{
           endAdornment: (
             <Button
-              sx={{ 
-                minWidth: 'auto', 
-                color: '#6366f1', 
+              sx={{
+                minWidth: 'auto',
+                color: '#6366f1',
                 fontWeight: 700,
                 '&:hover': { background: 'rgba(99, 102, 241, 0.1)' }
               }}
@@ -80,14 +80,14 @@ const GasForm: React.FC<{
           )
         }}
       />
-      <Button 
+      <Button
         className={styles.premiumButton}
-        disabled={loading || !value} 
-        onClick={handleClick} 
-        size='small' 
+        disabled={loading || !value}
+        onClick={handleClick}
+        size='small'
         variant='contained'
       >
-        {loading ? <CircularProgress size={24} color="inherit" /> : buttonText}
+        {loading ? <CircularProgress size={24} color='inherit' /> : buttonText}
       </Button>
     </Stack>
   )

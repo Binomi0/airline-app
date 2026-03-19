@@ -11,15 +11,13 @@ const LegalLayout: React.FC<LegalLayoutProps> = ({ title, children }) => {
   return (
     <Box className={styles.pageContainer}>
       <div className={styles.backgroundOverlay} />
-      
+
       <Container className={styles.contentWrapper}>
         <Box className={styles.glassCard}>
           <Typography variant='h1' className={styles.title}>
             {title}
           </Typography>
-          <Box className={styles.content}>
-            {children}
-          </Box>
+          <Box className={styles.content}>{children}</Box>
         </Box>
       </Container>
     </Box>

@@ -32,7 +32,7 @@ const EmailInput: FC<Props> = ({ onSubmit, onCancel, loading, color }: Props) =>
     } else {
       if (validateEmail(emailRef.current.value)) {
         if (window.PublicKeyCredential) {
-           await onSubmit(emailRef.current?.value)
+          await onSubmit(emailRef.current?.value)
         } else {
           setError('WebAuthn no es compatible con este navegador.')
         }
@@ -74,9 +74,9 @@ const EmailInput: FC<Props> = ({ onSubmit, onCancel, loading, color }: Props) =>
         helperText={error}
         onKeyDown={handleKeyDown}
         sx={{
-            '& .MuiInput-underline:before': { borderBottomColor: 'rgba(255,255,255,0.1)' },
-            '& .MuiInput-underline:after': { borderBottomColor: '#6366f1' },
-            '& .MuiInputBase-input': { p: 1 }
+          '& .MuiInput-underline:before': { borderBottomColor: 'rgba(255,255,255,0.1)' },
+          '& .MuiInput-underline:after': { borderBottomColor: '#6366f1' },
+          '& .MuiInputBase-input': { p: 1 }
         }}
         InputProps={{
           disableUnderline: false,
@@ -93,16 +93,16 @@ const EmailInput: FC<Props> = ({ onSubmit, onCancel, loading, color }: Props) =>
         disabled={loading}
         variant='contained'
         onClick={handleAccess}
-        sx={{ 
-            borderRadius: '10px',
-            textTransform: 'none',
-            fontWeight: 600,
-            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)',
-            '&:hover': {
-                filter: 'brightness(1.1)',
-                boxShadow: '0 6px 16px rgba(99, 102, 241, 0.4)',
-            }
+        sx={{
+          borderRadius: '10px',
+          textTransform: 'none',
+          fontWeight: 600,
+          background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)',
+          '&:hover': {
+            filter: 'brightness(1.1)',
+            boxShadow: '0 6px 16px rgba(99, 102, 241, 0.4)'
+          }
         }}
       >
         Continuar

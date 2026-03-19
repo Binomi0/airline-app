@@ -21,7 +21,7 @@ const LicenseView: React.FC = () => {
   const { claimLicenseNFT, isClaiming } = useClaimNFT()
   const { getAirlBalance } = useTokenProviderContext()
   const balance = useRecoilValue(tokenBalanceStore)
-  
+
   const [selectedLicense, setSelectedLicense] = useState<INft | null>(null)
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const LicenseView: React.FC = () => {
       const { name } = nft.metadata
 
       const hasEnough = balance.airl !== undefined && Number(balance.airl) / 1e18 >= Number(attribute?.value || 0)
-      
+
       if (hasEnough) {
         const { isConfirmed } = await Swal.fire({
           title: name as string,
@@ -82,7 +82,7 @@ const LicenseView: React.FC = () => {
   return (
     <Box className={styles.pageContainer}>
       <div className={styles.backgroundOverlay} />
-      
+
       <Box className={styles.contentWrapper}>
         {/* Header Section */}
         <Box mb={2}>

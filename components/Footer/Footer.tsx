@@ -23,13 +23,19 @@ const Footer: React.FC = () => {
           <Grid item xs={12} md={4}>
             <Stack spacing={2}>
               <Stack direction='row' alignItems='center' spacing={1}>
-                <Image src={isDark ? '/logo64x64-white.png' : '/logo64x64.png'} alt='WeiFly Logo' width={32} height={32} />
+                <Image
+                  src={isDark ? '/logo64x64-white.png' : '/logo64x64.png'}
+                  alt='WeiFly Logo'
+                  width={32}
+                  height={32}
+                />
                 <Typography variant='h6' fontWeight={700} className={styles.brandTitle}>
                   WeiFly
                 </Typography>
               </Stack>
               <Typography variant='body2' color='text.secondary' sx={{ maxWidth: '300px' }}>
-                Una aerolínea virtual descentralizada basada en Ethereum. Experimenta el futuro de la simulación y gestión aeronáutica.
+                Una aerolínea virtual descentralizada basada en Ethereum. Experimenta el futuro de la simulación y
+                gestión aeronáutica.
               </Typography>
               <Stack direction='row' spacing={1}>
                 <IconButton size='small' color='inherit' className={styles.socialIcon}>
@@ -51,10 +57,18 @@ const Footer: React.FC = () => {
               Plataforma
             </Typography>
             <Stack spacing={1}>
-              <Link href='/' className={styles.link}>Home</Link>
-              <Link href='/guide' className={styles.link}>Guía</Link>
-              <Link href='/missions' className={styles.link}>Misiones</Link>
-              <Link href='/live' className={styles.link}>Live Map</Link>
+              <Link href='/' className={styles.link}>
+                Home
+              </Link>
+              <Link href='/guide' className={styles.link}>
+                Guía
+              </Link>
+              <Link href='/missions' className={styles.link}>
+                Misiones
+              </Link>
+              <Link href='/live' className={styles.link}>
+                Live Map
+              </Link>
             </Stack>
           </Grid>
 
@@ -64,10 +78,18 @@ const Footer: React.FC = () => {
               Recursos
             </Typography>
             <Stack spacing={1}>
-              <Link href='/hangar' className={styles.link}>Hangar</Link>
-              <Link href='/gas' className={styles.link}>Gas Station</Link>
-              <Link href='/license' className={styles.link}>Licencias</Link>
-              <Link href='/whitepaper.md' className={styles.link}>Whitepaper</Link>
+              <Link href='/hangar' className={styles.link}>
+                Hangar
+              </Link>
+              <Link href='/gas' className={styles.link}>
+                Gas Station
+              </Link>
+              <Link href='/license' className={styles.link}>
+                Licencias
+              </Link>
+              <Link href='/whitepaper.md' className={styles.link}>
+                Whitepaper
+              </Link>
             </Stack>
           </Grid>
 
@@ -77,9 +99,15 @@ const Footer: React.FC = () => {
               Legal
             </Typography>
             <Stack spacing={1}>
-              <Link href='/privacy' className={styles.link}>Privacidad</Link>
-              <Link href='/terms' className={styles.link}>Términos</Link>
-              <Link href='/legal' className={styles.link}>Aviso Legal</Link>
+              <Link href='/privacy' className={styles.link}>
+                Privacidad
+              </Link>
+              <Link href='/terms' className={styles.link}>
+                Términos
+              </Link>
+              <Link href='/legal' className={styles.link}>
+                Aviso Legal
+              </Link>
             </Stack>
           </Grid>
 
@@ -92,7 +120,9 @@ const Footer: React.FC = () => {
               IVAO Integrated
             </Typography>
             <Box mt={1} className={styles.ivaoBadge}>
-              <Typography variant='caption' fontWeight={700}>IVAO READY</Typography>
+              <Typography variant='caption' fontWeight={700}>
+                IVAO READY
+              </Typography>
             </Box>
           </Grid>
         </Grid>
@@ -101,7 +131,7 @@ const Footer: React.FC = () => {
 
         <Box py={4} textAlign='center'>
           <Typography variant='caption' color='text.secondary' display='block'>
-            © {currentYear} WeiFly. Todos los derechos reservados. 
+            © {currentYear} WeiFly. Todos los derechos reservados.
           </Typography>
           <Typography variant='caption' color='primary' sx={{ mt: 1, display: 'inline-block', opacity: 0.8 }}>
             WeiFly se encuentra actualmente en fase Alpha. La aviación virtual no implica riesgo financiero real.

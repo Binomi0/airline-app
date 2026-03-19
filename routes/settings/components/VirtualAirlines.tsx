@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
@@ -57,7 +56,7 @@ const VirtualAirlines = ({ user }: Props) => {
               sx={{
                 borderColor: '#fbbf24',
                 color: '#fbbf24',
-                '&:hover': { borderColor: '#fff', background: 'rgba(251, 191, 36, 0.05)' },
+                '&:hover': { borderColor: '#fff', background: 'rgba(251, 191, 36, 0.05)' }
               }}
               onClick={() => {}}
             >
@@ -83,7 +82,7 @@ const VirtualAirlines = ({ user }: Props) => {
             sx={{
               borderColor: 'rgba(255, 255, 255, 0.1)',
               color: 'rgba(255, 255, 255, 0.3)',
-              '&.Mui-disabled': { borderColor: 'rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.1)' },
+              '&.Mui-disabled': { borderColor: 'rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.1)' }
             }}
           >
             Soon

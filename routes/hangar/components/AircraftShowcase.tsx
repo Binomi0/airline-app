@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import Image from 'next/image'
-import { Box, Typography, Button, Stack, Fade } from '@mui/material'
+import { Box, Typography, Button, Stack } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
 import { INft } from 'models/Nft'
 import { getNFTAttributes } from 'utils'
@@ -20,12 +20,12 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
 
   // Extract key specs
   const specs = useMemo(() => {
-    return attributes.filter(attr => 
+    return attributes.filter((attr) =>
       ['range', 'cruise_speed', 'capacity', 'license_required', 'price'].includes(attr.trait_type.toLowerCase())
     )
   }, [attributes])
 
-  const price = attributes.find(attr => attr.trait_type.toLowerCase() === 'price')?.value
+  const price = attributes.find((attr) => attr.trait_type.toLowerCase() === 'price')?.value
 
   return (
     <Box className={styles.showcaseContainer}>
@@ -40,13 +40,7 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
           className={styles.imageShowcase}
         >
           <Box position='relative' width='100%' height='400px'>
-            <Image
-              src={image}
-              alt={name}
-              fill
-              className={styles.mainAircraftImage}
-              priority
-            />
+            <Image src={image} alt={name} fill className={styles.mainAircraftImage} priority />
           </Box>
         </motion.div>
       </AnimatePresence>

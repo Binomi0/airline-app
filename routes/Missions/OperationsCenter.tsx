@@ -2,28 +2,21 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   Grid,
   Box,
-  Container,
   Stack,
   Typography,
-  Paper,
   useTheme,
   GlobalStyles,
   TextField,
   InputAdornment,
-  IconButton,
-  Tooltip,
-  Badge,
-  alpha
+  alpha,
+  Paper
 } from '@mui/material'
-import MapIcon from '@mui/icons-material/Map'
-import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
 import SearchIcon from '@mui/icons-material/Search'
-import Sidebar from 'routes/Ivao/components/IvaoAtcs'
 import Map from 'components/Map/RadarMap'
 import MissionBoard from './components/MissionBoard'
 import FlightDispatch from './components/FlightDispatch'
 import { useVaProviderContext } from 'context/VaProvider'
-import { Mission } from 'types'
+import { Atc, Mission } from 'types'
 import nextApiInstance from 'config/axios'
 import useOwnedNFTs from 'hooks/useOwnedNFTs'
 import { nftAircraftTokenAddress } from 'contracts/address'
@@ -97,7 +90,7 @@ const OperationsCenter = () => {
             name: selectedMission.destination
           }
         }
-      } as any
+      } as Atc
     }
 
     // Find origin ATC if it exists, otherwise create a dummy
@@ -113,7 +106,7 @@ const OperationsCenter = () => {
             name: selectedMission.origin
           }
         }
-      } as any
+      } as Atc
     }
 
     return { origin: originAtc, destination: destAtc }
