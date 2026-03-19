@@ -53,10 +53,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(500).end()
   }
 
-  console.log('ACTUALIZANDO TORRES DE CONTROL')
+  const apiKey = process.env.NEXT_PUBLIC_IVAO_API_KEY
+  const userToken = req.headers['x-ivao-token'] as string
+  
+  console.log('[TOWER] Relay:', { 
+    hasApiKey: !!apiKey, 
+    hasUserToken: !!userToken,
+    vid: userToken?.split(' ')?.[1] // Just for debug
+  })
 
   try {
-    const { data } = await ivaoInstance.get<ActiveAtc[]>('/v2/tracker/now/atc', { timeout: 2000 })
+    const headers: Record<string, string> = {}
+    if (apiKey) headers['apiKey'] = apiKey
+    if (userToken) headers['Authorization'] = userToken
+
+    const { data } = await ivaoInstance.get<ActiveAtc[]>('/v2/tracker/now/atc', { 
+      timeout: 5000,
+      headers
+    })
     const towers = data.reduce(reduceAtcTower, [])
 
     await updateTowers(towers).then(

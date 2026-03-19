@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import MissionView from 'routes/Missions/MissionView'
+import dynamic from 'next/dynamic'
+const OperationsCenter = dynamic(() => import('routes/Missions/OperationsCenter'), { ssr: false })
 import MissionAircraftSelector from 'routes/Missions/components/MissionAircraftSelector'
 import { VaProvider } from 'context/VaProvider'
 import Disconnected from 'components/Disconnected'
@@ -53,7 +55,7 @@ const MissionsPage = () => {
 
   return (
     <VaProvider>
-      {aircraft ? <MissionView aircraft={aircraft} /> : <MissionAircraftSelector owned={ownedAircrafts || []} />}
+      <OperationsCenter />
     </VaProvider>
   )
 }

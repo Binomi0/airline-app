@@ -55,6 +55,12 @@ export enum MissionType {
   VIP = 'VIP',
   CHARTER = 'CHARTER'
 }
+export enum MissionCategory {
+  ATC = 'ATC',
+  EVENT = 'EVENT',
+  SOLO = 'SOLO',
+  NORMAL = 'NORMAL'
+}
 export type Flight = Record<string, FRoute[]>
 export interface AtcPosition {
   atcPosition: {
@@ -106,10 +112,15 @@ export interface Mission {
   prize: number
   status: MissionStatus
   remote: boolean
+  category: MissionCategory
+  isSponsored: boolean
+  rewardMultiplier: number
   rewards?: number
   isRewarded: boolean
   score?: number
   expiresAt?: Date
+  originCoords?: Coords
+  destinationCoords?: Coords
 }
 
 export interface MissionDetail {

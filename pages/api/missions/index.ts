@@ -7,14 +7,11 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     return res.status(405).end()
   }
 
-  const { aircraftId } = req.query
-
-  if (!aircraftId || typeof aircraftId !== 'string') {
-    return res.status(400).json({ error: 'aircraftId is required' })
-  }
+  const { aircraftId, origin } = req.query
+  console.log('Missions API - Requesting missions for:', { origin, aircraftId })
 
   try {
-    const missions = await generateMissionsForUser(req.id as string, aircraftId)
+    const missions = await generateMissionsForUser(req.id as string, aircraftId as string, origin as string)
     res.status(200).json(missions)
   } catch (error) {
     console.error('Fetch Missions ERROR =>', error)

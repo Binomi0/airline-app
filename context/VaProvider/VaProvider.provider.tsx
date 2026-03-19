@@ -1,5 +1,5 @@
 import React, { type FC, startTransition, useCallback, useMemo, useReducer, useRef, useState } from 'react'
-import { useSetRecoilState } from 'recoil'
+import { useSetRecoilState, useRecoilValue } from 'recoil'
 import { getApi } from 'lib/api'
 import type { Atc, Flight } from 'types'
 // import { ivaoUserStore } from 'store/ivao-user.atom'
@@ -25,8 +25,15 @@ export const INITIAL_STATE: IVAOClients = {
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   // const user = useRecoilValue(userState)
   // const ivaoUser = useRecoilValue(ivaoUserStore)
-  // const ivaoToken = useRecoilValue(ivaoUserAuthStore)
+  const ivaoToken = useRecoilValue(ivaoUserAuthStore)
   const setIvaoToken = useSetRecoilState(ivaoUserAuthStore)
+
+  React.useEffect(() => {
+    if (ivaoToken) {
+      ivaoInstance.defaults.headers['x-ivao-token'] = `Bearer ${ivaoToken}`
+      nextApiInstance.defaults.headers['x-ivao-token'] = `Bearer ${ivaoToken}`
+    }
+  }, [ivaoToken])
 
   const [state, dispatch] = useReducer(vaProviderReducer, INITIAL_STATE)
   const [isLoading, setIsLoading] = useState(0)

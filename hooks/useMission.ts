@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import { Mission, MissionStatus, FRoute, MissionType } from 'types'
+import { Mission, MissionStatus, FRoute, MissionType, MissionCategory } from 'types'
 import { getMissionWeight, getRandomInt, getMissionPrize } from 'utils'
 import { missionStore } from 'store/mission.atom'
 import { cargos } from 'mocks/cargos'
@@ -44,6 +44,9 @@ const useMission = (): UseMission => {
           destination: route.destination,
           distance: route.distance,
           type: route.type || MissionType.CARGO,
+          category: MissionCategory.NORMAL,
+          isSponsored: false,
+          rewardMultiplier: 1.0,
           details,
 
           aircraft,

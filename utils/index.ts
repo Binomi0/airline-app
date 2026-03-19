@@ -92,8 +92,18 @@ export function getRandomInt(max: number) {
 }
 
 export function getCallsign() {
-  const ident = Math.round(Math.floor(Math.random() * (10000 - 1000 + 1) + 1000))
-  return `${process.env.NEXT_PUBLIC_CALLSIGN}${ident}`
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const numbers = '0123456789'
+  let result = ''
+  // Format: 3 numbers followed by 1 number or letter
+  for (let i = 0; i < 3; i++) {
+    result += numbers.charAt(Math.floor(Math.random() * numbers.length))
+  }
+  // Last char can be letter or number, mostly number but sometimes letter
+  const lastPool = Math.random() > 0.7 ? letters : numbers
+  result += lastPool.charAt(Math.floor(Math.random() * lastPool.length))
+
+  return `${process.env.NEXT_PUBLIC_CALLSIGN}-${result}`
 }
 
 export function getMissionWeight(aircraft: INft) {

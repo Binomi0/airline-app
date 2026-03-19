@@ -1,4 +1,4 @@
-import axios from 'config/axios'
+import { ivaoInstance } from 'config/axios'
 import withAuth from 'lib/withAuth'
 import { PilotModel, AtcModel } from 'models'
 import Live, { ILive } from 'models/Live'
@@ -171,8 +171,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       console.info('requesting IVAO data at %s', now.format('HH:mm:ss'))
 
-      const response = await axios.get<{ clients: { atcs: Atc[]; pilots: IvaoPilot[] } }>(
-        'https://api.ivao.aero/v2/tracker/whazzup'
+      const apiKey = process.env.NEXT_PUBLIC_IVAO_API_KEY
+      const userToken = req.headers['x-ivao-token'] as string
+
+      const headers: Record<string, string> = {}
+      if (apiKey) headers['apiKey'] = apiKey
+      if (userToken) headers['Authorization'] = userToken
+
+      const response = await ivaoInstance.get<{ clients: { atcs: Atc[]; pilots: IvaoPilot[] } }>(
+        '/v2/tracker/whazzup',
+        {
+          headers
+        }
       )
       // logDiferentAircrafts(response.data.clients)
 

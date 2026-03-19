@@ -68,9 +68,12 @@ const useWallet = (): UseWallet => {
       if (!personalAccount || !_user.id) return null
 
       try {
+        const { count: completedMissions } = (await getApi<{ count: number }>('/api/missions/count')) || { count: 0 }
+        const sponsorGas = completedMissions < 10
+
         const account = await smartWallet({
           chain,
-          sponsorGas: true
+          sponsorGas
         }).connect({
           client: twClient,
           personalAccount

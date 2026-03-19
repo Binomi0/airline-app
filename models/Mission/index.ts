@@ -1,6 +1,6 @@
 import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
-import { Mission, MissionStatus, MissionType } from 'types'
+import { Mission, MissionStatus, MissionType, MissionCategory } from 'types'
 
 export type IMission = Document & Mission & { userId: ObjectId }
 
@@ -60,6 +60,20 @@ const missionSchema: mongoose.Schema = new mongoose.Schema<IMission>(
       type: Boolean,
       require: true
     },
+    category: {
+      type: String,
+      enum: Object.values(MissionCategory),
+      default: MissionCategory.NORMAL,
+      required: true
+    },
+    isSponsored: {
+      type: Boolean,
+      default: false
+    },
+    rewardMultiplier: {
+      type: Number,
+      default: 1.0
+    },
     rewards: {
       type: Number
     },
@@ -69,6 +83,14 @@ const missionSchema: mongoose.Schema = new mongoose.Schema<IMission>(
     },
     expiresAt: {
       type: Date
+    },
+    originCoords: {
+      latitude: { type: Number },
+      longitude: { type: Number }
+    },
+    destinationCoords: {
+      latitude: { type: Number },
+      longitude: { type: Number }
     }
   },
   {
