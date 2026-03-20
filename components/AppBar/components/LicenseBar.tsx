@@ -1,26 +1,30 @@
-import { CircularProgress, AvatarGroup, Tooltip, Avatar } from '@mui/material'
-import { useContract, useOwnedNFTs, MediaRenderer, useUser } from '@thirdweb-dev/react'
-import { nftLicenseTokenAddress } from 'contracts/address'
+import Avatar from '@mui/material/Avatar'
+import AvatarGroup from '@mui/material/AvatarGroup'
+import CircularProgress from '@mui/material/CircularProgress'
+import Tooltip from '@mui/material/Tooltip'
+import { MediaRenderer } from 'thirdweb/react'
+import { walletStore } from 'store/wallet.atom'
 import React from 'react'
+import { useRecoilValue } from 'recoil'
+import { ownedLicenseNftStore } from 'store/licenseNFT.atom'
 
 const LicenseBar = () => {
-  const { user } = useUser()
-  const { contract: licenseContract } = useContract(nftLicenseTokenAddress, 'edition-drop')
-  const { data: ownedLicense, isLoading } = useOwnedNFTs(licenseContract, user?.address)
+  const ownedLicenses = useRecoilValue(ownedLicenseNftStore)
+  const { twClient, smartAccountAddress } = useRecoilValue(walletStore)
 
   return (
     <div>
-      {isLoading && user?.address ? (
-        <CircularProgress size={25} />
+      {!smartAccountAddress ? (
+        <CircularProgress size={24} />
       ) : (
-        ownedLicense &&
-        ownedLicense?.length > 0 && (
+        ownedLicenses &&
+        ownedLicenses.length > 0 && (
           <AvatarGroup>
-            {ownedLicense
+            {ownedLicenses
               .map((license) => (
-                <Tooltip arrow title={(license.metadata.name as string).split(' - ')[1]} key={license.metadata.id}>
+                <Tooltip arrow title={(license.metadata.name as string).split(' - ')[1]} key={license.id.toString()}>
                   <Avatar>
-                    <MediaRenderer width='50px' height='50px' src={license?.metadata.image} />
+                    <MediaRenderer client={twClient!} width='50px' height='50px' src={license.metadata.image} />
                   </Avatar>
                 </Tooltip>
               ))

@@ -1,8 +1,57 @@
-import { NFT } from '@thirdweb-dev/sdk'
-import License from 'pages/license'
-import { Aircraft, Atc, AttributeType, Cargo, CargoDetails, IvaoPilot } from 'types'
+import nextApiInstance from 'config/axios'
+import {
+  ActiveAtc,
+  Airport,
+  AttributeType,
+  Coords,
+  IcaoCode,
+  IvaoPilot,
+  TowerMatrix,
+  TowerMatrixList,
+  aircraftNameToIcaoCode
+} from 'types'
+import { verifyAuthenticationResponse } from '@simplewebauthn/server'
+import { INft } from 'models/Nft'
+import { IUserNftPopulated } from 'models/UserNft'
 
-export const getNFTAttributes = (nft: NFT) => {
+// A unique identifier for your website
+const rpID = process.env.NEXT_PUBLIC_DOMAIN
+// The URL at which registrations and authentications should occur
+const origin = process.env.ORIGIN
+
+// @ts-expect-error: simplewebauthn types are complex and sometimes mismatch with older stored authenticators
+export const verifySignature = async function (authenticator, response, expectedChallenge) {
+  const bufferFromBase64 = (buffer: string) => Buffer.from(buffer, 'base64')
+  const credentialPublicKeyBuffer = bufferFromBase64(authenticator.credentialPublicKey)
+
+  try {
+    await verifyAuthenticationResponse({
+      response,
+      expectedChallenge,
+      expectedOrigin: origin,
+      expectedRPID: rpID,
+      credential: {
+        id: authenticator.credentialID,
+        publicKey: new Uint8Array(
+          credentialPublicKeyBuffer.buffer,
+          credentialPublicKeyBuffer.byteOffset,
+          credentialPublicKeyBuffer.byteLength / Uint8Array.BYTES_PER_ELEMENT
+        ) as Uint8Array<ArrayBuffer>,
+        counter: authenticator.counter,
+        transports: authenticator.transports
+      }
+    })
+
+    return true
+  } catch (error) {
+    console.error(error)
+
+    return false
+    // return res.status(400).send({ error: error.message, verified: false });
+  }
+}
+
+export const getNFTAttributes = (nft: INft) => {
   if (nft.metadata.attributes && Array.isArray(nft.metadata.attributes) && nft.metadata.attributes.length > 0) {
     return nft.metadata.attributes as AttributeType[]
   }
@@ -18,25 +67,14 @@ export const formatNumber = (value: number = 0, decimals: number = 2) =>
     maximumFractionDigits: decimals
   }).format(isNaN(value) ? 0 : value)
 
-export const getDistanceByCoords = (atcs: Atc[], cargo: Pick<Cargo, 'origin' | 'destination'>) => {
-  if (!cargo.origin) return 0
+export const getDistanceByCoords = (
+  origin: Coords,
+  destination: Coords // AtcPosition['atcPosition']['airport']
+) => {
+  if (!origin || !destination) return 0
 
-  const originTower = atcs.find((a) => a.callsign.startsWith(cargo.origin))
-  if (!originTower) return 0
-
-  const arrivalTower = atcs.find((a) => a.callsign.startsWith(cargo.destination))
-  if (!arrivalTower) return 0
-
-  const originCoords = {
-    latitude: originTower.lastTrack.latitude,
-    longitude: originTower.lastTrack.longitude
-  }
-  const arrivalCoords = {
-    latitude: arrivalTower.lastTrack.latitude,
-    longitude: arrivalTower.lastTrack.longitude
-  }
-  const horizontal = Math.pow(arrivalCoords.longitude - originCoords.longitude, 2)
-  const vertical = Math.pow(arrivalCoords.latitude - originCoords.latitude, 2)
+  const horizontal = Math.pow(Number(destination.longitude) - Number(origin.longitude), 2)
+  const vertical = Math.pow(Number(destination.latitude) - Number(origin.latitude), 2)
   const result = Math.sqrt(horizontal + vertical)
 
   return result * 100
@@ -51,39 +89,49 @@ export function getRandomInt(max: number) {
 }
 
 export function getCallsign() {
-  // TODO: hardcoded value
-  return 'TAP1122'
-  const ident = Math.round(Math.floor(Math.random() * (10000 - 1000 + 1) + 1000))
-  return `${process.env.NEXT_PUBLIC_CALLSIGN}${ident}`
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const numbers = '0123456789'
+  let result = ''
+  // Format: 3 numbers followed by 1 number or letter
+  for (let i = 0; i < 3; i++) {
+    result += numbers.charAt(Math.floor(Math.random() * numbers.length))
+  }
+  // Last char can be letter or number, mostly number but sometimes letter
+  const lastPool = Math.random() > 0.7 ? letters : numbers
+  result += lastPool.charAt(Math.floor(Math.random() * lastPool.length))
+
+  return `${process.env.NEXT_PUBLIC_CALLSIGN}-${result}`
 }
 
-export function getCargoWeight(aircraft: NFT) {
+export function getMissionWeight(aircraft: INft) {
   const attribute = getNFTAttributes(aircraft).find((attribute) => attribute.trait_type === 'cargo')
 
   if (!attribute) {
-    throw new Error('Missing attribute')
+    console.warn(`Aircraft ${aircraft.id} is missing 'cargo' attribute`)
+    return 0
   }
 
   return Number(attribute.value) * randomIntFromInterval(40, 70) || 0
 }
 
-export function getCargoPrize(distance: number, aircraft: NFT) {
+export function getMissionPrize(distance: number, aircraft: INft) {
   const attribute = getNFTAttributes(aircraft).find((attr) => attr.trait_type === 'license')
   if (attribute) {
-    const base = Math.floor(distance / 100)
+    const base = Math.floor(distance / 100) / 5
     switch (attribute.value) {
-      case 'D':
+      case '0': // 'D'
         return base * (1 + randomIntFromInterval(35, 75))
-      case 'C':
-        return base * (1 + randomIntFromInterval(35, 75) * 10)
-      case 'B':
-        return base * (1 + randomIntFromInterval(35, 75) * 100)
-      case 'A':
-        return base * (1 + randomIntFromInterval(35, 75) * 1000)
+      case '1': // 'C
+        return base * (1 + randomIntFromInterval(55, 65) * 1.2)
+      case '2': // 'B'
+        return base * (1 + randomIntFromInterval(65, 75) * 1.3)
+      case '3': // 'A'
+        return base * (1 + randomIntFromInterval(75, 95) * 1.5)
       default:
         return base * (1 + randomIntFromInterval(35, 75))
     }
   }
+  console.warn(`Aircraft ${aircraft.id} is missing 'license' attribute`)
   return 0
 }
 
@@ -91,3 +139,187 @@ export const getLicenseIdFromAttributes = (attributes: AttributeType[]) =>
   attributes.find((attribute) => attribute.trait_type === 'license')?.value || ''
 
 export const filterLEOrigins = (pilot: IvaoPilot) => pilot.flightPlan.departureId?.includes('LE')
+
+export const downloadFile = (base64Key: string, address: string) => {
+  const key = Buffer.from(base64Key, 'base64').toString()
+  const blob = new Blob([key], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `weifly-private-key-${address.slice(-4)}.pem`
+
+  // Append the <a> element to the document and trigger the click event
+  document.body.appendChild(a)
+  a.click()
+
+  // Clean up the temporary URL object
+  URL.revokeObjectURL(url)
+
+  // Remove the <a> element from the document
+  document.body.removeChild(a)
+}
+
+export const validateEmail = (email?: string) => {
+  if (!email) return false
+  const expression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+  return expression.test(email)
+}
+
+export const getFuelForFlight = (distance: number, aircraftType: IcaoCode, passengers: number = 2) => {
+  switch (aircraftType) {
+    case 'AN225': {
+      return distance * 9.99 + 10000
+    }
+    case 'A20N': {
+      return distance * (0.0225 * Math.min(passengers, 2)) + 1000
+    }
+    case 'A21N': {
+      return distance * 2.8 + 1000
+    }
+    case 'A319': {
+      return distance * 2.45 + 1000
+    }
+    case 'A320': {
+      return distance * 3 + 1000
+    }
+    case 'A321': {
+      return distance * 2.225 + 1000
+    }
+    case 'A339': {
+      return distance * 2.21 + 1000
+    }
+    case 'B350': {
+      return distance * 0.67 + 3000
+    }
+    case 'B748': {
+      return distance * 4 + 6000
+    }
+    case 'B738': {
+      return distance * 2.5 + 7000
+    }
+    case 'B739': {
+      return distance * 2.45 + 6000
+    }
+    case 'B737': {
+      return distance * 2.75 + 1000
+    }
+    case 'B763': {
+      return distance * 4.8 + 1000
+    }
+    case 'B77W': {
+      return distance * 5.5 + 4000
+    }
+    case 'B788': {
+      return distance * 2.4 + 3000
+    }
+    case 'C172': {
+      return distance * 0.36 + 15
+    }
+    case 'C700':
+      return distance * 5.43 + 600
+    default:
+      return distance * 1.325
+  }
+}
+
+export const getEstimatedTimeMinutes = (distance: number, aircraftType: IcaoCode): number => {
+  let speedKts = 250 // Default
+  switch (aircraftType) {
+    case 'C172':
+      speedKts = 110
+      break
+    case 'B350':
+    case 'BE20':
+      speedKts = 280
+      break
+    case 'C700':
+    case 'B737':
+    case 'B738':
+    case 'B739':
+    case 'A20N':
+    case 'A320':
+    case 'A321':
+      speedKts = 440
+      break
+    case 'B748':
+    case 'B77W':
+    case 'B788':
+    case 'A339':
+      speedKts = 480
+      break
+    case 'AN225':
+      speedKts = 430
+      break
+  }
+
+  // Time = (Distance / Speed) * 60 + Buffer for climb/descend/taxi
+  return Math.round((distance / speedKts) * 60 + 25)
+}
+
+export const reduceTowerMatrix =
+  (atcs: ActiveAtc[]) =>
+  (acc: TowerMatrixList, curr: ActiveAtc): TowerMatrixList =>
+    [
+      ...acc,
+      {
+        [curr.callsign]: {
+          airport: curr.atcPosition?.airport,
+          destinations: atcs
+            .map((atc: ActiveAtc) =>
+              atc.callsign === curr.callsign
+                ? { distance: 0 }
+                : {
+                    ...(atc.atcPosition ? { ...atc.atcPosition.airport } : {}),
+                    distance:
+                      getDistanceByCoords(curr.atcPosition?.airport as Coords, atc.atcPosition?.airport as Coords) ?? 0,
+                    callsign: atc.callsign
+                  }
+            )
+            .filter((d) => d.distance > 0)
+            .sort((a, b) => a.distance - b.distance)
+        } as TowerMatrix
+      }
+    ] as TowerMatrixList
+
+/** Reduce and remove duplicated towers */
+export const reduceAtcTower = (acc: ActiveAtc[], curr: ActiveAtc) => {
+  const currentCallsign = curr.callsign.split('_')[0]
+  return acc.some((c) => c?.callsign.split('_')[0] === currentCallsign)
+    ? acc
+    : new RegExp(/[A-Z][A-Z][A-Z][A-Z](_TWR)+/g).test(curr.callsign)
+      ? [...acc, curr]
+      : acc
+}
+
+export const findByCallsign = (callsign: string) => (f: Airport) => f.callsign === callsign
+export const getIcaoCodeFromAircraftNFT = (name: keyof typeof aircraftNameToIcaoCode) => aircraftNameToIcaoCode[name]
+
+export const hasRequirement = (aircrafts: INft[], distance: number, requirement?: string) => {
+  if (!requirement) return false
+  const aircraft = aircrafts.find((aircraft) => aircraft.metadata.id === requirement)
+  if (!aircraft) return false
+
+  const icaoCode = getIcaoCodeFromAircraftNFT(aircraft.metadata.name as keyof typeof aircraftNameToIcaoCode)
+  if (!icaoCode) return false
+
+  const fuel = getFuelForFlight(distance ?? 0, icaoCode)
+
+  const combustible = getNFTAttributes(aircraft).find((a) => a.trait_type === 'combustible')?.value
+  if (!combustible) return false
+
+  return fuel < gallonsToLiters(Number(combustible))
+}
+
+export const gallonsToLiters = (gallons?: number): number => {
+  if (!gallons) return 0
+  const litersPerGallon = 3.78541 // 1 gallon is approximately 3.78541 liters
+  return gallons * litersPerGallon
+}
+
+export const fetcherGET = (url: string) => nextApiInstance.get(url).then((res) => res.data)
+export const fetcherPOST = (url: string, body: unknown) => nextApiInstance.post(url, body).then((res) => res.data)
+export const fetcher = (url: string) => nextApiInstance.get(url).then((res) => res.data)
+
+export const filterByTokenAddress = (tokenAddress: string) => (nft: INft | IUserNftPopulated) =>
+  nft.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()

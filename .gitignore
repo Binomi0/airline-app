@@ -38,3 +38,9 @@ yarn-error.log*
 *.tsbuildinfo
 
 yarn.lock
+
+iota-sdk.log
+*.stronghold
+
+typechain-types/
+outdated_libs.txt

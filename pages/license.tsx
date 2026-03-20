@@ -1,31 +1,12 @@
-import type { NextPage } from 'next'
-import { Box, Container, Typography } from '@mui/material'
-import LicenseMarketPlace from '../components/LicenseMarketPlace'
-import styles from 'styles/License.module.css'
-import image from 'public/img/airplanes4.png'
-import Image from 'next/image'
-import { ConnectWallet, useUser } from '@thirdweb-dev/react'
-import serverSidePropsHandler from 'components/ServerSideHandler'
+import LicenseView from 'routes/license/LicenseView'
+import Box from '@mui/material/Box'
 
-const License: NextPage = () => {
-  const { isLoggedIn } = useUser()
-
+const LicensePage = () => {
   return (
     <Box sx={{ position: 'relative' }}>
-      <Image priority className={styles.background} src={image} alt='banner' fill />
-
-      <Container>
-        <Box my={5} textAlign='center'>
-          <Typography variant='h1'>License Page</Typography>
-          {!isLoggedIn && <ConnectWallet />}
-        </Box>
-
-        <LicenseMarketPlace />
-      </Container>
+      <LicenseView />
     </Box>
   )
 }
 
-export const getServerSideProps = serverSidePropsHandler
-
-export default License
+export default LicensePage

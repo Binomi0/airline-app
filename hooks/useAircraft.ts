@@ -1,13 +1,18 @@
-import { useContract, useNFTBalance, useUser } from '@thirdweb-dev/react'
 import { nftAircraftTokenAddress } from 'contracts/address'
+import useOwnedNfts from 'hooks/useOwnedNFTs'
 
-const useAircraft = (id?: string) => {
-  const { user } = useUser()
-  const { contract } = useContract(nftAircraftTokenAddress)
+interface UseAircraftReturnType {
+  hasAircraft: boolean
+  media: string
+}
 
-  const { data } = useNFTBalance(contract, user?.address, id)
+const useAircraft = (tokenId: string): UseAircraftReturnType => {
+  const { data: ownedNfts } = useOwnedNfts()
 
-  return !data?.isZero()
+  const aircraft = ownedNfts?.find(
+    (n) => n.tokenId === tokenId && n.tokenAddress.toLowerCase() === nftAircraftTokenAddress.toLowerCase()
+  )
+  return { hasAircraft: !!aircraft, media: aircraft?.nft.metadata.image || '' }
 }
 
 export default useAircraft

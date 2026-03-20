@@ -2,11 +2,10 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: 'Roboto';
+  font-family: 'Sora';
 }
 
 a {
-  color: #556cd6;
   text-decoration: none;
 }
 
@@ -15,17 +14,13 @@ a {
 }
 
 html {
-  color-scheme: dark;
-}
-
-body {
-  color: #e7e8e8;
-  background: #0f1318;
+  color-scheme: light dark;
 }
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 

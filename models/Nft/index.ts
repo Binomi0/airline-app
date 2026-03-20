@@ -1,0 +1,58 @@
+import { mongoose } from 'lib/mongoose'
+import { NFT } from 'thirdweb'
+import { Document } from 'mongoose'
+import { NftName } from 'types'
+
+export type INft = Document &
+  (Omit<NFT, 'id' | 'supply'> & {
+    id: bigint | string // Token ID
+    supply?: bigint | string // Solo para ERC1155
+    name: NftName // El campo que faltaba
+  })
+
+const nftSchema: mongoose.Schema = new mongoose.Schema(
+  {
+    metadata: {
+      uri: { type: String, required: true },
+      name: { type: String },
+      description: { type: String },
+      image: { type: String },
+      animation_url: { type: String },
+      external_url: { type: String },
+      background_color: { type: String },
+      properties: { type: mongoose.Schema.Types.Mixed },
+      attributes: { type: mongoose.Schema.Types.Mixed },
+      image_url: { type: String }
+    },
+    name: { type: String, required: true, enum: ['AIRCRAFT', 'LICENSE'] },
+    owner: { type: String, default: null },
+    id: { type: BigInt, required: true },
+    tokenURI: { type: String, required: true },
+    type: { type: String, enum: ['ERC721', 'ERC1155'], required: true },
+    tokenAddress: { type: String, required: true },
+    chainId: { type: Number, required: true },
+    supply: { type: BigInt, required: true }
+  },
+  {
+    id: false,
+    timestamps: true,
+    toJSON: {
+      transform: (_doc: INft, ret: Record<string, unknown>) => {
+        const r = ret as { id: bigint | string; supply?: bigint | string }
+        if (typeof r.id === 'bigint') r.id = r.id.toString()
+        if (typeof r.supply === 'bigint') r.supply = r.supply.toString()
+        return r
+      }
+    },
+    toObject: {
+      transform: (_doc: INft, ret: Record<string, unknown>) => {
+        const r = ret as { id: bigint | string; supply?: bigint | string }
+        if (typeof r.id === 'bigint') r.id = r.id.toString()
+        if (typeof r.supply === 'bigint') r.supply = r.supply.toString()
+        return r
+      }
+    }
+  }
+)
+
+export default mongoose.models.Nft || mongoose.model<INft>('Nft', nftSchema)

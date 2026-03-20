@@ -1,61 +1,75 @@
-import { Grid, Card, Box, Typography } from '@mui/material'
 import React, { useCallback, useState } from 'react'
-import { useBalance, useContract, useContractWrite } from '@thirdweb-dev/react'
-import { ethers } from 'ethers'
+import { toWei, toEther } from 'thirdweb'
 import { formatNumber } from 'utils'
 import { coinTokenAddress, stakingAddress } from 'contracts/address'
 import GasForm from './components/GasForm'
+import useStaking from 'hooks/useStaking'
+import useERC20 from 'hooks/useERC20'
+import { amountExceedBalanceSwal, handleStakeSwal, stakedSwal } from 'lib/swal'
 
-const GasAvailable = () => {
-  const { data: airl } = useBalance(coinTokenAddress)
-  const { contract: coin } = useContract(coinTokenAddress, 'token')
-  const { contract: staking, refetch } = useContract(stakingAddress)
-  const { mutateAsync: stake } = useContractWrite(staking, 'stake')
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import styles from 'styles/Gas.module.css'
+
+interface Props {
+  airl?: Readonly<bigint>
+  getAirlBalance: () => void
+  getStakingInfo: () => void
+}
+
+const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
+  const { stake } = useStaking()
+  const { setAllowance, getAllowance } = useERC20(coinTokenAddress)
   const [loading, setLoading] = useState(false)
-
-  const setAllowance = useCallback(
-    async (amount: string) => {
-      try {
-        await coin?.erc20.setAllowance(stakingAddress, ethers.utils.parseEther(amount).toString())
-        return true
-      } catch (error) {
-        return false
-      }
-    },
-    [coin]
-  )
 
   const handleStake = useCallback(
     async (amount: string) => {
-      setLoading(true)
-      if (await setAllowance(amount)) {
-        await stake({
-          args: [ethers.utils.parseEther(amount)]
-        })
-        refetch()
+      const parsedAmount = toWei(amount)
+      if (airl !== undefined && airl >= parsedAmount) {
+        setLoading(true)
+        const { isConfirmed } = await handleStakeSwal(amount)
+        if (isConfirmed) {
+          const allowance = await getAllowance(stakingAddress)
+
+          if (allowance === 0n) {
+            await setAllowance(stakingAddress)
+          }
+          await stake(parsedAmount)
+          stakedSwal()
+          getAirlBalance()
+          getStakingInfo()
+        }
+        setLoading(false)
+      } else {
+        amountExceedBalanceSwal()
       }
-      setLoading(false)
     },
-    [setAllowance, stake, refetch]
+    [airl, getAirlBalance, getAllowance, getStakingInfo, setAllowance, stake]
   )
 
   return (
-    <Grid item xs={4}>
-      <Card>
-        <Box p={1}>
-          <Typography variant='subtitle1'>Available to deposit</Typography>
-          <Typography variant='subtitle2' paragraph>
-            {formatNumber(Number(airl?.displayValue))} AIRL
-          </Typography>
-          <GasForm
-            max={airl?.displayValue || ''}
-            onClick={handleStake}
-            loading={loading}
-            label='Amount to Stake'
-            buttonText='Add to Staking'
-          />
-        </Box>
-      </Card>
+    <Grid item xs={12} md={4}>
+      <Box className={styles.glassCard}>
+        <Typography
+          variant='subtitle1'
+          fontWeight={700}
+          sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}
+        >
+          Disponible para Depósito
+        </Typography>
+        <Typography variant='h4' fontWeight={800} sx={{ my: 1 }}>
+          {airl !== undefined ? formatNumber(Number(toEther(airl || 0n))) : formatNumber()}{' '}
+          <span style={{ fontSize: '1rem', opacity: 0.5 }}>AIRL</span>
+        </Typography>
+        <GasForm
+          max={airl !== undefined ? toEther(airl).toString() : '0'}
+          onClick={handleStake}
+          loading={loading}
+          label='Cantidad a Stakear'
+          buttonText='Añadir al Staking'
+        />
+      </Box>
     </Grid>
   )
 }

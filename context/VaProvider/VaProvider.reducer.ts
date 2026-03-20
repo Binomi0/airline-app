@@ -1,32 +1,45 @@
-import { Atc } from 'types'
+// import { Atc, IvaoPilot, LastTrackStateEnum } from 'types'
 import { VaReducerHandler } from './VaProvider.types'
 
-const sortAtcs = (a: Atc, b: Atc) => {
-  if (a.callsign > b.callsign) {
-    return 1
-  } else if (a.callsign < b.callsign) {
-    return -1
-  }
-  return 0
-}
+// const filterPilotsByAtc = (atcs: Readonly<Atc[]>) => (pilot: IvaoPilot) => {
+//   if (!pilot.flightPlan) return
+//   const { arrivalId, departureId } = pilot.flightPlan
+
+//   return atcs.some((atc) => {
+//     if (!atc.callsign) return
+//     const callsign = atc.callsign.slice(0, 4)
+//     const hasMatch = callsign.includes(arrivalId) || callsign.includes(departureId)
+//     const isNotTraining = arrivalId !== departureId
+//     const isBoarding = pilot?.lastTrack?.state === LastTrackStateEnum.Boarding
+
+//     return hasMatch && isNotTraining && isBoarding
+//   })
+// }
 
 export const vaProviderReducer: VaReducerHandler = (state, action) => {
   switch (action.type) {
-    case 'SET_CLIENTS':
+    case 'SET_ATCS':
       return {
         ...state,
-        pilots: action.payload.pilots,
-        atcs: action.payload.atcs.sort(sortAtcs)
+        atcs: action.payload
+        // pilots: state.pilots.filter(filterPilotsByAtc(action.payload))
       }
+
+    case 'SET_TOWERS': {
+      return {
+        ...state,
+        towers: action.payload
+      }
+    }
+    // case 'SET_PILOTS':
+    //   return {
+    //     ...state,
+    //     pilots: action.payload.filter(filterPilotsByAtc(state.atcs))
+    //   }
     case 'SET_FLIGHTS':
       return {
         ...state,
         flights: action.payload
-      }
-    case 'SET_CURRENT_PILOT':
-      return {
-        ...state,
-        active: action.payload
       }
     case 'SET_FILTER':
       return {

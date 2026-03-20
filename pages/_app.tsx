@@ -1,43 +1,34 @@
 import * as React from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { Router } from 'next/router'
 import Head from 'next/head'
 import { AppProps } from 'next/app'
-import { ThemeProvider } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
 import { CacheProvider, EmotionCache } from '@emotion/react'
-import { Router, useRouter } from 'next/router'
-import {
-  ThirdwebProvider,
-  coinbaseWallet,
-  localWallet,
-  metamaskWallet,
-  safeWallet,
-  smartWallet,
-  walletConnect
-} from '@thirdweb-dev/react'
-import {
-  Sepolia
-  // Goerli
-} from '@thirdweb-dev/chains'
-import ReactGA from 'react-ga'
+// import { SpeedInsights } from '@vercel/speed-insights/next'
+import { RecoilRoot } from 'recoil'
+import { getCookie } from 'cookies-next'
 import AppBar from 'components/AppBar'
 import Sidebar from 'components/Sidebar'
 import ErrorBoundary from 'components/ErrorBoundary'
-import { factoryAddress } from 'contracts/address'
+import CustomWeb3Provider from 'components/CustomWeb3Provider'
+import { Box } from '@mui/material'
+import RightSidebar from 'components/Sidebar/Right'
+import ThemeWrapper from 'components/ThemeWrapper'
+import NFTProvider from 'context/NFTProvider'
 import { MainProvider } from 'context/MainProvider'
+import { AuthProvider } from 'context/AuthProvider'
+import { TokenProvider } from 'context/TokenProvider'
+import { VaProvider } from 'context/VaProvider'
+import { LiveFlightsProvider } from 'context/LiveFlightProvider'
+import { authStore } from 'store/auth.atom'
+import { themeStore } from 'store/theme.atom'
+import Footer from 'components/Footer'
+import 'lib/alchemy'
 import createEmotionCache from '../src/createEmotionCache'
-import theme from '../src/theme'
 import '../styles/globals.css'
-import Script from 'next/script'
-
-const tag = process.env['NEXT_PUBLIC_GOOGLE_ANALYTICS_TAG'] || ''
-
-ReactGA.initialize(tag, {
-  debug: process.env['NODE_ENV'] === 'development',
-  testMode: process.env['NODE_ENV'] === 'development',
-  gaOptions: {
-    name: 'tracker1'
-  }
-})
+import 'leaflet/dist/leaflet.css'
+import { ContractProvider } from 'context/ContractProvider'
+import WithLoading from 'components/WithLoading'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -48,81 +39,71 @@ export interface MyAppProps extends AppProps {
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache } = props
-  const [loading, setLoading] = React.useState(false)
-  const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
-  React.useEffect(() => {
-    const toggleLoading = (status: boolean) => () => setLoading(status)
-
-    Router.events.on('routeChangeStart', toggleLoading(true))
-    Router.events.on('routeChangeComplete', toggleLoading(false))
-
-    return () => {
-      Router.events.off('routeChangeStart', toggleLoading(true))
-      Router.events.off('routeChangeComplete', toggleLoading(false))
-    }
+  const startLoading = useCallback(() => {
+    setLoading(true)
   }, [])
 
-  React.useEffect(() => {
-    ReactGA.pageview(router.asPath, ['tracker1'])
-  }, [router.asPath])
+  const finishLoading = useCallback(() => {
+    setLoading(false)
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
+    Router.events.on('routeChangeStart', startLoading)
+    Router.events.on('routeChangeComplete', finishLoading)
+
+    return () => {
+      Router.events.off('routeChangeStart', startLoading)
+      Router.events.off('routeChangeComplete', finishLoading)
+    }
+  }, [startLoading, finishLoading])
 
   return (
-    <>
-      <ThirdwebProvider
-        activeChain={Sepolia}
-        supportedChains={[Sepolia]}
-        authConfig={{
-          domain: process.env['NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN'] || '',
-          authUrl: '/api/auth'
+    <CacheProvider value={emotionCache}>
+      <RecoilRoot
+        initializeState={({ set }) => {
+          const isLoggedIn = getCookie('isLoggedIn') === 'true'
+          set(authStore, isLoggedIn ? 'session_active' : undefined)
+          set(themeStore, 'dark')
         }}
-        supportedWallets={[
-          smartWallet({
-            factoryAddress,
-            thirdwebApiKey: process.env['NEXT_PUBLIC_API_KEY'] || '',
-            gasless: true,
-            personalWallets: [
-              metamaskWallet(),
-              // coinbaseWallet(),
-              localWallet({ persist: true })
-            ]
-          }),
-          metamaskWallet(),
-          coinbaseWallet(),
-          walletConnect(),
-          safeWallet(),
-          localWallet({ persist: true })
-        ]}
       >
-        <CacheProvider value={emotionCache}>
-          <Head>
-            <meta name='viewport' content='initial-scale=1, width=device-width' />
-          </Head>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <ErrorBoundary>
-              <MainProvider>
-                <AppBar />
-                <Sidebar />
-              </MainProvider>
-              <Component loading={loading} />
-            </ErrorBoundary>
-          </ThemeProvider>
-        </CacheProvider>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NODE_ENV}`}
-          strategy='afterInteractive'
-        />
-        <Script id='google-analytics' strategy='afterInteractive'>
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', ${process.env.NODE_ENV});
-        `}
-        </Script>
-      </ThirdwebProvider>
-    </>
+        <AuthProvider>
+          <CustomWeb3Provider>
+            <ContractProvider>
+              <Head>
+                <meta name='viewport' content='initial-scale=1, width=device-width' />
+                <title>WeiFly | Aerolínea Virtual Descentralizada | Arbitrum</title>
+              </Head>
+              <ThemeWrapper>
+                <ErrorBoundary>
+                  <NFTProvider>
+                    <TokenProvider>
+                      <VaProvider>
+                        <LiveFlightsProvider>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                            <MainProvider>
+                              <AppBar />
+                              <Sidebar />
+                              <RightSidebar />
+                            </MainProvider>
+                            <WithLoading loading={loading}>
+                              <Component {...props.pageProps} />
+                            </WithLoading>
+                            <Footer />
+                          </Box>
+                          {/* <SpeedInsights /> */}
+                        </LiveFlightsProvider>
+                      </VaProvider>
+                    </TokenProvider>
+                  </NFTProvider>
+                </ErrorBoundary>
+              </ThemeWrapper>
+            </ContractProvider>
+          </CustomWeb3Provider>
+        </AuthProvider>
+      </RecoilRoot>
+    </CacheProvider>
   )
 }

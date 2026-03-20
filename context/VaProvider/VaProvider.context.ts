@@ -1,7 +1,17 @@
 import { createContext, useContext } from 'react'
 import { VaContextProps } from './VaProvider.types'
 
-export const VaProviderContext = createContext<VaContextProps | undefined>(undefined)
+export const VaProviderContext = createContext<VaContextProps>({
+  atcs: [],
+  towers: [],
+  origins: [],
+  filter: [''],
+  isLoading: false,
+  initIvaoAuth: () => {},
+  setFilter: () => {},
+  initIvaoData: () => {},
+  getFlights: () => Promise.resolve()
+})
 
 export const useVaProviderContext = (): VaContextProps => {
   const context = useContext(VaProviderContext)
@@ -11,3 +21,5 @@ export const useVaProviderContext = (): VaContextProps => {
 
   return context
 }
+
+export const useVaProvider = () => useContext(VaProviderContext)

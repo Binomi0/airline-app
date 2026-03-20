@@ -1,5 +1,7 @@
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
 import type { NextPage } from 'next'
-import { Box, Container, Typography } from '@mui/material'
 
 const Error500: NextPage = () => {
   return (

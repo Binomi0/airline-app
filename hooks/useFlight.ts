@@ -1,7 +1,13 @@
-interface UseFlight {}
+import type { IvaoPilot } from 'types'
+
+interface UseFlight {
+  pilot?: IvaoPilot
+}
 
 const useFlight = (): UseFlight => {
-  return {}
+  return {
+    pilot: undefined
+  }
 }
 
 export default useFlight
