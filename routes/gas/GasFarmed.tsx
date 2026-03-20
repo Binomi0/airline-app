@@ -11,8 +11,8 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
-import Paper from '@mui/material/Paper'
 import { stakingClaimRewardsSwal, stakingInsufficientRewardsSwal, stakingRewardsClaimedSwal } from 'lib/swal'
+import styles from 'styles/Gas.module.css'
 
 const MIN_REWARDS_CLAIM = '100000000000000000000'
 
@@ -64,30 +64,35 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
 
   return (
     <Grid item xs={12} md={4}>
-      <Paper>
-        <Box p={1}>
-          <Typography variant='subtitle1'>Farmed Gasoline (AIRG)</Typography>
-          <Typography variant='caption'>
-            Get <b>100 Liters/day</b> for each AIRL token staked
-          </Typography>
+      <Box className={styles.glassCard}>
+        <Typography
+          variant='subtitle1'
+          fontWeight={700}
+          sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}
+        >
+          Combustible Generado (AIRG)
+        </Typography>
+        <Typography variant='caption' sx={{ opacity: 0.8, mb: 1 }}>
+          Gana <b>100 Litros/día</b> por cada AIRL stakeado
+        </Typography>
 
-          <Typography variant='h3' paragraph>
-            {formatNumber(Number(stakeInfo?.[1] || 0) / 1e18)} Liters
-          </Typography>
+        <Typography variant='h3' fontWeight={800} sx={{ my: 2, color: '#6366f1' }}>
+          {formatNumber(Number(stakeInfo?.[1] || 0) / 1e18)}{' '}
+          <span style={{ fontSize: '1.2rem', opacity: 0.6 }}>Liters</span>
+        </Typography>
 
-          <Stack>
-            <Button
-              color='info'
-              disabled={isClaiming || !canClaimMin}
-              size='small'
-              variant='contained'
-              onClick={handleClaimRewards}
-            >
-              Get Gas
-            </Button>
-          </Stack>
-        </Box>
-      </Paper>
+        <Stack>
+          <Button
+            className={styles.premiumButton}
+            disabled={isClaiming || !canClaimMin}
+            variant='contained'
+            onClick={handleClaimRewards}
+            fullWidth
+          >
+            Recolectar Combustible
+          </Button>
+        </Stack>
+      </Box>
     </Grid>
   )
 }

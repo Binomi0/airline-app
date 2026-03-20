@@ -8,6 +8,7 @@ import { INft } from 'models/Nft'
 export interface AircraftAttributes {
   deposit: number
   cargo: number
+  mission: number
   license: string
 }
 export enum NftName {
@@ -39,12 +40,36 @@ export interface FRoute {
   origin: string
   destination: string
   distance: number
+  type?: MissionType
 }
 
-export enum CargoStatus {
+export enum MissionStatus {
   STARTED = 'STARTED',
   COMPLETED = 'COMPLETED',
   ABORTED = 'ABORTED'
+}
+export enum AtcStatus {
+  ACTIVE = 'ACTIVE',
+  DISCONNECTED = 'DISCONNECTED'
+}
+export enum PublicMissionStatus {
+  AVAILABLE = 'AVAILABLE',
+  RESERVED = 'RESERVED',
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED'
+}
+export enum MissionType {
+  CARGO = 'CARGO',
+  PASSENGER = 'PASSENGER',
+  HUMANITARIAN = 'HUMANITARIAN',
+  VIP = 'VIP',
+  CHARTER = 'CHARTER'
+}
+export enum MissionCategory {
+  ATC = 'ATC',
+  EVENT = 'EVENT',
+  SOLO = 'SOLO',
+  NORMAL = 'NORMAL'
 }
 export type Flight = Record<string, FRoute[]>
 export interface AtcPosition {
@@ -67,18 +92,58 @@ export interface AtcPosition {
       longitude: number
       military: boolean | string
     }
+    latitude?: number
+    longitude?: number
   }
 }
-export type Atc = AtcPosition & typeof atc
-export interface Cargo {
-  // where it starts
+export type Atc = AtcPosition &
+  typeof atc & {
+    latitude?: number
+    longitude?: number
+    firstSeenAt?: Date
+    lastSeenAt?: Date
+    status?: AtcStatus
+  }
+
+export interface AtcHistory {
+  callsign: string
+  airportIcao: string
+  firstSeenAt: Date
+  lastSeenAt: Date
+  durationMinutes: number
+}
+
+export interface IBaseMission {
+  _id?: string
   origin: string
-  // where it finish
   destination: string
-  // total distance in NM
   distance: number
-  // Detailed info about cargo
-  details: CargoDetail
+  type: MissionType
+  category: MissionCategory
+  prize: number
+  rewardMultiplier: number
+  isSponsored: boolean
+  details: MissionDetail
+  startTime?: Date
+  endTime?: Date
+  originCoords?: Coords
+  destinationCoords?: Coords
+  estimatedTimeMinutes?: number
+  originAtcOnStart?: boolean
+  destinationAtcOnStart?: boolean
+  expiresAt?: Date
+  startedAt?: Date
+  callsign?: string
+}
+
+export interface PublicMission extends IBaseMission {
+  basePrize: number
+  status: PublicMissionStatus
+  reservedBy?: string // User ID (ObjectId string)
+  reservedAt?: Date
+}
+
+export interface Mission extends IBaseMission {
   // selected aircraft nft data
   aircraft: INft
   // selected aircraft id
@@ -86,20 +151,19 @@ export interface Cargo {
   // pilot callsign
   callsign: string
   weight: number
-  prize: number
-  status: CargoStatus
+  status: MissionStatus
   remote: boolean
   rewards?: number
   isRewarded: boolean
   score?: number
 }
 
-export interface CargoDetail {
+export interface MissionDetail {
   name: string
   description: string
 }
 
-export interface CargoStep {
+export interface MissionStep {
   name: string
   value: string
 }
@@ -139,7 +203,7 @@ export enum DB {
 
 export enum Collection {
   user = 'user',
-  cargo = 'cargo',
+  missions = 'missions',
   live = 'live',
   wallet = 'wallet',
   webauthn = 'webauthn',
@@ -314,3 +378,26 @@ export const aircraftNameToIcaoCode = {
 }
 
 export type Hex = `0x${string}`
+
+export type IvaoEventType = 'generic' | 'hq_event' | 'pde' | 'rfe'
+
+export interface IvaoRoute {
+  departureIcao: string
+  arrivalIcao: string
+  route: string
+}
+
+export interface IvaoEvent {
+  id: number
+  startDate: string
+  endDate: string
+  title: string
+  imageUrl: string
+  description: string
+  infoUrl: string
+  divisions: string[]
+  airports: string[]
+  eventType: IvaoEventType
+  hqeAward: boolean
+  routes: IvaoRoute[]
+}

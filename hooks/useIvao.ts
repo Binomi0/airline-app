@@ -17,29 +17,20 @@ const useIvao = (): UseIvaoReturnType => {
   const [error, setError] = useState('')
   // const { initIvaoAuth } = useVaProviderContext()
 
-  const requestIvaoUser = useCallback(
-    (ivaoUserToken: string) => {
-      nextApiInstance
-        .get('/api/ivao/user', {
-          headers: {
-            Authorization: `Bearer ${ivaoUserToken}`
-          }
-        })
-        .then((response: AxiosResponse) => {
-          setIvaoUser(response.data)
-          localStorage.setItem('ivao-auth-token', ivaoUserToken)
-        })
-        .catch((error: AxiosError) => {
-          console.log('IVAO ERROR =>', error)
-          setError('Error al conectar con IVAO')
-          localStorage.removeItem('ivao-auth-token')
-        })
-        .finally(() => {
-          setIsLoading(false)
-        })
-    },
-    [setIvaoUser]
-  )
+  const requestIvaoUser = useCallback(() => {
+    nextApiInstance
+      .get('/api/ivao/user')
+      .then((response: AxiosResponse) => {
+        setIvaoUser(response.data)
+      })
+      .catch((error: AxiosError) => {
+        console.log('IVAO ERROR =>', error)
+        setError('Error al conectar con IVAO')
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [setIvaoUser])
 
   // const checkExistingIvaoToken = useCallback(() => {
   //   if (ivaoToken === undefined) {
@@ -61,8 +52,8 @@ const useIvao = (): UseIvaoReturnType => {
       if (state && code) {
         nextApiInstance
           .get('/api/ivao/authorize', { params: { code, state } })
-          .then((response) => {
-            requestIvaoUser(response.data)
+          .then(() => {
+            requestIvaoUser()
           })
           .catch((err: AxiosError<{ code: number }>) => {
             if (err.response?.data.code === 11000) {

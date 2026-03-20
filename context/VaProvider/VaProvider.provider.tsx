@@ -1,15 +1,19 @@
+import { useRouter } from 'next/router'
 import React, { type FC, startTransition, useCallback, useMemo, useReducer, useRef, useState } from 'react'
-import { useSetRecoilState } from 'recoil'
+import { useSetRecoilState, useRecoilValue } from 'recoil'
 import { getApi } from 'lib/api'
 import type { Atc, Flight } from 'types'
 // import { ivaoUserStore } from 'store/ivao-user.atom'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
+import { authStore } from 'store/auth.atom'
 import vaProviderReducer from './VaProvider.reducer'
 import { IVAOClients } from './VaProvider.types'
 import { VaProviderContext } from './VaProvider.context'
 import nextApiInstance, { ivaoInstance } from 'config/axios'
 
 const MIN_IVAO_REQ_DELAY = 1 * 60 * 1000
+const IVAO_ACTIVE_ROUTES = ['/missions', '/live', '/ivao', '/map', '/operations']
+
 export const INITIAL_STATE: IVAOClients = {
   // pilots: [],
   atcs: [],
@@ -23,10 +27,19 @@ export const INITIAL_STATE: IVAOClients = {
 }
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const router = useRouter()
   // const user = useRecoilValue(userState)
   // const ivaoUser = useRecoilValue(ivaoUserStore)
-  // const ivaoToken = useRecoilValue(ivaoUserAuthStore)
+  const ivaoToken = useRecoilValue(ivaoUserAuthStore)
   const setIvaoToken = useSetRecoilState(ivaoUserAuthStore)
+  const authToken = useRecoilValue(authStore)
+
+  React.useEffect(() => {
+    if (ivaoToken) {
+      ivaoInstance.defaults.headers['x-ivao-token'] = `Bearer ${ivaoToken}`
+      nextApiInstance.defaults.headers['x-ivao-token'] = `Bearer ${ivaoToken}`
+    }
+  }, [ivaoToken])
 
   const [state, dispatch] = useReducer(vaProviderReducer, INITIAL_STATE)
   const [isLoading, setIsLoading] = useState(0)
@@ -102,7 +115,13 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [])
 
   React.useEffect(() => {
-    // Only start sync if we have a token or don't need one for whazzup
+    // Only start sync if we have an app token (logged in)
+    if (!authToken) return
+
+    // Route-based guard: only sync on specific pages
+    const isAllowedRoute = IVAO_ACTIVE_ROUTES.some((route) => router.pathname.startsWith(route))
+    if (!isAllowedRoute) return
+
     const atcTimer = setInterval(() => getAtcs(), MIN_IVAO_REQ_DELAY)
     const ivaoTimer = setInterval(() => getIVAOData(), MIN_IVAO_REQ_DELAY)
     // const pilotsTimer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
@@ -111,7 +130,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       clearInterval(atcTimer)
       clearInterval(ivaoTimer)
     }
-  }, [getAtcs, getIVAOData])
+  }, [getAtcs, getIVAOData, authToken, router.pathname])
 
   const initIvaoData = useCallback(() => {
     // Manual trigger for first load
@@ -125,7 +144,6 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     nextApiInstance
       .get('/api/ivao/oauth')
       .then((response) => {
-        console.log('ivao token =>', response.data)
         ivaoInstance.defaults.headers['x-ivao-token'] = `Bearer ${response.data}`
         nextApiInstance.defaults.headers['x-ivao-token'] = `Bearer ${response.data}`
         setIvaoToken(response.data)

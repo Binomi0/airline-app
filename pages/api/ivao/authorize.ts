@@ -3,99 +3,112 @@ import { connectDB } from 'lib/mongoose'
 import { UserModel, VirtualAirlineModel } from 'models'
 import { NextApiRequest, NextApiResponse } from 'next'
 import jwt from 'jsonwebtoken'
+import { AxiosError } from 'axios'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     console.log('req.query =>', req.query)
-    if (!req.query.state || !req.query.code) {
-      if (req.query.error_description) {
-        return res.status(400).send(req.query.error_description)
-        // TODO: Redirect to IVAO page with error message
-        // IF error_description = User+is+Inactive+User => Show message: "Your IVAO account is inactive. Please contact IVAO support to activate your account."
-        // ELSE => Show message: "An error has occurred while connecting to IVAO. Please try again."
-      }
+    const state = (Array.isArray(req.query.state) ? req.query.state[0] : req.query.state) as string
+    const code = (Array.isArray(req.query.code) ? req.query.code[0] : req.query.code) as string
 
-      return res.status(400).end()
+    interface IvaoTokenBody {
+      grant_type: string
+      code: string
+      client_id: string
+      client_secret: string
+      redirect_uri?: string
+      code_verifier?: string
     }
 
-    const body = {
-      // code: req.query.code,
-      // code_verifier: req.query.code_verifier,
-      // state: req.query.state,
-      grant_type: 'client_credentials',
-      scope: 'openid profile location flight_plans:read configuration tracker training email birthday',
-      client_id: process.env.NEXT_PUBLIC_IVAO_ID,
-      client_secret: process.env.IVAO_SECRET
-      // redirect_uri: process.env.NEXT_PUBLIC_IVAO_REDIRECT_URI
+    const body: IvaoTokenBody = {
+      grant_type: 'authorization_code',
+      code: code as string,
+      client_id: process.env.NEXT_PUBLIC_IVAO_ID!,
+      client_secret: process.env.IVAO_SECRET!,
+      code_verifier: 'dXNlci5pZA'
     }
 
-    let accessToken
+    if (process.env.NEXT_PUBLIC_IVAO_REDIRECT_URI) {
+      body.redirect_uri = process.env.NEXT_PUBLIC_IVAO_REDIRECT_URI
+    }
+
+    let tokenData
     try {
-      const response = await ivaoInstance.post<{ access_token?: string }>('/v2/oauth/token', body, {
-        headers: { Authorization: `Bearer ${req.query.code}` }
+      const response = await ivaoInstance.post<{
+        access_token: string
+        refresh_token: string
+        expires_in: number
+      }>('/v2/oauth/token', body, {
+        headers: { Authorization: `Bearer ${code}` }
       })
 
-      if (!response.data) {
-        res.status(404).end()
+      if (!response.data || !response.data.access_token) {
+        res.status(404).send('Token not found in IVAO response')
         return
       }
 
-      accessToken = response.data.access_token
-      console.log('response =>', response.data)
+      tokenData = response.data
+      console.log('tokenData =>', tokenData)
     } catch (error) {
-      console.error('Error getting token =>', error)
-      res.status(500).send(error)
+      console.error('[IVAO Authorize] Error exchanging code =>', error)
+      const axiosError = error as AxiosError
+      return res.status(500).json({
+        error: 'exchange_failed',
+        details: axiosError.response?.data || axiosError.message
+      })
+    }
+
+    console.log('[IVAO Authorize] Starting identity decode...')
+    const decoded = jwt.decode(code as string, { json: true, complete: true })
+    console.log('[IVAO Authorize] Decoded identity:', decoded ? 'SUCCESS' : 'NULL')
+
+    if (!decoded || !decoded.payload || typeof decoded.payload === 'string' || !decoded.payload.sub) {
+      console.error('[IVAO Authorize] Invalid code payload or missing sub. Payload:', decoded?.payload)
+      res.status(403).send('Invalid identity code')
       return
     }
 
-    // FIXME: Missing state and challenge validation
-
-    const decoded = jwt.decode(req.query.code as string, { json: true, complete: true })
-    if (!decoded) {
-      res.status(403).end()
-      return
-    }
-    if (typeof decoded.payload === 'string') {
-      res.status(400).send('Invalid jwt payload')
-      return
-    }
-
-    console.log('code challenge =>', decoded.payload.pkce.codeChallenge)
-    console.log('code method =>', decoded.payload.pkce.codeChallengeMethod)
+    console.log('[IVAO Authorize] Identity verified. Pilot ID:', decoded.payload.sub)
 
     try {
+      console.log('[IVAO Authorize] Connecting to DB...')
       await connectDB()
-      const va = await VirtualAirlineModel.findOne({ userId: req.query.state })
-      if (va) {
-        return res.status(200).json(accessToken)
-      }
+      console.log('[IVAO Authorize] DB Connected. Starting VirtualAirline update for state:', state)
+
+      const expiryDate = new Date()
+      expiryDate.setSeconds(expiryDate.getSeconds() + (tokenData.expires_in || 3600))
 
       const vaUser = await VirtualAirlineModel.findOneAndUpdate(
-        { userId: req.query.state },
-        { isVerified: true, pilotId: decoded.payload.sub },
+        { userId: state },
+        {
+          isVerified: true,
+          type: 'IVAO',
+          pilotId: decoded.payload.sub,
+          accessToken: tokenData.access_token,
+          refreshToken: tokenData.refresh_token,
+          tokenExpiry: expiryDate
+        },
         { upsert: true, returnDocument: 'after' }
       )
-      try {
-        await UserModel.findOneAndUpdate({ userId: req.query.state }, { vaUser: vaUser._id })
-        console.log('User updated vaUser')
-      } catch (err) {
-        console.error('Updating user', vaUser._id, err)
-        console.log('Error al actualizar el usuario', req.query.state)
-        res.status(406).end()
-        return
+
+      console.log('[IVAO Authorize] VA User updated/created. ID:', vaUser?._id)
+
+      if (vaUser?._id) {
+        console.log('[IVAO Authorize] Linking User to VA profile...')
+        const updatedUser = await UserModel.findOneAndUpdate({ userId: state }, { vaUser: vaUser._id })
+        console.log('[IVAO Authorize] User link result:', updatedUser ? 'SUCCESS' : 'USER NOT FOUND')
       }
+
+      console.log('[IVAO Authorize] Process finished successfully.')
+      return res.status(200).json(tokenData.access_token)
     } catch (error) {
-      console.log('Error updating virtual airline user', error)
+      console.error('[IVAO Authorize] CRITICAL ERROR IN DB PHASE:', error)
       res.status(400).send(error)
       return
     }
-    // res.redirect(`/ivao?token=${req.query.code}`)
-    return res.status(200).json(accessToken)
   } else {
     res.status(405).end()
   }
-
-  res.status(401).end()
 }
 
 export default handler

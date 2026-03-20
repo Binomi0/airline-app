@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from 'react'
-import useCargo from 'hooks/useCargo'
+import useMission from 'hooks/useMission'
 import Link from 'next/link'
 import { LastTrackState, LastTrackStateEnum } from 'types'
 import MCDUView from './components/MCDUView'
@@ -21,7 +21,7 @@ type Props = Record<string, never>
 
 const LiveView = ({}: Props) => {
   const router = useRouter()
-  const { cargo, getCargo, isLoading } = useCargo()
+  const { mission, getMission, isLoading } = useMission()
   const { setPilot, pilot } = useLiveFlightProviderContext()
   const setLive = useSetRecoilState(liveStore)
   const [flightState, setFlightState] = useState<LastTrackState>(LastTrackStateEnum.Boarding)
@@ -29,14 +29,14 @@ const LiveView = ({}: Props) => {
 
   const handleDisconnect = useCallback(async () => {
     const { isConfirmed } = await Swal.fire({
-      title: 'Abort Flight?',
-      text: 'Current flight progress will be lost',
+      title: '¿Abortar Vuelo?',
+      text: 'El progreso actual del vuelo se perderá',
       icon: 'warning',
       showCancelButton: true
     })
     if (isConfirmed) {
       setBooking(false)
-      await Promise.all([deleteApi('/api/live'), deleteApi('/api/cargo')])
+      await Promise.all([deleteApi('/api/live'), deleteApi('/api/missions')])
       setPilot()
       setLive(undefined)
       router.push('/')
@@ -48,8 +48,8 @@ const LiveView = ({}: Props) => {
   }, [])
 
   useEffect(() => {
-    getCargo()
-  }, [getCargo])
+    getMission()
+  }, [getMission])
 
   useEffect(() => {
     if (!pilot || pilot?.lastTrack.state === flightState) return
@@ -64,10 +64,10 @@ const LiveView = ({}: Props) => {
         <Stack mt={5} spacing={10} alignItems='center'>
           <Typography variant='h2'>Esperando conexión...</Typography>
           <Button color='warning' size='large' variant='contained' onClick={handleDisconnect}>
-            cancel current flight
+            Cancelar vuelo actual
           </Button>
           <Box bgcolor='primary.light' px={5} borderRadius={10}>
-            <Typography variant='h3'>{cargo?.callsign}</Typography>
+            <Typography variant='h3'>{mission?.callsign || '---'}</Typography>
           </Box>
           <Typography variant='h4' paragraph>
             Conéctate a IVAO para continuar.
@@ -82,21 +82,21 @@ const LiveView = ({}: Props) => {
           {pilot?.lastTrack.state === 'On Blocks' && (
             <Box textAlign='center' my={2}>
               <Button sx={{ zIndex: 1 }} onClick={handleClaim} size='large' variant='contained'>
-                CLAIM PRIZE!
+                ¡RECLAMAR PREMIO!
               </Button>
             </Box>
           )}
           {pilot && <MCDUView pilot={pilot} onDisconnect={handleDisconnect} />}
         </Box>
       </Fade>
-      <Fade in={!cargo && !isLoading}>
+      <Fade in={!mission && !isLoading}>
         <Box my={10} textAlign='center'>
           <Typography variant='h3' paragraph>
-            No tienes vuelos activos para empezar
+            No tienes misiones activas para empezar
           </Typography>
-          <Link href='/cargo'>
+          <Link href='/missions'>
             <Button variant='contained'>
-              <Typography>Configura un nuevo vuelo</Typography>
+              <Typography>Configura una nueva misión</Typography>
             </Button>
           </Link>
         </Box>

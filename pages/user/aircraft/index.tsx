@@ -69,7 +69,7 @@ const UserAircrafts: NextPage = () => {
                       <TableRow>
                         <TableCell align='right'>Fuel onboard</TableCell>
                         <TableCell align='right'>Capacity</TableCell>
-                        <TableCell align='right'>Cargo</TableCell>
+                        <TableCell align='right'>Capacidad</TableCell>
                         <TableCell align='right'>Price</TableCell>
                         <TableCell align='right'>license</TableCell>
                       </TableRow>

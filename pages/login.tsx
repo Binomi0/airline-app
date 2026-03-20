@@ -1,7 +1,20 @@
-import React from 'react'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { useRecoilValue } from 'recoil'
+import LoginView from 'routes/Login'
+import { userState } from 'store/user.atom'
 
-const LoginPage = () => {
-  return <div>LoginPage</div>
+const Login = () => {
+  const user = useRecoilValue(userState)
+  const router = useRouter()
+
+  useEffect(() => {
+    if (user) {
+      router.push('/')
+    }
+  }, [user, router])
+
+  return !user ? <LoginView /> : null
 }
 
-export default LoginPage
+export default Login

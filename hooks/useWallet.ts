@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { generatePrivateKey } from 'viem/accounts'
 import { useCallback } from 'react'
-import { consentCloudSyncSwal, consentSecureWalletSwal, unlockWalletSwal } from 'lib/swal'
+import { consentCloudSyncSwal, unlockWalletSwal } from 'lib/swal'
 import { useSetRecoilState } from 'recoil'
 import { IWallet } from 'models/Wallet'
 import { walletStore } from 'store/wallet.atom'
@@ -68,9 +68,13 @@ const useWallet = (): UseWallet => {
       if (!personalAccount || !_user.id) return null
 
       try {
+        const { sponsorGas } = (await getApi<{ sponsorGas: boolean }>(
+          `/api/user/sponsorship?address=${_user.address || ''}`
+        )) || { sponsorGas: false }
+
         const account = await smartWallet({
           chain,
-          sponsorGas: true
+          sponsorGas
         }).connect({
           client: twClient,
           personalAccount
@@ -129,14 +133,10 @@ const useWallet = (): UseWallet => {
           const cryptoKey = await deriveKeyFromPRF(prfSecret)
           return (await decryptVault(vault.ciphertext, cryptoKey, vault.iv)) as string
         }
-        return raw.slice(0, 66)
+        throw new Error('Wallet is not protected. Please re-encrypt.')
       } catch (e) {
         if (e instanceof Error && e.message.includes('decrypt')) {
           throw new Error('Could not decrypt wallet. Is it the correct Passkey?')
-        }
-        // Migration Path: only if it doesn't look like a vault
-        if (!raw.includes('"protected":true')) {
-          return raw.slice(0, 66)
         }
         throw e
       }
@@ -163,13 +163,7 @@ const useWallet = (): UseWallet => {
       }
 
       if (!ciphertext || !iv) {
-        const { isConfirmed: wantSecure } = await consentSecureWalletSwal()
-        if (!wantSecure) {
-          const base64Key = Buffer.from(privateKey).toString('base64')
-          if (_user.id) localStorage.setItem(_user.id, base64Key)
-          return
-        }
-
+        // Encryption is mandatory for security
         const prfSecret = await getPRFSecret()
         const cryptoKey = await deriveKeyFromPRF(prfSecret)
         const encrypted = await encryptVault(privateKey, cryptoKey)

@@ -7,7 +7,7 @@ import { handleUnStakeSwal, maxWithdrawExceeded, unstakedSwal } from 'lib/swal'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Paper from '@mui/material/Paper'
+import styles from 'styles/Gas.module.css'
 
 interface Props {
   getAirlBalance: () => void
@@ -39,21 +39,26 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
 
   return (
     <Grid item xs={12} md={4}>
-      <Paper>
-        <Box p={1}>
-          <Typography variant='subtitle1'>Deposited</Typography>
-          <Typography variant='subtitle2' paragraph>
-            {staking ? formatNumber(Number(staking[0].toString()) / 1e18) : formatNumber()} sAIRL
-          </Typography>
-          <GasForm
-            max={maxAmount}
-            onClick={handleUnStake}
-            loading={isLoading}
-            label='Amount to UnStake'
-            buttonText='Remove from Staking'
-          />
-        </Box>
-      </Paper>
+      <Box className={styles.glassCard}>
+        <Typography
+          variant='subtitle1'
+          fontWeight={700}
+          sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}
+        >
+          Depositado
+        </Typography>
+        <Typography variant='h4' fontWeight={800} sx={{ my: 1 }}>
+          {staking ? formatNumber(Number(staking[0].toString()) / 1e18) : formatNumber()}{' '}
+          <span style={{ fontSize: '1rem', opacity: 0.5 }}>sAIRL</span>
+        </Typography>
+        <GasForm
+          max={maxAmount}
+          onClick={handleUnStake}
+          loading={isLoading}
+          label='Cantidad a Retirar'
+          buttonText='Retirar del Staking'
+        />
+      </Box>
     </Grid>
   )
 }

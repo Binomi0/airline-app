@@ -7,24 +7,25 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     res.status(405).end()
     return
-  } else if (!req.body.cargo) {
+  } else if (!req.body.mission) {
     res.status(400).end()
     return
   }
 
-  const { cargo } = req.body
+  const { mission } = req.body
 
   try {
     const live = await Live.findOne({ userId: req.id })
     if (!live) {
       const current = await Live.create({
-        cargoId: cargo._id,
+        missionId: mission._id,
         userId: req.id,
-        aircraftId: cargo.aircraftId,
-        callsign: cargo.callsign,
+        aircraftId: mission.aircraftId,
+        callsign: mission.callsign,
         isCompleted: false,
         track: { name: LastTrackStateEnum.Boarding, value: new Date() }
       })
+
       res.status(201).send(current)
       return
     }

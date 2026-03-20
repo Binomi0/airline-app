@@ -3,15 +3,16 @@ import useOwnedNfts from 'hooks/useOwnedNFTs'
 
 interface UseAircraftReturnType {
   hasAircraft: boolean
+  media: string
 }
 
 const useAircraft = (tokenId: string): UseAircraftReturnType => {
   const { data: ownedNfts } = useOwnedNfts()
 
-  const hasAircraft = ownedNfts?.some(
+  const aircraft = ownedNfts?.find(
     (n) => n.tokenId === tokenId && n.tokenAddress.toLowerCase() === nftAircraftTokenAddress.toLowerCase()
   )
-  return { hasAircraft: !!hasAircraft }
+  return { hasAircraft: !!aircraft, media: aircraft?.nft.metadata.image || '' }
 }
 
 export default useAircraft

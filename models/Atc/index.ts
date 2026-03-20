@@ -58,6 +58,14 @@ const atcSchema: mongoose.Schema = new mongoose.Schema<AtcSchema>(
         longitude: Number,
         military: mongoose.Schema.Types.Mixed
       }
+    },
+    firstSeenAt: { type: Date, default: Date.now },
+    lastSeenAt: { type: Date, default: Date.now },
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'DISCONNECTED'],
+      default: 'ACTIVE',
+      index: true
     }
   },
   {

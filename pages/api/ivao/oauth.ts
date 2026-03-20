@@ -1,45 +1,19 @@
-import { AxiosError } from 'axios'
-import { ivaoInstance } from 'config/axios'
+import { getSystemIvaoToken } from 'utils/ivao'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
-    const request = {
-      grant_type: 'client_credentials',
-      // code: '1111',
-      // redirect_uri: 'http://localhost:3000',
-      client_id: process.env.NEXT_PUBLIC_IVAO_ID,
-      client_secret: process.env.IVAO_SECRET,
-      // refresh_token: '',
-      // password: '',
-      // username: '',
-      scope:
-        'flight_plans:write openid supervisor profile discord location flight_plans:read configuration bookings:read tracker training friends:write friends:read email birthday bookings:write'
-      // code_verifier: '',
-      // nonce: ''
-    }
-
     try {
-      const { data } = await ivaoInstance.post('v2/oauth/token', request)
+      const token = await getSystemIvaoToken()
 
-      if (!data) {
-        res.status(403).send(data)
-        return
+      if (!token) {
+        return res.status(403).send('Failed to obtain IVAO system token')
       }
 
-      if (typeof data.access_token === 'string') {
-        ivaoInstance.defaults.headers.common.Authorization = `Bearer ${data.access_token}`
-        return res.status(200).send(data.access_token)
-      } else if (data.access_token?._token === 'string') {
-        ivaoInstance.defaults.headers.common.Authorization = `Bearer ${data.access_token._token}`
-        return res.status(200).send(data.access_token._token)
-      }
-      return res.status(400).send('Invalid token')
+      return res.status(200).send(token)
     } catch (error) {
-      const err = error as AxiosError
-      console.error('IVAO OAUTH', err.response?.data)
-      res.status(500).send(err)
-      return
+      console.error('IVAO OAUTH Error:', error)
+      return res.status(500).send(error)
     }
   }
 

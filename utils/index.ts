@@ -2,8 +2,8 @@ import nextApiInstance from 'config/axios'
 import {
   ActiveAtc,
   Airport,
-  AtcPosition,
   AttributeType,
+  Coords,
   IcaoCode,
   IvaoPilot,
   TowerMatrix,
@@ -68,8 +68,8 @@ export const formatNumber = (value: number = 0, decimals: number = 2) =>
   }).format(isNaN(value) ? 0 : value)
 
 export const getDistanceByCoords = (
-  origin: AtcPosition['atcPosition']['airport'],
-  destination: AtcPosition['atcPosition']['airport']
+  origin: Coords,
+  destination: Coords // AtcPosition['atcPosition']['airport']
 ) => {
   if (!origin || !destination) return 0
 
@@ -89,11 +89,21 @@ export function getRandomInt(max: number) {
 }
 
 export function getCallsign() {
-  const ident = Math.round(Math.floor(Math.random() * (10000 - 1000 + 1) + 1000))
-  return `${process.env.NEXT_PUBLIC_CALLSIGN}${ident}`
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const numbers = '0123456789'
+  let result = ''
+  // Format: 3 numbers followed by 1 number or letter
+  for (let i = 0; i < 3; i++) {
+    result += numbers.charAt(Math.floor(Math.random() * numbers.length))
+  }
+  // Last char can be letter or number, mostly number but sometimes letter
+  const lastPool = Math.random() > 0.7 ? letters : numbers
+  result += lastPool.charAt(Math.floor(Math.random() * lastPool.length))
+
+  return `${process.env.NEXT_PUBLIC_CALLSIGN}-${result}`
 }
 
-export function getCargoWeight(aircraft: INft) {
+export function getMissionWeight(aircraft: INft) {
   const attribute = getNFTAttributes(aircraft).find((attribute) => attribute.trait_type === 'cargo')
 
   if (!attribute) {
@@ -104,7 +114,7 @@ export function getCargoWeight(aircraft: INft) {
   return Number(attribute.value) * randomIntFromInterval(40, 70) || 0
 }
 
-export function getCargoPrize(distance: number, aircraft: INft) {
+export function getMissionPrize(distance: number, aircraft: INft) {
   const attribute = getNFTAttributes(aircraft).find((attr) => attr.trait_type === 'license')
   if (attribute) {
     const base = Math.floor(distance / 100) / 5
@@ -213,6 +223,40 @@ export const getFuelForFlight = (distance: number, aircraftType: IcaoCode, passe
   }
 }
 
+export const getEstimatedTimeMinutes = (distance: number, aircraftType: IcaoCode): number => {
+  let speedKts = 250 // Default
+  switch (aircraftType) {
+    case 'C172':
+      speedKts = 110
+      break
+    case 'B350':
+    case 'BE20':
+      speedKts = 280
+      break
+    case 'C700':
+    case 'B737':
+    case 'B738':
+    case 'B739':
+    case 'A20N':
+    case 'A320':
+    case 'A321':
+      speedKts = 440
+      break
+    case 'B748':
+    case 'B77W':
+    case 'B788':
+    case 'A339':
+      speedKts = 480
+      break
+    case 'AN225':
+      speedKts = 430
+      break
+  }
+
+  // Time = (Distance / Speed) * 60 + Buffer for climb/descend/taxi
+  return Math.round((distance / speedKts) * 60 + 25)
+}
+
 export const reduceTowerMatrix =
   (atcs: ActiveAtc[]) =>
   (acc: TowerMatrixList, curr: ActiveAtc): TowerMatrixList =>
@@ -227,7 +271,8 @@ export const reduceTowerMatrix =
                 ? { distance: 0 }
                 : {
                     ...(atc.atcPosition ? { ...atc.atcPosition.airport } : {}),
-                    distance: getDistanceByCoords(curr.atcPosition?.airport, atc.atcPosition?.airport) ?? 0,
+                    distance:
+                      getDistanceByCoords(curr.atcPosition?.airport as Coords, atc.atcPosition?.airport as Coords) ?? 0,
                     callsign: atc.callsign
                   }
             )

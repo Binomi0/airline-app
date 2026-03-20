@@ -1,56 +1,59 @@
 import Link from 'next/link'
 import { useRecoilValue } from 'recoil'
 import { themeStore } from 'store/theme.atom'
+import { userState } from 'store/user.atom'
 import styles from '../../styles/Home.module.css'
+import LiveDashboard from './components/LiveDashboard'
+import PilotRankings from './components/PilotRankings'
 
 const NAV_ITEMS = [
   {
     link: '/hangar',
     emoji: '✈️',
     title: 'Hangar',
-    desc: 'Compra y vende aeronaves NFT. Gestiona tu flota virtual.'
+    desc: 'Compra y vende aeronaves. Gestiona tu flota virtual en la red Arbitrum.'
   },
   {
     link: '/license',
     emoji: '🪪',
     title: 'Licencias',
-    desc: 'Obtén tu licencia de vuelo y empieza a volar hoy.'
+    desc: 'Certifícate para volar. Selecciona la licencia adecuada para tu aeronave.'
   },
   {
     link: '/gas',
     emoji: '⛽',
     title: 'Gasolinera',
-    desc: 'Haz staking de AIRL y gana AIRG para repostar tus aeronaves.'
+    desc: 'Genera combustible. Haz staking de AIRL para obtener AIRG y repostar.'
   },
   {
-    link: '/cargo',
-    emoji: '📦',
-    title: 'Cargo',
-    desc: 'Realiza vuelos pendientes y gana tokens AIRL.'
+    link: '/missions',
+    emoji: '🗺️',
+    title: 'Misiones',
+    desc: 'Vuelos dinámicos. Encuentra misiones basadas en el tráfico aéreo real de IVAO.'
   },
   {
     link: '/ivao',
     emoji: '🌐',
     title: 'IVAO',
-    desc: 'Monitoriza tus vuelos en IVAO y recibe recompensas en cadena.'
+    desc: 'Sincronización total. Valida tus vuelos en tiempo real y recibe tus recompensas.'
   }
 ]
 
 const FEATURES = [
   {
     icon: '🔐',
-    title: 'Propiedad Descentralizada',
-    desc: 'Tus aeronaves son NFTs en Ethereum. Ninguna autoridad centralizada puede arrebatarte lo que es tuyo.'
+    title: 'Cuentas Inteligentes',
+    desc: 'Acceso seguro con Passkeys. Tu identidad y activos protegidos por Smart Accounts de Thirdweb.'
   },
   {
-    icon: '🔍',
-    title: 'Operaciones Transparentes',
-    desc: 'Cada vuelo, venta de ticket y transferencia de aeronave queda registrada en la blockchain de forma inmutable.'
+    icon: '⚡',
+    title: 'Eficiencia Layer 2',
+    desc: 'Transacciones casi instantáneas y sin apenas comisiones gracias a la red Arbitrum.'
   },
   {
-    icon: '🏛️',
-    title: 'Gobernanza Comunitaria',
-    desc: 'La plataforma avanza según la voluntad de sus usuarios. Vota, propón y decide el futuro de WeiFly.'
+    icon: '⛽',
+    title: 'Economía Circular',
+    desc: 'Un ecosistema sostenible donde el staking de AIRL alimenta tus misiones de vuelo diarias.'
   }
 ]
 
@@ -58,25 +61,25 @@ const STEPS = [
   {
     n: '01',
     title: 'Crea tu cuenta',
-    desc: 'Regístrate con passkey. Sin contraseñas, sin complicaciones.'
+    desc: 'Registro rápido con Passkey. Sin contraseñas, máxima seguridad y facilidad.'
   },
   {
     n: '02',
-    title: 'Adquiere tu aeronave',
-    desc: 'Compra un NFT de aeronave en el Hangar y obtén tu licencia de vuelo.'
+    title: 'Prepara tu flota',
+    desc: 'Adquiere tu aeronave y la licencia correspondiente para empezar a operar.'
   },
   {
     n: '03',
-    title: 'Vuela y Gana',
-    desc: 'Completa rutas en IVAO, gana tokens AIRL y crece dentro del ecosistema.'
+    title: 'Vuela y Progresa',
+    desc: 'Completa misiones, gestiona tu combustible y destaca como piloto en IVAO.'
   }
 ]
 
 const STATS = [
-  { value: 'NFT', label: 'Aeronaves tokenizadas' },
-  { value: 'IVAO', label: 'Integración de vuelo real' },
-  { value: 'AIRL', label: 'Token nativo del ecosistema' },
-  { value: 'ETH', label: 'Blockchain Ethereum' }
+  { value: 'NFT', label: 'Aeronaves Únicas' },
+  { value: 'IVAO', label: 'Tráfico en Real' },
+  { value: 'AIRL', label: 'Utility Token' },
+  { value: 'L2', label: 'Red Arbitrum' }
 ]
 
 /** Tokens que cambian entre dark y light mode */
@@ -115,6 +118,7 @@ const THEME_TOKENS: Record<'dark' | 'light', React.CSSProperties> = {
 
 const HomeView = () => {
   const theme = useRecoilValue(themeStore)
+  const user = useRecoilValue(userState)
 
   return (
     <div className={styles.root} style={THEME_TOKENS[theme]}>
@@ -122,26 +126,29 @@ const HomeView = () => {
       <section className={styles.hero}>
         <div className={styles.badge}>
           <span />
-          Simulación de vuelo virtual · Ethereum
+          Operaciones Aéreas Descentralizadas · Layer 2
         </div>
 
         <h1 className={styles.heroTitle}>WeiFly</h1>
-        <p className={styles.heroSubtitle}>La Aerolínea Virtual Descentralizada</p>
+        <p className={styles.heroSubtitle}>La Aerolínea Virtual Evolucionada</p>
         <p className={styles.heroDescription}>
-          Vuela, posee aeronaves como NFTs, gana tokens y participa en la gobernanza de una aerolínea completamente
-          transparente sobre blockchain.
+          WeiFly es la evolución de las aerolíneas virtuales. Posee activos reales, gestiona tu combustible mediante
+          staking y vuela misiones sincronizadas con el tráfico real de IVAO.
         </p>
 
         <div className={styles.heroCtas}>
           <Link href='/hangar' className={styles.ctaPrimary}>
-            Entrar al Hangar
+            Explorar Hangar
           </Link>
-          <Link href='/whitepaper' className={styles.ctaSecondary}>
-            Whitepaper
+          <Link href='/guide' className={styles.ctaSecondary}>
+            Cómo Empezar
+          </Link>
+          <Link href='/license' className={styles.ctaSecondary}>
+            Obtener Licencia
           </Link>
         </div>
 
-        <div className={styles.scrollHint}>Explorar</div>
+        <div className={styles.scrollHint}>Saber más</div>
       </section>
 
       {/* ── Stats ──────────────────────────────────────────────── */}
@@ -153,6 +160,8 @@ const HomeView = () => {
           </div>
         ))}
       </div>
+
+      {user && <LiveDashboard />}
 
       {/* ── Features ───────────────────────────────────────────── */}
       <div className={styles.section}>
@@ -182,6 +191,12 @@ const HomeView = () => {
         <div className={styles.sectionHeader}>
           <span className={styles.sectionLabel}>Cómo funciona</span>
           <h2 className={styles.sectionTitle}>Tres pasos para despegar</h2>
+          <Link
+            href='/guide'
+            style={{ color: 'var(--home-accent)', fontWeight: 600, marginTop: '1rem', display: 'inline-block' }}
+          >
+            Ver guía paso a paso →
+          </Link>
         </div>
         <div className={styles.stepsGrid}>
           {STEPS.map(({ n, title, desc }) => (
@@ -193,6 +208,8 @@ const HomeView = () => {
           ))}
         </div>
       </div>
+
+      {user && <PilotRankings />}
 
       <div className={styles.divider} />
 
@@ -217,17 +234,17 @@ const HomeView = () => {
       {/* ── Footer CTA ─────────────────────────────────────────── */}
       <div className={styles.divider} />
       <div className={styles.footerCta}>
-        <h2 className={styles.footerCtaTitle}>¿Listo para volar?</h2>
+        <h2 className={styles.footerCtaTitle}>¿Listo para tu primer vuelo?</h2>
         <p className={styles.footerCtaDesc}>
-          Lee el whitepaper, conecta tu wallet y únete a la primera aerolínea virtual descentralizada construida sobre
-          Ethereum.
+          Únete a la aerolínea virtual que utiliza Smart Accounts y Passkeys para una experiencia Web3 sin fricción.
+          Conecta tu wallet y empieza a volar hoy mismo.
         </p>
         <div className={styles.heroCtas}>
           <Link href='/hangar' className={styles.ctaPrimary}>
-            Empezar ahora
+            Acceder al Hangar
           </Link>
-          <Link href='/whitepaper' className={styles.ctaSecondary}>
-            Leer Whitepaper
+          <Link href='/guide' className={styles.ctaSecondary}>
+            Ver Guía de Inicio
           </Link>
         </div>
       </div>

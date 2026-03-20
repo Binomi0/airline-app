@@ -55,7 +55,7 @@ const LaunchpadLanding: FC = () => {
               Roadmap
             </a>
           </nav>
-          <Link href={user ? '/home' : '/signin'} className={styles.navCta}>
+          <Link href={user ? '/home' : '/login'} className={styles.navCta}>
             {user ? 'Ir al Hangar' : 'Acceder / Registrarse'}
           </Link>
         </div>
@@ -65,7 +65,7 @@ const LaunchpadLanding: FC = () => {
       <section className={styles.hero}>
         <div className={styles.heroBackground}>
           <Image
-            src='/img/hero_bg.png'
+            src='/img/airport_bg.png'
             alt='Futuristic jet flying over digital city'
             fill
             className={styles.heroImage}

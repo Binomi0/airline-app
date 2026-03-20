@@ -1,4 +1,4 @@
-import axios from 'config/axios'
+import { ivaoInstance } from 'config/axios'
 import withAuth from 'lib/withAuth'
 import { PilotModel, AtcModel } from 'models'
 import Live, { ILive } from 'models/Live'
@@ -6,6 +6,7 @@ import { Pilot } from 'models/Pilot'
 import moment, { Moment } from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Atc, IvaoPilot, LastTrackStateEnum } from 'types'
+import { syncAtcsWithGracePeriod } from 'lib/ivao-atc-sync'
 
 let nextCall: Moment
 
@@ -90,26 +91,6 @@ const removeDuplicates = async (Model: typeof AtcModel | typeof PilotModel, fiel
 
 const batchSize = 50 // You can adjust this based on your needs
 
-// Function to process a batch of updates
-async function processBatchAtcs(batch: Atc[]) {
-  const bulkOps = []
-
-  for (const atc of batch) {
-    const updateOperation = {
-      replaceOne: {
-        filter: { callsign: atc.callsign },
-        replacement: atc
-      }
-    }
-
-    bulkOps.push(updateOperation)
-  }
-
-  await AtcModel.bulkWrite(bulkOps)
-}
-
-const hasSameCallsign = (callsign: string) => (live: ILive) => live.callsign === callsign
-
 async function processBatchPilots(batch: Pilot[], lives: ILive[]) {
   const bulkOps = []
 
@@ -131,19 +112,7 @@ async function processBatchPilots(batch: Pilot[], lives: ILive[]) {
   }
 }
 
-const getCreateAndUpdateAtcs = async (atcs: Atc[]): Promise<{ update: Atc[]; create: Atc[] }> => {
-  const current = await AtcModel.find<Atc>({ callsign: { $in: atcs.map((atc) => atc.callsign) } })
-
-  const reducedAtcs = atcs.reduce(
-    (acc, curr) => ({
-      create: !current.some((a) => a.callsign === curr.callsign) ? [...acc.create, curr] : acc.create,
-      update: current.some((a) => a.callsign === curr.callsign) ? [...acc.update, curr] : acc.update
-    }),
-    { create: [] as Atc[], update: [] as Atc[] }
-  )
-
-  return reducedAtcs
-}
+const hasSameCallsign = (callsign: string) => (live: ILive) => live.callsign === callsign
 
 const getCreateAndUpdatePilots = async (pilots: Pilot[]): Promise<{ update: Pilot[]; create: Pilot[] }> => {
   const current = await PilotModel.find<Pilot>({ userId: { $in: pilots.map((pilot) => pilot.userId) } })
@@ -171,39 +140,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       console.info('requesting IVAO data at %s', now.format('HH:mm:ss'))
 
-      const response = await axios.get<{ clients: { atcs: Atc[]; pilots: IvaoPilot[] } }>(
-        'https://api.ivao.aero/v2/tracker/whazzup'
+      const apiKey = process.env.NEXT_PUBLIC_IVAO_API_KEY
+      const userToken = req.headers['x-ivao-token'] as string
+
+      const headers: Record<string, string> = {}
+      if (apiKey) headers['apiKey'] = apiKey
+      if (userToken) headers['Authorization'] = userToken
+
+      const response = await ivaoInstance.get<{ clients: { atcs: Atc[]; pilots: IvaoPilot[] } }>(
+        '/v2/tracker/whazzup',
+        {
+          headers
+        }
       )
       // logDiferentAircrafts(response.data.clients)
 
       if (response.data.clients.atcs) {
         if (await checkDuplicates(AtcModel, '$callsign')) {
-          removeDuplicates(AtcModel, '$callsign')
+          await removeDuplicates(AtcModel, '$callsign')
         }
-        const { atcs } = response.data.clients
-        const { update, create } = await getCreateAndUpdateAtcs(atcs)
-
-        if (create.length) {
-          try {
-            await AtcModel.insertMany(create, { ordered: false })
-          } catch (err) {
-            res.status(500).send({ error: err, message: 'While processing atcs insertMany' })
-            return
-          }
-        }
-
-        if (update.length) {
-          const totalItems = update.length
-          for (let i = 0; i < totalItems; i += batchSize) {
-            const batch = update.slice(i, i + batchSize)
-            try {
-              await processBatchAtcs(batch)
-            } catch (err) {
-              res.status(500).send({ error: err, message: 'While processing atcs batch' })
-              break
-            }
-          }
-        }
+        await syncAtcsWithGracePeriod(response.data.clients.atcs)
       }
 
       if (response.data.clients.pilots) {

@@ -1,9 +1,6 @@
-import styles from 'styles/Hangar.module.css'
-import Image from 'next/image'
-import image from 'public/img/airplanes3.png'
+import styles from 'styles/Settings.module.css'
 import SettingsView from 'routes/settings/SettingsView'
 import Box from '@mui/material/Box'
-import Paper from '@mui/material/Paper'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
@@ -29,28 +26,27 @@ const SettingsPage = () => {
   }, [user, router])
 
   return user ? (
-    <Box>
-      <Box sx={{ position: 'relative' }} my={5}>
-        <Image alt='banner' className={styles.background} fill placeholder='blur' priority src={image} />
+    <Box className={styles.pageContainer}>
+      <Box className={styles.backgroundOverlay} />
 
-        <Container>
-          <Paper>
-            <Box p={2}>
-              <Breadcrumbs aria-label='breadcrumb'>
-                <Link underline='hover' color='inherit' href='/'>
-                  Home
-                </Link>
-                <Typography color='text.primary'>Settings</Typography>
-              </Breadcrumbs>
-              <Typography variant='h2'>Settings</Typography>
-            </Box>
+      <Container className={styles.contentWrapper}>
+        <Box className={styles.headerSection}>
+          <Breadcrumbs aria-label='breadcrumb' sx={{ mb: 2 }}>
+            <Link underline='hover' className={styles.breadcrumbLink} href='/'>
+              Home
+            </Link>
+            <Typography className={styles.breadcrumbActive}>Settings</Typography>
+          </Breadcrumbs>
+          <Typography variant='h3' className={styles.title}>
+            System Settings
+          </Typography>
+          <Typography variant='body1' sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+            Manage your account security, wallet sync, and third-party integrations.
+          </Typography>
+        </Box>
 
-            <SettingsView hasBackup={hasBackup} user={user} />
-
-            {/* {address && <MyAircrafts />} */}
-          </Paper>
-        </Container>
-      </Box>
+        <SettingsView hasBackup={hasBackup} user={user} />
+      </Container>
     </Box>
   ) : null
 }

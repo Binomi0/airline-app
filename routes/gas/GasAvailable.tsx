@@ -10,7 +10,7 @@ import { amountExceedBalanceSwal, handleStakeSwal, stakedSwal } from 'lib/swal'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Paper from '@mui/material/Paper'
+import styles from 'styles/Gas.module.css'
 
 interface Props {
   airl?: Readonly<bigint>
@@ -50,21 +50,26 @@ const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
 
   return (
     <Grid item xs={12} md={4}>
-      <Paper>
-        <Box p={1}>
-          <Typography variant='subtitle1'>Available to deposit</Typography>
-          <Typography variant='subtitle2' paragraph>
-            {airl !== undefined ? formatNumber(Number(toEther(airl || 0n))) : formatNumber()} AIRL
-          </Typography>
-          <GasForm
-            max={airl !== undefined ? toEther(airl).toString() : '0'}
-            onClick={handleStake}
-            loading={loading}
-            label='Amount to Stake'
-            buttonText='Add to Staking'
-          />
-        </Box>
-      </Paper>
+      <Box className={styles.glassCard}>
+        <Typography
+          variant='subtitle1'
+          fontWeight={700}
+          sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}
+        >
+          Disponible para Depósito
+        </Typography>
+        <Typography variant='h4' fontWeight={800} sx={{ my: 1 }}>
+          {airl !== undefined ? formatNumber(Number(toEther(airl || 0n))) : formatNumber()}{' '}
+          <span style={{ fontSize: '1rem', opacity: 0.5 }}>AIRL</span>
+        </Typography>
+        <GasForm
+          max={airl !== undefined ? toEther(airl).toString() : '0'}
+          onClick={handleStake}
+          loading={loading}
+          label='Cantidad a Stakear'
+          buttonText='Añadir al Staking'
+        />
+      </Box>
     </Grid>
   )
 }

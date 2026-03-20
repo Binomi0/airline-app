@@ -6,27 +6,7 @@ import { ActiveAtc } from 'types'
 import { reduceAtcTower } from 'utils'
 import Atcs from 'models/Atc'
 import moment from 'moment'
-import { AnyBulkWriteOperation } from 'mongoose'
-
-const bulkOps: AnyBulkWriteOperation<ActiveAtc>[] = []
-
-const updateTowers = async (towers: ActiveAtc[]) => {
-  try {
-    towers.forEach((doc) => {
-      bulkOps.push({
-        updateOne: {
-          filter: { callsign: doc.callsign },
-          update: { $set: doc },
-          upsert: true
-        }
-      })
-    })
-
-    await Atcs.bulkWrite(bulkOps)
-  } catch (error) {
-    console.error('While updating towers with bulk', error)
-  }
-}
+import { syncAtcsWithGracePeriod } from 'lib/ivao-atc-sync'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.time('TOWER')
@@ -39,32 +19,43 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const query = req.query.callsign ? { callsign: { $regex: req.query.callsign as string, $options: 'i' } } : {}
     const atcs = await Atcs.find<ActiveAtc>(query)
 
-    const now = moment()
-    const expiry = moment(atcs[0].updatedAt).add(1, 'minute')
-    const needUpdate = now.isAfter(expiry)
+    if (atcs.length > 0) {
+      const lastUpdate = moment(atcs[0].updatedAt)
+      const now = moment()
+      const needUpdate = now.diff(lastUpdate, 'minutes') >= 1
 
-    if (atcs.length && !needUpdate) {
-      console.timeEnd('TOWER')
-      res.status(200).send(atcs)
-      return
+      if (!needUpdate) {
+        console.timeEnd('TOWER')
+        res.status(200).send(atcs)
+        return
+      }
     }
   } catch (error) {
     console.error('error =>', error)
-    res.status(500).end()
   }
 
-  console.log('ACTUALIZANDO TORRES DE CONTROL')
+  const apiKey = process.env.NEXT_PUBLIC_IVAO_API_KEY
+  const userToken = req.headers['x-ivao-token'] as string
 
   try {
-    const { data } = await ivaoInstance.get<ActiveAtc[]>('/v2/tracker/now/atc', { timeout: 2000 })
+    const headers: Record<string, string> = {}
+    if (apiKey) headers['apiKey'] = apiKey
+    if (userToken) headers['Authorization'] = userToken
+
+    const { data } = await ivaoInstance.get<ActiveAtc[]>('/v2/tracker/now/atc', {
+      timeout: 5000,
+      headers
+    })
     const towers = data.reduce(reduceAtcTower, [])
 
-    await updateTowers(towers).then(
-      async () => await Atcs.deleteMany({ callsign: { $nin: towers.map((doc) => doc.callsign) } })
-    )
+    // Use shared sync logic instead of local update/delete
+    await syncAtcsWithGracePeriod(towers)
+
+    // Return the latest from DB after sync to include statuses etc.
+    const updatedAtcs = await Atcs.find({})
 
     console.timeEnd('TOWER')
-    res.status(200).send(towers)
+    res.status(200).send(updatedAtcs)
   } catch (err) {
     const error = err as AxiosError<{ message: string }>
     if (error.response?.data.message === 'Unauthorized') {

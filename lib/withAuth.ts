@@ -40,7 +40,7 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
             })
           }
 
-          const user = await User.findOne({ email: decoded.data.email }, { _id: 1, id: 1 })
+          const user = await User.findOne({ email: decoded.data.email })
           if (user?._id) {
             req.user = decoded.data.email
             req.id = user._id
