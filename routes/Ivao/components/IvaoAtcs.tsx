@@ -2,7 +2,7 @@ import Search from '@mui/icons-material/Search'
 import React, { startTransition, useCallback, useRef, useState } from 'react'
 import FlightLandIcon from '@mui/icons-material/FlightLand'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
-import { Atc } from 'types'
+import { Atc, AtcStatus } from 'types'
 import { useVaProviderContext } from 'context/VaProvider'
 import CellTowerIcon from '@mui/icons-material/CellTower'
 import Box from '@mui/material/Box'
@@ -114,7 +114,15 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
         </Stack>
       </Paper>
       {filteredAtcs.map((atc) => (
-        <StyledPaper key={atc.id} onClick={() => onSelectTower(atc.callsign)} selected={selected === atc.callsign}>
+        <StyledPaper 
+          key={atc.id} 
+          onClick={() => onSelectTower(atc.callsign)} 
+          selected={selected === atc.callsign}
+          sx={{ 
+            opacity: atc.status === AtcStatus.DISCONNECTED ? 0.6 : 1,
+            borderLeft: atc.status === AtcStatus.DISCONNECTED ? '4px solid var(--mui-palette-error-main)' : 'none'
+          }}
+        >
           <Stack direction='row' justifyContent='space-between' p={1}>
             <Box>
               <Typography variant='subtitle1'>
@@ -134,6 +142,11 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
                       )
                     : 'N/A'}
                 </Typography>
+                {atc.status === AtcStatus.DISCONNECTED && (
+                  <Typography variant='caption' color='error' sx={{ fontWeight: 'bold', ml: 1 }}>
+                    • RECONNECTING / GRACE PERIOD
+                  </Typography>
+                )}
               </Stack>
             </Box>
             <Stack direction='column' spacing={1}>

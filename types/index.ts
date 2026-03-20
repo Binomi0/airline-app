@@ -48,6 +48,10 @@ export enum MissionStatus {
   COMPLETED = 'COMPLETED',
   ABORTED = 'ABORTED'
 }
+export enum AtcStatus {
+  ACTIVE = 'ACTIVE',
+  DISCONNECTED = 'DISCONNECTED'
+}
 export enum PublicMissionStatus {
   AVAILABLE = 'AVAILABLE',
   RESERVED = 'RESERVED',
@@ -95,7 +99,18 @@ export type Atc = AtcPosition &
   typeof atc & {
     latitude?: number
     longitude?: number
+    firstSeenAt?: Date
+    lastSeenAt?: Date
+    status?: AtcStatus
   }
+
+export interface AtcHistory {
+  callsign: string
+  airportIcao: string
+  firstSeenAt: Date
+  lastSeenAt: Date
+  durationMinutes: number
+}
 
 export interface PublicMission {
   _id?: string
@@ -115,6 +130,9 @@ export interface PublicMission {
   originCoords: Coords
   destinationCoords: Coords
   status: PublicMissionStatus
+  estimatedTimeMinutes?: number
+  originAtcOnStart?: boolean
+  destinationAtcOnStart?: boolean
   reservedBy?: string // User ID (ObjectId string)
   reservedAt?: Date
 }
@@ -150,6 +168,10 @@ export interface Mission {
   endTime?: Date
   originCoords?: Coords
   destinationCoords?: Coords
+  estimatedTimeMinutes?: number
+  originAtcOnStart?: boolean
+  destinationAtcOnStart?: boolean
+  expiresAt?: Date
 }
 
 export interface MissionDetail {

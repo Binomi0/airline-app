@@ -91,6 +91,17 @@ const missionSchema: mongoose.Schema = new mongoose.Schema<IMission>(
     destinationCoords: {
       latitude: { type: Number },
       longitude: { type: Number }
+    },
+    estimatedTimeMinutes: {
+      type: Number
+    },
+    originAtcOnStart: {
+      type: Boolean,
+      default: false
+    },
+    destinationAtcOnStart: {
+      type: Boolean,
+      default: false
     }
   },
   {

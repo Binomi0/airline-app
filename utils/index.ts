@@ -226,6 +226,40 @@ export const getFuelForFlight = (distance: number, aircraftType: IcaoCode, passe
   }
 }
 
+export const getEstimatedTimeMinutes = (distance: number, aircraftType: IcaoCode): number => {
+  let speedKts = 250 // Default
+  switch (aircraftType) {
+    case 'C172':
+      speedKts = 110
+      break
+    case 'B350':
+    case 'BE20':
+      speedKts = 280
+      break
+    case 'C700':
+    case 'B737':
+    case 'B738':
+    case 'B739':
+    case 'A20N':
+    case 'A320':
+    case 'A321':
+      speedKts = 440
+      break
+    case 'B748':
+    case 'B77W':
+    case 'B788':
+    case 'A339':
+      speedKts = 480
+      break
+    case 'AN225':
+      speedKts = 430
+      break
+  }
+
+  // Time = (Distance / Speed) * 60 + Buffer for climb/descend/taxi
+  return Math.round((distance / speedKts) * 60 + 25)
+}
+
 export const reduceTowerMatrix =
   (atcs: ActiveAtc[]) =>
   (acc: TowerMatrixList, curr: ActiveAtc): TowerMatrixList =>

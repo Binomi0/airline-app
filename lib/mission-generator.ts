@@ -2,8 +2,9 @@ import AtcModel from 'models/Atc'
 import VirtualAirlineModel from 'models/VirtualAirline'
 import PilotModel from 'models/Pilot'
 import UserModel from 'models/User'
-import { MissionStatus, MissionType, Coords, MissionCategory, PublicMissionStatus } from 'types'
-import { getDistanceByCoords, randomIntFromInterval, getRandomInt, getCallsign, getMissionAttributes } from 'utils'
+import { MissionStatus, MissionType, Coords, MissionCategory, PublicMissionStatus, AtcStatus, aircraftNameToIcaoCode } from 'types'
+import { getDistanceByCoords, randomIntFromInterval, getRandomInt, getCallsign, getMissionAttributes, getEstimatedTimeMinutes } from 'utils'
+import { getAverageAtcDuration } from 'utils/ivao'
 import { ObjectId } from 'mongodb'
 import NftModel, { INft } from 'models/Nft'
 import PublicMissionModel from 'models/PublicMission'
@@ -67,7 +68,8 @@ export const generatePublicMissionPool = async () => {
     icao: a.atcPosition.airport.icao,
     latitude: a.atcPosition.airport.latitude,
     longitude: a.atcPosition.airport.longitude,
-    hasAtc: true
+    hasAtc: true,
+    status: a.status
   }))
 
   const uniqueAtcOrigins = Array.from(new Map(atcOrigins.map(a => [a.icao, a])).values())
@@ -164,6 +166,10 @@ const createMissionData = (origin: { icao: string, latitude: number, longitude: 
     const isSponsored = destination.hasAtc
     const rewardMultiplier = isSponsored ? 1.25 : (origin.hasAtc ? 1.1 : 1.0)
     const basePrize = (50 + distance * 1.1) * blueprint.multiplier
+
+    // Fetch average duration for destination if sponsored
+    // Note: We'll use a placeholder for now since we can't await easily in this sync-ish creator without refactoring
+    // But we can improve the description below.
 
     const startTime = new Date()
     // Random start delay (up to 30 mins)
@@ -285,12 +291,13 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
   ].filter((d) => d.icao !== location.icao)
 
   const allDestinations = [
-    ...activeAtcs.map(a => ({ ...a.atcPosition.airport, hasAtc: true })),
+    ...activeAtcs.map(a => ({ ...a.atcPosition.airport, hasAtc: true, status: a.status })),
     ...soloDestinations.map(d => ({ ...d, hasAtc: false }))
   ]
 
   // Get aircraft range if aircraftId is provided
   let rangeLimit = Infinity
+  let cruiseSpeedIcao: any = 'C172'
   if (aircraftId && aircraftId !== 'undefined' && aircraftId !== '') {
     try {
       console.log('Fetching range for aircraftId:', aircraftId)
@@ -306,6 +313,7 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
           rangeLimit = Number(rangeAttr.value) * 0.9 // Let's use 90% as a safety margin
           console.log('Range limit set to (90%):', rangeLimit)
         }
+        cruiseSpeedIcao = aircraftNameToIcaoCode[aircraftNft.metadata.name as keyof typeof aircraftNameToIcaoCode] || 'C172'
       } else {
         console.warn('Aircraft NFT not found for ID:', aircraftId)
         // If not found, we could default to Cessna 172 range as a safety measure for new users
@@ -346,6 +354,10 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       .slice(0, 3)
   }
 
+  const uniqueDestIcaos = Array.from(new Set(finalDestinations.map(d => d.icao)))
+  const avgDurations = await Promise.all(uniqueDestIcaos.map(icao => getAverageAtcDuration(icao)))
+  const durationMap = new Map(uniqueDestIcaos.map((icao, i) => [icao, avgDurations[i]]))
+
   const missions = finalDestinations.map((dest) => {
     const blueprint = MISSION_BLUEPRINTS[getRandomInt(MISSION_BLUEPRINTS.length)]
     const distance = getDistanceByCoords(
@@ -354,6 +366,8 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
     )
 
     const isSponsored = dest.hasAtc
+    const isGracePeriod = dest.status === AtcStatus.DISCONNECTED
+    const avgDuration = durationMap.get(dest.icao) || 120
     const rewardMultiplier = isSponsored ? 1.5 : (originHasAtc ? 1.2 : 0.8)
     const basePrize = (50 + distance * 1.1) * blueprint.multiplier
 
@@ -369,9 +383,11 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       isSponsored,
       rewardMultiplier,
       details: {
-        name: `[${isSponsored ? 'Sponsored' : 'Solo'}] ${blueprint.name}`,
+        name: `[${isSponsored ? (isGracePeriod ? 'Grace Period' : 'Sponsored') : 'Solo'}] ${blueprint.name}`,
         description: isSponsored 
-          ? `${blueprint.description} Dedicated ATC coverage at destination (${dest.icao}). Premium rewards!` 
+          ? `${blueprint.description} Dedicated ATC coverage at destination (${dest.icao}). Premium rewards!${
+              isGracePeriod ? ' [ATC disconnected - Grace Period active]' : ''
+            } (Avg. session: ${avgDuration}m)` 
           : originHasAtc 
             ? `${blueprint.description} Controlled departure from ${location.icao}. Enhanced rewards.`
             : `${blueprint.description} Standard solo flight. Standard rewards.`
@@ -383,7 +399,10 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       status: MissionStatus.STARTED,
       remote: false,
       isRewarded: false,
-      expiresAt: new Date(Date.now() + 3600000 * 2)
+      expiresAt: new Date(Date.now() + 3600000 * 2),
+      estimatedTimeMinutes: getEstimatedTimeMinutes(distance, cruiseSpeedIcao),
+      originAtcOnStart: originHasAtc,
+      destinationAtcOnStart: isSponsored
     }
   })
 

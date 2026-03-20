@@ -2,7 +2,10 @@ import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
 import PublicMissionModel from 'models/PublicMission'
 import MissionModel from 'models/Mission'
-import { PublicMissionStatus, MissionStatus } from 'types'
+import AtcModel from 'models/Atc'
+import NftModel from 'models/Nft'
+import { PublicMissionStatus, MissionStatus, aircraftNameToIcaoCode } from 'types'
+import { getEstimatedTimeMinutes, getMissionAttributes } from 'utils'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -16,7 +19,14 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    // 1. Atomic reservation in the public pool
+    // 1. Fetch aircraft details to calculate performance
+    const aircraftNft = await NftModel.findOne({ id: BigInt(aircraftId) }).lean()
+    if (!aircraftNft) {
+      return res.status(404).json({ error: 'Aircraft not found' })
+    }
+    const cruiseSpeedIcao = aircraftNameToIcaoCode[aircraftNft.metadata.name as keyof typeof aircraftNameToIcaoCode] || 'C172'
+
+    // 2. Atomic reservation in the public pool
     const publicMission = await PublicMissionModel.findOneAndUpdate(
       { 
         _id: missionId, 
@@ -36,7 +46,13 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return res.status(409).json({ error: 'Mission already reserved or not found' })
     }
 
-    // 2. Create the personal mission record for tracking
+    // 3. Check current ATC status for origin and destination
+    const [originAtc, destAtc] = await Promise.all([
+      AtcModel.exists({ 'atcPosition.airport.icao': publicMission.origin }),
+      AtcModel.exists({ 'atcPosition.airport.icao': publicMission.destination })
+    ])
+
+    // 4. Create the personal mission record for tracking
     const userMission = await MissionModel.create({
       userId: req.id,
       origin: publicMission.origin,
@@ -56,7 +72,10 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       weight: weight || 1500, // Default weight if not provided
       status: MissionStatus.STARTED,
       remote: false,
-      isRewarded: false
+      isRewarded: false,
+      estimatedTimeMinutes: getEstimatedTimeMinutes(publicMission.distance, cruiseSpeedIcao),
+      originAtcOnStart: !!originAtc,
+      destinationAtcOnStart: !!destAtc
     })
 
     res.status(201).json(userMission)

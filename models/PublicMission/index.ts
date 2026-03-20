@@ -73,6 +73,17 @@ const publicMissionSchema: mongoose.Schema = new mongoose.Schema<IPublicMission>
       latitude: { type: Number },
       longitude: { type: Number }
     },
+    estimatedTimeMinutes: {
+      type: Number
+    },
+    originAtcOnStart: {
+      type: Boolean,
+      default: false
+    },
+    destinationAtcOnStart: {
+      type: Boolean,
+      default: false
+    },
     status: {
       type: String,
       enum: Object.values(PublicMissionStatus),

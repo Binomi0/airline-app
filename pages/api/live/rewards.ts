@@ -4,8 +4,9 @@ import { coinTokenAddress } from 'contracts/address'
 import User from 'models/User'
 import VirtualAirline from 'models/VirtualAirline'
 import Mission from 'models/Mission'
-import { MissionStatus, MissionStep, LastTrackStateEnum } from 'types'
+import { MissionStatus, MissionStep, LastTrackStateEnum, AtcStatus } from 'types'
 import Live from 'models/Live'
+import AtcModel from 'models/Atc'
 import { getContract, sendAndConfirmTransaction } from 'thirdweb'
 import { privateKeyToAccount } from 'thirdweb/wallets'
 import { transfer } from 'thirdweb/extensions/erc20'
@@ -69,8 +70,33 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     if (score) {
       if (mission.status !== MissionStatus.ABORTED && !mission.isRewarded) {
         const remote = mission.remote ? 3 : 1
+        
+        // 1. Calculate Actual vs Estimated time for AFK check
+        const flightTimeMinutes = (new Date().getTime() - new Date(mission.createdAt).getTime()) / (1000 * 60)
+        const estimatedTime = mission.estimatedTimeMinutes || (mission.distance * 0.25 + 30) // Fallback
+        
+        let afkMultiplier = 1.0
+        if (flightTimeMinutes > estimatedTime * 4) {
+          afkMultiplier = 0.1 // Severe penalty for extreme AFK
+        } else if (flightTimeMinutes > estimatedTime * 2) {
+          afkMultiplier = 0.5 // Moderate penalty
+        }
 
-        const prize = ((mission.prize * (mission.rewardMultiplier || 1.0)) / remote) * (1 + score / 100)
+        // 2. Dynamic ATC Bonus (at completion)
+        const currentDestAtc = await AtcModel.findOne({ 
+          'atcPosition.airport.icao': mission.destination,
+          status: { $in: [AtcStatus.ACTIVE, AtcStatus.DISCONNECTED] } 
+        })
+        
+        let atcBonus = 1.0
+        if (mission.isSponsored) {
+          // If the mission was sponsored, we check if they actually got service at departure/arrival
+          const depBonus = mission.originAtcOnStart ? 0.15 : 0
+          const arrBonus = !!currentDestAtc ? 0.25 : (mission.destinationAtcOnStart ? 0.1 : 0)
+          atcBonus = 1.0 + depBonus + arrBonus
+        }
+
+        const finalPrize = ((mission.prize * atcBonus * afkMultiplier) / remote) * (1 + score / 100)
 
         // Refactored transfer logic for Thirdweb v5
         if (process.env.THIRDWEB_AUTH_PRIVATE_KEY) {
@@ -86,7 +112,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
               address: coinTokenAddress
             }),
             to: user.address,
-            amount: mission.prize.toString()
+            amount: Math.round(finalPrize).toString()
           })
 
           const receipt = await sendAndConfirmTransaction({
@@ -94,7 +120,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
             account: serverAccount
           })
 
-          console.log('Reward transfer successful:', receipt.transactionHash)
+          console.log('Reward transfer successful:', receipt.transactionHash, 'Final Prize:', Math.round(finalPrize), 'AFK Multiplier:', afkMultiplier)
         } else {
           console.error('Missing THIRDWEB_AUTH_PRIVATE_KEY for rewards')
           throw new Error('Server wallet not configured')
@@ -105,7 +131,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
             isRewarded: true,
             status: MissionStatus.COMPLETED,
             score,
-            rewards: prize
+            rewards: Math.round(finalPrize)
           }),
           VirtualAirline.findOneAndUpdate({ userId: req.id }, { lastLandedAt: mission.destination }, { upsert: true }),
           Live.findOneAndDelete({ userId: req.id })

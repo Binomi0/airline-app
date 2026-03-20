@@ -1,6 +1,27 @@
 import { ivaoInstance } from 'config/axios'
-import { VirtualAirlineModel } from 'models'
+import { VirtualAirlineModel, AtcHistoryModel } from 'models'
 import moment from 'moment'
+
+/**
+ * Calculates the average ATC connection duration.
+ * @param icao Optional airport ICAO to filter stats.
+ * @returns Average duration in minutes.
+ */
+export const getAverageAtcDuration = async (icao?: string): Promise<number> => {
+  try {
+    const query = icao ? { airportIcao: icao.toUpperCase() } : {}
+    
+    const stats = await AtcHistoryModel.aggregate([
+      { $match: query },
+      { $group: { _id: null, avgDuration: { $avg: '$durationMinutes' } } }
+    ])
+
+    return stats.length > 0 ? Math.round(stats[0].avgDuration) : 120 // Default 2 hours if no data
+  } catch (error) {
+    console.error('[IVAO Utils] Error calculating average duration:', error)
+    return 120
+  }
+}
 
 interface IvaoTokenResponse {
   access_token: string
