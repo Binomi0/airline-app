@@ -1,4 +1,3 @@
-import { VaProvider } from 'context/VaProvider'
 import { useRouter } from 'next/router'
 import React from 'react'
 import MissionView from 'routes/Missions/MissionView'
@@ -41,7 +40,7 @@ const MissionAircraftPage = () => {
   }
 
   return (
-    <VaProvider>
+    <>
       <Fade in={!ownedAircrafts}>
         <Box>
           <LinearProgress />
@@ -52,7 +51,7 @@ const MissionAircraftPage = () => {
           <MissionView aircraft={ownedAircrafts?.find((a) => a.tokenId.toString() === router.query.aircraft)?.nft} />
         </Box>
       </Fade>
-    </VaProvider>
+    </>
   )
 }
 

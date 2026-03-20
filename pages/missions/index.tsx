@@ -1,7 +1,6 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 const OperationsCenter = dynamic(() => import('routes/Missions/OperationsCenter'), { ssr: false })
-import { VaProvider } from 'context/VaProvider'
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
@@ -46,9 +45,7 @@ const MissionsPage = () => {
   }
 
   return (
-    <VaProvider>
-      <OperationsCenter />
-    </VaProvider>
+    <OperationsCenter />
   )
 }
 

@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import React, { type FC, startTransition, useCallback, useMemo, useReducer, useRef, useState } from 'react'
 import { useSetRecoilState, useRecoilValue } from 'recoil'
 import { getApi } from 'lib/api'
@@ -11,6 +12,8 @@ import { VaProviderContext } from './VaProvider.context'
 import nextApiInstance, { ivaoInstance } from 'config/axios'
 
 const MIN_IVAO_REQ_DELAY = 1 * 60 * 1000
+const IVAO_ACTIVE_ROUTES = ['/missions', '/live', '/ivao', '/map', '/operations']
+
 export const INITIAL_STATE: IVAOClients = {
   // pilots: [],
   atcs: [],
@@ -24,6 +27,7 @@ export const INITIAL_STATE: IVAOClients = {
 }
 
 export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const router = useRouter()
   // const user = useRecoilValue(userState)
   // const ivaoUser = useRecoilValue(ivaoUserStore)
   const ivaoToken = useRecoilValue(ivaoUserAuthStore)
@@ -114,6 +118,10 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     // Only start sync if we have an app token (logged in)
     if (!authToken) return
 
+    // Route-based guard: only sync on specific pages
+    const isAllowedRoute = IVAO_ACTIVE_ROUTES.some((route) => router.pathname.startsWith(route))
+    if (!isAllowedRoute) return
+
     const atcTimer = setInterval(() => getAtcs(), MIN_IVAO_REQ_DELAY)
     const ivaoTimer = setInterval(() => getIVAOData(), MIN_IVAO_REQ_DELAY)
     // const pilotsTimer = setInterval(getPilots, MIN_IVAO_REQ_DELAY / 2)
@@ -122,7 +130,7 @@ export const VaProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
       clearInterval(atcTimer)
       clearInterval(ivaoTimer)
     }
-  }, [getAtcs, getIVAOData, authToken])
+  }, [getAtcs, getIVAOData, authToken, router.pathname])
 
   const initIvaoData = useCallback(() => {
     // Manual trigger for first load

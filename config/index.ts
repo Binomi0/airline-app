@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query'
 import { createThirdwebClient } from 'thirdweb'
-import { sepolia } from 'thirdweb/chains'
+import { arbitrum, sepolia } from 'thirdweb/chains'
 
 export const queryClient = new QueryClient()
 
@@ -17,4 +17,4 @@ export const twClient = createThirdwebClient({ clientId: twClientId })
 // cuando las variables de entorno pueden no estar cargadas.
 export const twServer = createThirdwebClient(twSecretKey ? { secretKey: twSecretKey } : { clientId: twClientId })
 
-export const activeChain = sepolia
+export const activeChain = process.env.NEXT_PUBLIC_DEFAULT_NETWORK === 'sepolia' ? sepolia : arbitrum
