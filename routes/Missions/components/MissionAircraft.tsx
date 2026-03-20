@@ -17,7 +17,7 @@ import React, { useCallback, useMemo } from 'react'
 import { useRecoilValue } from 'recoil'
 import Swal from 'sweetalert2'
 import { Mission } from 'types'
-import { getMissionAttributes } from 'utils'
+import { getNFTAttributes } from 'utils'
 import { useAppContracts } from 'hooks/useAppContracts'
 import { twClient } from 'config'
 
@@ -34,7 +34,7 @@ const MissionAircraft: React.FC<{ mission?: Mission; onCancel: () => void }> = (
 
   const aircraftAttributes: AircraftAttributes = useMemo(() => {
     if (!mission?.aircraft) return {} as AircraftAttributes
-    const attributes = getMissionAttributes(mission.aircraft).reduce(
+    const attributes = getNFTAttributes(mission.aircraft).reduce(
       (acc, curr) =>
         ({
           ...acc,

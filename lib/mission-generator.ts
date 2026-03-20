@@ -2,8 +2,24 @@ import AtcModel from 'models/Atc'
 import VirtualAirlineModel from 'models/VirtualAirline'
 import PilotModel from 'models/Pilot'
 import UserModel from 'models/User'
-import { MissionStatus, MissionType, Coords, MissionCategory, PublicMissionStatus, AtcStatus, aircraftNameToIcaoCode, IcaoCode } from 'types'
-import { getDistanceByCoords, randomIntFromInterval, getRandomInt, getCallsign, getMissionAttributes, getEstimatedTimeMinutes } from 'utils'
+import {
+  MissionStatus,
+  MissionType,
+  Coords,
+  MissionCategory,
+  PublicMissionStatus,
+  AtcStatus,
+  aircraftNameToIcaoCode,
+  IcaoCode
+} from 'types'
+import {
+  getDistanceByCoords,
+  randomIntFromInterval,
+  getRandomInt,
+  getCallsign,
+  getNFTAttributes,
+  getEstimatedTimeMinutes
+} from 'utils'
 import { getAverageAtcDuration } from 'utils/ivao'
 import { ObjectId } from 'mongodb'
 import NftModel, { INft } from 'models/Nft'
@@ -57,14 +73,14 @@ const MISSION_POOL_SIZE = 50 // Increased pool size to accommodate more variety
 
 export const generatePublicMissionPool = async () => {
   console.info('[MissionPool] Replenishing mission pool...')
-  
+
   // 1. Get current active ATCs to use as mandatory origins
   const activeAtcs = await AtcModel.find({
     'atcPosition.airport.icao': { $exists: true },
     'atcPosition.airport.latitude': { $exists: true }
   }).lean()
 
-  const atcOrigins = activeAtcs.map(a => ({
+  const atcOrigins = activeAtcs.map((a) => ({
     icao: a.atcPosition.airport.icao,
     latitude: a.atcPosition.airport.latitude,
     longitude: a.atcPosition.airport.longitude,
@@ -72,43 +88,42 @@ export const generatePublicMissionPool = async () => {
     status: a.status
   }))
 
-  const uniqueAtcOrigins = Array.from(new Map(atcOrigins.map(a => [a.icao, a])).values())
+  const uniqueAtcOrigins = Array.from(new Map(atcOrigins.map((a) => [a.icao, a])).values())
 
   // Combine with hubs for destinations variety
-  const allDestinations = [
-    ...uniqueAtcOrigins,
-    ...MAJOR_HUBS.map(h => ({ ...h, hasAtc: false }))
-  ]
-  const uniqueDestinations = Array.from(new Map(allDestinations.map(a => [a.icao, a])).values())
+  const allDestinations = [...uniqueAtcOrigins, ...MAJOR_HUBS.map((h) => ({ ...h, hasAtc: false }))]
+  const uniqueDestinations = Array.from(new Map(allDestinations.map((a) => [a.icao, a])).values())
 
   // 2. Get existing routes in the pool to avoid duplicates
-  const existingMissions = await PublicMissionModel.find({ 
-    status: PublicMissionStatus.AVAILABLE 
-  }).select('origin destination').lean()
-  
-  const existingRoutes = new Set(existingMissions.map(m => `${m.origin}-${m.destination}`))
+  const existingMissions = await PublicMissionModel.find({
+    status: PublicMissionStatus.AVAILABLE
+  })
+    .select('origin destination')
+    .lean()
+
+  const existingRoutes = new Set(existingMissions.map((m) => `${m.origin}-${m.destination}`))
   const newMissions = []
 
   // Shuffle origins to provide different variety each time
   const shuffledOrigins = uniqueAtcOrigins.sort(() => Math.random() - 0.5)
-  
+
   // 3. Guarantee missions for each ATC origin
   for (const origin of shuffledOrigins) {
     // For each tier, generate at least one mission if possible
     if (newMissions.length + existingMissions.length >= MISSION_POOL_SIZE) break
 
     const tiers = [
-      { min: 20, max: 150 },   // Short
-      { min: 151, max: 500 },  // Medium
-      { min: 501, max: 2500 }  // Long
+      { min: 20, max: 150 }, // Short
+      { min: 151, max: 500 }, // Medium
+      { min: 501, max: 2500 } // Long
     ]
 
     for (const tier of tiers) {
       // Find eligible destinations within this range
-      let possibleDests = uniqueDestinations.filter(d => {
+      let possibleDests = uniqueDestinations.filter((d) => {
         if (d.icao === origin.icao) return false
         if (existingRoutes.has(`${origin.icao}-${d.icao}`)) return false // Skip existing routes
-        
+
         const dist = getDistanceByCoords(
           { latitude: origin.latitude, longitude: origin.longitude } as Coords,
           { latitude: d.latitude, longitude: d.longitude } as Coords
@@ -119,7 +134,7 @@ export const generatePublicMissionPool = async () => {
       if (possibleDests.length > 0) {
         // Shuffle to avoid picking the same one first consistently
         possibleDests = possibleDests.sort(() => Math.random() - 0.5)
-        
+
         // Pick only ONE destination per tier to ensure maximum spread
         const destination = possibleDests[0]
         const mission = createMissionData(origin, destination)
@@ -138,11 +153,11 @@ export const generatePublicMissionPool = async () => {
     attempts++
     const origin = uniqueDestinations[getRandomInt(uniqueDestinations.length)]
     const destination = uniqueDestinations[getRandomInt(uniqueDestinations.length)]
-    
+
     if (origin.icao !== destination.icao && !existingRoutes.has(`${origin.icao}-${destination.icao}`)) {
-        newMissions.push(createMissionData(origin, destination))
-        existingRoutes.add(`${origin.icao}-${destination.icao}`)
-        remaining--
+      newMissions.push(createMissionData(origin, destination))
+      existingRoutes.add(`${origin.icao}-${destination.icao}`)
+      remaining--
     }
   }
 
@@ -155,54 +170,56 @@ export const generatePublicMissionPool = async () => {
 }
 
 // Helper to centralize mission creation logic
-const createMissionData = (origin: { icao: string, latitude: number, longitude: number, hasAtc: boolean }, destination: { icao: string, latitude: number, longitude: number, hasAtc: boolean }) => {
-    const blueprint = MISSION_BLUEPRINTS[getRandomInt(MISSION_BLUEPRINTS.length)]
-    const distance = getDistanceByCoords(
-      { latitude: origin.latitude, longitude: origin.longitude } as Coords,
-      { latitude: destination.latitude, longitude: destination.longitude } as Coords
-    )
+const createMissionData = (
+  origin: { icao: string; latitude: number; longitude: number; hasAtc: boolean },
+  destination: { icao: string; latitude: number; longitude: number; hasAtc: boolean }
+) => {
+  const blueprint = MISSION_BLUEPRINTS[getRandomInt(MISSION_BLUEPRINTS.length)]
+  const distance = getDistanceByCoords(
+    { latitude: origin.latitude, longitude: origin.longitude } as Coords,
+    { latitude: destination.latitude, longitude: destination.longitude } as Coords
+  )
 
-    
-    const isSponsored = destination.hasAtc
-    const rewardMultiplier = isSponsored ? 1.25 : (origin.hasAtc ? 1.1 : 1.0)
-    const basePrize = (50 + distance * 1.1) * blueprint.multiplier
+  const isSponsored = destination.hasAtc
+  const rewardMultiplier = isSponsored ? 1.25 : origin.hasAtc ? 1.1 : 1.0
+  const basePrize = (50 + distance * 1.1) * blueprint.multiplier
 
-    // Fetch average duration for destination if sponsored
-    // Note: We'll use a placeholder for now since we can't await easily in this sync-ish creator without refactoring
-    // But we can improve the description below.
+  // Fetch average duration for destination if sponsored
+  // Note: We'll use a placeholder for now since we can't await easily in this sync-ish creator without refactoring
+  // But we can improve the description below.
 
-    const startTime = new Date()
-    // Random start delay (up to 30 mins)
-    startTime.setMinutes(startTime.getMinutes() + getRandomInt(30))
-    
-    const durationHours = randomIntFromInterval(2, 6)
-    const endTime = new Date(startTime.getTime() + durationHours * 3600000)
+  const startTime = new Date()
+  // Random start delay (up to 30 mins)
+  startTime.setMinutes(startTime.getMinutes() + getRandomInt(30))
 
-    return {
-      origin: origin.icao,
-      destination: destination.icao,
-      originCoords: { latitude: origin.latitude, longitude: origin.longitude },
-      destinationCoords: { latitude: destination.latitude, longitude: destination.longitude },
-      distance: Math.round(distance),
-      type: blueprint.type,
-      category: isSponsored ? MissionCategory.ATC : MissionCategory.SOLO,
-      isSponsored,
-      rewardMultiplier,
-      details: {
-        name: `[${isSponsored ? 'Sponsored' : 'Solo'}] ${blueprint.name}`,
-        description: isSponsored 
-          ? `${blueprint.description} Cobertura ATC dedicada en destino (${destination.icao}). ¡Recompensas Premium!` 
-          : origin.hasAtc 
-            ? `${blueprint.description} Salida controlada desde ${origin.icao}. Recompensas mejoradas.`
-            : `${blueprint.description} Vuelo estándar en solitario. Recompensas base.`
-      },
-      basePrize: Math.round(basePrize / 100),
-      prize: Math.round((basePrize * rewardMultiplier) / 100),
-      status: PublicMissionStatus.AVAILABLE,
-      startTime,
-      endTime,
-      expiresAt: endTime
-    }
+  const durationHours = randomIntFromInterval(2, 6)
+  const endTime = new Date(startTime.getTime() + durationHours * 3600000)
+
+  return {
+    origin: origin.icao,
+    destination: destination.icao,
+    originCoords: { latitude: origin.latitude, longitude: origin.longitude },
+    destinationCoords: { latitude: destination.latitude, longitude: destination.longitude },
+    distance: Math.round(distance),
+    type: blueprint.type,
+    category: isSponsored ? MissionCategory.ATC : MissionCategory.SOLO,
+    isSponsored,
+    rewardMultiplier,
+    details: {
+      name: `[${isSponsored ? 'Sponsored' : 'Solo'}] ${blueprint.name}`,
+      description: isSponsored
+        ? `${blueprint.description} Cobertura ATC dedicada en destino (${destination.icao}). ¡Recompensas Premium!`
+        : origin.hasAtc
+          ? `${blueprint.description} Salida controlada desde ${origin.icao}. Recompensas mejoradas.`
+          : `${blueprint.description} Vuelo estándar en solitario. Recompensas base.`
+    },
+    basePrize: Math.round(basePrize / 100),
+    prize: Math.round((basePrize * rewardMultiplier) / 100),
+    status: PublicMissionStatus.AVAILABLE,
+    startTime,
+    endTime,
+    expiresAt: endTime
+  }
 }
 
 export const getPlayerLocation = async (
@@ -247,7 +264,7 @@ export const getPlayerLocation = async (
 export const generateMissionsForUser = async (user_id: string, aircraftId?: string, originIcao?: string) => {
   const user = await UserModel.findById(user_id)
   if (!user) return []
-  
+
   const ivaoVid = user.id
   let location: { icao: string; latitude: number; longitude: number } | null = null
 
@@ -291,8 +308,8 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
   ].filter((d) => d.icao !== location.icao)
 
   const allDestinations = [
-    ...activeAtcs.map(a => ({ ...a.atcPosition.airport, hasAtc: true, status: a.status })),
-    ...soloDestinations.map(d => ({ ...d, hasAtc: false }))
+    ...activeAtcs.map((a) => ({ ...a.atcPosition.airport, hasAtc: true, status: a.status })),
+    ...soloDestinations.map((d) => ({ ...d, hasAtc: false }))
   ]
 
   // Get aircraft range if aircraftId is provided
@@ -304,8 +321,8 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       // Use BigInt for the lookup as the schema defines id as BigInt
       const aircraftNft = await NftModel.findOne({ id: BigInt(aircraftId) }).lean()
       if (aircraftNft) {
-        const attrs = getMissionAttributes(aircraftNft as unknown as INft)
-        const rangeAttr = attrs.find(a => a.trait_type === 'range')
+        const attrs = getNFTAttributes(aircraftNft as unknown as INft)
+        const rangeAttr = attrs.find((a) => a.trait_type === 'range')
         console.log('Aircraft attributes found:', attrs.length, 'Range attribute:', rangeAttr)
         if (rangeAttr) {
           // Range is usually in KM in our metadata (e.g. 1289 for C172)
@@ -313,7 +330,8 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
           rangeLimit = Number(rangeAttr.value) * 0.9 // Let's use 90% as a safety margin
           console.log('Range limit set to (90%):', rangeLimit)
         }
-        cruiseSpeedIcao = aircraftNameToIcaoCode[aircraftNft.metadata.name as keyof typeof aircraftNameToIcaoCode] || 'C172'
+        cruiseSpeedIcao =
+          aircraftNameToIcaoCode[aircraftNft.metadata.name as keyof typeof aircraftNameToIcaoCode] || 'C172'
       } else {
         console.warn('Aircraft NFT not found for ID:', aircraftId)
         // If not found, we could default to Cessna 172 range as a safety measure for new users
@@ -327,7 +345,7 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
     rangeLimit = 1200
   }
 
-  const filteredDestinations = allDestinations.filter(dest => {
+  const filteredDestinations = allDestinations.filter((dest) => {
     const d = getDistanceByCoords(
       { latitude: location!.latitude, longitude: location!.longitude } as Coords,
       { latitude: dest.latitude, longitude: dest.longitude } as Coords
@@ -343,7 +361,7 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
   if (finalDestinations.length === 0) {
     console.warn('No destinations within range, falling back to 3 closest.')
     finalDestinations = allDestinations
-      .map(dest => ({
+      .map((dest) => ({
         ...dest,
         dist: getDistanceByCoords(
           { latitude: location!.latitude, longitude: location!.longitude } as Coords,
@@ -354,8 +372,8 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       .slice(0, 3)
   }
 
-  const uniqueDestIcaos = Array.from(new Set(finalDestinations.map(d => d.icao)))
-  const avgDurations = await Promise.all(uniqueDestIcaos.map(icao => getAverageAtcDuration(icao)))
+  const uniqueDestIcaos = Array.from(new Set(finalDestinations.map((d) => d.icao)))
+  const avgDurations = await Promise.all(uniqueDestIcaos.map((icao) => getAverageAtcDuration(icao)))
   const durationMap = new Map(uniqueDestIcaos.map((icao, i) => [icao, avgDurations[i]]))
 
   const missions = finalDestinations.map((dest) => {
@@ -369,7 +387,7 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
     const isOriginSponsored = originHasAtc
     const isGracePeriod = dest.status === AtcStatus.DISCONNECTED
     const avgDuration = durationMap.get(dest.icao) || 120
-    
+
     // Cumulative Multiplier logic:
     // Base: 0.8 (Solo)
     // Origin ATC: +0.4
@@ -392,18 +410,18 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       destinationCoords: { latitude: dest.latitude, longitude: dest.longitude },
       distance: Math.round(distance),
       type: blueprint.type,
-      category: isTopFlight ? MissionCategory.ATC : (isBoosted ? MissionCategory.EVENT : MissionCategory.SOLO),
+      category: isTopFlight ? MissionCategory.ATC : isBoosted ? MissionCategory.EVENT : MissionCategory.SOLO,
       isSponsored: isDestinationSponsored,
       rewardMultiplier,
       details: {
-        name: `[${isTopFlight ? 'TOP FLIGHT' : (isBoosted ? 'BOOSTED' : 'SOLO')}] ${blueprint.name}`,
+        name: `[${isTopFlight ? 'TOP FLIGHT' : isBoosted ? 'BOOSTED' : 'SOLO'}] ${blueprint.name}`,
         description: isTopFlight
           ? `${blueprint.description} ¡Misión de élite con cobertura ATC total (Origen y Destino)! Recompensas máximas (+110%).`
-          : isDestinationSponsored 
+          : isDestinationSponsored
             ? `${blueprint.description} Cobertura ATC dedicada en destino (${dest.icao}). Recompensas Premium (+70%).${
                 isGracePeriod ? ' [ATC disconnected - Grace Period active]' : ''
-              } (Avg. session: ${avgDuration}m)` 
-            : isOriginSponsored 
+              } (Avg. session: ${avgDuration}m)`
+            : isOriginSponsored
               ? `${blueprint.description} Salida controlada desde ${location.icao}. Recompensas mejoradas (+40%).`
               : `${blueprint.description} Vuelo estándar en solitario. Recompensas base.`
       },
@@ -422,15 +440,10 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
   })
 
   // Ensure we have at least some missions of each type if available
-  const sponsored = missions.filter(m => m.isSponsored)
-  const solo = missions.filter(m => !m.isSponsored)
-  
-  const finalMissions = [
-    ...sponsored.slice(0, 6),
-    ...solo.slice(0, 4)
-  ]
+  const sponsored = missions.filter((m) => m.isSponsored)
+  const solo = missions.filter((m) => !m.isSponsored)
 
-  return finalMissions
-    .filter((m) => m !== null)
-    .sort((a, b) => a.distance - b.distance)
+  const finalMissions = [...sponsored.slice(0, 6), ...solo.slice(0, 4)]
+
+  return finalMissions.filter((m) => m !== null).sort((a, b) => a.distance - b.distance)
 }

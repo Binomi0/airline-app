@@ -1,14 +1,13 @@
 import React from 'react'
-import { Box, Typography, Skeleton, Stack, alpha, useTheme } from '@mui/material'
-import { Mission } from 'types'
+import { Box, Typography, Skeleton, Stack, useTheme, Paper } from '@mui/material'
+import { PublicMission } from 'types'
 import MissionRow from './MissionRow'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
 
 interface MissionBoardProps {
-  // eslint-disable-next-line no-unused-vars
-  missions: Mission[]
-  onSelect: (mission: Mission) => void
-  selectedMission?: Mission
+  missions: PublicMission[]
+  onSelect: (mission: PublicMission) => void
+  selectedMission?: PublicMission
   isLoading?: boolean
   filterSlot?: React.ReactNode
 }
@@ -21,21 +20,18 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
     return (
       <Stack spacing={0.5}>
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <Skeleton key={i} variant='rectangular' height={40} sx={{ borderRadius: 0, bgcolor: '#050505' }} />
+          <Skeleton key={i} variant='rectangular' height={40} sx={{ borderRadius: 0 }} />
         ))}
       </Stack>
     )
   }
 
   return (
-    <Box
+    <Paper
+      variant='terminal'
       sx={{
         pb: 4,
-        bgcolor: '#000',
-        p: 2,
-        borderRadius: '12px',
-        border: `1px solid ${alpha(primaryColor, 0.2)}`,
-        boxShadow: `0 20px 25px -5px rgba(0, 0, 0, 0.5)`
+        p: 2
       }}
     >
       {/* Board Title & Filter Slot */}
@@ -53,15 +49,7 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
           >
             <FlightTakeoffIcon sx={{ color: '#000', fontSize: 24 }} />
           </Box>
-          <Typography
-            variant='h4'
-            sx={{
-              color: primaryColor,
-              fontFamily: "'VT323', monospace",
-              fontWeight: 'bold',
-              letterSpacing: 1
-            }}
-          >
+          <Typography variant='h4' color='primary' sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
             OPERATIONS CENTER
           </Typography>
         </Stack>
@@ -70,11 +58,11 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
       </Stack>
 
       {missions.length === 0 ? (
-        <Box textAlign='center' py={10} sx={{ border: '1px solid #1a1a1a' }}>
-          <Typography variant='h5' sx={{ color: primaryColor, fontFamily: "'VT323', monospace" }}>
+        <Box textAlign='center' py={10} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+          <Typography variant='h5' color='primary'>
             NO MISSIONS AVAILABLE
           </Typography>
-          <Typography sx={{ color: alpha(primaryColor, 0.6), fontFamily: "'VT323', monospace" }}>
+          <Typography color='primary' sx={{ opacity: 0.6 }}>
             CONNECT TO AN ACTIVE ATC TOWER TO UNLOCK MISSIONS
           </Typography>
         </Box>
@@ -87,30 +75,46 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
               px: 2,
               pb: 1,
               mb: 1,
-              borderBottom: `1px solid #1a1a1a`,
-              fontFamily: "'VT323', monospace",
+              borderBottom: '1px solid',
+              borderColor: 'divider',
               opacity: 0.8
             }}
           >
-            <Typography sx={{ width: 80, color: primaryColor, fontSize: '1rem', fontWeight: 'bold' }}>TIME</Typography>
-            <Typography sx={{ width: 220, color: primaryColor, fontSize: '1rem', fontWeight: 'bold' }}>
+            <Typography sx={{ width: 80, color: 'primary.main', fontSize: '1rem', fontWeight: 'bold' }}>
+              TIME
+            </Typography>
+            <Typography sx={{ width: 220, color: 'primary.main', fontSize: '1rem', fontWeight: 'bold' }}>
               ROUTE (ICAO)
             </Typography>
-            <Typography sx={{ width: 120, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', pl: 1 }}>
+            <Typography sx={{ width: 120, color: 'primary.main', fontSize: '1rem', fontWeight: 'bold', pl: 1 }}>
               TYPE
             </Typography>
             <Typography
-              sx={{ width: 100, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', textAlign: 'right' }}
+              sx={{ width: 100, color: 'primary.main', fontSize: '1rem', fontWeight: 'bold', textAlign: 'right' }}
             >
               DIST (NM)
             </Typography>
             <Typography
-              sx={{ width: 140, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', textAlign: 'right', ml: 3 }}
+              sx={{
+                width: 140,
+                color: 'primary.main',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                textAlign: 'right',
+                ml: 3
+              }}
             >
               PRIZE (AIRL)
             </Typography>
             <Typography
-              sx={{ width: 140, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', textAlign: 'right', ml: 2 }}
+              sx={{
+                width: 140,
+                color: 'primary.main',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                textAlign: 'right',
+                ml: 2
+              }}
             >
               STATUS
             </Typography>
@@ -131,7 +135,7 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
           </Box>
         </>
       )}
-    </Box>
+    </Paper>
   )
 }
 

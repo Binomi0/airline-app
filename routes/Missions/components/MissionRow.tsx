@@ -1,29 +1,29 @@
 import React from 'react'
-import { Box, Typography, useTheme, alpha, Chip } from '@mui/material'
-import { IBaseMission } from 'types'
-import { formatNumber } from 'utils'
 import moment from 'moment'
+import { Box, Typography, useTheme, alpha, Chip } from '@mui/material'
+import { formatNumber } from 'utils'
+import { PublicMission } from 'types'
+import { vt323 } from 'src/theme'
 
 interface MissionRowProps {
-  mission: IBaseMission
-  onSelect: (missionId: string) => void
+  mission: PublicMission
+  onSelect: (mission: PublicMission) => void
   isSelected?: boolean
 }
 
 const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }) => {
   const theme = useTheme()
-
   const primaryColor = theme.palette.primary.main
-  const mutedColor = alpha(primaryColor, 0.4)
 
   return (
     <Box
-      onClick={() => onSelect(mission._id!)}
+      onClick={() => onSelect(mission)}
       sx={{
         cursor: 'pointer',
         mb: '2px',
-        background: isSelected ? alpha(primaryColor, 0.08) : '#020202',
-        border: `1px solid ${isSelected ? alpha(primaryColor, 0.4) : '#121212'}`,
+        background: isSelected ? alpha(primaryColor, 0.08) : 'rgba(0,0,0,0.8)',
+        border: '1px solid',
+        borderColor: isSelected ? alpha(primaryColor, 0.4) : 'rgba(255,255,255,0.05)',
         display: 'flex',
         alignItems: 'center',
         px: 2,
@@ -38,7 +38,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
             textShadow: `0 0 10px ${primaryColor}`
           }
         },
-        fontFamily: "'VT323', monospace",
+        fontFamily: vt323.style.fontFamily,
         textTransform: 'uppercase'
       }}
     >
@@ -78,7 +78,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           sx={{
             fontFamily: 'inherit',
             fontSize: '1.8rem',
-            color: isSelected ? '#fff' : primaryColor,
+            color: isSelected ? '#fff' : 'primary.main',
             width: 80,
             textAlign: 'left',
             letterSpacing: 2
@@ -86,13 +86,13 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
         >
           {mission.origin}
         </Typography>
-        <Typography sx={{ color: mutedColor, fontSize: '1.2rem' }}>→</Typography>
+        <Typography sx={{ color: alpha(primaryColor, 0.4), fontSize: '1.2rem' }}>→</Typography>
         <Typography
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
             fontSize: '1.8rem',
-            color: isSelected ? '#fff' : primaryColor,
+            color: isSelected ? '#fff' : 'primary.main',
             width: 80,
             textAlign: 'left',
             letterSpacing: 2
@@ -111,8 +111,9 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
             fontFamily: 'inherit',
             fontSize: '1rem',
             bgcolor: alpha(primaryColor, 0.15),
-            color: isSelected ? '#fff' : primaryColor,
-            border: `1px solid ${alpha(primaryColor, 0.4)}`,
+            color: isSelected ? '#fff' : 'primary.main',
+            border: '1px solid',
+            borderColor: alpha(primaryColor, 0.4),
             borderRadius: 1,
             height: 22,
             fontWeight: 'bold',
@@ -128,7 +129,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           sx={{
             fontFamily: 'inherit',
             fontSize: '1.6rem',
-            color: isSelected ? '#fff' : primaryColor
+            color: isSelected ? '#fff' : 'primary.main'
           }}
         >
           {mission.distance.toString().padStart(4, '0')} NM
@@ -142,7 +143,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           sx={{
             fontFamily: 'inherit',
             fontSize: '1.8rem',
-            color: isSelected ? '#fff' : primaryColor,
+            color: isSelected ? '#fff' : 'primary.main',
             letterSpacing: 1
           }}
         >
@@ -175,14 +176,10 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5, mt: -0.5 }}>
           {mission.originAtcOnStart && (
-            <Typography sx={{ fontSize: '0.7rem', color: theme.palette.info.main, opacity: 0.8 }}>
-              ATC ORIGIN
-            </Typography>
+            <Typography sx={{ fontSize: '0.7rem', color: 'info.main', opacity: 0.8 }}>ATC ORIGIN</Typography>
           )}
           {mission.isSponsored && (
-            <Typography sx={{ fontSize: '0.7rem', color: theme.palette.success.main, opacity: 0.8 }}>
-              ATC DEST
-            </Typography>
+            <Typography sx={{ fontSize: '0.7rem', color: 'success.main', opacity: 0.8 }}>ATC DEST</Typography>
           )}
         </Box>
       </Box>

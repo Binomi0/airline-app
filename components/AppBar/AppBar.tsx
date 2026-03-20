@@ -105,7 +105,7 @@ const CustomAppBar = () => {
           </Link>
           {matches ? (
             <Typography ml={2} variant='h6' component='div' sx={{ flexGrow: 1 }}>
-              WeiFly (Alpha)
+              WeiFly (Testnet)
             </Typography>
           ) : (
             <Typography ml={2} variant='h6' component='div' sx={{ flexGrow: 1 }}>

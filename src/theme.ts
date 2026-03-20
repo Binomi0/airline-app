@@ -1,5 +1,5 @@
-import { Roboto, Sora } from 'next/font/google'
-import { createTheme, responsiveFontSizes, ThemeOptions } from '@mui/material/styles'
+import { Roboto, Sora, VT323, B612_Mono } from 'next/font/google'
+import { createTheme, responsiveFontSizes, ThemeOptions, alpha } from '@mui/material/styles'
 import { grey, red } from '@mui/material/colors'
 
 export const roboto = Roboto({
@@ -13,6 +13,16 @@ export const sora = Sora({
   subsets: ['latin'],
   display: 'swap',
   fallback: ['Helvetica', 'Arial', 'sans-serif']
+})
+export const vt323 = VT323({
+  weight: ['400'],
+  subsets: ['latin'],
+  display: 'swap'
+})
+export const b612Mono = B612_Mono({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  display: 'swap'
 })
 
 const commonTypography: ThemeOptions['typography'] = {
@@ -54,7 +64,9 @@ const commonComponents: ThemeOptions['components'] = {
   MuiButton: {
     styleOverrides: {
       root: {
-        borderRadius: '8px'
+        borderRadius: '8px',
+        textTransform: 'none',
+        fontWeight: 600
       }
     }
   },
@@ -65,6 +77,85 @@ const commonComponents: ThemeOptions['components'] = {
         boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
       }
     }
+  },
+  MuiPaper: {
+    styleOverrides: {
+      root: {
+        borderRadius: '12px'
+      }
+    },
+    variants: [
+      {
+        props: { variant: 'terminal' },
+        style: ({ theme }) => ({
+          background: '#000',
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+          boxShadow: `0 20px 25px -5px rgba(0, 0, 0, 0.5)`,
+          padding: theme.spacing(2)
+        })
+      },
+      {
+        props: { variant: 'glass' },
+        style: ({ theme }) => ({
+          background: theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.7)' : 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(12px)',
+          border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
+          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)'
+        })
+      }
+    ]
+  },
+  MuiTextField: {
+    variants: [
+      {
+        props: { variant: 'outlined', color: 'primary' },
+        style: ({ theme }) => ({
+          '& .MuiOutlinedInput-root': {
+            height: 32,
+            fontFamily: vt323.style.fontFamily,
+            fontSize: '1rem',
+            backgroundColor: alpha(theme.palette.primary.main, 0.05),
+            '& fieldset': {
+              borderColor: alpha(theme.palette.primary.main, 0.2)
+            },
+            '&:hover fieldset': {
+              borderColor: alpha(theme.palette.primary.main, 0.4)
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: theme.palette.primary.main
+            }
+          },
+          '& .MuiInputBase-input::placeholder': {
+            color: alpha(theme.palette.primary.main, 0.5),
+            opacity: 1
+          }
+        })
+      }
+    ]
+  },
+  MuiTypography: {
+    variants: [
+      {
+        props: { variant: 'h4' }, // Apply to h4 if it's used for headers
+        style: {
+          fontFamily: vt323.style.fontFamily
+        }
+      },
+      {
+        props: { variant: 'button' },
+        style: {
+          fontFamily: sora.style.fontFamily
+        }
+      }
+    ]
+  }
+}
+
+// Module augmentation for custom variants
+declare module '@mui/material/Paper' {
+  interface PaperPropsVariantOverrides {
+    terminal: true
+    glass: true
   }
 }
 

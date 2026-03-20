@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { INft } from 'models/Nft'
 import { getNFTAttributes } from 'utils'
 import styles from 'styles/Hangar.module.css'
+import { useNFTProviderContext } from 'context/NFTProvider'
 
 interface Props {
   nft: INft
@@ -13,19 +14,28 @@ interface Props {
   onClaim: () => void
 }
 
+const attributeFields = ['range', 'license', 'cargo', 'combustible', 'price']
+
 const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onClaim }) => {
   const attributes = useMemo(() => getNFTAttributes(nft), [nft])
   const name = nft.metadata.name as string
   const image = nft.metadata.image as string
+  const description = nft.metadata.description as string
+  const { licenses } = useNFTProviderContext()
 
-  // Extract key specs
-  const specs = useMemo(() => {
-    return attributes.filter((attr) =>
-      ['range', 'cruise_speed', 'capacity', 'license_required', 'price'].includes(attr.trait_type.toLowerCase())
-    )
-  }, [attributes])
+  const specs = useMemo(
+    () => attributes.filter((attr) => attributeFields.includes(attr.trait_type.toLowerCase())),
+    [attributes]
+  )
 
-  const price = attributes.find((attr) => attr.trait_type.toLowerCase() === 'price')?.value
+  const licenseId = useMemo(
+    () => attributes.find((attr) => attr.trait_type.toLowerCase() === 'license')?.value,
+    [attributes]
+  )
+
+  const license = useMemo(() => licenses.find((license) => license.id === licenseId), [licenses, licenseId])
+
+  const price = useMemo(() => attributes.find((attr) => attr.trait_type.toLowerCase() === 'price')?.value, [attributes])
 
   return (
     <Box className={styles.showcaseContainer}>
@@ -44,7 +54,7 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
               src={image}
               alt={name}
               fill
-              style={{ objectFit: 'contain' }}
+              style={{ objectFit: 'cover' }}
               className={styles.mainAircraftImage}
               priority
             />
@@ -83,19 +93,33 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
             </Box>
           </Box>
           <Typography variant='body2' color='rgba(255,255,255,0.6)' sx={{ mb: 2 }}>
-            Configuración técnica y especificaciones de vuelo.
+            {description}
           </Typography>
         </Stack>
 
         <Box>
-          {specs.map((spec) => (
-            <Box key={spec.trait_type} className={styles.specRow}>
-              <Typography className={styles.specLabel}>{spec.trait_type.replace('_', ' ')}</Typography>
-              <Typography className={styles.specValue}>
-                {spec.trait_type.toLowerCase() === 'price' ? `${spec.value} AIRL` : spec.value}
-              </Typography>
-            </Box>
-          ))}
+          {specs.map((spec) => {
+            if (hasAircraft && spec.trait_type.toLowerCase() === 'price') return null
+            return (
+              <Box key={spec.trait_type} className={styles.specRow}>
+                <Typography className={styles.specLabel}>{spec.trait_type.replace('_', ' ')}</Typography>
+                {spec.trait_type.toLowerCase() === 'license' ? (
+                  <Box className={styles.specValue}>
+                    <Image
+                      src={license?.metadata.image as string}
+                      alt={license?.metadata.name as string}
+                      width={20}
+                      height={20}
+                    />
+                  </Box>
+                ) : (
+                  <Typography className={styles.specValue}>
+                    {spec.trait_type.toLowerCase() === 'price' ? `${spec.value} AIRL` : spec.value}
+                  </Typography>
+                )}
+              </Box>
+            )
+          })}
         </Box>
 
         {!hasAircraft && (

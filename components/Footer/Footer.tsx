@@ -28,6 +28,7 @@ const Footer: React.FC = () => {
                   alt='WeiFly Logo'
                   width={32}
                   height={32}
+                  priority
                 />
                 <Typography variant='h6' fontWeight={700} className={styles.brandTitle}>
                   WeiFly

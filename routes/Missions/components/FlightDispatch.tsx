@@ -17,12 +17,12 @@ import {
   alpha,
   useTheme
 } from '@mui/material'
-import { Mission, MissionCategory, aircraftNameToIcaoCode } from 'types'
+import { PublicMission, MissionCategory, aircraftNameToIcaoCode } from 'types'
 import {
   formatNumber,
   getFuelForFlight,
   getIcaoCodeFromAircraftNFT,
-  getMissionAttributes,
+  getNFTAttributes,
   gallonsToLiters,
   filterByTokenAddress
 } from 'utils'
@@ -41,7 +41,7 @@ import { useRouter } from 'next/router'
 import Swal from 'sweetalert2'
 
 interface FlightDispatchProps {
-  mission: Mission
+  mission: PublicMission
   onCancel: () => void
 }
 
@@ -247,9 +247,7 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
                   Capacidad:{' '}
                   {formatNumber(
                     gallonsToLiters(
-                      Number(
-                        getMissionAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value || 0
-                      )
+                      Number(getNFTAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value || 0)
                     ),
                     0
                   )}{' '}

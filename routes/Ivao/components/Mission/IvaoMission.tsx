@@ -13,7 +13,7 @@ import {
   getCallsign,
   getFuelForFlight,
   getIcaoCodeFromAircraftNFT,
-  getMissionAttributes,
+  getNFTAttributes,
   getMissionWeight
 } from 'utils'
 import { tokenBalanceStore } from 'store/balance.atom'
@@ -64,7 +64,7 @@ const IvaoMission = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, 
   )
 
   const getCurrentFuelInLiters = useCallback((currentAircraft: INft) => {
-    const combustible = getMissionAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value
+    const combustible = getNFTAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value
     if (!combustible) return 0
 
     return formatNumber(gallonsToLiters(Number(combustible)), 0)

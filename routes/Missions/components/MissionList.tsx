@@ -9,7 +9,6 @@ import { INft } from 'models/Nft'
 import { Box, Stack, Typography, useTheme, alpha } from '@mui/material'
 
 type Props = {
-  // eslint-disable-next-line no-unused-vars
   reserveMission: (missionId: string, aircraft: INft, callsign: string) => Promise<Mission>
   pool: PublicMission[]
   aircraft?: INft
@@ -20,13 +19,13 @@ const MissionList = ({ reserveMission, pool, aircraft }: Props) => {
   const theme = useTheme()
 
   const handleSelect = useCallback(
-    async (missionId: string) => {
+    async (mission: PublicMission) => {
       if (!aircraft) {
         alert('Selecciona una aeronave primero')
         return
       }
       try {
-        await reserveMission(missionId, aircraft, getCallsign())
+        await reserveMission(mission._id!, aircraft, getCallsign())
       } catch {
         alert('No se pudo reservar la misión. Es posible que otro piloto la haya tomado.')
       }

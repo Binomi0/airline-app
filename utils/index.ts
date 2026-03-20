@@ -51,16 +51,13 @@ export const verifySignature = async function (authenticator, response, expected
   }
 }
 
-export const getMissionAttributes = (nft: INft) => {
+export const getNFTAttributes = (nft: INft) => {
   if (nft.metadata.attributes && Array.isArray(nft.metadata.attributes) && nft.metadata.attributes.length > 0) {
     return nft.metadata.attributes as AttributeType[]
   }
 
   return []
 }
-
-/** @deprecated Use getMissionAttributes instead */
-export const getNFTAttributes = getMissionAttributes
 
 export const parseNumber = (value: number | bigint) => Intl.NumberFormat('es').format(value)
 
@@ -107,7 +104,7 @@ export function getCallsign() {
 }
 
 export function getMissionWeight(aircraft: INft) {
-  const attribute = getMissionAttributes(aircraft).find((attribute) => attribute.trait_type === 'cargo')
+  const attribute = getNFTAttributes(aircraft).find((attribute) => attribute.trait_type === 'cargo')
 
   if (!attribute) {
     console.warn(`Aircraft ${aircraft.id} is missing 'cargo' attribute`)
@@ -118,7 +115,7 @@ export function getMissionWeight(aircraft: INft) {
 }
 
 export function getMissionPrize(distance: number, aircraft: INft) {
-  const attribute = getMissionAttributes(aircraft).find((attr) => attr.trait_type === 'license')
+  const attribute = getNFTAttributes(aircraft).find((attr) => attr.trait_type === 'license')
   if (attribute) {
     const base = Math.floor(distance / 100) / 5
     switch (attribute.value) {

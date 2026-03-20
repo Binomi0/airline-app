@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { Grid, Box, Stack, Typography, useTheme, GlobalStyles, TextField, InputAdornment, Paper } from '@mui/material'
+import { Grid, Box, Stack, Typography, useTheme, TextField, InputAdornment, Paper } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import Map from 'components/Map/RadarMap'
 import MissionBoard from './components/MissionBoard'
 import FlightDispatch from './components/FlightDispatch'
 import { useVaProviderContext } from 'context/VaProvider'
-import { Atc, Mission } from 'types'
+import { Atc, Mission, PublicMission } from 'types'
 import nextApiInstance from 'config/axios'
 import useOwnedNFTs from 'hooks/useOwnedNFTs'
 import { nftAircraftTokenAddress } from 'contracts/address'
-import { filterByTokenAddress } from 'utils'
+import { filterByTokenAddress, getCallsign } from 'utils'
 import { useRecoilValue } from 'recoil'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 
@@ -31,9 +31,9 @@ const OperationsCenter = () => {
     [userNfts]
   )
 
-  const [missions, setMissions] = useState<Mission[]>([])
+  const [missions, setMissions] = useState<PublicMission[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedMission, setSelectedMission] = useState<Mission | null>(null)
+  const [selectedMission, setSelectedMission] = useState<PublicMission | null>(null)
   const [originInput, setOriginInput] = useState<string>('') // To avoid multiple renders on input
   const [origin, setOrigin] = useState<string>('')
 
@@ -43,7 +43,7 @@ const OperationsCenter = () => {
       // We pass the first owned aircraft ID if available, otherwise it works with fallback
       const aircraftId = ownedAircrafts[0]?.nft?.id.toString() || ''
       const url = `/api/missions?aircraftId=${aircraftId}${origin ? `&origin=${origin}` : ''}`
-      const response = await nextApiInstance.get<Mission[]>(url)
+      const response = await nextApiInstance.get<PublicMission[]>(url)
       setMissions(response.data)
     } catch (error) {
       console.error('Failed to fetch missions:', error)
@@ -99,55 +99,6 @@ const OperationsCenter = () => {
 
   return (
     <Box component='main' sx={{ height: 'calc(100vh - 64px)', p: 3, overflowY: 'auto', bgcolor: 'background.default' }}>
-      <GlobalStyles
-        styles={{
-          '.radar-popup .leaflet-popup-content-wrapper': {
-            background: `${theme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`,
-            color: `${theme.palette.text.primary} !important`,
-            padding: '0 !important',
-            borderRadius: '12px !important',
-            border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(0,0,0,0.1)'} !important`,
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important'
-          },
-          '.radar-popup .leaflet-popup-tip': {
-            background: `${theme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`,
-            border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(0,0,0,0.1)'} !important`
-          },
-          '.radar-popup .leaflet-popup-content': {
-            margin: '0 !important',
-            width: 'auto !important',
-            padding: '16px !important',
-            paddingRight: '32px !important'
-          },
-          '.radar-popup .leaflet-popup-close-button': {
-            color: `${theme.palette.text.secondary} !important`,
-            top: '8px !important',
-            right: '8px !important',
-            fontSize: '20px !important',
-            zIndex: 1000
-          },
-          '.leaflet-tooltip': {
-            background: `${theme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`,
-            border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(0,0,0,0.1)'} !important`,
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1) !important',
-            color: `${theme.palette.text.primary} !important`,
-            padding: '8px !important',
-            borderRadius: '8px !important'
-          },
-          '.leaflet-tooltip-top:before': {
-            borderTopColor: `${theme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`
-          },
-          '.leaflet-tooltip-bottom:before': {
-            borderBottomColor: `${theme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`
-          },
-          '.leaflet-tooltip-left:before': {
-            borderLeftColor: `${theme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`
-          },
-          '.leaflet-tooltip-right:before': {
-            borderRightColor: `${theme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`
-          }
-        }}
-      />
       <Grid container spacing={4}>
         <Grid item xs={12} lg={8}>
           <Stack spacing={4}>
@@ -160,7 +111,7 @@ const OperationsCenter = () => {
                   const icao = tower.atcPosition?.airport?.icao || tower.callsign.split('_')[0]
                   const m = missions.find((m) => m.destination === icao || m.origin === icao)
                   if (m) {
-                    setSelectedMission(m)
+                    setSelectedMission({ ...m, callsign: getCallsign() })
                   } else {
                     // If no mission, offer to set as origin
                     setOrigin(icao)
@@ -172,7 +123,7 @@ const OperationsCenter = () => {
 
             <MissionBoard
               missions={missions}
-              onSelect={setSelectedMission}
+              onSelect={(m) => setSelectedMission({ ...m, callsign: getCallsign() })}
               selectedMission={selectedMission || undefined}
               isLoading={isLoading}
               filterSlot={
@@ -180,30 +131,12 @@ const OperationsCenter = () => {
                   size='small'
                   placeholder='ORIGIN ICAO...'
                   variant='outlined'
+                  color='primary'
                   value={originInput}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOriginInput(e.target.value.toUpperCase())}
                   onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                     if (e.key === 'Enter') {
                       setOrigin(originInput)
-                    }
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      height: 32,
-                      fontFamily: "'VT323', monospace",
-                      fontSize: '1rem',
-                      color: 'primary.main',
-                      bgcolor: 'rgba(59, 130, 246, 0.05)',
-                      '& fieldset': {
-                        borderColor: 'rgba(59, 130, 246, 0.2)'
-                      },
-                      '&:hover fieldset': {
-                        borderColor: 'rgba(59, 130, 246, 0.4)'
-                      }
-                    },
-                    '& .MuiInputBase-input::placeholder': {
-                      color: 'rgba(59, 130, 246, 0.5)',
-                      opacity: 1
                     }
                   }}
                   InputProps={{
@@ -214,10 +147,7 @@ const OperationsCenter = () => {
                     ),
                     endAdornment: (
                       <InputAdornment position='end'>
-                        <Typography
-                          variant='caption'
-                          sx={{ fontFamily: "'VT323', monospace", color: 'primary.main', opacity: 0.5 }}
-                        >
+                        <Typography variant='caption' color='primary' sx={{ opacity: 0.5 }}>
                           ENTER
                         </Typography>
                       </InputAdornment>
@@ -235,6 +165,7 @@ const OperationsCenter = () => {
               <FlightDispatch mission={selectedMission} onCancel={() => setSelectedMission(null)} />
             ) : (
               <Paper
+                variant='outlined'
                 sx={{
                   p: 4,
                   minHeight: 400,
@@ -242,9 +173,8 @@ const OperationsCenter = () => {
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  borderRadius: 3,
-                  border: '2px dashed',
-                  borderColor: 'divider',
+                  borderStyle: 'dashed',
+                  borderWidth: 2,
                   bgcolor: 'transparent'
                 }}
               >

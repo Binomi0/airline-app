@@ -133,6 +133,7 @@ export interface IBaseMission {
   destinationAtcOnStart?: boolean
   expiresAt?: Date
   startedAt?: Date
+  callsign?: string
 }
 
 export interface PublicMission extends IBaseMission {
