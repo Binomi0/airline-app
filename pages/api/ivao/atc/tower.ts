@@ -34,7 +34,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.error('error =>', error)
   }
 
-  const apiKey = process.env.NEXT_PUBLIC_IVAO_API_KEY
+  const apiKey = process.env.IVAO_API_KEY
   const userToken = req.headers['x-ivao-token'] as string
 
   try {

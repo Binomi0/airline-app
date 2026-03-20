@@ -18,8 +18,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const headers: Record<string, string> = {}
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
-    } else if (process.env.NEXT_PUBLIC_IVAO_API_KEY) {
-      headers['apiKey'] = process.env.NEXT_PUBLIC_IVAO_API_KEY
+    } else if (process.env.IVAO_API_KEY) {
+      headers['apiKey'] = process.env.IVAO_API_KEY
     }
 
     const response = await ivaoInstance.get<IvaoEvent[]>('/v1/events', {

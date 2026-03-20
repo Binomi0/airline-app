@@ -11,7 +11,7 @@ interface AxiosErrorResponse {
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query
-  const apiKey = process.env.NEXT_PUBLIC_IVAO_API_KEY
+  const apiKey = process.env.IVAO_API_KEY
 
   console.log('[ATIS API] Fetching ATIS for session:', id)
 
@@ -20,7 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   if (!apiKey) {
-    console.error('[ATIS API] NEXT_PUBLIC_IVAO_API_KEY is not configured')
+    console.error('[ATIS API] IVAO_API_KEY is not configured')
     return res.status(500).json({ message: 'IVAO API key is missing in configuration' })
   }
 
