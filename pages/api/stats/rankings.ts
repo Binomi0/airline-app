@@ -29,12 +29,12 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
     // 3. Top 10 Fastest (Average Speed)
     const fastest = await Mission.aggregate([
-      { 
-        $match: { 
-          status: MissionStatus.COMPLETED, 
-          startedAt: { $ne: null }, 
-          distance: { $gt: 0 } 
-        } 
+      {
+        $match: {
+          status: MissionStatus.COMPLETED,
+          startedAt: { $ne: null },
+          distance: { $gt: 0 }
+        }
       },
       {
         $project: {

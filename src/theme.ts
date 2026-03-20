@@ -187,7 +187,8 @@ const lTheme = createTheme({
           backdropFilter: 'blur(12px)',
           boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
           borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
-          color: '#1e293b'
+          color: '#1e293b',
+          borderRadius: 0
         }
       }
     }
@@ -227,7 +228,8 @@ const dTheme = createTheme({
           backdropFilter: 'blur(10px)',
           boxShadow: 'none',
           borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-          color: '#fff'
+          color: '#fff',
+          borderRadius: 0
         }
       }
     }

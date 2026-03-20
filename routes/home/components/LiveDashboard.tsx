@@ -48,9 +48,7 @@ const LiveDashboard = () => {
       <div className={styles.sectionHeader}>
         <span className={styles.sectionLabel}>Operaciones en Vivo</span>
         <h2 className={styles.sectionTitle}>Tráfico Real en el Ecosistema</h2>
-        <p className={styles.sectionDesc}>
-          Pilotos que están surcando los cielos en este mismo instante.
-        </p>
+        <p className={styles.sectionDesc}>Pilotos que están surcando los cielos en este mismo instante.</p>
       </div>
 
       <div className={styles.liveGrid}>
@@ -58,9 +56,7 @@ const LiveDashboard = () => {
           flights.map((flight) => (
             <div key={flight._id} className={styles.liveCard}>
               <div className={styles.livePilot}>
-                <span className={styles.pilotBadge}>
-                  {flight.userId?.vaUser?.pilotId || 'Pilot'}
-                </span>
+                <span className={styles.pilotBadge}>{flight.userId?.vaUser?.pilotId || 'Pilot'}</span>
                 <span className={styles.liveAircraft}>{flight.missionId?.aircraftId}</span>
               </div>
               <div className={styles.liveRoute}>
@@ -70,7 +66,9 @@ const LiveDashboard = () => {
               </div>
               <div className={styles.liveStatus}>
                 <span className={styles.statusDot} />
-                <span>{flight.status || 'En vuelo'} · {flight.missionId?.callsign}</span>
+                <span>
+                  {flight.status || 'En vuelo'} · {flight.missionId?.callsign}
+                </span>
               </div>
             </div>
           ))

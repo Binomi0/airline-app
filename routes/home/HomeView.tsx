@@ -160,7 +160,7 @@ const HomeView = () => {
           </div>
         ))}
       </div>
-      
+
       {user && <LiveDashboard />}
 
       {/* ── Features ───────────────────────────────────────────── */}

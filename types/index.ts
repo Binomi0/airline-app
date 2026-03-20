@@ -378,3 +378,26 @@ export const aircraftNameToIcaoCode = {
 }
 
 export type Hex = `0x${string}`
+
+export type IvaoEventType = 'generic' | 'hq_event' | 'pde' | 'rfe'
+
+export interface IvaoRoute {
+  departureIcao: string
+  arrivalIcao: string
+  route: string
+}
+
+export interface IvaoEvent {
+  id: number
+  startDate: string
+  endDate: string
+  title: string
+  imageUrl: string
+  description: string
+  infoUrl: string
+  divisions: string[]
+  airports: string[]
+  eventType: IvaoEventType
+  hqeAward: boolean
+  routes: IvaoRoute[]
+}

@@ -30,6 +30,7 @@ import axios from 'config/axios'
 import useMission from 'hooks/useMission'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
+import IvaoEvents from './components/IvaoEvents'
 
 const getMetar = async (callsign: string, ivaoAuthToken?: string | null) =>
   axios
@@ -188,6 +189,7 @@ const IvaoView = ({ user: _user }: Props) => {
 
       <Container>
         <Box px={2} width='100%' maxHeight='100vh'>
+          <IvaoEvents />
           <Stack direction='row' justifyContent='space-between' mt={2} spacing={2}>
             {start && (
               <Box>

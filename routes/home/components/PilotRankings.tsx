@@ -43,16 +43,14 @@ const PilotRankings = () => {
       <div className={styles.sectionHeader}>
         <span className={styles.sectionLabel}>Salón de la Fama</span>
         <h2 className={styles.sectionTitle}>Nuestros Pilotos de Élite</h2>
-        <p className={styles.sectionDesc}>
-          Reconocimiento a los aviadores más destacados de la red WeiFly.
-        </p>
+        <p className={styles.sectionDesc}>Reconocimiento a los aviadores más destacados de la red WeiFly.</p>
       </div>
 
       <div className={styles.rankingsGrid}>
-        <RankingColumn title="Más Efectivos" items={rankings.effective} unit="AIRL" />
-        <RankingColumn title="Más Viajeros" items={rankings.traveled} unit="nm" />
-        <RankingColumn title="Más Rápidos" items={rankings.fastest} unit="kts" decimals={1} />
-        <RankingColumn title="Puntuación Top" items={rankings.topScorers} unit="pts" decimals={1} />
+        <RankingColumn title='Más Efectivos' items={rankings.effective} unit='AIRL' />
+        <RankingColumn title='Más Viajeros' items={rankings.traveled} unit='nm' />
+        <RankingColumn title='Más Rápidos' items={rankings.fastest} unit='kts' decimals={1} />
+        <RankingColumn title='Puntuación Top' items={rankings.topScorers} unit='pts' decimals={1} />
       </div>
     </section>
   )
