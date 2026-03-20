@@ -158,14 +158,32 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           sx={{ 
             fontFamily: 'inherit', 
             fontSize: '1.4rem', 
-            color: isSponsored ? theme.palette.success.main : alpha(theme.palette.text.disabled, 0.4),
+            color: mission.rewardMultiplier >= 1.9 
+              ? theme.palette.success.main 
+              : mission.rewardMultiplier > 0.8 
+                ? theme.palette.info.main 
+                : alpha(theme.palette.text.disabled, 0.4),
             fontWeight: 'bold',
             letterSpacing: 1,
-            textShadow: isSponsored ? `0 0 10px ${theme.palette.success.main}` : 'none'
+            textShadow: mission.rewardMultiplier > 0.8 
+              ? `0 0 10px ${mission.rewardMultiplier >= 1.9 ? theme.palette.success.main : theme.palette.info.main}` 
+              : 'none'
           }}
         >
-          {isSponsored ? 'SPONSORED' : 'SOLO'}
+          {mission.rewardMultiplier >= 1.9 
+            ? 'TOP FLIGHT' 
+            : mission.rewardMultiplier > 0.8 
+              ? 'BOOSTED' 
+              : 'SOLO'}
         </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5, mt: -0.5 }}>
+           {mission.originAtcOnStart && (
+             <Typography sx={{ fontSize: '0.7rem', color: theme.palette.info.main, opacity: 0.8 }}>ATC ORIGIN</Typography>
+           )}
+           {mission.isSponsored && (
+             <Typography sx={{ fontSize: '0.7rem', color: theme.palette.success.main, opacity: 0.8 }}>ATC DEST</Typography>
+           )}
+        </Box>
       </Box>
     </Box>
   )

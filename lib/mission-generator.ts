@@ -2,7 +2,7 @@ import AtcModel from 'models/Atc'
 import VirtualAirlineModel from 'models/VirtualAirline'
 import PilotModel from 'models/Pilot'
 import UserModel from 'models/User'
-import { MissionStatus, MissionType, Coords, MissionCategory, PublicMissionStatus, AtcStatus, aircraftNameToIcaoCode } from 'types'
+import { MissionStatus, MissionType, Coords, MissionCategory, PublicMissionStatus, AtcStatus, aircraftNameToIcaoCode, IcaoCode } from 'types'
 import { getDistanceByCoords, randomIntFromInterval, getRandomInt, getCallsign, getMissionAttributes, getEstimatedTimeMinutes } from 'utils'
 import { getAverageAtcDuration } from 'utils/ivao'
 import { ObjectId } from 'mongodb'
@@ -297,7 +297,7 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
 
   // Get aircraft range if aircraftId is provided
   let rangeLimit = Infinity
-  let cruiseSpeedIcao: any = 'C172'
+  let cruiseSpeedIcao: IcaoCode = 'C172'
   if (aircraftId && aircraftId !== 'undefined' && aircraftId !== '') {
     try {
       console.log('Fetching range for aircraftId:', aircraftId)
@@ -365,10 +365,23 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       { latitude: dest.latitude, longitude: dest.longitude } as Coords
     )
 
-    const isSponsored = dest.hasAtc
+    const isDestinationSponsored = dest.hasAtc
+    const isOriginSponsored = originHasAtc
     const isGracePeriod = dest.status === AtcStatus.DISCONNECTED
     const avgDuration = durationMap.get(dest.icao) || 120
-    const rewardMultiplier = isSponsored ? 1.5 : (originHasAtc ? 1.2 : 0.8)
+    
+    // Cumulative Multiplier logic:
+    // Base: 0.8 (Solo)
+    // Origin ATC: +0.4
+    // Dest ATC: +0.7
+    // Both: 1.9
+    let rewardMultiplier = 0.8
+    if (isOriginSponsored) rewardMultiplier += 0.4
+    if (isDestinationSponsored) rewardMultiplier += 0.7
+
+    const isTopFlight = isOriginSponsored && isDestinationSponsored
+    const isBoosted = isOriginSponsored || isDestinationSponsored
+
     const basePrize = (50 + distance * 1.1) * blueprint.multiplier
 
     return {
@@ -379,18 +392,20 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       destinationCoords: { latitude: dest.latitude, longitude: dest.longitude },
       distance: Math.round(distance),
       type: blueprint.type,
-      category: isSponsored ? MissionCategory.ATC : MissionCategory.SOLO,
-      isSponsored,
+      category: isTopFlight ? MissionCategory.ATC : (isBoosted ? MissionCategory.EVENT : MissionCategory.SOLO),
+      isSponsored: isDestinationSponsored,
       rewardMultiplier,
       details: {
-        name: `[${isSponsored ? (isGracePeriod ? 'Grace Period' : 'Sponsored') : 'Solo'}] ${blueprint.name}`,
-        description: isSponsored 
-          ? `${blueprint.description} Dedicated ATC coverage at destination (${dest.icao}). Premium rewards!${
-              isGracePeriod ? ' [ATC disconnected - Grace Period active]' : ''
-            } (Avg. session: ${avgDuration}m)` 
-          : originHasAtc 
-            ? `${blueprint.description} Controlled departure from ${location.icao}. Enhanced rewards.`
-            : `${blueprint.description} Standard solo flight. Standard rewards.`
+        name: `[${isTopFlight ? 'TOP FLIGHT' : (isBoosted ? 'BOOSTED' : 'SOLO')}] ${blueprint.name}`,
+        description: isTopFlight
+          ? `${blueprint.description} ¡Misión de élite con cobertura ATC total (Origen y Destino)! Recompensas máximas (+110%).`
+          : isDestinationSponsored 
+            ? `${blueprint.description} Cobertura ATC dedicada en destino (${dest.icao}). Recompensas Premium (+70%).${
+                isGracePeriod ? ' [ATC disconnected - Grace Period active]' : ''
+              } (Avg. session: ${avgDuration}m)` 
+            : isOriginSponsored 
+              ? `${blueprint.description} Salida controlada desde ${location.icao}. Recompensas mejoradas (+40%).`
+              : `${blueprint.description} Vuelo estándar en solitario. Recompensas base.`
       },
       aircraftId,
       callsign: getCallsign(),
@@ -402,7 +417,7 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       expiresAt: new Date(Date.now() + 3600000 * 2),
       estimatedTimeMinutes: getEstimatedTimeMinutes(distance, cruiseSpeedIcao),
       originAtcOnStart: originHasAtc,
-      destinationAtcOnStart: isSponsored
+      destinationAtcOnStart: isDestinationSponsored
     }
   })
 

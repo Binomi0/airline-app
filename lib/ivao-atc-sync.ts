@@ -38,7 +38,7 @@ export async function syncAtcsWithGracePeriod(incomingAtcs: Atc[]) {
 
     try {
       await AtcHistoryModel.insertMany(historyRecords, { ordered: false })
-      await AtcModel.deleteMany({ _id: { $in: expiredAtcs.map((a) => (a as any)._id) } })
+      await AtcModel.deleteMany({ _id: { $in: expiredAtcs.map((a) => a._id) } })
     } catch (err) {
       console.error('[ATC Sync] Error archiving ATC history:', err)
     }

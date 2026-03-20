@@ -14,7 +14,8 @@ import {
   SelectChangeEvent,
   LinearProgress,
   Chip,
-  alpha
+  alpha,
+  useTheme
 } from '@mui/material'
 import { Mission, MissionCategory, aircraftNameToIcaoCode } from 'types'
 import {
@@ -53,6 +54,7 @@ const aircraftImageMap = [
 
 const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) => {
   const router = useRouter()
+  const theme = useTheme()
   const balance = useRecoilValue(tokenBalanceStore)
   const { data: userNfts } = useOwnedNFTs()
   const { twClient } = useRecoilValue(walletStore)
@@ -123,10 +125,29 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
           <Typography variant='h5' fontWeight='bold'>
             ORDEN DE VUELO
           </Typography>
-          <Chip
-            label={mission.category === MissionCategory.ATC ? 'ATC SPONSORED' : 'SOLO MISSION'}
-            color={mission.category === MissionCategory.ATC ? 'success' : 'default'}
-          />
+          <Stack direction='row' spacing={1} alignItems='center'>
+            {mission.rewardMultiplier > 0.8 && (
+              <Chip
+                label={mission.rewardMultiplier >= 1.9 ? 'TOP MISSION' : 'BOOSTED'}
+                color={mission.rewardMultiplier >= 1.9 ? 'success' : 'primary'}
+                variant='filled'
+                size='small'
+                sx={{ fontWeight: 'bold' }}
+              />
+            )}
+            <Chip
+              label={
+                mission.category === MissionCategory.SOLO
+                  ? 'SOLO MISSION'
+                  : mission.rewardMultiplier >= 1.9
+                    ? 'DUAL ATC COVERAGE'
+                    : 'ATC COVERAGE'
+              }
+              variant='outlined'
+              size='small'
+              sx={{ color: 'text.secondary', borderColor: 'divider' }}
+            />
+          </Stack>
         </Box>
 
         <Divider />
@@ -137,8 +158,12 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
           </Typography>
           <Stack direction='row' spacing={2} alignItems='center' mt={1}>
             <Box textAlign='center'>
-              <Typography variant='h4'>{mission.origin}</Typography>
-              <Typography variant='caption'>ORIGEN</Typography>
+              <Typography variant='h4' color={mission.originAtcOnStart ? 'info.main' : 'inherit'}>
+                {mission.origin}
+              </Typography>
+              <Typography variant='caption' sx={{ display: 'block', mt: -0.5 }}>
+                {mission.originAtcOnStart ? 'ATC ACTIVE (+40%)' : 'ORIGEN'}
+              </Typography>
             </Box>
             <Box flex={1} textAlign='center' position='relative'>
               <Typography variant='body2' color='text.secondary'>
@@ -158,10 +183,29 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
               />
             </Box>
             <Box textAlign='center'>
-              <Typography variant='h4'>{mission.destination}</Typography>
-              <Typography variant='caption'>DESTINO</Typography>
+              <Typography variant='h4' color={mission.isSponsored ? 'success.main' : 'inherit'}>
+                {mission.destination}
+              </Typography>
+              <Typography variant='caption' sx={{ display: 'block', mt: -0.5 }}>
+                {mission.isSponsored ? 'ATC ACTIVE (+70%)' : 'DESTINO'}
+              </Typography>
             </Box>
           </Stack>
+          {mission.rewardMultiplier > 0.8 && (
+            <Alert
+              icon={false}
+              severity='info'
+              sx={{
+                mt: 2,
+                bgcolor: alpha(theme.palette.info.main, 0.05),
+                border: `1px solid ${alpha(theme.palette.info.main, 0.1)}`
+              }}
+            >
+              <Typography variant='caption' sx={{ color: 'info.main', fontWeight: 'bold' }}>
+                RECOMPENSAS MEJORADAS: {Math.round((mission.rewardMultiplier - 0.8) * 100)}% BONUS POR ATC
+              </Typography>
+            </Alert>
+          )}
         </Box>
 
         <Box>

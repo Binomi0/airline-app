@@ -5,7 +5,7 @@ import MissionModel from 'models/Mission'
 import AtcModel from 'models/Atc'
 import NftModel from 'models/Nft'
 import { PublicMissionStatus, MissionStatus, aircraftNameToIcaoCode } from 'types'
-import { getEstimatedTimeMinutes, getMissionAttributes } from 'utils'
+import { getEstimatedTimeMinutes } from 'utils'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
