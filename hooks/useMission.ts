@@ -1,69 +1,74 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import { Mission, MissionStatus, FRoute, MissionType, MissionCategory } from 'types'
-import { getMissionWeight, getRandomInt, getMissionPrize } from 'utils'
+import { Mission, PublicMission } from 'types'
+import { getMissionWeight } from 'utils'
 import { missionStore } from 'store/mission.atom'
-import { cargos } from 'mocks/cargos'
 import nextApiInstance from 'config/axios'
 import { INft } from 'models/Nft'
 
 interface UseMission {
-  newMission: (route: FRoute, owned: INft, callsign: string, remote: boolean) => Promise<void>
+  // eslint-disable-next-line no-unused-vars
+  reserveMission: (missionId: string, aircraft: INft, callsign: string) => Promise<Mission>
   getMission: () => Promise<void>
+  getPool: () => Promise<PublicMission[]>
   setMission: (mission?: Mission) => void
   mission?: Mission
+  pool: PublicMission[]
   isLoading: boolean
   completed: number
 }
 
 const useMission = (): UseMission => {
   const [mission, setMission] = useRecoilState(missionStore)
+  const [pool, setPool] = useState<PublicMission[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [completed, setCompleted] = useState(0)
 
   const getMission = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await nextApiInstance.get<Mission>('/api/missions')
+      const response = await nextApiInstance.get<Mission>('/api/missions/current') // Assuming we move it to /current or similar
       setMission(response.data)
     } catch (error) {
-      console.error('error =>', error)
+      console.error('getMission error =>', error)
     } finally {
       setIsLoading(false)
     }
   }, [setMission])
 
-  const newMission = useCallback(
-    async (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => {
-      try {
-        const details = cargos[getRandomInt(8)]
-        const weight = getMissionWeight(aircraft)
-        const prize = getMissionPrize(route.distance, aircraft)
-        const mission: Mission = {
-          origin: route.origin,
-          destination: route.destination,
-          distance: route.distance,
-          type: route.type || MissionType.CARGO,
-          category: MissionCategory.NORMAL,
-          isSponsored: false,
-          rewardMultiplier: 1.0,
-          details,
+  const getPool = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const response = await nextApiInstance.get<PublicMission[]>('/api/missions')
+      setPool(response.data)
+      return response.data
+    } catch (error) {
+      console.error('getPool error =>', error)
+      return []
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
-          aircraft,
+  const reserveMission = useCallback(
+    async (missionId: string, aircraft: INft, callsign: string) => {
+      setIsLoading(true)
+      try {
+        const weight = getMissionWeight(aircraft)
+        const { data: userMission } = await nextApiInstance.post<Mission>('/api/missions/reserve', {
+          missionId,
           aircraftId: aircraft.id.toString(),
-          weight,
           callsign,
-          prize,
-          rewards: 0,
-          status: MissionStatus.STARTED,
-          remote,
-          isRewarded: false
-        }
-        setMission(mission)
+          weight
+        })
+
+        setMission(userMission)
+        return userMission
       } catch (err) {
-        const error = err as Error
-        console.error(error)
-        throw new Error(error.message)
+        console.error('reserveMission error =>', err)
+        throw err
+      } finally {
+        setIsLoading(false)
       }
     },
     [setMission]
@@ -82,7 +87,7 @@ const useMission = (): UseMission => {
     getCompletedCount()
   }, [getCompletedCount])
 
-  return { newMission, mission, getMission, setMission, isLoading, completed }
+  return { reserveMission, mission, pool, getMission, getPool, setMission, isLoading, completed }
 }
 
 export default useMission

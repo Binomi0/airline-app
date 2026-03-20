@@ -1,14 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
 import Image from 'next/image'
 import styles from 'styles/Home.module.css'
 import image from 'public/img/airplanes9.png'
-import { useVaProviderContext } from 'context/VaProvider'
-import { FRoute, Flight } from 'types'
 import useMission from 'hooks/useMission'
 import NoAddress from 'routes/Missions/components/NoAddress'
 import MissionReady from 'routes/Missions/components/MissionReady'
 import MissionList from 'routes/Missions/components/MissionList'
-import { useRouter } from 'next/router'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Fade from '@mui/material/Fade'
@@ -21,76 +18,53 @@ import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { INft } from 'models/Nft'
 
-const initialState: FRoute = {
-  origin: '',
-  destination: '',
-  distance: 0
-}
-
 type Props = {
   aircraft?: INft
 }
 
 const MissionView = ({ aircraft }: Props) => {
-  const router = useRouter()
   const address = useRecoilValue(smartAccountAddressStore)
-  const { newMission, mission, completed, getMission } = useMission()
-  const { flights, getFlights } = useVaProviderContext()
-  const [selected, setSelected] = useState(initialState)
-  const flightList = Object.entries(flights as Flight)
+  const { reserveMission, mission, pool, completed, getMission, getPool, isLoading } = useMission()
 
-  React.useEffect(() => {
-    const { origin, destination, callsign } = router.query
-    if (origin && destination && callsign && aircraft) {
-      if (origin === mission?.origin && destination === mission?.destination && aircraft.id === mission?.aircraftId) {
-        return
-      }
-      setSelected({ origin: origin as string, destination: destination as string, distance: 0 })
-      newMission(
-        { origin: origin as string, destination: destination as string, distance: 0 },
-        aircraft,
-        callsign as string,
-        true
-      )
-    }
-  }, [aircraft, mission?.aircraftId, mission?.destination, mission?.origin, newMission, router.query])
-
-  React.useEffect(() => {
+  useEffect(() => {
     getMission()
-    getFlights()
-  }, [getMission, getFlights])
+    getPool()
+  }, [getMission, getPool])
 
   return (
     <Box sx={{ position: 'relative' }}>
       <Image priority className={styles.background} src={image} alt='banner' fill />
-      {!flights && <LinearProgress />}
+      {isLoading && <LinearProgress />}
 
       <Container>
         <NoAddress />
 
-        <Fade in={!!address && !!selected.origin} unmountOnExit>
+        <Fade in={!!address && !!mission} unmountOnExit>
           <Box>
             <Typography color='common.white' variant='h5' gutterBottom>
               Misiones Completadas: {completed}
             </Typography>
-            <MissionReady mission={mission} onCancel={() => setSelected(initialState)} />
-          </Box>
-        </Fade>
-        <Fade in={!!address && !selected.origin} unmountOnExit>
-          <Box>
-            <MissionList aircraft={aircraft} flights={flightList} newMission={newMission} setSelected={setSelected} />
+            <MissionReady mission={mission} onCancel={() => {}} />
           </Box>
         </Fade>
 
-        <Fade in={flightList.length < 2} unmountOnExit>
-          <Box textAlign='center'>
-            {flightList.length === 0 && (
-              <Typography variant='h4' color='white' sx={{ mb: 2 }}>
-                No hay misiones disponibles basadas en torres ATC activas.
-              </Typography>
-            )}
-            <Alert severity='info' action={<Button onClick={() => {}}>Actualizar</Button>}>
-              <AlertTitle>Conecta con torres de control activas para desbloquear misiones exclusivas.</AlertTitle>
+        <Fade in={!!address && !mission} unmountOnExit>
+          <Box>
+            <MissionList 
+              aircraft={aircraft} 
+              pool={pool} 
+              reserveMission={reserveMission} 
+            />
+          </Box>
+        </Fade>
+
+        <Fade in={pool.length === 0 && !mission && !isLoading} unmountOnExit>
+          <Box textAlign='center' sx={{ mt: 4 }}>
+            <Typography variant='h4' color='white' sx={{ mb: 2 }}>
+              No hay misiones disponibles en la bolsa común.
+            </Typography>
+            <Alert severity='info' action={<Button onClick={() => getPool()}>Actualizar</Button>}>
+              <AlertTitle>Se generan nuevas misiones periódicamente basadas en el tráfico real de IVAO.</AlertTitle>
             </Alert>
           </Box>
         </Fade>

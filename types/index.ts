@@ -48,6 +48,11 @@ export enum MissionStatus {
   COMPLETED = 'COMPLETED',
   ABORTED = 'ABORTED'
 }
+export enum PublicMissionStatus {
+  AVAILABLE = 'AVAILABLE',
+  RESERVED = 'RESERVED',
+  COMPLETED = 'COMPLETED'
+}
 export enum MissionType {
   CARGO = 'CARGO',
   PASSENGER = 'PASSENGER',
@@ -91,6 +96,29 @@ export type Atc = AtcPosition &
     latitude?: number
     longitude?: number
   }
+
+export interface PublicMission {
+  _id?: string
+  origin: string
+  destination: string
+  distance: number
+  type: MissionType
+  category: MissionCategory
+  isSponsored: boolean
+  rewardMultiplier: number
+  details: MissionDetail
+  basePrize: number
+  prize: number
+  expiresAt: Date
+  startTime: Date
+  endTime: Date
+  originCoords: Coords
+  destinationCoords: Coords
+  status: PublicMissionStatus
+  reservedBy?: string // User ID (ObjectId string)
+  reservedAt?: Date
+}
+
 export interface Mission {
   // where it starts
   origin: string
@@ -118,7 +146,8 @@ export interface Mission {
   rewards?: number
   isRewarded: boolean
   score?: number
-  expiresAt?: Date
+  startTime?: Date
+  endTime?: Date
   originCoords?: Coords
   destinationCoords?: Coords
 }

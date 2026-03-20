@@ -74,7 +74,7 @@ export default function MyApp(props: MyAppProps) {
             <ContractProvider>
               <Head>
                 <meta name='viewport' content='initial-scale=1, width=device-width' />
-                <title>Weifly a decentralized virtual airline based on Ethereum</title>
+                <title>WeiFly | Aerolínea Virtual Descentralizada | Arbitrum</title>
               </Head>
               <ThemeWrapper>
                 <ErrorBoundary>

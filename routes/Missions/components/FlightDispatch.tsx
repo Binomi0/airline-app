@@ -117,7 +117,7 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
   }, [mission, currentAircraft, selectedAircraftId, getLive, router])
 
   return (
-    <Paper elevation={6} sx={{ p: 4, borderRadius: 3, position: 'sticky', top: 0 }}>
+    <Paper elevation={6} sx={{ p: 4, borderRadius: 3 }}>
       <Stack spacing={3}>
         <Box display='flex' justifyContent='space-between' alignItems='flex-start'>
           <Typography variant='h5' fontWeight='bold'>

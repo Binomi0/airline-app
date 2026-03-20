@@ -185,91 +185,93 @@ const OperationsCenter = () => {
               />
             </Box>
 
-            <Box>
-              <Stack direction='row' alignItems='center' justifyContent='space-between' mb={2}>
-                <Typography variant='h4' fontWeight='bold'>
-                  Panel de Misiones Disponibles
-                </Typography>
-                <Stack direction='row' spacing={2} alignItems='center'>
-                  <TextField
-                    size='small'
-                    placeholder='Origin ICAO...'
-                    value={originInput}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOriginInput(e.target.value.toUpperCase())}
-                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                      if (e.key === 'Enter') {
-                        setOrigin(originInput)
+            <MissionBoard
+              missions={missions}
+              onSelect={setSelectedMission}
+              selectedMission={selectedMission || undefined}
+              isLoading={isLoading}
+              filterSlot={
+                <TextField
+                  size='small'
+                  placeholder='ORIGIN ICAO...'
+                  variant='outlined'
+                  value={originInput}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOriginInput(e.target.value.toUpperCase())}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                    if (e.key === 'Enter') {
+                      setOrigin(originInput)
+                    }
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      height: 32,
+                      fontFamily: "'VT323', monospace",
+                      fontSize: '1rem',
+                      color: 'primary.main',
+                      bgcolor: 'rgba(59, 130, 246, 0.05)',
+                      '& fieldset': {
+                        borderColor: 'rgba(59, 130, 246, 0.2)'
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(59, 130, 246, 0.4)'
                       }
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position='start'>
-                          <SearchIcon color='primary' sx={{ opacity: 0.7 }} />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Box
-                            sx={{
-                              bgcolor: alpha(theme.palette.primary.main, 0.1),
-                              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                              borderRadius: '4px',
-                              px: 1,
-                              py: 0.2,
-                              display: 'flex',
-                              alignItems: 'center'
-                            }}
-                          >
-                            <Typography
-                              variant='caption'
-                              sx={{ fontWeight: 'bold', color: 'primary.main', fontSize: '0.65rem' }}
-                            >
-                              ENTER
-                            </Typography>
-                          </Box>
-                        </InputAdornment>
-                      )
-                    }}
-                    sx={{ width: 220 }}
-                  />
-                </Stack>
-              </Stack>
-              <MissionBoard
-                missions={missions}
-                isLoading={isLoading}
-                onSelect={handleSelectMission}
-                selectedMission={selectedMission || undefined}
-              />
-            </Box>
+                    },
+                    '& .MuiInputBase-input::placeholder': {
+                      color: 'rgba(59, 130, 246, 0.5)',
+                      opacity: 1
+                    }
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <SearchIcon sx={{ color: 'primary.main', fontSize: 18, opacity: 0.7 }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <Typography
+                          variant='caption'
+                          sx={{ fontFamily: "'VT323', monospace", color: 'primary.main', opacity: 0.5 }}
+                        >
+                          ENTER
+                        </Typography>
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              }
+            />
           </Stack>
         </Grid>
 
         <Grid item xs={12} lg={4}>
-          {selectedMission ? (
-            <FlightDispatch mission={selectedMission} onCancel={() => setSelectedMission(null)} />
-          ) : (
-            <Paper
-              sx={{
-                p: 4,
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 3,
-                border: '2px dashed',
-                borderColor: 'divider',
-                bgcolor: 'transparent'
-              }}
-            >
-              <Typography variant='h5' color='text.secondary' align='center'>
-                SELECCIONA UNA MISIÓN PARA EMPEZAR EL DESPACHO
-              </Typography>
-              <Typography variant='body2' color='text.secondary' align='center' mt={1}>
-                Elige un destino patrocinado para obtener más recompensas.
-              </Typography>
-            </Paper>
-          )}
+          <Box sx={{ position: 'sticky', top: 0 }}>
+            {selectedMission ? (
+              <FlightDispatch mission={selectedMission} onCancel={() => setSelectedMission(null)} />
+            ) : (
+              <Paper
+                sx={{
+                  p: 4,
+                  minHeight: 400,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 3,
+                  border: '2px dashed',
+                  borderColor: 'divider',
+                  bgcolor: 'transparent'
+                }}
+              >
+                <Typography variant='h5' color='text.secondary' align='center'>
+                  SELECCIONA UNA MISIÓN PARA EMPEZAR EL DESPACHO
+                </Typography>
+                <Typography variant='body2' color='text.secondary' align='center' mt={1}>
+                  Elige un destino patrocinado para obtener más recompensas.
+                </Typography>
+              </Paper>
+            )}
+          </Box>
         </Grid>
       </Grid>
     </Box>
