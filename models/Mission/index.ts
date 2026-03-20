@@ -84,6 +84,10 @@ const missionSchema: mongoose.Schema = new mongoose.Schema<IMission>(
     expiresAt: {
       type: Date
     },
+    startedAt: {
+      type: Date,
+      default: null
+    },
     originCoords: {
       latitude: { type: Number },
       longitude: { type: Number }

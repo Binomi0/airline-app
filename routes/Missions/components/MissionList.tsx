@@ -27,7 +27,7 @@ const MissionList = ({ reserveMission, pool, aircraft }: Props) => {
       }
       try {
         await reserveMission(missionId, aircraft, getCallsign())
-      } catch (err) {
+      } catch {
         alert('No se pudo reservar la misión. Es posible que otro piloto la haya tomado.')
       }
     },
@@ -38,31 +38,37 @@ const MissionList = ({ reserveMission, pool, aircraft }: Props) => {
     <Fade in={pool.length > 0 && !!address} unmountOnExit>
       <Box sx={{ pb: 4 }}>
         {/* Flight Board Header */}
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            px: 1.5, 
-            pb: 1, 
-            mb: 1, 
+        <Box
+          sx={{
+            display: 'flex',
+            px: 1.5,
+            pb: 1,
+            mb: 1,
             borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             opacity: 0.6
           }}
         >
-          <Typography variant="caption" sx={{ width: 100, fontWeight: 'bold' }}>TIPO</Typography>
-          <Typography variant="caption" sx={{ width: 150, fontWeight: 'bold' }}>RUTA (ICAO)</Typography>
-          <Typography variant="caption" sx={{ flex: 1, fontWeight: 'bold' }}>DETALLES DE MISIÓN</Typography>
-          <Typography variant="caption" sx={{ width: 80, fontWeight: 'bold', textAlign: 'right' }}>DIST (NM)</Typography>
-          <Typography variant="caption" sx={{ width: 120, fontWeight: 'bold', textAlign: 'right', ml: 2 }}>PREMIO (AIRL)</Typography>
+          <Typography variant='caption' sx={{ width: 100, fontWeight: 'bold' }}>
+            TIPO
+          </Typography>
+          <Typography variant='caption' sx={{ width: 150, fontWeight: 'bold' }}>
+            RUTA (ICAO)
+          </Typography>
+          <Typography variant='caption' sx={{ flex: 1, fontWeight: 'bold' }}>
+            DETALLES DE MISIÓN
+          </Typography>
+          <Typography variant='caption' sx={{ width: 80, fontWeight: 'bold', textAlign: 'right' }}>
+            DIST (NM)
+          </Typography>
+          <Typography variant='caption' sx={{ width: 120, fontWeight: 'bold', textAlign: 'right', ml: 2 }}>
+            PREMIO (AIRL)
+          </Typography>
           <Box sx={{ width: 44 }} />
         </Box>
 
         <Stack spacing={1}>
-          {pool.map((mission, index) => (
-            <MissionRow
-              key={mission._id}
-              mission={mission as any} // Cast to any because MissionRow expects Mission which is similar enough for display
-              onSelect={() => handleSelect(mission._id!)}
-            />
+          {pool.map((mission) => (
+            <MissionRow key={mission._id} mission={mission} onSelect={handleSelect} />
           ))}
         </Stack>
       </Box>

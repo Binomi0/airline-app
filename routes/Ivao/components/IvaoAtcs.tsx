@@ -114,11 +114,11 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
         </Stack>
       </Paper>
       {filteredAtcs.map((atc) => (
-        <StyledPaper 
-          key={atc.id} 
-          onClick={() => onSelectTower(atc.callsign)} 
+        <StyledPaper
+          key={atc.id}
+          onClick={() => onSelectTower(atc.callsign)}
           selected={selected === atc.callsign}
-          sx={{ 
+          sx={{
             opacity: atc.status === AtcStatus.DISCONNECTED ? 0.6 : 1,
             borderLeft: atc.status === AtcStatus.DISCONNECTED ? '4px solid var(--mui-palette-error-main)' : 'none'
           }}

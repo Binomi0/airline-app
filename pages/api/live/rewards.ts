@@ -70,11 +70,11 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     if (score) {
       if (mission.status !== MissionStatus.ABORTED && !mission.isRewarded) {
         const remote = mission.remote ? 3 : 1
-        
+
         // 1. Calculate Actual vs Estimated time for AFK check
         const flightTimeMinutes = (new Date().getTime() - new Date(mission.createdAt).getTime()) / (1000 * 60)
-        const estimatedTime = mission.estimatedTimeMinutes || (mission.distance * 0.25 + 30) // Fallback
-        
+        const estimatedTime = mission.estimatedTimeMinutes || mission.distance * 0.25 + 30 // Fallback
+
         let afkMultiplier = 1.0
         if (flightTimeMinutes > estimatedTime * 4) {
           afkMultiplier = 0.1 // Severe penalty for extreme AFK
@@ -83,16 +83,16 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         }
 
         // 2. Dynamic ATC Bonus (at completion)
-        const currentDestAtc = await AtcModel.findOne({ 
+        const currentDestAtc = await AtcModel.findOne({
           'atcPosition.airport.icao': mission.destination,
-          status: { $in: [AtcStatus.ACTIVE, AtcStatus.DISCONNECTED] } 
+          status: { $in: [AtcStatus.ACTIVE, AtcStatus.DISCONNECTED] }
         })
-        
+
         let atcBonus = 1.0
         if (mission.isSponsored) {
           // If the mission was sponsored, we check if they actually got service at departure/arrival
           const depBonus = mission.originAtcOnStart ? 0.15 : 0
-          const arrBonus = !!currentDestAtc ? 0.25 : (mission.destinationAtcOnStart ? 0.1 : 0)
+          const arrBonus = !!currentDestAtc ? 0.25 : mission.destinationAtcOnStart ? 0.1 : 0
           atcBonus = 1.0 + depBonus + arrBonus
         }
 
@@ -120,7 +120,14 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
             account: serverAccount
           })
 
-          console.log('Reward transfer successful:', receipt.transactionHash, 'Final Prize:', Math.round(finalPrize), 'AFK Multiplier:', afkMultiplier)
+          console.log(
+            'Reward transfer successful:',
+            receipt.transactionHash,
+            'Final Prize:',
+            Math.round(finalPrize),
+            'AFK Multiplier:',
+            afkMultiplier
+          )
         } else {
           console.error('Missing THIRDWEB_AUTH_PRIVATE_KEY for rewards')
           throw new Error('Server wallet not configured')

@@ -55,6 +55,7 @@ export enum AtcStatus {
 export enum PublicMissionStatus {
   AVAILABLE = 'AVAILABLE',
   RESERVED = 'RESERVED',
+  ACTIVE = 'ACTIVE',
   COMPLETED = 'COMPLETED'
 }
 export enum MissionType {
@@ -112,58 +113,17 @@ export interface AtcHistory {
   durationMinutes: number
 }
 
-export interface PublicMission {
+export interface IBaseMission {
   _id?: string
   origin: string
   destination: string
   distance: number
   type: MissionType
   category: MissionCategory
-  isSponsored: boolean
-  rewardMultiplier: number
-  details: MissionDetail
-  basePrize: number
   prize: number
-  expiresAt: Date
-  startTime: Date
-  endTime: Date
-  originCoords: Coords
-  destinationCoords: Coords
-  status: PublicMissionStatus
-  estimatedTimeMinutes?: number
-  originAtcOnStart?: boolean
-  destinationAtcOnStart?: boolean
-  reservedBy?: string // User ID (ObjectId string)
-  reservedAt?: Date
-}
-
-export interface Mission {
-  // where it starts
-  origin: string
-  // where it finish
-  destination: string
-  // total distance in NM
-  distance: number
-  // mission type
-  type: MissionType
-  // Detailed info about mission
-  details: MissionDetail
-  // selected aircraft nft data
-  aircraft: INft
-  // selected aircraft id
-  aircraftId: string
-  // pilot callsign
-  callsign: string
-  weight: number
-  prize: number
-  status: MissionStatus
-  remote: boolean
-  category: MissionCategory
-  isSponsored: boolean
   rewardMultiplier: number
-  rewards?: number
-  isRewarded: boolean
-  score?: number
+  isSponsored: boolean
+  details: MissionDetail
   startTime?: Date
   endTime?: Date
   originCoords?: Coords
@@ -172,6 +132,29 @@ export interface Mission {
   originAtcOnStart?: boolean
   destinationAtcOnStart?: boolean
   expiresAt?: Date
+  startedAt?: Date
+}
+
+export interface PublicMission extends IBaseMission {
+  basePrize: number
+  status: PublicMissionStatus
+  reservedBy?: string // User ID (ObjectId string)
+  reservedAt?: Date
+}
+
+export interface Mission extends IBaseMission {
+  // selected aircraft nft data
+  aircraft: INft
+  // selected aircraft id
+  aircraftId: string
+  // pilot callsign
+  callsign: string
+  weight: number
+  status: MissionStatus
+  remote: boolean
+  rewards?: number
+  isRewarded: boolean
+  score?: number
 }
 
 export interface MissionDetail {

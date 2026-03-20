@@ -28,36 +28,36 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
   }
 
   return (
-    <Box 
-      sx={{ 
-        pb: 4, 
-        bgcolor: '#000', 
-        p: 2, 
-        borderRadius: '12px', 
+    <Box
+      sx={{
+        pb: 4,
+        bgcolor: '#000',
+        p: 2,
+        borderRadius: '12px',
         border: `1px solid ${alpha(primaryColor, 0.2)}`,
         boxShadow: `0 20px 25px -5px rgba(0, 0, 0, 0.5)`
       }}
     >
       {/* Board Title & Filter Slot */}
-      <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Box 
-            sx={{ 
-              bgcolor: primaryColor, 
-              p: 0.5, 
-              borderRadius: 1, 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center' 
+      <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between' sx={{ mb: 3 }}>
+        <Stack direction='row' spacing={2} alignItems='center'>
+          <Box
+            sx={{
+              bgcolor: primaryColor,
+              p: 0.5,
+              borderRadius: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
             <FlightTakeoffIcon sx={{ color: '#000', fontSize: 24 }} />
           </Box>
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              color: primaryColor, 
-              fontFamily: "'VT323', monospace", 
+          <Typography
+            variant='h4'
+            sx={{
+              color: primaryColor,
+              fontFamily: "'VT323', monospace",
               fontWeight: 'bold',
               letterSpacing: 1
             }}
@@ -66,11 +66,7 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
           </Typography>
         </Stack>
 
-        {filterSlot && (
-          <Box sx={{ minWidth: 200 }}>
-            {filterSlot}
-          </Box>
-        )}
+        {filterSlot && <Box sx={{ minWidth: 200 }}>{filterSlot}</Box>}
       </Stack>
 
       {missions.length === 0 ? (
@@ -85,23 +81,39 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
       ) : (
         <>
           {/* Flight Board Header Labels */}
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              px: 2, 
-              pb: 1, 
-              mb: 1, 
+          <Box
+            sx={{
+              display: 'flex',
+              px: 2,
+              pb: 1,
+              mb: 1,
               borderBottom: `1px solid #1a1a1a`,
               fontFamily: "'VT323', monospace",
               opacity: 0.8
             }}
           >
             <Typography sx={{ width: 80, color: primaryColor, fontSize: '1rem', fontWeight: 'bold' }}>TIME</Typography>
-            <Typography sx={{ width: 220, color: primaryColor, fontSize: '1rem', fontWeight: 'bold' }}>ROUTE (ICAO)</Typography>
-            <Typography sx={{ width: 120, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', pl: 1 }}>TYPE</Typography>
-            <Typography sx={{ width: 100, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', textAlign: 'right' }}>DIST (NM)</Typography>
-            <Typography sx={{ width: 140, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', textAlign: 'right', ml: 3 }}>PRIZE (AIRL)</Typography>
-            <Typography sx={{ width: 140, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', textAlign: 'right', ml: 2 }}>STATUS</Typography>
+            <Typography sx={{ width: 220, color: primaryColor, fontSize: '1rem', fontWeight: 'bold' }}>
+              ROUTE (ICAO)
+            </Typography>
+            <Typography sx={{ width: 120, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', pl: 1 }}>
+              TYPE
+            </Typography>
+            <Typography
+              sx={{ width: 100, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', textAlign: 'right' }}
+            >
+              DIST (NM)
+            </Typography>
+            <Typography
+              sx={{ width: 140, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', textAlign: 'right', ml: 3 }}
+            >
+              PRIZE (AIRL)
+            </Typography>
+            <Typography
+              sx={{ width: 140, color: primaryColor, fontSize: '1rem', fontWeight: 'bold', textAlign: 'right', ml: 2 }}
+            >
+              STATUS
+            </Typography>
           </Box>
 
           {/* Rows */}

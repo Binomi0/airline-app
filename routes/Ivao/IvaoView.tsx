@@ -25,9 +25,9 @@ import { authStore } from 'store/auth.atom'
 import Destinations from './components/Destinations'
 import Swal from 'sweetalert2'
 import { postApi } from 'lib/api'
-import { missionStore } from 'store/mission.atom'
 import { hasRequirement } from 'utils'
 import axios from 'config/axios'
+import useMission from 'hooks/useMission'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 
@@ -58,9 +58,7 @@ const IvaoView = ({ user: _user }: Props) => {
   const authToken = useRecoilValue(authStore)
   const ivaoAuthToken = useRecoilValue(ivaoUserAuthStore)
   const [booking, setBooking] = useRecoilState(bookingStore)
-  // const [hasApp, setHasApp] = useRecoilState(appInstalledStore)
-  // const { getPilots } = usePilots()
-  const mission = useRecoilValue(missionStore)
+  const { mission, reserveMission } = useMission()
   const [aircraft, setAircraft] = useState<string>('-1')
   const [metar, setMetar] = useState<string>('')
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
@@ -88,20 +86,24 @@ const IvaoView = ({ user: _user }: Props) => {
     if (!mission) return
 
     try {
-      // eslint-disable-next-line no-unused-vars
-      const { aircraft: _, ...newMission } = mission
+      if (!mission?._id || !ownedAircrafts || aircraft === '-1') return
+
+      const selectedAircraftNft = ownedAircrafts[Number(aircraft)]
+      if (!selectedAircraftNft) return
 
       const { isConfirmed } = await Swal.fire({
-        title: `Callsign ${newMission.callsign}`,
+        title: `Callsign ${mission.callsign}`,
         text: '¿Estás listo para este vuelo? Recuerda configurar el callsign antes de empezar.',
         icon: 'question',
         showCancelButton: true
       })
+
       if (isConfirmed) {
-        const missionResult = await postApi('/api/missions/new', newMission)
+        const missionResult = await reserveMission(mission._id, selectedAircraftNft, mission.callsign)
         if (!missionResult) return
         await postApi('/api/live/new', { mission: missionResult })
         await getLive()
+
         if (!ivaoUser) {
           const clearance = await Swal.fire({
             title: 'Clearance required',
@@ -126,7 +128,7 @@ const IvaoView = ({ user: _user }: Props) => {
     } catch (err) {
       console.error(err)
     }
-  }, [authToken, mission, getLive, ivaoUser, router])
+  }, [mission, ownedAircrafts, aircraft, reserveMission, getLive, ivaoUser, authToken, router])
 
   const handleBooking = useCallback(
     (hasFuel: boolean) => {

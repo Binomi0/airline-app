@@ -9,9 +9,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const activeMission = await MissionModel.findOne({ 
-      userId: req.id, 
-      status: MissionStatus.STARTED 
+    const activeMission = await MissionModel.findOne({
+      userId: req.id,
+      status: MissionStatus.STARTED
     }).lean()
 
     if (!activeMission) {

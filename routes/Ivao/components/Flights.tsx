@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Mission, FRoute, IvaoPilot } from 'types'
+import type { Mission, IvaoPilot } from 'types'
 import { useRouter } from 'next/router'
 import Swal from 'sweetalert2'
 import FlightDetailsHeader from './FlightDetailsHeader'
@@ -19,11 +19,9 @@ interface Props {
   onSelect: () => void
   selected: boolean
   mission?: Mission
-  // eslint-disable-next-line no-unused-vars
-  newMission: (route: FRoute, aircraft: INft, callsign: string, remote: boolean) => Promise<void>
 }
 
-const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newMission, mission }: Props) => {
+const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, mission }: Props) => {
   const router = useRouter()
   const { palette } = useTheme()
   const { setPilot, getLive } = useLiveFlightProviderContext()
@@ -46,16 +44,16 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, newMission, mi
 
   const handleNewMission = React.useCallback(async () => {
     if (!aircraft) return
-    const { arrivalId: destination, departureId: origin } = pilot.flightPlan
+    // const { arrivalId: destination, departureId: origin } = pilot.flightPlan
 
-    if (!origin || !destination) {
-      throw new Error('Falló el plan de vuelo: falta origen o destino')
-    }
+    // if (!origin || !destination) {
+    //   throw new Error('Falló el plan de vuelo: falta origen o destino')
+    // }
 
-    if (pilot.callsign !== mission?.callsign) {
-      await newMission({ origin, destination, distance: 0 }, aircraft, pilot.callsign, true)
-    }
-  }, [aircraft, mission?.callsign, newMission, pilot.callsign, pilot.flightPlan])
+    // if (pilot.callsign !== mission?.callsign) {
+    //   console.log('Searching for mission matching pilot route...')
+    // }
+  }, [aircraft])
 
   const handleClickPilot = React.useCallback(async () => {
     handleNewMission().then(onSelect).catch(onRemove)

@@ -13,14 +13,14 @@ import {
   getCallsign,
   getFuelForFlight,
   getIcaoCodeFromAircraftNFT,
-  getMissionAttributes
+  getMissionAttributes,
+  getMissionWeight
 } from 'utils'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'
 import useMission from 'hooks/useMission'
-import { destinationStore } from 'store/destination.atom'
 import MissionSelectAircraft from './MissionSelectAircraft'
-import { aircraftNameToIcaoCode } from 'types'
+import { aircraftNameToIcaoCode, Mission, MissionStatus } from 'types'
 import { useRouter } from 'next/router'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 import { INft } from 'models/Nft'
@@ -30,22 +30,18 @@ interface Props {
   aircrafts: INft[]
   end: string
   start: string
-  // eslint-disable-next-line no-unused-vars
   isAllowed: (value: number) => boolean
-  // eslint-disable-next-line no-unused-vars
   onBooking: (hasFuel: boolean) => void
-  // eslint-disable-next-line no-unused-vars
   setAircraft: (value: string) => void
 }
 
 const IvaoMission = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, onBooking }: Props) => {
   const router = useRouter()
   const balance = useRecoilValue(tokenBalanceStore)
-  const { mission, newMission, setMission } = useMission()
-  const destinations = useRecoilValue(destinationStore)
+  const { mission, pool, setMission, getPool } = useMission()
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
 
-  const currentAircraft = useMemo(() => aircrafts.find((ac) => ac.metadata.id === aircraft), [aircrafts, aircraft])
+  const currentAircraft = useMemo(() => aircrafts.find((ac) => ac.id.toString() === aircraft), [aircrafts, aircraft])
 
   const requiredGas = React.useCallback(() => {
     if (!currentAircraft) return 0
@@ -75,21 +71,32 @@ const IvaoMission = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, 
   }, [])
 
   React.useEffect(() => {
+    if (pool.length === 0) {
+      getPool()
+    }
+  }, [getPool, pool.length])
+
+  React.useEffect(() => {
     if (start && end && currentAircraft) {
-      newMission(
-        {
-          origin: start,
-          destination: end,
-          distance: destinations?.destinations.find((d) => d.callsign === end)?.distance ?? 0
-        },
-        currentAircraft,
-        getCallsign(),
-        false
-      )
+      const match = pool.find((p) => p.origin === start && p.destination === end)
+      if (match) {
+        setMission({
+          ...match,
+          aircraft: currentAircraft,
+          aircraftId: currentAircraft.id.toString(),
+          callsign: getCallsign(),
+          status: MissionStatus.STARTED,
+          remote: false,
+          isRewarded: false,
+          weight: getMissionWeight(currentAircraft)
+        } as Mission)
+      } else {
+        setMission()
+      }
     } else {
       setMission()
     }
-  }, [newMission, setMission, currentAircraft, start, end, destinations?.destinations])
+  }, [pool, setMission, currentAircraft, start, end])
 
   return (
     <Paper elevation={3} sx={{ borderRadius: 2 }}>

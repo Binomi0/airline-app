@@ -53,7 +53,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Return the latest from DB after sync to include statuses etc.
     const updatedAtcs = await Atcs.find({})
-    
+
     console.timeEnd('TOWER')
     res.status(200).send(updatedAtcs)
   } catch (err) {

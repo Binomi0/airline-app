@@ -16,9 +16,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     const userAddress = req.query.address as string
 
     // 1. Check completed missions
-    const completedCount = await MissionModel.countDocuments({ 
-      userId, 
-      status: MissionStatus.COMPLETED 
+    const completedCount = await MissionModel.countDocuments({
+      userId,
+      status: MissionStatus.COMPLETED
     })
 
     let hasFuel = false
@@ -29,13 +29,13 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           chain: activeChain,
           address: rewardTokenAddress
         })
-        
+
         const balance = await readContract({
           contract,
           method: 'function balanceOf(address owner) view returns (uint256)',
           params: [userAddress]
         })
-        
+
         hasFuel = (balance as bigint) > 0n
       } catch (e) {
         console.error('Error fetching AIRG balance for sponsorship:', e)
@@ -44,10 +44,10 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
     const sponsorGas = completedCount < 10 || hasFuel
 
-    res.status(200).json({ 
-      sponsorGas, 
-      completedCount, 
-      hasFuel 
+    res.status(200).json({
+      sponsorGas,
+      completedCount,
+      hasFuel
     })
   } catch (error) {
     console.error('Sponsorship API ERROR =>', error)

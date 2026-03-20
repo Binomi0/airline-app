@@ -10,7 +10,7 @@ import moment from 'moment'
 export const getAverageAtcDuration = async (icao?: string): Promise<number> => {
   try {
     const query = icao ? { airportIcao: icao.toUpperCase() } : {}
-    
+
     const stats = await AtcHistoryModel.aggregate([
       { $match: query },
       { $group: { _id: null, avgDuration: { $avg: '$durationMinutes' } } }

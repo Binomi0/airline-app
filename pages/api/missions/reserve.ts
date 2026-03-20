@@ -6,6 +6,7 @@ import AtcModel from 'models/Atc'
 import NftModel from 'models/Nft'
 import { PublicMissionStatus, MissionStatus, aircraftNameToIcaoCode } from 'types'
 import { getEstimatedTimeMinutes } from 'utils'
+import { ObjectId } from 'mongodb'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -19,25 +20,39 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   try {
+    // 0. Single-Reservation Check: User can only have one active mission or reservation
+    const [hasActiveMission, hasPoolReservation] = await Promise.all([
+      MissionModel.exists({ userId: req.id, status: MissionStatus.STARTED }),
+      PublicMissionModel.exists({
+        reservedBy: new ObjectId(req.id as string),
+        status: { $in: [PublicMissionStatus.RESERVED, PublicMissionStatus.ACTIVE] }
+      })
+    ])
+
+    if (hasActiveMission || hasPoolReservation) {
+      return res.status(400).json({ error: 'You already have an active mission or reservation' })
+    }
+
     // 1. Fetch aircraft details to calculate performance
     const aircraftNft = await NftModel.findOne({ id: BigInt(aircraftId) }).lean()
     if (!aircraftNft) {
       return res.status(404).json({ error: 'Aircraft not found' })
     }
-    const cruiseSpeedIcao = aircraftNameToIcaoCode[aircraftNft.metadata.name as keyof typeof aircraftNameToIcaoCode] || 'C172'
+    const cruiseSpeedIcao =
+      aircraftNameToIcaoCode[aircraftNft.metadata.name as keyof typeof aircraftNameToIcaoCode] || 'C172'
 
     // 2. Atomic reservation in the public pool
     const publicMission = await PublicMissionModel.findOneAndUpdate(
-      { 
-        _id: missionId, 
-        status: PublicMissionStatus.AVAILABLE 
+      {
+        _id: missionId,
+        status: PublicMissionStatus.AVAILABLE
       },
-      { 
-        $set: { 
+      {
+        $set: {
           status: PublicMissionStatus.RESERVED,
           reservedBy: req.id,
           reservedAt: new Date()
-        } 
+        }
       },
       { new: true }
     ).lean()

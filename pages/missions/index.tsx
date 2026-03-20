@@ -44,9 +44,7 @@ const MissionsPage = () => {
     )
   }
 
-  return (
-    <OperationsCenter />
-  )
+  return <OperationsCenter />
 }
 
 export default MissionsPage

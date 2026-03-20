@@ -10,17 +10,35 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    // 1. Trigger pool replenishment if low (non-blocking)
+    // 1. Lazy Cleanup: Revert expired reservations (20 min timeout)
+    const reservationTimeout = new Date(Date.now() - 20 * 60 * 1000)
+    await PublicMissionModel.updateMany(
+      {
+        status: PublicMissionStatus.RESERVED,
+        reservedAt: { $lt: reservationTimeout }
+      },
+      {
+        $set: {
+          status: PublicMissionStatus.AVAILABLE,
+          reservedBy: null,
+          reservedAt: null
+        }
+      }
+    )
+
+    // 2. Trigger pool replenishment if low (non-blocking)
     const currentCount = await PublicMissionModel.countDocuments({ status: PublicMissionStatus.AVAILABLE })
     if (currentCount < 30) {
-      generatePublicMissionPool().catch(err => console.error('[MissionPool] Replenishment error:', err))
+      generatePublicMissionPool().catch((err) => console.error('[MissionPool] Replenishment error:', err))
     }
 
     // 2. Fetch available missions
-    const missions = await PublicMissionModel.find({ 
+    const missions = await PublicMissionModel.find({
       status: PublicMissionStatus.AVAILABLE,
       endTime: { $gt: new Date() } // Ensure they haven't ended
-    }).sort({ distance: 1 }).lean()
+    })
+      .sort({ distance: 1 })
+      .lean()
 
     res.status(200).json(missions)
   } catch (error) {

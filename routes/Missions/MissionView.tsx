@@ -50,11 +50,7 @@ const MissionView = ({ aircraft }: Props) => {
 
         <Fade in={!!address && !mission} unmountOnExit>
           <Box>
-            <MissionList 
-              aircraft={aircraft} 
-              pool={pool} 
-              reserveMission={reserveMission} 
-            />
+            <MissionList aircraft={aircraft} pool={pool} reserveMission={reserveMission} />
           </Box>
         </Fade>
 

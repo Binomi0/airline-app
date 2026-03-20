@@ -32,7 +32,10 @@ const MissionItem: React.FC<{
     <div style={style}>
       <Grow in timeout={{ enter: delay }}>
         <Box p={1}>
-          <Card className={styles.card} sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+          <Card
+            className={styles.card}
+            sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}
+          >
             <CardHeader
               title={
                 <Stack direction='row' justifyContent='space-between' alignItems='center'>
@@ -41,22 +44,22 @@ const MissionItem: React.FC<{
                   </Typography>
                   <Stack direction='row' spacing={1}>
                     {bonusPercent > 0 && (
-                      <Chip 
-                        label={`+${bonusPercent}%`} 
-                        size='small' 
-                        sx={{ 
+                      <Chip
+                        label={`+${bonusPercent}%`}
+                        size='small'
+                        sx={{
                           background: 'linear-gradient(45deg, #10b981 30%, #34d399 90%)',
                           color: 'black',
                           fontWeight: 'bold',
                           fontSize: '0.65rem'
-                        }} 
+                        }}
                       />
                     )}
-                    <Chip 
-                      label={category} 
-                      size='small' 
-                      color={category === 'ATC' ? 'primary' : 'default'} 
-                      sx={{ fontWeight: 'bold' }} 
+                    <Chip
+                      label={category}
+                      size='small'
+                      color={category === 'ATC' ? 'primary' : 'default'}
+                      sx={{ fontWeight: 'bold' }}
                     />
                   </Stack>
                 </Stack>
@@ -66,7 +69,7 @@ const MissionItem: React.FC<{
               <Typography variant='body2' color='grey.400' sx={{ mb: 2, minHeight: 40 }}>
                 {details.description}
               </Typography>
-              
+
               <Stack spacing={1.5}>
                 <Stack direction='row' spacing={1} alignItems='center'>
                   <FlightTakeoffIcon sx={{ color: 'var(--home-accent)', fontSize: 20 }} />
@@ -92,7 +95,10 @@ const MissionItem: React.FC<{
                 <Stack direction='row' spacing={1} alignItems='center'>
                   <AccessTimeIcon sx={{ color: '#66bb6a', fontSize: 20 }} />
                   <Typography variant='body2' color='white'>
-                    Ventana: <strong>{startStr} - {endStr}</strong>
+                    Ventana:{' '}
+                    <strong>
+                      {startStr} - {endStr}
+                    </strong>
                   </Typography>
                 </Stack>
               </Stack>

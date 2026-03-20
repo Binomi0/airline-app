@@ -98,6 +98,10 @@ const publicMissionSchema: mongoose.Schema = new mongoose.Schema<IPublicMission>
     reservedAt: {
       type: Date,
       default: null
+    },
+    startedAt: {
+      type: Date,
+      default: null
     }
   },
   {

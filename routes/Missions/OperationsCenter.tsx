@@ -1,16 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import {
-  Grid,
-  Box,
-  Stack,
-  Typography,
-  useTheme,
-  GlobalStyles,
-  TextField,
-  InputAdornment,
-  alpha,
-  Paper
-} from '@mui/material'
+import { Grid, Box, Stack, Typography, useTheme, GlobalStyles, TextField, InputAdornment, Paper } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import Map from 'components/Map/RadarMap'
 import MissionBoard from './components/MissionBoard'
@@ -68,10 +57,6 @@ const OperationsCenter = () => {
       fetchMissions()
     }
   }, [fetchMissions, atcs.length])
-
-  const handleSelectMission = (mission: Mission) => {
-    setSelectedMission(mission)
-  }
 
   // Find origin/destination objects for the map based on mission selection
   const mapSelection = useMemo(() => {
