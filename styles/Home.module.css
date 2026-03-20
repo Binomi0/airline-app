@@ -501,3 +501,204 @@
   margin: 0 auto 32px;
   line-height: 1.75;
 }
+
+/* ─── Live Dashboard ───────────────────────────────────────────── */
+.liveDashboard {
+  background: var(--c-bg-alt);
+  border-top: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border);
+  padding: 64px 24px;
+}
+
+.liveGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.liveCard {
+  background: rgba(128, 128, 128, 0.05);
+  border: 1px solid var(--c-border-card);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease,
+    background 200ms ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+
+.liveCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--c-accent), transparent);
+  opacity: 0.4;
+}
+
+.liveCard:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--c-accent) 40%, transparent);
+  background: rgba(128, 128, 128, 0.08);
+}
+
+.livePilot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pilotBadge {
+  background: var(--c-accent-soft);
+  color: var(--c-accent-text);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid color-mix(in srgb, var(--c-accent) 20%, transparent);
+}
+
+.liveAircraft {
+  font-size: 0.75rem;
+  color: var(--c-muted-label);
+  font-weight: 500;
+}
+
+.liveRoute {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-weight: 700;
+  color: var(--c-title);
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.routeArrow {
+  opacity: 0.3;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.liveStatus {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--c-muted);
+  font-weight: 500;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulse 2s infinite;
+}
+
+/* ─── Rankings ─────────────────────────────────────────────────── */
+.rankings {
+  padding: 96px 24px;
+  background: radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.04) 0%, transparent 50%);
+}
+
+.rankingsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
+  max-width: 1200px;
+  margin: 24px auto 0;
+}
+
+.rankingColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rankingTitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--c-accent-text);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.9;
+}
+
+.rankingList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rankItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: rgba(128, 128, 128, 0.035);
+  border: 1px solid var(--c-border-card);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.rankItem:hover {
+  background: rgba(128, 128, 128, 0.07);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.rankPos {
+  width: 28px;
+  font-weight: 900;
+  color: var(--c-muted-label);
+  font-size: 0.75rem;
+}
+
+.rankName {
+  flex: 1;
+  font-weight: 600;
+  color: var(--c-title);
+  font-size: 0.88rem;
+}
+
+.rankValue {
+  font-weight: 800;
+  color: var(--c-accent-text);
+  font-family: inherit;
+  font-size: 0.88rem;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: var(--c-muted-label);
+  font-style: italic;
+  font-size: 0.9rem;
+  border: 1px dashed var(--c-border);
+  border-radius: 12px;
+}

@@ -1,7 +1,10 @@
 import Link from 'next/link'
 import { useRecoilValue } from 'recoil'
 import { themeStore } from 'store/theme.atom'
+import { userState } from 'store/user.atom'
 import styles from '../../styles/Home.module.css'
+import LiveDashboard from './components/LiveDashboard'
+import PilotRankings from './components/PilotRankings'
 
 const NAV_ITEMS = [
   {
@@ -115,6 +118,7 @@ const THEME_TOKENS: Record<'dark' | 'light', React.CSSProperties> = {
 
 const HomeView = () => {
   const theme = useRecoilValue(themeStore)
+  const user = useRecoilValue(userState)
 
   return (
     <div className={styles.root} style={THEME_TOKENS[theme]}>
@@ -156,6 +160,8 @@ const HomeView = () => {
           </div>
         ))}
       </div>
+      
+      {user && <LiveDashboard />}
 
       {/* ── Features ───────────────────────────────────────────── */}
       <div className={styles.section}>
@@ -202,6 +208,8 @@ const HomeView = () => {
           ))}
         </div>
       </div>
+
+      {user && <PilotRankings />}
 
       <div className={styles.divider} />
 
