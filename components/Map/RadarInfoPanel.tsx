@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Card, CardContent, Typography, Stack, Divider, Button, alpha, CircularProgress } from '@mui/material'
+import { Box, Paper, CardContent, Typography, Stack, Divider, Button, alpha, CircularProgress } from '@mui/material'
 import { FlightTakeoff, FlightLand, RestartAlt, Radar } from '@mui/icons-material'
 import { Atc } from 'types'
 
@@ -21,19 +21,15 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
   theme
 }) => {
   return (
-    <Card
+    <Paper
+      variant="glass"
       sx={{
         position: 'absolute',
         top: 24,
         left: 24,
         zIndex: 1000,
         width: 320,
-        background: theme === 'dark' ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(16px)',
-        borderRadius: 3,
-        border: `1px solid ${theme === 'dark' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(56, 189, 248, 0.1)'}`,
-        color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-        boxShadow: theme === 'dark' ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.1)'
+        borderRadius: 3
       }}
     >
       <CardContent sx={{ p: '24px !important' }}>
@@ -188,7 +184,7 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
           </Button>
         </Stack>
       </CardContent>
-    </Card>
+    </Paper>
   )
 }
 

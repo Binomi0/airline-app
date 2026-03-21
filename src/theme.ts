@@ -61,6 +61,15 @@ const commonTypography: ThemeOptions['typography'] = {
 }
 
 const commonComponents: ThemeOptions['components'] = {
+  MuiDrawer: {
+    styleOverrides: {
+      paper: {
+        borderRadius: 0,
+        border: 'none',
+        backgroundImage: 'none'
+      }
+    }
+  },
   MuiButton: {
     styleOverrides: {
       root: {

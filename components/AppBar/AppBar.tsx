@@ -75,19 +75,14 @@ const CustomAppBar = () => {
       </Snackbar>
       <AppBar
         position='sticky'
+        elevation={trigger ? 4 : 0}
         sx={{
           background: trigger
-            ? theme === 'dark'
-              ? 'rgba(11, 15, 25, 0.8)'
-              : 'rgba(255, 255, 255, 0.8)'
-            : theme === 'dark'
-              ? 'rgba(11, 15, 25, 0.7)'
-              : 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(12px)',
-          backgroundImage: 'none',
-          boxShadow: 'none',
-          color: theme === 'dark' ? '#fff' : '#1e293b',
-          borderBottom: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`
+            ? (t) => t.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)'
+            : 'transparent',
+          backdropFilter: trigger ? 'blur(12px)' : 'none',
+          color: (t) => t.palette.text.primary,
+          backgroundImage: 'none'
         }}
       >
         <Toolbar sx={{ m: 0, p: 0 }}>

@@ -1,11 +1,10 @@
 import React, { ReactNode } from 'react'
 import CssBaseline from '@mui/material/CssBaseline'
 import GlobalStyles from '@mui/material/GlobalStyles'
-import { ThemeProvider, Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles'
+import { ThemeProvider, Experimental_CssVarsProvider as CssVarsProvider, useColorScheme, experimental_extendTheme as extendTheme } from '@mui/material/styles'
 import { darkTheme, lightTheme } from '../src/theme'
 import { useRecoilValue } from 'recoil'
 import { themeStore } from 'store/theme.atom'
-import { experimental_extendTheme as extendTheme } from '@mui/material/styles'
 
 const colorSchemes = {
   colorSchemes: {
@@ -16,6 +15,19 @@ const colorSchemes = {
 
 interface Props {
   children: ReactNode
+}
+
+const ThemeSync = () => {
+  const theme = useRecoilValue(themeStore)
+  const { setMode } = useColorScheme()
+
+  React.useEffect(() => {
+    if (setMode) {
+      setMode(theme)
+    }
+  }, [theme, setMode])
+
+  return null
 }
 
 const ThemeWrapper = ({ children }: Props) => {
@@ -76,6 +88,7 @@ const ThemeWrapper = ({ children }: Props) => {
         }}
       />
       <CssVarsProvider defaultMode={theme} theme={extendedTheme}>
+        <ThemeSync />
         {children}
       </CssVarsProvider>
     </ThemeProvider>
