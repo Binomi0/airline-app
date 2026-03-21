@@ -86,7 +86,7 @@ const LoginView: FC = () => {
         return (
           <Fade in timeout={500}>
             <Stack spacing={3} alignItems='center'>
-              <Typography variant='h4' fontWeight={700} align='center' gutterBottom>
+              <Typography variant='h4' className={styles.mainTitle} align='center' gutterBottom>
                 Eleva tu Trayecto
               </Typography>
               <Typography variant='body1' align='center' color='text.secondary' sx={{ mb: 2 }}>
