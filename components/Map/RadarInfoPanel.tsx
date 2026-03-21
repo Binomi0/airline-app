@@ -22,7 +22,7 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
 }) => {
   return (
     <Paper
-      variant="glass"
+      variant='glass'
       sx={{
         position: 'absolute',
         top: 24,

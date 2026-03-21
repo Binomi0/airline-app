@@ -78,7 +78,7 @@ const CustomAppBar = () => {
         elevation={trigger ? 4 : 0}
         sx={{
           background: trigger
-            ? (t) => t.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)'
+            ? (t) => (t.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)')
             : 'transparent',
           backdropFilter: trigger ? 'blur(12px)' : 'none',
           color: (t) => t.palette.text.primary,

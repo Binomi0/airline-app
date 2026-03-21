@@ -25,9 +25,7 @@ export const AppProviders = ({ children }: Props) => {
             <TokenProvider>
               <VaProvider>
                 <LiveFlightsProvider>
-                  <MainProvider>
-                    {children}
-                  </MainProvider>
+                  <MainProvider>{children}</MainProvider>
                 </LiveFlightsProvider>
               </VaProvider>
             </TokenProvider>

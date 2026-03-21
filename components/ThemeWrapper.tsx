@@ -1,7 +1,12 @@
 import React, { ReactNode } from 'react'
 import CssBaseline from '@mui/material/CssBaseline'
 import GlobalStyles from '@mui/material/GlobalStyles'
-import { ThemeProvider, Experimental_CssVarsProvider as CssVarsProvider, useColorScheme, experimental_extendTheme as extendTheme } from '@mui/material/styles'
+import {
+  ThemeProvider,
+  Experimental_CssVarsProvider as CssVarsProvider,
+  useColorScheme,
+  experimental_extendTheme as extendTheme
+} from '@mui/material/styles'
 import { darkTheme, lightTheme } from '../src/theme'
 import { useRecoilValue } from 'recoil'
 import { themeStore } from 'store/theme.atom'
