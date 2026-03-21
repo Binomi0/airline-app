@@ -55,5 +55,5 @@ export const AuthProvider = ({ children }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
 
-  return <div>{children}</div>
+  return <>{children}</>
 }

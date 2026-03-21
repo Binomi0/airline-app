@@ -1,7 +1,7 @@
 import { nftAircraftTokenAddress, nftLicenseTokenAddress } from 'contracts/address'
 import { INft } from 'models/Nft'
 import { createContext, useContext, useMemo } from 'react'
-import useSWR, { mutate } from 'swr'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetcher, filterByTokenAddress } from 'utils'
 
 type NftContextType = {
@@ -21,12 +21,16 @@ interface Props {
 }
 
 const NFTProviderWrapper = ({ children }: Props) => {
-  const { data: nfts = [] } = useSWR<INft[]>('/api/nft', fetcher)
+  const queryClient = useQueryClient()
+  const { data: nfts = [] } = useQuery<INft[]>({
+    queryKey: ['nfts'],
+    queryFn: () => fetcher('/api/nft')
+  })
 
-  const aircrafts = useMemo(() => nfts?.filter(filterByTokenAddress(nftAircraftTokenAddress)), [nfts])
-  const licenses = useMemo(() => nfts?.filter(filterByTokenAddress(nftLicenseTokenAddress)), [nfts])
+  const aircrafts = useMemo(() => nfts.filter(filterByTokenAddress(nftAircraftTokenAddress)), [nfts])
+  const licenses = useMemo(() => nfts.filter(filterByTokenAddress(nftLicenseTokenAddress)), [nfts])
 
-  const refetch = () => mutate('/api/nft')
+  const refetch = () => queryClient.invalidateQueries({ queryKey: ['nfts'] })
 
   return <NftContext.Provider value={{ aircrafts, licenses, refetch }}>{children}</NftContext.Provider>
 }
