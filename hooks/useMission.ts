@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { Mission, PublicMission } from 'types'
-import { getMissionWeight } from 'utils'
 import { missionStore } from 'store/mission.atom'
 import nextApiInstance from 'config/axios'
 import { INft } from 'models/Nft'
 
 interface UseMission {
-  // eslint-disable-next-line no-unused-vars
-  reserveMission: (missionId: string, aircraft: INft, callsign: string) => Promise<Mission>
+  reserveMission: (missionId: string, aircraft: INft) => Promise<Mission>
   getMission: () => Promise<void>
   getPool: () => Promise<PublicMission[]>
   setMission: (mission?: Mission) => void
@@ -51,15 +49,12 @@ const useMission = (): UseMission => {
   }, [])
 
   const reserveMission = useCallback(
-    async (missionId: string, aircraft: INft, callsign: string) => {
+    async (missionId: string, aircraft: INft) => {
       setIsLoading(true)
       try {
-        const weight = getMissionWeight(aircraft)
         const { data: userMission } = await nextApiInstance.post<Mission>('/api/missions/reserve', {
           missionId,
-          aircraftId: aircraft.id.toString(),
-          callsign,
-          weight
+          aircraftId: aircraft.id.toString()
         })
 
         setMission(userMission)

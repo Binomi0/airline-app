@@ -17,7 +17,7 @@ import { IUserNftPopulated } from 'models/UserNft'
 // A unique identifier for your website
 const rpID = process.env.NEXT_PUBLIC_DOMAIN
 // The URL at which registrations and authentications should occur
-const origin = process.env.ORIGIN
+const origin = [process.env.ORIGIN, process.env.ORIGIN_MAIN]
 
 // @ts-expect-error: simplewebauthn types are complex and sometimes mismatch with older stored authenticators
 export const verifySignature = async function (authenticator, response, expectedChallenge) {

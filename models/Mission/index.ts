@@ -54,7 +54,7 @@ const missionSchema: mongoose.Schema = new mongoose.Schema<IMission>(
     status: {
       type: String,
       enum: Object.values(MissionStatus),
-      default: MissionStatus.STARTED
+      default: MissionStatus.RESERVED
     },
     remote: {
       type: Boolean,

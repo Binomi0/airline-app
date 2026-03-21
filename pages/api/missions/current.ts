@@ -1,7 +1,8 @@
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import { NextApiResponse } from 'next'
 import MissionModel from 'models/Mission'
-import { MissionStatus } from 'types'
+import { MissionStatus, PublicMissionStatus } from 'types'
+import PublicMission from 'models/PublicMission'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
@@ -11,11 +12,20 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   try {
     const activeMission = await MissionModel.findOne({
       userId: req.id,
-      status: MissionStatus.STARTED
+      status: { $in: [MissionStatus.STARTED, MissionStatus.RESERVED] }
     }).lean()
 
     if (!activeMission) {
-      return res.status(204).end()
+      const reserverdMission = await PublicMission.findOne({
+        status: PublicMissionStatus.RESERVED
+        // reservedBy: req.id
+      }).lean()
+      console.log('RESERVED MISSION =>', reserverdMission)
+      if (!reserverdMission) {
+        return res.status(204).end()
+      }
+
+      return res.status(200).json(reserverdMission)
     }
 
     res.status(200).json(activeMission)

@@ -39,6 +39,7 @@ import { postApi } from 'lib/api'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import { useRouter } from 'next/router'
 import Swal from 'sweetalert2'
+import useMission from 'hooks/useMission'
 
 interface FlightDispatchProps {
   mission: PublicMission
@@ -59,6 +60,7 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
   const { data: userNfts } = useOwnedNFTs()
   const { twClient } = useRecoilValue(walletStore)
   const { getLive } = useLiveFlightProviderContext()
+  const { reserveMission } = useMission()
 
   const ownedAircrafts = useMemo(
     () => userNfts?.filter(filterByTokenAddress(nftAircraftTokenAddress)) || [],
@@ -99,17 +101,11 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
       cancelButtonText: 'Cancelar'
     })
 
+    // await reserveMission(mission._id!, currentAircraft)
+
     if (isConfirmed) {
       try {
-        const payload = {
-          ...mission,
-          aircraftId: selectedAircraftId
-        }
-        const missionResult = await postApi('/api/missions/new', payload)
-        if (!missionResult) return
-
-        await postApi('/api/live/new', { mission: missionResult })
-        await getLive()
+        await reserveMission(mission._id!, currentAircraft)
         router.push('/live')
       } catch (error) {
         console.error('Error booking flight:', error)

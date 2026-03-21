@@ -100,10 +100,8 @@ const IvaoView = ({ user: _user }: Props) => {
       })
 
       if (isConfirmed) {
-        const missionResult = await reserveMission(mission._id, selectedAircraftNft, mission.callsign)
+        const missionResult = await reserveMission(mission._id, selectedAircraftNft)
         if (!missionResult) return
-        await postApi('/api/live/new', { mission: missionResult })
-        await getLive()
 
         if (!ivaoUser) {
           const clearance = await Swal.fire({

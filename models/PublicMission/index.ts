@@ -40,6 +40,10 @@ const publicMissionSchema: mongoose.Schema = new mongoose.Schema<IPublicMission>
       type: Number,
       default: 1.0
     },
+    weight: {
+      type: Number,
+      required: true
+    },
     details: {
       name: { type: String, required: true },
       description: { type: String, required: true }

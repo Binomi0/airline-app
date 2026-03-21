@@ -44,6 +44,7 @@ export interface FRoute {
 }
 
 export enum MissionStatus {
+  RESERVED = 'RESERVED',
   STARTED = 'STARTED',
   COMPLETED = 'COMPLETED',
   ABORTED = 'ABORTED'
@@ -134,6 +135,7 @@ export interface IBaseMission {
   expiresAt?: Date
   startedAt?: Date
   callsign?: string
+  weight: number
 }
 
 export interface PublicMission extends IBaseMission {
@@ -150,7 +152,6 @@ export interface Mission extends IBaseMission {
   aircraftId: string
   // pilot callsign
   callsign: string
-  weight: number
   status: MissionStatus
   remote: boolean
   rewards?: number

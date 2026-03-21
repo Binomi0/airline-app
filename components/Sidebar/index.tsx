@@ -96,7 +96,7 @@ const Sidebar: React.FC = () => {
         {live && (
           <SidebarItem
             onLink={handleClick('/live')}
-            text='LIVE FLIGHT'
+            text='MISIÓN ACTUAL'
             Icon={LocalAirportIcon}
             selected={router.pathname === '/live'}
           />

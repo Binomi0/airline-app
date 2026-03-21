@@ -4,24 +4,30 @@ import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import Container from '@mui/material/Container'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
+import useMission from 'hooks/useMission'
+import { useEffect } from 'react'
 
 const LivePage = () => {
   const user = useRecoilValue(userState)
-  const { live } = useLiveFlightProviderContext()
+  const { mission, getMission, isLoading } = useMission()
+
+  useEffect(() => {
+    getMission()
+  }, [getMission])
 
   if (!user) {
     return <Disconnected />
   }
 
-  if (live === null) {
-    return <div>No flight plan</div>
+  if (!mission) {
+    return <div>No mission reserved</div>
   }
 
-  return live ? (
+  return (
     <Container>
-      <LiveView />
+      <LiveView mission={mission} isLoading={isLoading} />
     </Container>
-  ) : null
+  )
 }
 
 export default LivePage

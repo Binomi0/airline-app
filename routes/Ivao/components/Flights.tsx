@@ -11,6 +11,7 @@ import Grid from '@mui/material/Grid'
 import { useTheme } from '@mui/material/styles'
 import { postApi } from 'lib/api'
 import { INft } from 'models/Nft'
+import useMission from 'hooks/useMission'
 
 interface Props {
   onRemove: () => void
@@ -25,6 +26,7 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, mission }: Pro
   const router = useRouter()
   const { palette } = useTheme()
   const { setPilot, getLive } = useLiveFlightProviderContext()
+  const { reserveMission } = useMission()
 
   const handleSelectFlight = React.useCallback(async () => {
     const { isConfirmed } = await Swal.fire({
@@ -34,9 +36,8 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, mission }: Pro
       showCancelButton: true
     })
     if (isConfirmed) {
-      const data = await postApi('/api/missions/new', { ...mission })
-      await postApi('/api/live/new', { mission: data })
-      await getLive()
+      if (!mission?._id || !aircraft) return
+      await reserveMission(mission._id, aircraft)
       setPilot(pilot)
       router.push('/live')
     }

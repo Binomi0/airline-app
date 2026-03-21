@@ -18,7 +18,8 @@ import {
   getRandomInt,
   getCallsign,
   getNFTAttributes,
-  getEstimatedTimeMinutes
+  getEstimatedTimeMinutes,
+  getMissionWeight
 } from 'utils'
 import { getAverageAtcDuration } from 'utils/ivao'
 import { ObjectId } from 'mongodb'
@@ -202,8 +203,11 @@ const createMissionData = (
     destinationCoords: { latitude: destination.latitude, longitude: destination.longitude },
     distance: Math.round(distance),
     type: blueprint.type,
+    // FIXME: Implement getMissionWeight
+    weight: 0,
     category: isSponsored ? MissionCategory.ATC : MissionCategory.SOLO,
     isSponsored,
+    callsign: getCallsign(),
     rewardMultiplier,
     details: {
       name: `[${isSponsored ? 'Sponsored' : 'Solo'}] ${blueprint.name}`,

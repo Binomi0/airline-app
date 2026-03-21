@@ -4,6 +4,7 @@ import PublicMissionModel from 'models/PublicMission'
 import MissionModel from 'models/Mission'
 import AtcModel from 'models/Atc'
 import NftModel from 'models/Nft'
+import LiveModel from 'models/Live'
 import { PublicMissionStatus, MissionStatus, aircraftNameToIcaoCode } from 'types'
 import { getEstimatedTimeMinutes } from 'utils'
 import { ObjectId } from 'mongodb'
@@ -13,9 +14,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     return res.status(405).end()
   }
 
-  const { missionId, aircraftId, callsign, weight } = req.body
+  const { missionId, aircraftId } = req.body
 
-  if (!missionId || !aircraftId || !callsign) {
+  if (!missionId || !aircraftId) {
     return res.status(400).json({ error: 'Missing required fields' })
   }
 
@@ -30,7 +31,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     ])
 
     if (hasActiveMission || hasPoolReservation) {
-      return res.status(400).json({ error: 'You already have an active mission or reservation' })
+      return res.status(204).end()
     }
 
     // 1. Fetch aircraft details to calculate performance
@@ -54,7 +55,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           reservedAt: new Date()
         }
       },
-      { new: true }
+      { after: true }
     ).lean()
 
     if (!publicMission) {
@@ -83,15 +84,31 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       originCoords: publicMission.originCoords,
       destinationCoords: publicMission.destinationCoords,
       aircraftId,
-      callsign,
-      weight: weight || 1500, // Default weight if not provided
-      status: MissionStatus.STARTED,
+      callsign: publicMission.callsign,
+      weight: publicMission.weight,
+      status: MissionStatus.RESERVED,
       remote: false,
       isRewarded: false,
       estimatedTimeMinutes: getEstimatedTimeMinutes(publicMission.distance, cruiseSpeedIcao),
       originAtcOnStart: !!originAtc,
       destinationAtcOnStart: !!destAtc
     })
+
+    // 5. Create Live session record (initial state)
+    await LiveModel.findOneAndUpdate(
+      { userId: req.id },
+      {
+        $set: {
+          missionId: userMission._id,
+          userId: req.id,
+          aircraftId: userMission.aircraftId,
+          callsign: userMission.callsign,
+          isCompleted: false,
+          track: { name: PublicMissionStatus.RESERVED, value: new Date() }
+        }
+      },
+      { upsert: true, new: true }
+    )
 
     res.status(201).json(userMission)
   } catch (error) {

@@ -28,17 +28,18 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           expiresAt: extendedExpiration
         }
       },
-      { new: true }
+      { after: true }
     ).lean()
 
     // 2. Update the User's Mission record
     const userMission = await MissionModel.findOneAndUpdate(
       {
         userId: new ObjectId(req.id as string),
-        status: MissionStatus.STARTED
+        status: MissionStatus.RESERVED
       },
       {
         $set: {
+          status: MissionStatus.STARTED,
           startedAt,
           expiresAt: extendedExpiration
         }
