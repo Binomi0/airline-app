@@ -118,7 +118,6 @@ const CountdownTimer = ({ expiresAt, onExpire }: { expiresAt: string | Date; onE
 
 const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
   const router = useRouter()
-  const theme = useTheme()
   const { setPilot } = useLiveFlightProviderContext()
   const setLive = useSetRecoilState(liveStore)
   const setBooking = useSetRecoilState(bookingStore)

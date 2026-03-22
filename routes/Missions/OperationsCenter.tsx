@@ -116,9 +116,7 @@ const OperationsCenter = () => {
     if (topFlights.length >= 5) return topFlights.slice(0, 10)
 
     // Then we add those with best prize
-    const otherMissions = missions
-      .filter((m) => m.rewardMultiplier < 1.9)
-      .sort((a, b) => b.prize - a.prize)
+    const otherMissions = missions.filter((m) => m.rewardMultiplier < 1.9).sort((a, b) => b.prize - a.prize)
 
     return [...topFlights, ...otherMissions].slice(0, 10)
   }, [missions])

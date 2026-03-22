@@ -51,7 +51,7 @@ interface Props {
 const IvaoView = ({ user: _user }: Props) => {
   const { isLoading: _loading, initIvaoAuth, initIvaoData } = useVaProviderContext()
   const router = useRouter()
-  const { live, getLive } = useLiveFlightProviderContext()
+  const { live } = useLiveFlightProviderContext()
   const [start, setStart] = useState((router.query.start as string) ?? '')
   const [end, setEnd] = useState((router.query.end as string) ?? '')
   const ivaoUser = useRecoilValue(ivaoUserStore)

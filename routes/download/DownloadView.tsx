@@ -1,11 +1,9 @@
 import React from 'react'
 import { Box, Container, Typography, Stack, Button, Paper, Grid } from '@mui/material'
-import Head from 'next/head'
 import { motion } from 'framer-motion'
 import AppleIcon from '@mui/icons-material/Apple'
 import WindowsIcon from '@mui/icons-material/Window'
 import ComputerIcon from '@mui/icons-material/Computer'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 
 const DownloadView = () => {
   return (
@@ -79,8 +77,8 @@ const DownloadView = () => {
                     display: 'block',
                     boxShadow: '0 20px 50px rgba(0,0,0,0.3)'
                   }}
-                  onError={(e: any) => {
-                    e.target.src = 'https://placehold.co/600x400/1e293b/white?text=App+Preview'
+                  onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                    e.currentTarget.src = 'https://placehold.co/600x400/1e293b/white?text=App+Preview'
                   }}
                 />
               </Paper>

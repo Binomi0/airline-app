@@ -35,7 +35,6 @@ import { walletStore } from 'store/wallet.atom'
 import useOwnedNFTs from 'hooks/useOwnedNFTs'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
 import GasMeterIcon from '@mui/icons-material/GasMeter'
-import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import { useRouter } from 'next/router'
 import Swal from 'sweetalert2'
 import useMission from 'hooks/useMission'
@@ -58,7 +57,6 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
   const balance = useRecoilValue(tokenBalanceStore)
   const { data: userNfts } = useOwnedNFTs()
   const { twClient } = useRecoilValue(walletStore)
-  const { getLive } = useLiveFlightProviderContext()
   const { reserveMission } = useMission()
 
   const ownedAircrafts = useMemo(

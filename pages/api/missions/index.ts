@@ -35,11 +35,11 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       if (req.query.origin) {
         const origin = (req.query.origin as string).toUpperCase()
         const isIcaoCode = (code: string) => /^[A-Z0-9]{3,4}$/.test(code) // Standardized validation
-        
+
         if (isIcaoCode(origin)) {
           // Check if we have enough missions for this origin
-          const originCount = await PublicMissionModel.countDocuments({ 
-            origin, 
+          const originCount = await PublicMissionModel.countDocuments({
+            origin,
             status: PublicMissionStatus.AVAILABLE,
             endTime: { $gt: new Date() }
           })
