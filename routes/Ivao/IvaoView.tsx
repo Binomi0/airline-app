@@ -24,7 +24,6 @@ import { authStore } from 'store/auth.atom'
 // import { appInstalledStore } from 'store/appInstalled.atom'
 import Destinations from './components/Destinations'
 import Swal from 'sweetalert2'
-import { postApi } from 'lib/api'
 import { hasRequirement } from 'utils'
 import axios from 'config/axios'
 import useMission from 'hooks/useMission'
@@ -127,7 +126,7 @@ const IvaoView = ({ user: _user }: Props) => {
     } catch (err) {
       console.error(err)
     }
-  }, [mission, ownedAircrafts, aircraft, reserveMission, getLive, ivaoUser, authToken, router])
+  }, [mission, ownedAircrafts, aircraft, reserveMission, ivaoUser, authToken, router])
 
   const handleBooking = useCallback(
     (hasFuel: boolean) => {

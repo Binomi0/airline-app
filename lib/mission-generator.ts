@@ -18,8 +18,7 @@ import {
   getRandomInt,
   getCallsign,
   getNFTAttributes,
-  getEstimatedTimeMinutes,
-  getMissionWeight
+  getEstimatedTimeMinutes
 } from 'utils'
 import { getAverageAtcDuration } from 'utils/ivao'
 import { ObjectId } from 'mongodb'

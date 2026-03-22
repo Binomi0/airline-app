@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography'
 import { MediaRenderer, useReadContract } from 'thirdweb/react'
 import { getNFT } from 'thirdweb/extensions/erc721'
 import { walletStore } from 'store/wallet.atom'
-import { postApi } from 'lib/api'
 import { useRouter } from 'next/router'
 import React, { useCallback, useMemo } from 'react'
 import { useRecoilValue } from 'recoil'
@@ -76,7 +75,7 @@ const MissionAircraft: React.FC<{ mission?: Mission; onCancel: () => void }> = (
     } catch (err) {
       console.error(err)
     }
-  }, [mission, router])
+  }, [mission, router, reserveMission])
 
   if (!mission) {
     return <LinearProgress />

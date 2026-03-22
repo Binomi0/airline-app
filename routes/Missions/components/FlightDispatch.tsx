@@ -35,7 +35,6 @@ import { walletStore } from 'store/wallet.atom'
 import useOwnedNFTs from 'hooks/useOwnedNFTs'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
 import GasMeterIcon from '@mui/icons-material/GasMeter'
-import { postApi } from 'lib/api'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import { useRouter } from 'next/router'
 import Swal from 'sweetalert2'
@@ -112,7 +111,7 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
         Swal.fire('Error', 'No se pudo reservar el vuelo. Intenta de nuevo.', 'error')
       }
     }
-  }, [mission, currentAircraft, selectedAircraftId, getLive, router])
+  }, [mission, currentAircraft, router, reserveMission])
 
   return (
     <Paper elevation={6} sx={{ p: 4, borderRadius: 3 }}>

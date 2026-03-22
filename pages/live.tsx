@@ -1,6 +1,5 @@
 import LiveView from 'routes/Live/LiveView'
 import Disconnected from 'components/Disconnected'
-import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import Container from '@mui/material/Container'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'

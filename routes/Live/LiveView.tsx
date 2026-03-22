@@ -20,7 +20,7 @@ import { deleteApi } from 'lib/api'
 import { useSetRecoilState } from 'recoil'
 import { liveStore } from 'store/live.atom'
 import { bookingStore } from 'store/booking.atom'
-import { Mission } from 'types'
+import { Mission, ActiveAtc } from 'types'
 
 type Props = {
   mission: Mission
@@ -32,18 +32,20 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
   const { setPilot } = useLiveFlightProviderContext()
   const setLive = useSetRecoilState(liveStore)
   const setBooking = useSetRecoilState(bookingStore)
-  const [originAtc, setOriginAtc] = useState<any>(null)
+  const [originAtc, setOriginAtc] = useState<ActiveAtc | null>(null)
 
   useEffect(() => {
     if (mission?.origin) {
       fetch(`/api/ivao/atcs?callsign=${mission.origin}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data: ActiveAtc[]) => {
           // Find the most relevant ATC (TWR, APP, or GND)
-          const atc = data.find((a: any) => a.callsign.includes('_TWR') || a.callsign.includes('_APP') || a.callsign.includes('_GND'))
+          const atc = data.find(
+            (a) => a.callsign.includes('_TWR') || a.callsign.includes('_APP') || a.callsign.includes('_GND')
+          )
           if (atc) setOriginAtc(atc)
         })
-        .catch(err => console.error('Error fetching ATC:', err))
+        .catch((err) => console.error('Error fetching ATC:', err))
     }
   }, [mission?.origin])
 
@@ -93,7 +95,11 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
       <Fade in timeout={800}>
         <Stack spacing={4} alignItems='center' width='100%' maxWidth={800}>
           <Box textAlign='center'>
-            <Typography variant='h3' fontWeight='900' sx={{ color: 'primary.main', textTransform: 'uppercase', letterSpacing: 4 }}>
+            <Typography
+              variant='h3'
+              fontWeight='900'
+              sx={{ color: 'primary.main', textTransform: 'uppercase', letterSpacing: 4 }}
+            >
               Misión Despachada
             </Typography>
             <Typography variant='subtitle1' color='text.secondary'>
@@ -140,11 +146,19 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
             <Box sx={{ p: 6 }}>
               <Stack direction='row' justifyContent='space-between' alignItems='center' spacing={4}>
                 <Box textAlign='left' flex={1}>
-                  <Typography variant='h2' fontWeight='bold' sx={{ mb: 1 }}>{mission.origin}</Typography>
-                  <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 'bold' }}>ORIGEN</Typography>
+                  <Typography variant='h2' fontWeight='bold' sx={{ mb: 1 }}>
+                    {mission.origin}
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 'bold' }}>
+                    ORIGEN
+                  </Typography>
                 </Box>
 
-                <Box flex={2} position='relative' sx={{ height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box
+                  flex={2}
+                  position='relative'
+                  sx={{ height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
                   <Box
                     sx={{
                       width: '100%',
@@ -183,8 +197,12 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                 </Box>
 
                 <Box textAlign='right' flex={1}>
-                  <Typography variant='h2' fontWeight='bold' sx={{ mb: 1 }}>{mission.destination}</Typography>
-                  <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 'bold' }}>DESTINO</Typography>
+                  <Typography variant='h2' fontWeight='bold' sx={{ mb: 1 }}>
+                    {mission.destination}
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 'bold' }}>
+                    DESTINO
+                  </Typography>
                 </Box>
               </Stack>
             </Box>
@@ -200,19 +218,23 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
               }}
             >
               <Box textAlign='center'>
-                <Typography variant='caption' display='block' color='text.secondary' sx={{ fontWeight: 'bold' }}>CARGA</Typography>
+                <Typography variant='caption' display='block' color='text.secondary' sx={{ fontWeight: 'bold' }}>
+                  CARGA
+                </Typography>
                 <Typography sx={{ fontWeight: 'bold' }}>{mission.weight} KG</Typography>
               </Box>
               <Divider orientation='vertical' flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
               <Box textAlign='center'>
-                <Typography variant='caption' display='block' color='text.secondary' sx={{ fontWeight: 'bold' }}>RECOMPENSA</Typography>
-                <Typography sx={{ color: 'success.main', fontWeight: 'bold' }}>
-                  {mission.prize} AIRL
+                <Typography variant='caption' display='block' color='text.secondary' sx={{ fontWeight: 'bold' }}>
+                  RECOMPENSA
                 </Typography>
+                <Typography sx={{ color: 'success.main', fontWeight: 'bold' }}>{mission.prize} AIRL</Typography>
               </Box>
               <Divider orientation='vertical' flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
               <Box textAlign='center'>
-                <Typography variant='caption' display='block' color='text.secondary' sx={{ fontWeight: 'bold' }}>TIPO</Typography>
+                <Typography variant='caption' display='block' color='text.secondary' sx={{ fontWeight: 'bold' }}>
+                  TIPO
+                </Typography>
                 <Typography sx={{ fontWeight: 'bold' }}>{mission.type}</Typography>
               </Box>
             </Stack>
@@ -223,7 +245,7 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
             <Typography variant='h5' fontWeight='bold' sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
               <SettingsInputAntennaIcon color='primary' /> Briefing de Misión
             </Typography>
-            
+
             <Stack spacing={3}>
               {[
                 {
@@ -243,8 +265,8 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                 },
                 {
                   title: 'Solicitar Autorización',
-                  desc: originAtc 
-                    ? `Contacta con ${originAtc.callsign} en ${originAtc.frequency || 'su frecuencia'} para pedir plan de vuelo y puesta en marcha.`
+                  desc: originAtc
+                    ? `Contacta con ${originAtc.callsign} en ${originAtc.atcSession?.frequency || 'su frecuencia'} para pedir plan de vuelo y puesta en marcha.`
                     : 'Contacta con ATC (si hay servicio) para pedir plan de vuelo y puesta en marcha.',
                   icon: <HeadsetIcon />
                 }
@@ -278,8 +300,12 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                     {step.icon}
                   </Box>
                   <Box>
-                    <Typography variant='h6' fontWeight='bold'>{step.title}</Typography>
-                    <Typography variant='body2' color='text.secondary'>{step.desc}</Typography>
+                    <Typography variant='h6' fontWeight='bold'>
+                      {step.title}
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      {step.desc}
+                    </Typography>
                   </Box>
                 </Box>
               ))}
@@ -298,7 +324,8 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
             }}
           >
             <Typography variant='body2' fontWeight='500'>
-              El seguimiento web ha sido migrado. Por favor, asegúrate de tener abierta la aplicación de escritorio para que detecte tu vuelo automáticamente.
+              El seguimiento web ha sido migrado. Por favor, asegúrate de tener abierta la aplicación de escritorio para
+              que detecte tu vuelo automáticamente.
             </Typography>
           </Alert>
 

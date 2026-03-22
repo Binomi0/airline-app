@@ -9,7 +9,6 @@ import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import GradientCard from 'components/GradientCard'
 import Grid from '@mui/material/Grid'
 import { useTheme } from '@mui/material/styles'
-import { postApi } from 'lib/api'
 import { INft } from 'models/Nft'
 import useMission from 'hooks/useMission'
 
@@ -25,7 +24,7 @@ interface Props {
 const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, mission }: Props) => {
   const router = useRouter()
   const { palette } = useTheme()
-  const { setPilot, getLive } = useLiveFlightProviderContext()
+  const { setPilot } = useLiveFlightProviderContext()
   const { reserveMission } = useMission()
 
   const handleSelectFlight = React.useCallback(async () => {
@@ -41,7 +40,7 @@ const Flights = ({ pilot, onSelect, onRemove, aircraft, selected, mission }: Pro
       setPilot(pilot)
       router.push('/live')
     }
-  }, [pilot, mission, getLive, setPilot, router])
+  }, [pilot, mission, setPilot, router, aircraft, reserveMission])
 
   const handleNewMission = React.useCallback(async () => {
     if (!aircraft) return
