@@ -25,7 +25,10 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     // 0. Single-Reservation Check: User can only have one active mission or reservation
     console.info('[RESERVE] Checking existing missions for user:', req.id)
     const [hasActiveMission, hasPoolReservation] = await Promise.all([
-      MissionModel.exists({ userId: req.id, status: MissionStatus.STARTED }),
+      MissionModel.exists({
+        userId: req.id,
+        status: { $in: [MissionStatus.STARTED, MissionStatus.RESERVED] }
+      }),
       PublicMissionModel.exists({
         reservedBy: new mongoose.Types.ObjectId(req.id as string),
         status: { $in: [PublicMissionStatus.RESERVED, PublicMissionStatus.ACTIVE] }
@@ -75,6 +78,12 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     ])
 
     // 4. Create the personal mission record for tracking
+    const reservationTimeout = 20 * 60000 // 20 minutes
+    const expiresAt = new Date(Date.now() + reservationTimeout)
+
+    // Update public mission to avoid TTL deletion while reserved
+    await PublicMissionModel.updateOne({ _id: publicMission._id }, { $set: { expiresAt } })
+
     const userMission = await MissionModel.create({
       userId: req.id,
       origin: publicMission.origin,
@@ -86,7 +95,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       rewardMultiplier: publicMission.rewardMultiplier,
       details: publicMission.details,
       prize: publicMission.prize,
-      expiresAt: publicMission.expiresAt,
+      expiresAt: expiresAt,
       originCoords: publicMission.originCoords,
       destinationCoords: publicMission.destinationCoords,
       aircraftId,

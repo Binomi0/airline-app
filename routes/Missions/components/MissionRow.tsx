@@ -70,6 +70,22 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
         </Typography>
       </Box>
 
+      {/* 1.5 CALLSIGN */}
+      <Box sx={{ minWidth: 100, width: '100%', zIndex: 2 }}>
+        <Typography
+          className='dot-text'
+          sx={{
+            fontFamily: 'inherit',
+            color: isSelected ? '#fff' : primaryColor,
+            lineHeight: 1,
+            fontWeight: 'bold',
+            opacity: 0.9
+          }}
+        >
+          {mission.callsign}
+        </Typography>
+      </Box>
+
       {/* 2. ROUTE */}
       <Box
         sx={{

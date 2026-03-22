@@ -85,7 +85,8 @@ const missionSchema: mongoose.Schema = new mongoose.Schema<IMission>(
       default: false
     },
     expiresAt: {
-      type: Date
+      type: Date,
+      index: { expireAfterSeconds: 0 } // TTL index
     },
     startedAt: {
       type: Date,

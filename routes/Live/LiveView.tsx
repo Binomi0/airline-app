@@ -11,6 +11,7 @@ import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Alert from '@mui/material/Alert'
+import LinearProgress from '@mui/material/LinearProgress'
 import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import LabelImportantIcon from '@mui/icons-material/LabelImportant'
@@ -21,18 +22,120 @@ import { useSetRecoilState } from 'recoil'
 import { liveStore } from 'store/live.atom'
 import { bookingStore } from 'store/booking.atom'
 import { Mission, ActiveAtc } from 'types'
+import { useTheme } from '@mui/material/styles'
 
 type Props = {
   mission: Mission
   isLoading: boolean
 }
 
+const CountdownTimer = ({ expiresAt, onExpire }: { expiresAt: string | Date; onExpire: () => void }) => {
+  const [timeLeft, setTimeLeft] = useState<number>(0)
+  const theme = useTheme()
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const difference = new Date(expiresAt).getTime() - new Date().getTime()
+      // Add a 10-second grace period to account for clock drift
+      return Math.max(-10000, difference)
+    }
+
+    const initialTimeLeft = calculateTimeLeft()
+    setTimeLeft(Math.max(0, initialTimeLeft))
+
+    // Don't expire immediately if within grace period
+    if (initialTimeLeft <= -10000) {
+      onExpire()
+      return
+    }
+
+    const timer = setInterval(() => {
+      const remaining = calculateTimeLeft()
+      setTimeLeft(Math.max(0, remaining))
+      if (remaining <= -10000) {
+        clearInterval(timer)
+        onExpire()
+      }
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [expiresAt, onExpire])
+
+  const minutes = Math.floor(timeLeft / 60000)
+  const seconds = Math.floor((timeLeft % 60000) / 1000)
+  const totalDuration = 20 * 60000 // Assumed initial reservation time
+  const progress = Math.min(100, (timeLeft / totalDuration) * 100)
+  const isLow = timeLeft < 5 * 60000 // 5 minutes
+
+  return (
+    <Box sx={{ width: '100%', mb: 4 }}>
+      <Stack direction='row' justifyContent='space-between' alignItems='flex-end' sx={{ mb: 1 }}>
+        <Typography
+          variant='overline'
+          sx={{
+            color: isLow ? 'error.main' : 'primary.light',
+            fontWeight: '900',
+            letterSpacing: 2,
+            animation: isLow ? 'pulse 2s infinite' : 'none',
+            '@keyframes pulse': {
+              '0%': { opacity: 1 },
+              '50%': { opacity: 0.5 },
+              '100%': { opacity: 1 }
+            }
+          }}
+        >
+          {isLow ? 'RESERVA EXPIRANDO PRONTO' : 'TIEMPO RESTANTE DE RESERVA'}
+        </Typography>
+        <Typography
+          variant='h4'
+          sx={{
+            fontFamily: 'monospace',
+            fontWeight: '900',
+            color: isLow ? 'error.main' : 'primary.main',
+            textShadow: isLow ? `0 0 10px ${theme.palette.error.main}` : 'none'
+          }}
+        >
+          {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+        </Typography>
+      </Stack>
+      <LinearProgress
+        variant='determinate'
+        value={progress}
+        color={isLow ? 'error' : 'primary'}
+        sx={{
+          height: 8,
+          borderRadius: 4,
+          bgcolor: 'rgba(255,255,255,0.05)',
+          '& .MuiLinearProgress-bar': {
+            borderRadius: 4,
+            transition: 'transform 0.5s linear'
+          }
+        }}
+      />
+    </Box>
+  )
+}
+
 const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
   const router = useRouter()
+  const theme = useTheme()
   const { setPilot } = useLiveFlightProviderContext()
   const setLive = useSetRecoilState(liveStore)
   const setBooking = useSetRecoilState(bookingStore)
   const [originAtc, setOriginAtc] = useState<ActiveAtc | null>(null)
+
+  const handleExpire = useCallback(() => {
+    Swal.fire({
+      title: 'Reserva Expirada',
+      text: 'Tu reserva de misión ha caducado. Serás redirigido al centro de operaciones.',
+      icon: 'error',
+      confirmButtonText: 'Entendido'
+    }).then(() => {
+      setBooking(false)
+      setLive(undefined)
+      router.push('/missions')
+    })
+  }, [router, setBooking, setLive])
 
   useEffect(() => {
     if (mission?.origin) {
@@ -122,6 +225,7 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
           >
             {/* Header / Callsign */}
             <Box sx={{ p: 4, textAlign: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              {mission.expiresAt && <CountdownTimer expiresAt={mission.expiresAt} onExpire={handleExpire} />}
               <Typography variant='overline' sx={{ opacity: 0.6, letterSpacing: 2, fontWeight: 'bold' }}>
                 IDENTIFICATIVO DE VUELO
               </Typography>
@@ -371,18 +475,21 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
             </Button>
           </Stack>
 
-          <Button
-            variant='text'
-            onClick={handleDisconnect}
-            sx={{
-              color: 'error.main',
-              fontWeight: 'bold',
-              opacity: 0.7,
-              '&:hover': { opacity: 1, textDecoration: 'underline' }
-            }}
-          >
-            Cancelar misión reservada
-          </Button>
+          <Box sx={{ p: 2 }}>
+            <Button
+              variant='text'
+              onClick={handleDisconnect}
+              sx={{
+                color: 'error.main',
+                fontWeight: 'bold',
+                opacity: 0.7,
+                p: 2,
+                '&:hover': { opacity: 1, textDecoration: 'underline' }
+              }}
+            >
+              Cancelar misión reservada
+            </Button>
+          </Box>
         </Stack>
       </Fade>
     </Stack>

@@ -69,10 +69,10 @@ const MAJOR_HUBS = [
   { icao: 'GCCC', latitude: 27.9319, longitude: -15.3866 }
 ]
 
-const MISSION_POOL_SIZE = 50 // Increased pool size to accommodate more variety
+const MISSION_POOL_SIZE = 150 // Increased pool size to accommodate more variety
 
-export const generatePublicMissionPool = async () => {
-  console.info('[MissionPool] Replenishing mission pool...')
+export const generatePublicMissionPool = async (targetOrigin?: string) => {
+  console.info('[MissionPool] Replenishing mission pool...', targetOrigin ? `(Target: ${targetOrigin})` : '')
 
   // 1. Get current active ATCs to use as mandatory origins
   const activeAtcs = await AtcModel.find({
@@ -96,7 +96,7 @@ export const generatePublicMissionPool = async () => {
 
   // 2. Get existing routes in the pool to avoid duplicates
   const existingMissions = await PublicMissionModel.find({
-    status: PublicMissionStatus.AVAILABLE
+    status: { $in: [PublicMissionStatus.AVAILABLE, PublicMissionStatus.RESERVED] }
   })
     .select('origin destination')
     .lean()
@@ -104,26 +104,73 @@ export const generatePublicMissionPool = async () => {
   const existingRoutes = new Set(existingMissions.map((m) => `${m.origin}-${m.destination}`))
   const newMissions = []
 
-  // Shuffle origins to provide different variety each time
-  const shuffledOrigins = uniqueAtcOrigins.sort(() => Math.random() - 0.5)
+  // 3. If targetOrigin is provided, prioritize it
+  if (targetOrigin) {
+    const origin = uniqueAtcOrigins.find((o) => o.icao === targetOrigin.toUpperCase())
+    if (origin) {
+      const tiers = [
+        { min: 20, max: 250 }, // Short
+        { min: 251, max: 800 }, // Medium
+        { min: 801, max: 3000 } // Long
+      ]
+      for (const tier of tiers) {
+        const possibleDests = uniqueDestinations.filter((d) => {
+          if (d.icao === origin.icao) return false
+          if (existingRoutes.has(`${origin.icao}-${d.icao}`)) return false
+          const dist = getDistanceByCoords(
+            { latitude: origin.latitude, longitude: origin.longitude } as Coords,
+            { latitude: d.latitude, longitude: d.longitude } as Coords
+          )
+          return dist >= tier.min && dist <= tier.max
+        })
 
-  // 3. Guarantee missions for each ATC origin
+        if (possibleDests.length > 0) {
+          const destination = possibleDests[getRandomInt(possibleDests.length)]
+          newMissions.push(createMissionData(origin, destination))
+          existingRoutes.add(`${origin.icao}-${destination.icao}`)
+        }
+      }
+    }
+  }
+
+  // 4. Distribution Loop: Guarantee at least ONE mission for EVERY active ATC before generating more
+  const shuffledOrigins = uniqueAtcOrigins.sort(() => Math.random() - 0.5)
+  
+  // First pass: 1 mission per ATC
   for (const origin of shuffledOrigins) {
-    // For each tier, generate at least one mission if possible
+    if (newMissions.length + existingMissions.length >= MISSION_POOL_SIZE) break
+    
+    // Check if it already has missions in this specific generation OR globally
+    const hasExisting = existingMissions.some(m => m.origin === origin.icao)
+    if (hasExisting) continue
+
+    const possibleDests = uniqueDestinations.filter(d => 
+      d.icao !== origin.icao && !existingRoutes.has(`${origin.icao}-${d.icao}`)
+    ).sort(() => Math.random() - 0.5)
+
+    if (possibleDests.length > 0) {
+      const destination = possibleDests[0]
+      newMissions.push(createMissionData(origin, destination))
+      existingRoutes.add(`${origin.icao}-${destination.icao}`)
+    }
+  }
+
+  // Second pass: Fill up to MISSION_POOL_SIZE using tiers for variety
+  for (const origin of shuffledOrigins) {
     if (newMissions.length + existingMissions.length >= MISSION_POOL_SIZE) break
 
     const tiers = [
-      { min: 20, max: 150 }, // Short
-      { min: 151, max: 500 }, // Medium
-      { min: 501, max: 2500 } // Long
+      { min: 20, max: 250 },
+      { min: 251, max: 800 },
+      { min: 801, max: 3000 }
     ]
 
     for (const tier of tiers) {
-      // Find eligible destinations within this range
-      let possibleDests = uniqueDestinations.filter((d) => {
+      if (newMissions.length + existingMissions.length >= MISSION_POOL_SIZE) break
+      
+      const possibleDests = uniqueDestinations.filter((d) => {
         if (d.icao === origin.icao) return false
-        if (existingRoutes.has(`${origin.icao}-${d.icao}`)) return false // Skip existing routes
-
+        if (existingRoutes.has(`${origin.icao}-${d.icao}`)) return false
         const dist = getDistanceByCoords(
           { latitude: origin.latitude, longitude: origin.longitude } as Coords,
           { latitude: d.latitude, longitude: d.longitude } as Coords
@@ -132,37 +179,14 @@ export const generatePublicMissionPool = async () => {
       })
 
       if (possibleDests.length > 0) {
-        // Shuffle to avoid picking the same one first consistently
-        possibleDests = possibleDests.sort(() => Math.random() - 0.5)
-
-        // Pick only ONE destination per tier to ensure maximum spread
-        const destination = possibleDests[0]
-        const mission = createMissionData(origin, destination)
-        newMissions.push(mission)
+        const destination = possibleDests[getRandomInt(possibleDests.length)]
+        newMissions.push(createMissionData(origin, destination))
         existingRoutes.add(`${origin.icao}-${destination.icao}`)
-      } else {
-        console.warn(`[MissionPool] No destinations in tier ${tier.min}-${tier.max} for ${origin.icao}`)
       }
     }
   }
 
-  // 4. Fill up remaining slots with random unique routes if needed
-  let remaining = MISSION_POOL_SIZE - (existingMissions.length + newMissions.length)
-  let attempts = 0
-  while (remaining > 0 && attempts < 100) {
-    attempts++
-    const origin = uniqueDestinations[getRandomInt(uniqueDestinations.length)]
-    const destination = uniqueDestinations[getRandomInt(uniqueDestinations.length)]
-
-    if (origin.icao !== destination.icao && !existingRoutes.has(`${origin.icao}-${destination.icao}`)) {
-      newMissions.push(createMissionData(origin, destination))
-      existingRoutes.add(`${origin.icao}-${destination.icao}`)
-      remaining--
-    }
-  }
-
   if (newMissions.length > 0) {
-    // Final shuffle to ensure different origins/destinations are mixed in the insertion order
     const shuffledMissions = newMissions.sort(() => Math.random() - 0.5)
     await PublicMissionModel.insertMany(shuffledMissions)
     console.info('[MissionPool] Added %d new missions to the pool', shuffledMissions.length)

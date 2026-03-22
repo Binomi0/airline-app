@@ -86,6 +86,11 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
               DEPARTURE
             </Typography>
             <Typography
+              sx={{ minWidth: 100, width: '100%', color: 'primary.main', fontSize: '0.85rem', fontWeight: 'bold' }}
+            >
+              CALLSIGN
+            </Typography>
+            <Typography
               sx={{ minWidth: 200, width: '100%', color: 'primary.main', fontSize: '0.85rem', fontWeight: 'bold' }}
             >
               ROUTE (ICAO)

@@ -14,7 +14,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     const activeMission = await MissionModel.findOne({
       userId: req.id,
       status: { $in: [MissionStatus.STARTED, MissionStatus.RESERVED] }
-    }).lean()
+    })
+      .sort({ createdAt: -1 })
+      .lean()
 
     if (!activeMission) {
       const reserverdMission = await PublicMission.findOne({
