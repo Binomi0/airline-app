@@ -56,7 +56,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           reservedAt: new Date()
         }
       },
-      { after: true }
+      { returnDocument: 'after' }
     ).lean()
 
     if (!publicMission) {

@@ -28,7 +28,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           expiresAt: extendedExpiration
         }
       },
-      { after: true }
+      { returnDocument: 'after' }
     ).lean()
 
     // 2. Update the User's Mission record
