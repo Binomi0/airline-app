@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MenuIcon from '@mui/icons-material/Menu'
 import Alert from '@mui/material/Alert'
 import AppBar from '@mui/material/AppBar'
@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
 import Stack from '@mui/material/Stack'
 import useScrollTrigger from '@mui/material/useScrollTrigger'
-import Download from '@mui/icons-material/Download'
+
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Snackbar from '@mui/material/Snackbar'
 import { useMainProviderContext } from 'context/MainProvider'
@@ -21,7 +21,7 @@ import { smartAccountAddressStore } from 'store/wallet.atom'
 import { themeStore } from 'store/theme.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import styles from './appbar.module.css'
-import { AlertTitle, Box, Container } from '@mui/material'
+import { AlertTitle, Container, Box, Button } from '@mui/material'
 import Link from 'next/link'
 
 function base64URLEncode(str: string) {
@@ -47,7 +47,7 @@ const CustomAppBar = () => {
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
 
-  const handleDownloadApp = useCallback(() => {}, [])
+
 
   useEffect(() => {
     setSnack({ open: status === 'missingKey', message: 'Missing Key', status: 'error' })
@@ -108,11 +108,11 @@ const CustomAppBar = () => {
           )}
           {user && (
             <Box mr={2}>
-              <Tooltip title='Download App'>
-                <IconButton color='inherit' onClick={handleDownloadApp}>
-                  <Download color='inherit' />
-                </IconButton>
-              </Tooltip>
+              <Link href='/download'>
+                <Button color='inherit' size='small' variant='outlined' sx={{ borderRadius: 3 }}>
+                  Descargar App
+                </Button>
+              </Link>
             </Box>
           )}
           {matches && smartAccountAddress && (

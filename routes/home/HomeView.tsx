@@ -5,7 +5,6 @@ import { userState } from 'store/user.atom'
 import styles from '../../styles/Home.module.css'
 import LiveDashboard from './components/LiveDashboard'
 import PilotRankings from './components/PilotRankings'
-import ATCTeaser from './components/ATCTeaser'
 
 const NAV_ITEMS = [
   {
@@ -212,9 +211,8 @@ const HomeView = () => {
 
       {user && <PilotRankings />}
 
-      <div className={styles.divider} />
 
-      <ATCTeaser />
+      <div className={styles.divider} />
 
       <div className={styles.divider} />
 

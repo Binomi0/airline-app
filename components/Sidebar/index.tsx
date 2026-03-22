@@ -7,6 +7,7 @@ import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork'
 import LocalAirportIcon from '@mui/icons-material/LocalAirport'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
+import ComputerIcon from '@mui/icons-material/Computer'
 import SchoolIcon from '@mui/icons-material/School'
 import { useMainProviderContext } from 'context/MainProvider'
 import SidebarItem from './SidebarItem'
@@ -55,12 +56,12 @@ const Sidebar: React.FC = () => {
       </Stack>
       <Divider />
       <List>
-        <SidebarItem onLink={handleClick('/')} text='Home' Icon={HomeIcon} selected={router.pathname === '/'} />
+        <SidebarItem onLink={handleClick('/')} text='Inicio' Icon={HomeIcon} selected={router.pathname === '/'} />
         <SidebarItem
-          onLink={handleClick('/guide')}
-          text='Guía de Usuario'
-          Icon={SchoolIcon}
-          selected={router.pathname === '/guide'}
+          onLink={handleClick('/missions')}
+          text='Misiones'
+          Icon={AddHomeWorkIcon}
+          selected={router.pathname === '/missions'}
         />
         <SidebarItem
           onLink={handleClick('/hangar')}
@@ -70,21 +71,15 @@ const Sidebar: React.FC = () => {
         />
         <SidebarItem
           onLink={handleClick('/license')}
-          text='License'
+          text='Licencias'
           Icon={WorkspacePremiumIcon}
           selected={router.pathname === '/license'}
         />
         <SidebarItem
           onLink={handleClick('/gas')}
-          text='Gas Station'
+          text='Gasolinera'
           Icon={LocalGasStationIcon}
           selected={router.pathname === '/gas'}
-        />
-        <SidebarItem
-          onLink={handleClick('/missions')}
-          text='Misiones'
-          Icon={AddHomeWorkIcon}
-          selected={router.pathname === '/missions'}
         />
         <SidebarItem
           disabled={!user?.vaUser}
@@ -101,6 +96,23 @@ const Sidebar: React.FC = () => {
             selected={router.pathname === '/live'}
           />
         )}
+      </List>
+
+      <Divider />
+
+      <List>
+        <SidebarItem
+          onLink={handleClick('/download')}
+          text='Descargar App'
+          Icon={ComputerIcon}
+          selected={router.pathname === '/download'}
+        />
+        <SidebarItem
+          onLink={handleClick('/guide')}
+          text='Guía de Usuario'
+          Icon={SchoolIcon}
+          selected={router.pathname === '/guide'}
+        />
       </List>
 
       <Divider />

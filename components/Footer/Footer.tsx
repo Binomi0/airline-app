@@ -59,16 +59,19 @@ const Footer: React.FC = () => {
             </Typography>
             <Stack spacing={1}>
               <Link href='/' className={styles.link}>
-                Home
-              </Link>
-              <Link href='/guide' className={styles.link}>
-                Guía
+                Inicio
               </Link>
               <Link href='/missions' className={styles.link}>
                 Misiones
               </Link>
               <Link href='/live' className={styles.link}>
-                Live Map
+                Mapa en Vivo
+              </Link>
+              <Link href='/guide' className={styles.link}>
+                Guía de Usuario
+              </Link>
+              <Link href='/download' className={styles.link}>
+                Descargar App
               </Link>
             </Stack>
           </Grid>
@@ -82,19 +85,19 @@ const Footer: React.FC = () => {
               <Link href='/hangar' className={styles.link}>
                 Hangar
               </Link>
-              <Link href='/gas' className={styles.link}>
-                Gas Station
-              </Link>
               <Link href='/license' className={styles.link}>
                 Licencias
               </Link>
-              <Link href='/whitepaper.md' className={styles.link}>
+              <Link href='/gas' className={styles.link}>
+                Gasolinera
+              </Link>
+              <Link href='/whitepaper' className={styles.link}>
                 Whitepaper
               </Link>
             </Stack>
           </Grid>
 
-          {/* Community */}
+          {/* Legal */}
           <Grid item xs={6} md={2}>
             <Typography variant='subtitle1' fontWeight={600} gutterBottom>
               Legal
