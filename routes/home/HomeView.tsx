@@ -211,7 +211,6 @@ const HomeView = () => {
 
       {user && <PilotRankings />}
 
-
       <div className={styles.divider} />
 
       <div className={styles.divider} />

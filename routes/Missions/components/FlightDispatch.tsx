@@ -66,7 +66,14 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
     [userNfts]
   )
 
-  const [selectedAircraftId, setSelectedAircraftId] = useState<string>(ownedAircrafts[0]?.nft?.id.toString() || '')
+  const [selectedAircraftId, setSelectedAircraftId] = useState<string>('')
+
+  // Automatically select the first aircraft when the list loads
+  React.useEffect(() => {
+    if (ownedAircrafts.length > 0 && !selectedAircraftId) {
+      setSelectedAircraftId(ownedAircrafts[0].nft.id.toString())
+    }
+  }, [ownedAircrafts, selectedAircraftId])
   const media = aircraftImageMap[selectedAircraftId as keyof typeof aircraftImageMap]
 
   const currentAircraft = useMemo(
@@ -114,10 +121,10 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
   }, [mission, currentAircraft, router, reserveMission])
 
   return (
-    <Paper elevation={6} sx={{ p: 4, borderRadius: 3 }}>
-      <Stack spacing={3}>
+    <Paper elevation={6} sx={{ p: 2, borderRadius: 3 }}>
+      <Stack spacing={2}>
         <Box display='flex' justifyContent='space-between' alignItems='flex-start'>
-          <Typography variant='h5' fontWeight='bold'>
+          <Typography variant='h6' fontWeight='bold'>
             ORDEN DE VUELO
           </Typography>
           <Stack direction='row' spacing={1} alignItems='center'>
@@ -153,10 +160,10 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
           </Typography>
           <Stack direction='row' spacing={2} alignItems='center' mt={1}>
             <Box textAlign='center'>
-              <Typography variant='h4' color={mission.originAtcOnStart ? 'info.main' : 'inherit'}>
+              <Typography variant='h5' color={mission.originAtcOnStart ? 'info.main' : 'inherit'}>
                 {mission.origin}
               </Typography>
-              <Typography variant='caption' sx={{ display: 'block', mt: -0.5 }}>
+              <Typography variant='caption' sx={{ display: 'block', mt: -0.5, fontSize: '0.7rem' }}>
                 {mission.originAtcOnStart ? 'ATC ACTIVE (+40%)' : 'ORIGEN'}
               </Typography>
             </Box>
@@ -164,10 +171,10 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
               <Typography variant='body2' color='text.secondary'>
                 {formatNumber(mission.distance, 0)} NM
               </Typography>
-              <Box sx={{ borderBottom: '2px solid', borderColor: 'divider', my: 1 }} />
+              <Box sx={{ borderBottom: '2px solid', borderColor: 'divider', my: 0.5 }} />
               <FlightTakeoffIcon
                 sx={{
-                  fontSize: 40,
+                  fontSize: 30,
                   color: 'primary.main',
                   opacity: 0.1,
                   position: 'absolute',
@@ -178,10 +185,10 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
               />
             </Box>
             <Box textAlign='center'>
-              <Typography variant='h4' color={mission.isSponsored ? 'success.main' : 'inherit'}>
+              <Typography variant='h5' color={mission.isSponsored ? 'success.main' : 'inherit'}>
                 {mission.destination}
               </Typography>
-              <Typography variant='caption' sx={{ display: 'block', mt: -0.5 }}>
+              <Typography variant='caption' sx={{ display: 'block', mt: -0.5, fontSize: '0.7rem' }}>
                 {mission.isSponsored ? 'ATC ACTIVE (+70%)' : 'DESTINO'}
               </Typography>
             </Box>
@@ -207,8 +214,8 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
           <Typography variant='overline' color='text.secondary'>
             CALLSIGN ASIGNADO
           </Typography>
-          <Paper variant='outlined' sx={{ p: 2, textAlign: 'center', bgcolor: 'primary.dark', color: 'white' }}>
-            <Typography variant='h3' sx={{ letterSpacing: 4, fontWeight: 'bold' }}>
+          <Paper variant='outlined' sx={{ p: 1, textAlign: 'center', bgcolor: 'primary.dark', color: 'white' }}>
+            <Typography variant='h4' sx={{ letterSpacing: 4, fontWeight: 'bold' }}>
               {mission.callsign}
             </Typography>
           </Paper>

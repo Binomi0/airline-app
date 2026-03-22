@@ -34,7 +34,7 @@ const OperationsCenter = () => {
   const [missions, setMissions] = useState<PublicMission[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedMission, setSelectedMission] = useState<PublicMission | null>(null)
-  const [originInput, setOriginInput] = useState<string>('') // To avoid multiple renders on input
+  const [originInput, setOriginInput] = useState<string>('')
   const [origin, setOrigin] = useState<string>('')
 
   const fetchMissions = useCallback(async () => {
@@ -167,8 +167,8 @@ const OperationsCenter = () => {
               <Paper
                 variant='outlined'
                 sx={{
-                  p: 4,
-                  minHeight: 400,
+                  p: 3,
+                  minHeight: 300,
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
@@ -178,10 +178,10 @@ const OperationsCenter = () => {
                   bgcolor: 'transparent'
                 }}
               >
-                <Typography variant='h5' color='text.secondary' align='center'>
+                <Typography variant='h6' color='text.secondary' align='center'>
                   SELECCIONA UNA MISIÓN PARA EMPEZAR EL DESPACHO
                 </Typography>
-                <Typography variant='body2' color='text.secondary' align='center' mt={1}>
+                <Typography variant='caption' color='text.secondary' align='center' mt={1}>
                   Elige un destino patrocinado para obtener más recompensas.
                 </Typography>
               </Paper>

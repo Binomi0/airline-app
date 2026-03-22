@@ -1,4 +1,5 @@
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import mongoose from 'mongoose'
 import { NextApiResponse } from 'next'
 import PublicMissionModel from 'models/PublicMission'
 import MissionModel from 'models/Mission'
@@ -8,7 +9,6 @@ import LiveModel from 'models/Live'
 import { PublicMissionStatus, MissionStatus, aircraftNameToIcaoCode } from 'types'
 import { getEstimatedTimeMinutes, getMissionWeight } from 'utils'
 import { INft } from 'models/Nft'
-import { ObjectId } from 'mongodb'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -23,16 +23,21 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
   try {
     // 0. Single-Reservation Check: User can only have one active mission or reservation
+    console.info('[RESERVE] Checking existing missions for user:', req.id)
     const [hasActiveMission, hasPoolReservation] = await Promise.all([
       MissionModel.exists({ userId: req.id, status: MissionStatus.STARTED }),
       PublicMissionModel.exists({
-        reservedBy: new ObjectId(req.id as string),
+        reservedBy: new mongoose.Types.ObjectId(req.id as string),
         status: { $in: [PublicMissionStatus.RESERVED, PublicMissionStatus.ACTIVE] }
       })
     ])
 
     if (hasActiveMission || hasPoolReservation) {
-      return res.status(204).end()
+      console.warn('[RESERVE] User already has an active mission or reservation', {
+        hasActiveMission,
+        hasPoolReservation
+      })
+      return res.status(204).json({ error: 'Ya tienes una misión activa o una reserva pendiente.' })
     }
 
     // 1. Fetch aircraft details to calculate performance

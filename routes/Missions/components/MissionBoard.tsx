@@ -47,9 +47,9 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
               justifyContent: 'center'
             }}
           >
-            <FlightTakeoffIcon sx={{ color: '#000', fontSize: 24 }} />
+            <FlightTakeoffIcon sx={{ color: '#000', fontSize: 18 }} />
           </Box>
-          <Typography variant='h4' color='primary' sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+          <Typography variant='h6' color='primary' sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
             OPERATIONS CENTER
           </Typography>
         </Stack>
@@ -80,25 +80,46 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
               opacity: 0.8
             }}
           >
-            <Typography sx={{ width: 80, color: 'primary.main', fontSize: '1rem', fontWeight: 'bold' }}>
-              TIME
+            <Typography
+              sx={{ minWidth: 80, width: '100%', color: 'primary.main', fontSize: '0.85rem', fontWeight: 'bold' }}
+            >
+              DEPARTURE
             </Typography>
-            <Typography sx={{ width: 220, color: 'primary.main', fontSize: '1rem', fontWeight: 'bold' }}>
+            <Typography
+              sx={{ minWidth: 200, width: '100%', color: 'primary.main', fontSize: '0.85rem', fontWeight: 'bold' }}
+            >
               ROUTE (ICAO)
             </Typography>
-            <Typography sx={{ width: 120, color: 'primary.main', fontSize: '1rem', fontWeight: 'bold', pl: 1 }}>
+            <Typography
+              sx={{
+                minWidth: 100,
+                width: '100%',
+                color: 'primary.main',
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+                pl: 1
+              }}
+            >
               TYPE
             </Typography>
             <Typography
-              sx={{ width: 100, color: 'primary.main', fontSize: '1rem', fontWeight: 'bold', textAlign: 'right' }}
+              sx={{
+                minWidth: 90,
+                width: '100%',
+                color: 'primary.main',
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+                textAlign: 'right'
+              }}
             >
               DIST (NM)
             </Typography>
             <Typography
               sx={{
-                width: 140,
+                minWidth: 120,
+                width: '100%',
                 color: 'primary.main',
-                fontSize: '1rem',
+                fontSize: '0.85rem',
                 fontWeight: 'bold',
                 textAlign: 'right',
                 ml: 3
@@ -108,15 +129,16 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
             </Typography>
             <Typography
               sx={{
-                width: 140,
+                minWidth: 100,
+                width: '100%',
                 color: 'primary.main',
-                fontSize: '1rem',
+                fontSize: '0.85rem',
                 fontWeight: 'bold',
                 textAlign: 'right',
                 ml: 2
               }}
             >
-              STATUS
+              BONUS
             </Typography>
           </Box>
 

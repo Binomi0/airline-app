@@ -7,13 +7,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
-import {
-  formatNumber,
-  gallonsToLiters,
-  getFuelForFlight,
-  getIcaoCodeFromAircraftNFT,
-  getNFTAttributes
-} from 'utils'
+import { formatNumber, gallonsToLiters, getFuelForFlight, getIcaoCodeFromAircraftNFT, getNFTAttributes } from 'utils'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'
 import useMission from 'hooks/useMission'

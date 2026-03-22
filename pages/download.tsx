@@ -8,7 +8,10 @@ const DownloadPage: NextPage = () => {
     <>
       <Head>
         <title>Descargar App | WeiFly</title>
-        <meta name='description' content='Descarga la aplicación de escritorio de WeiFly para conectar tu simulador y empezar a ganar recompensas.' />
+        <meta
+          name='description'
+          content='Descarga la aplicación de escritorio de WeiFly para conectar tu simulador y empezar a ganar recompensas.'
+        />
       </Head>
       <DownloadView />
     </>

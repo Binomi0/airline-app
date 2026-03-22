@@ -3,7 +3,7 @@ import moment from 'moment'
 import { Box, Typography, useTheme, alpha, Chip } from '@mui/material'
 import { formatNumber } from 'utils'
 import { PublicMission } from 'types'
-import { vt323 } from 'src/theme'
+import { b612Mono } from 'src/theme'
 
 interface MissionRowProps {
   mission: PublicMission
@@ -27,7 +27,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
         display: 'flex',
         alignItems: 'center',
         px: 2,
-        py: 0.6,
+        py: 0.3,
         position: 'relative',
         transition: 'all 0.1s ease',
         '&:hover': {
@@ -38,7 +38,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
             textShadow: `0 0 10px ${primaryColor}`
           }
         },
-        fontFamily: vt323.style.fontFamily,
+        fontFamily: b612Mono.style.fontFamily,
         textTransform: 'uppercase'
       }}
     >
@@ -56,12 +56,11 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       />
 
       {/* 1. TIME */}
-      <Box sx={{ width: 80, zIndex: 2 }}>
+      <Box sx={{ minWidth: 80, width: '100%', zIndex: 2 }}>
         <Typography
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            fontSize: '1.4rem',
             color: isSelected ? '#fff' : primaryColor,
             lineHeight: 1,
             opacity: isSelected ? 1 : 0.8
@@ -72,30 +71,39 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       </Box>
 
       {/* 2. ROUTE */}
-      <Box sx={{ width: 220, zIndex: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box
+        sx={{
+          minWidth: 200,
+          width: '100%',
+          zIndex: 2,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}
+      >
         <Typography
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            fontSize: '1.8rem',
+            fontWeight: 'bold',
             color: isSelected ? '#fff' : 'primary.main',
-            width: 80,
+            width: 70,
             textAlign: 'left',
-            letterSpacing: 2
+            letterSpacing: 1
           }}
         >
           {mission.origin}
         </Typography>
-        <Typography sx={{ color: alpha(primaryColor, 0.4), fontSize: '1.2rem' }}>→</Typography>
+        <Typography sx={{ color: alpha(primaryColor, 0.4), fontSize: '0.9rem' }}>→</Typography>
         <Typography
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            fontSize: '1.8rem',
+            fontWeight: 'bold',
             color: isSelected ? '#fff' : 'primary.main',
-            width: 80,
+            width: 70,
             textAlign: 'left',
-            letterSpacing: 2
+            letterSpacing: 1
           }}
         >
           {mission.destination}
@@ -103,32 +111,29 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       </Box>
 
       {/* 3. TYPE (BADGE) */}
-      <Box sx={{ width: 120, zIndex: 2, pl: 1 }}>
+      <Box sx={{ minWidth: 100, width: '100%', zIndex: 2, pl: 1 }}>
         <Chip
           label={mission.type || 'CARGO'}
           size='small'
           sx={{
             fontFamily: 'inherit',
-            fontSize: '1rem',
             bgcolor: alpha(primaryColor, 0.15),
             color: isSelected ? '#fff' : 'primary.main',
             border: '1px solid',
             borderColor: alpha(primaryColor, 0.4),
             borderRadius: 1,
-            height: 22,
             fontWeight: 'bold',
-            '& .MuiChip-label': { px: 1 }
+            '& .MuiChip-label': { px: 0.8 }
           }}
         />
       </Box>
 
       {/* 4. DISTANCE */}
-      <Box sx={{ width: 100, textAlign: 'right', zIndex: 2 }}>
+      <Box sx={{ minWidth: 90, width: '100%', textAlign: 'right', zIndex: 2 }}>
         <Typography
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            fontSize: '1.6rem',
             color: isSelected ? '#fff' : 'primary.main'
           }}
         >
@@ -137,14 +142,13 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       </Box>
 
       {/* 5. PRIZE */}
-      <Box sx={{ width: 140, textAlign: 'right', ml: 3, zIndex: 2 }}>
+      <Box sx={{ minWidth: 120, width: '100%', textAlign: 'right', ml: 3, zIndex: 2 }}>
         <Typography
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            fontSize: '1.8rem',
             color: isSelected ? '#fff' : 'primary.main',
-            letterSpacing: 1
+            letterSpacing: 0.5
           }}
         >
           {formatNumber(mission.prize, 2)} AIRL
@@ -152,12 +156,11 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       </Box>
 
       {/* 6. SPONSORED / STATUS */}
-      <Box sx={{ width: 140, textAlign: 'right', ml: 2, zIndex: 2 }}>
+      <Box sx={{ minWidth: 100, width: '100%', textAlign: 'right', ml: 2, zIndex: 2 }}>
         <Typography
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            fontSize: '1.4rem',
             color:
               mission.rewardMultiplier >= 1.9
                 ? theme.palette.success.main
@@ -165,7 +168,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
                   ? theme.palette.info.main
                   : alpha(theme.palette.text.disabled, 0.4),
             fontWeight: 'bold',
-            letterSpacing: 1,
+            letterSpacing: 0.5,
             textShadow:
               mission.rewardMultiplier > 0.8
                 ? `0 0 10px ${mission.rewardMultiplier >= 1.9 ? theme.palette.success.main : theme.palette.info.main}`
