@@ -77,12 +77,11 @@ const CustomAppBar = () => {
         position='sticky'
         elevation={trigger ? 4 : 0}
         sx={{
-          background: trigger
-            ? (t) => (t.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)')
-            : 'transparent',
-          backdropFilter: trigger ? 'blur(12px)' : 'none',
+          background: (t) => (t.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.85)'),
+          backdropFilter: 'blur(12px)',
           color: (t) => t.palette.text.primary,
-          backgroundImage: 'none'
+          backgroundImage: 'none',
+          zIndex: 1100
         }}
       >
         <Toolbar sx={{ m: 0, p: 0 }}>

@@ -6,7 +6,8 @@ import AtcModel from 'models/Atc'
 import NftModel from 'models/Nft'
 import LiveModel from 'models/Live'
 import { PublicMissionStatus, MissionStatus, aircraftNameToIcaoCode } from 'types'
-import { getEstimatedTimeMinutes } from 'utils'
+import { getEstimatedTimeMinutes, getMissionWeight } from 'utils'
+import { INft } from 'models/Nft'
 import { ObjectId } from 'mongodb'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
@@ -85,7 +86,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       destinationCoords: publicMission.destinationCoords,
       aircraftId,
       callsign: publicMission.callsign,
-      weight: publicMission.weight,
+      weight: getMissionWeight(aircraftNft as unknown as INft),
       status: MissionStatus.RESERVED,
       remote: false,
       isRewarded: false,

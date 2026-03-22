@@ -9,7 +9,7 @@ import { Atc, PublicMission } from 'types'
 import nextApiInstance from 'config/axios'
 import useOwnedNFTs from 'hooks/useOwnedNFTs'
 import { nftAircraftTokenAddress } from 'contracts/address'
-import { filterByTokenAddress, getCallsign } from 'utils'
+import { filterByTokenAddress } from 'utils'
 import { useRecoilValue } from 'recoil'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 
@@ -111,7 +111,7 @@ const OperationsCenter = () => {
                   const icao = tower.atcPosition?.airport?.icao || tower.callsign.split('_')[0]
                   const m = missions.find((m) => m.destination === icao || m.origin === icao)
                   if (m) {
-                    setSelectedMission({ ...m, callsign: getCallsign() })
+                    setSelectedMission(m)
                   } else {
                     // If no mission, offer to set as origin
                     setOrigin(icao)
@@ -123,7 +123,7 @@ const OperationsCenter = () => {
 
             <MissionBoard
               missions={missions}
-              onSelect={(m) => setSelectedMission({ ...m, callsign: getCallsign() })}
+              onSelect={(m) => setSelectedMission(m)}
               selectedMission={selectedMission || undefined}
               isLoading={isLoading}
               filterSlot={

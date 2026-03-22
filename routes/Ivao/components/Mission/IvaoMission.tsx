@@ -10,11 +10,9 @@ import AlertTitle from '@mui/material/AlertTitle'
 import {
   formatNumber,
   gallonsToLiters,
-  getCallsign,
   getFuelForFlight,
   getIcaoCodeFromAircraftNFT,
-  getNFTAttributes,
-  getMissionWeight
+  getNFTAttributes
 } from 'utils'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { useRecoilValue } from 'recoil'
@@ -84,11 +82,9 @@ const IvaoMission = ({ aircrafts, aircraft, isAllowed, setAircraft, start, end, 
           ...match,
           aircraft: currentAircraft,
           aircraftId: currentAircraft.id.toString(),
-          callsign: getCallsign(),
           status: MissionStatus.STARTED,
           remote: false,
-          isRewarded: false,
-          weight: getMissionWeight(currentAircraft)
+          isRewarded: false
         } as Mission)
       } else {
         setMission()

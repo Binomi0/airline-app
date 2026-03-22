@@ -1,6 +1,7 @@
 import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
 import { Mission, MissionStatus, MissionType, MissionCategory } from 'types'
+import { getCallsign } from 'utils'
 
 export type IMission = Document & Mission & { userId: ObjectId }
 
@@ -38,7 +39,9 @@ const missionSchema: mongoose.Schema = new mongoose.Schema<IMission>(
     },
     callsign: {
       type: String,
-      required: true
+      unique: true,
+      required: true,
+      default: () => getCallsign()
     },
     weight: {
       type: Number,

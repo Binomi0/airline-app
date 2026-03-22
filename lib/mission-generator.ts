@@ -202,7 +202,7 @@ const createMissionData = (
     destinationCoords: { latitude: destination.latitude, longitude: destination.longitude },
     distance: Math.round(distance),
     type: blueprint.type,
-    // FIXME: Implement getMissionWeight
+    // Initial weight is 0 until an aircraft is selected during reservation
     weight: 0,
     category: isSponsored ? MissionCategory.ATC : MissionCategory.SOLO,
     isSponsored,
@@ -430,7 +430,8 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       },
       aircraftId,
       callsign: getCallsign(),
-      weight: randomIntFromInterval(500, 5000),
+    // Initial weight is 0 until an aircraft is selected during reservation
+    weight: 0,
       prize: Math.round((basePrize * rewardMultiplier) / 100),
       status: MissionStatus.STARTED,
       remote: false,
