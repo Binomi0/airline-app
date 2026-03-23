@@ -74,7 +74,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     })
 
     // Return token in body to allow frontend to pass it to Electron app
-    return res.status(200).json({ verified: true, id: user.id, emailVerified: user.emailVerified, token })
+    res.status(200).json({ verified: true, id: user.id, emailVerified: user.emailVerified, token })
+    return
   } catch (err) {
     console.error('login-response error =>', err)
     return res.status(500).json({ error: 'Internal server error' })

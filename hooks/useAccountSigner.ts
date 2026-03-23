@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import {
   startAuthentication,
   startRegistration,
@@ -6,19 +6,22 @@ import {
   PublicKeyCredentialRequestOptionsJSON
 } from '@simplewebauthn/browser'
 import { backupDoneSwal, backupErrorSwal } from 'lib/swal'
-import { AccountSignerStatus, User, WebAuthnUri } from 'types'
+import { AccountSignerStatus, User, WebAuthnUri, Authenticator } from 'types'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import { walletStore } from 'store/wallet.atom'
 import useWallet from './useWallet'
-import { postApi } from 'lib/api'
+import { postApi, getApi } from 'lib/api'
 
 interface UseAccountSignerReturnType {
   addBackup: () => Promise<void>
   loadAccount: (user: User) => Promise<void>
-  createCredential: (email: string) => Promise<{ verified: boolean; token?: string }>
+  createCredential: (email: string) => Promise<{ verified: boolean; token?: string; error?: string }>
   // eslint-disable-next-line no-unused-vars
-  verifyCredential: (email: string) => Promise<{ verified: boolean; token?: string }>
+  verifyCredential: (email: string) => Promise<{ verified: boolean; token?: string; error?: string }>
+  removeBackup: (credentialID: string) => Promise<void>
+  fetchBackups: () => Promise<void>
+  backups: Authenticator[]
   status: AccountSignerStatus
 }
 
@@ -43,10 +46,10 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       setStatus(validation?.success ? 'success' : 'error')
 
       return { verified: Boolean(validation?.success), token: validation?.token }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
       setStatus('error')
-      return { verified: false }
+      return { verified: false, error: err.message }
     }
   }, [])
 
@@ -63,10 +66,10 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       setStatus(validation?.verified ? 'success' : 'error')
 
       return { verified: Boolean(validation?.verified), token: validation?.token }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
       setStatus('error')
-      return { verified: false }
+      return { verified: false, error: err.message }
     }
   }, [])
 
@@ -85,6 +88,19 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
     [initWallet, wallet.isLoaded]
   )
 
+  const [backups, setBackups] = useState<Authenticator[]>([])
+
+  const fetchBackups = useCallback(async () => {
+    try {
+      const response = await getApi<{ authenticators: Authenticator[] }>('/api/webauthn/get')
+      if (response?.authenticators) {
+        setBackups(response.authenticators)
+      }
+    } catch (err) {
+      console.error('Error fetching backups:', err)
+    }
+  }, [])
+
   const addBackup = useCallback(async () => {
     if (!user?.email || !user?.id) {
       if (!user?.id) {
@@ -94,26 +110,54 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       throw new Error('Missing required params email or id')
     }
     try {
-      const { verified } = await verifyCredential(user.email)
-      if (!verified) return
-      const { verified: created } = await createCredential(user.email)
+      const { verified, error: verifyError } = await verifyCredential(user.email)
+      if (!verified) {
+        if (verifyError) backupErrorSwal(verifyError)
+        return
+      }
+
+      const { verified: created, error: createError } = await createCredential(user.email)
       if (created) {
         backupDoneSwal()
+        fetchBackups()
       } else {
-        backupErrorSwal()
+        backupErrorSwal(createError as string)
       }
     } catch (err) {
       const error = err as Error
-      console.error('[handleSignUp] Error =>', err)
+      console.error('[addBackup] Error =>', err)
       setStatus(error.message === 'Missing private key' ? 'missingKey' : 'error')
     }
-  }, [createCredential, user?.email, user?.id, verifyCredential])
+  }, [createCredential, fetchBackups, user?.email, user?.id, verifyCredential])
+
+  const removeBackup = useCallback(
+    async (credentialID: string) => {
+      try {
+        const response = await postApi<{ success: boolean }>('/api/webauthn/remove', { credentialID })
+        if (response?.success) {
+          fetchBackups()
+        }
+      } catch (err) {
+        console.error('Error removing backup:', err)
+      }
+    },
+    [fetchBackups]
+  )
+
+  useEffect(() => {
+    if (user?.email) {
+      fetchBackups()
+    }
+  }, [fetchBackups, user?.email])
 
   return {
     addBackup,
     loadAccount,
     createCredential,
     verifyCredential,
+    removeBackup,
+    fetchBackups,
+    backups,
     status
   }
 }

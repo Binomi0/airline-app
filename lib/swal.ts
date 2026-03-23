@@ -35,13 +35,22 @@ export const accountBackupSwal = async () =>
     text: 'Add another device to log in this site',
     showCancelButton: true,
     showConfirmButton: true,
-    icon: 'question'
+    icon: 'info'
   })
 
-export const backupErrorSwal = async () =>
+export const removeBackupSwal = async () =>
+  Swal.fire({
+    title: 'Removing Device',
+    text: 'Are you sure you want to remove this device?',
+    icon: 'warning',
+    showCancelButton: true,
+    showConfirmButton: true
+  })
+
+export const backupErrorSwal = async (text?: string) =>
   Swal.fire({
     title: 'Backup not complete',
-    text: 'An error occoured while adding a new backup',
+    text: text || 'An error occoured while adding a new backup',
     icon: 'error'
   })
 

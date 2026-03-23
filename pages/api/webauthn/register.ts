@@ -7,8 +7,8 @@ import { connectDB } from 'lib/mongoose'
 import Webauthn from 'models/Webauthn'
 import { jwtSecret } from 'config'
 
-const rpID = process.env.NEXT_PUBLIC_DOMAIN
-const origin = process.env.ORIGIN
+const rpID = process.env.NEXT_PUBLIC_DOMAIN || 'localhost'
+const origin = process.env.ORIGIN || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '')
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -27,42 +27,86 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(404).json({ error: 'Registration session not found' })
   }
 
-  let verification
+  let verified = false
+  let registrationInfo: any = null
   try {
-    verification = await verifyRegistrationResponse({
+    const verification = await verifyRegistrationResponse({
       response: data,
       expectedChallenge: user.challenge,
       expectedOrigin: origin as string,
-      expectedRPID: rpID as string
+      expectedRPID: rpID as string,
+      requireUserVerification: false
     })
+    verified = verification.verified
+    registrationInfo = verification.registrationInfo
   } catch (err) {
     console.error('WebAuthn Verification Error:', err)
-    return res.status(400).json({ error: 'Registration verification failed' })
+    res.status(400).json({ error: 'Registration verification failed' })
+    return
   }
 
-  const { verified, registrationInfo } = verification
+  console.log(`[register] Verification result for ${email}:`, {
+    verified,
+    registrationInfo: registrationInfo ? {
+      credentialID: registrationInfo.credential.id,
+      transports: data.response.transports
+    } : null
+  })
+
   if (!verified || !registrationInfo) {
-    return res.status(403).json({ error: 'Verification failed' })
+    res.status(403).json({ error: 'Verification failed' })
+    return
   }
 
   const { credential } = registrationInfo
+
+  const userAgent = req.headers['user-agent'] || ''
+  let deviceName = 'Unknown Device'
+
+  if (userAgent.includes('Windows')) deviceName = 'Windows'
+  else if (userAgent.includes('Android')) deviceName = 'Android'
+  else if (userAgent.includes('iPhone') || userAgent.includes('iPad')) deviceName = 'iOS'
+  else if (userAgent.includes('Macintosh')) deviceName = 'Mac'
+  else if (userAgent.includes('Linux')) deviceName = 'Linux'
+
+  const browser =
+    userAgent.includes('Chrome') && !userAgent.includes('Edg')
+      ? 'Chrome'
+      : userAgent.includes('Safari') && !userAgent.includes('Chrome')
+        ? 'Safari'
+        : userAgent.includes('Edg')
+          ? 'Edge'
+          : userAgent.includes('Firefox')
+            ? 'Firefox'
+            : ''
+
+  if (browser) deviceName = `${deviceName} (${browser})`
 
   const newAuthenticator: Authenticator = {
     credentialID: credential.id,
     credentialPublicKey: Buffer.from(credential.publicKey).toString('base64'),
     counter: credential.counter,
-    transports: data.response.transports
+    transports: data.response.transports,
+    name: deviceName,
+    createdAt: new Date()
   }
 
   try {
-    // Atomic update for both key and authenticators
-    await Webauthn.findOneAndUpdate(
-      { email },
-      {
-        $set: { key: newAuthenticator.credentialID },
-        $push: { authenticators: newAuthenticator }
-      }
-    )
+    const webauthnUser = await Webauthn.findOne({ email })
+
+    if (webauthnUser?.authenticators.some((a: Authenticator) => a.credentialID === newAuthenticator.credentialID)) {
+      return res.status(400).json({ error: 'Authenticator already registered' })
+    }
+
+    const update: { $push: { authenticators: Authenticator }; $set?: { key: string } } = {
+      $push: { authenticators: newAuthenticator }
+    }
+
+    if (!webauthnUser?.key) {
+      update.$set = { key: newAuthenticator.credentialID }
+    }
+
+    await Webauthn.findOneAndUpdate({ email }, update)
   } catch (error) {
     console.error('Database Update Error:', error)
     return res.status(500).json({ error: 'Internal server error during registration' })

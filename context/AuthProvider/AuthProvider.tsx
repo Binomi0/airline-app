@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: Props) => {
           counter = 0
         })
     }
-  }, [token])
+  }, [token, loadAccount, setAuthToken, setUser])
 
   return <>{children}</>
 }

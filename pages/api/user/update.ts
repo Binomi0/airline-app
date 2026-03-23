@@ -10,11 +10,11 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     }
 
     const { address, onboarded } = req.body
-    const updateData: any = {}
+    const updateData: { address?: string; onboarded?: boolean } = {}
     if (address !== undefined) updateData.address = address
     if (onboarded !== undefined) updateData.onboarded = onboarded
 
-    const user = await User.findOneAndUpdate({ email: req.user }, updateData, { new: true })
+    const user = await User.findOneAndUpdate({ email: req.user }, updateData, { returnDocument: 'after' })
 
     res.status(200).send(user)
   }

@@ -3,9 +3,11 @@ import { generateAuthenticationOptions, AuthenticatorTransport } from '@simplewe
 import { Authenticator } from 'types'
 import { connectDB } from 'lib/mongoose'
 import Webauthn from 'models/Webauthn'
+import { isoBase64URL } from '@simplewebauthn/server/helpers'
+
 
 // Human-readable title for your website
-const rpID = process.env.NEXT_PUBLIC_DOMAIN
+const rpID = process.env.NEXT_PUBLIC_DOMAIN || 'localhost'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -15,9 +17,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
     try {
       await connectDB()
-      const user = await Webauthn.findOne({ email: req.body.email })
+      const auth = await Webauthn.findOne({ email: req.body.email })
 
-      if (!user) {
+      if (!auth) {
         res.status(204).end()
         return
       }
@@ -25,15 +27,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const options = await generateAuthenticationOptions({
         rpID: rpID as string,
         // Require users to use a previously-registered authenticator
-        allowCredentials: user.authenticators.map((authenticator: Authenticator) => {
+        allowCredentials: auth.authenticators.map((authenticator: Authenticator) => {
           return {
-            id: (authenticator.credentialID as string).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
+            id: isoBase64URL.fromBuffer(isoBase64URL.toBuffer(authenticator.credentialID)),
             type: 'public-key',
             // Optional
             transports: authenticator.transports as AuthenticatorTransport[]
           }
         }),
-        userVerification: 'discouraged'
+        userVerification: 'preferred'
+      })
+
+      console.log(`[login] Options for ${req.body.email}:`, {
+        challenge: options.challenge,
+        allowCredentials: options.allowCredentials?.map((c) => ({
+          id: c.id,
+          transports: c.transports
+        }))
       })
 
       await Webauthn.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })

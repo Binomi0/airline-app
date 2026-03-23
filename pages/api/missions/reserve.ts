@@ -122,7 +122,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           track: { name: PublicMissionStatus.RESERVED, value: new Date() }
         }
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     )
 
     res.status(201).json(userMission)

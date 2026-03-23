@@ -39,7 +39,8 @@ export const verifySignature = async function (authenticator, response, expected
         ) as Uint8Array<ArrayBuffer>,
         counter: authenticator.counter,
         transports: authenticator.transports
-      }
+      },
+      requireUserVerification: false
     })
 
     return true

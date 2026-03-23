@@ -44,7 +44,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           expiresAt: extendedExpiration
         }
       },
-      { new: true }
+      { returnDocument: 'after' }
     ).lean()
 
     if (!publicMission && !userMission) {

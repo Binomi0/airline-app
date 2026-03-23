@@ -20,15 +20,17 @@ const StepPasskey: FC<Props> = ({ onNext, onBack }) => {
         Secure with Passkeys
       </Typography>
       <Typography variant='body1' paragraph color='text.secondary'>
-        We use Passkeys for seamless, passwordless login. Your wallet is securely encrypted and stored logically on your device.
+        We use Passkeys for seamless, passwordless login. Your wallet is securely encrypted and stored logically on your
+        device.
       </Typography>
-      
+
       <Box my={3}>
         <Alert severity='info' sx={{ textAlign: 'left' }}>
-          <strong>Recommendation:</strong> It's highly recommended to add a backup Passkey on another device (e.g. your phone or another PC) later from your settings to avoid losing access to your account.
+          <strong>Recommendation:</strong> It&apos;s highly recommended to add a backup Passkey on another device (e.g.
+          your phone or another PC) later from your settings to avoid losing access to your pnpm account.
         </Alert>
       </Box>
-      
+
       <Box mt={4} display='flex' justifyContent='space-between'>
         <Button onClick={onBack} variant='outlined' size='large'>
           Back

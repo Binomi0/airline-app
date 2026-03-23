@@ -12,6 +12,7 @@ interface Props {
 }
 
 const SettingsView = ({ hasBackup, user }: Props) => {
+  console.log('SettingsView =>', hasBackup)
   return (
     <Box>
       <Grid container spacing={4}>

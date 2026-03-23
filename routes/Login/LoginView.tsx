@@ -38,8 +38,11 @@ const LoginView: FC = () => {
     try {
       const check = await postApi<{ success: boolean; emailVerified?: boolean }>('/api/user/check', { email: value })
       if (check?.success && check?.emailVerified) {
-        setMode('signin')
-        setEmail(value)
+        const create = await postApi<{ success: boolean }>('/api/user/create', { email: value })
+        if (create?.success) {
+          setEmail(value)
+          setMode('verify')
+        }
         return
       }
       const create = await postApi<{ success: boolean }>('/api/user/create', { email: value })

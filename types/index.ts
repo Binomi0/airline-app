@@ -225,6 +225,8 @@ export interface Authenticator {
   credentialPublicKey: string
   counter: number
   transports?: string[]
+  name?: string
+  createdAt?: Date
 }
 
 export interface WebAuthnUser {

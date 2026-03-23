@@ -3,27 +3,19 @@ import SettingsView from 'routes/settings/SettingsView'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
-import axios from 'config/axios'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import { useRouter } from 'next/router'
-import { AxiosResponse } from 'axios'
 import Link from '@mui/material/Link'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
+import { useQuery } from '@tanstack/react-query'
+import { fetcher } from 'utils'
 
 const SettingsPage = () => {
   const user = useRecoilValue(userState)
-  const router = useRouter()
-  const [hasBackup, setHasBackup] = useState(false)
-
-  useEffect(() => {
-    if (!user) return
-
-    axios.get('api/webauthn/get').then((response: AxiosResponse<{ authenticators: string[] }>) => {
-      setHasBackup(!!response.data.authenticators.length)
-    })
-  }, [user, router])
+  const { data } = useQuery({
+    queryKey: ['api/webauthn/get'],
+    queryFn: () => fetcher('api/webauthn/get')
+  })
 
   return user ? (
     <Box className={styles.pageContainer}>
@@ -45,7 +37,7 @@ const SettingsPage = () => {
           </Typography>
         </Box>
 
-        <SettingsView hasBackup={hasBackup} user={user} />
+        <SettingsView hasBackup={data?.authenticators.length > 1} user={user} />
       </Container>
     </Box>
   ) : null

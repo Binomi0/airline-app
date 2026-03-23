@@ -8,6 +8,13 @@ import { useSetRecoilState } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 import { authStore } from 'store/auth.atom'
 import { userState } from 'store/user.atom'
+import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
+import { ivaoUserStore } from 'store/ivao-user.atom'
+import { tokenBalanceStore } from 'store/balance.atom'
+import { missionStore } from 'store/mission.atom'
+import { ownedNftStore } from 'store/ownedNft.atom'
+import { aircraftStore } from 'store/aircraft.atom'
+import { pilotStore } from 'store/pilot.atom'
 import axios from 'config/axios'
 
 interface UseAuthReturnType {
@@ -26,6 +33,13 @@ const useAuth = (): UseAuthReturnType => {
   const setWallet = useSetRecoilState(walletStore)
   const setAuthToken = useSetRecoilState(authStore)
   const setUser = useSetRecoilState(userState)
+  const setIvaoAuth = useSetRecoilState(ivaoUserAuthStore)
+  const setIvaoUser = useSetRecoilState(ivaoUserStore)
+  const setBalance = useSetRecoilState(tokenBalanceStore)
+  const setMission = useSetRecoilState(missionStore)
+  const setOwnedNft = useSetRecoilState(ownedNftStore)
+  const setAircraft = useSetRecoilState(aircraftStore)
+  const setPilot = useSetRecoilState(pilotStore)
 
   const handleSignIn = useCallback(
     async (email: string) => {
@@ -77,13 +91,35 @@ const useAuth = (): UseAuthReturnType => {
       baseSigner: undefined,
       smartSigner: null,
       smartAccountAddress: undefined,
-      isLoaded: false
+      isLoaded: false,
+      isLocked: true,
+      isCloudSynced: false
     }))
     deleteCookie('token')
     deleteCookie('isLoggedIn')
     setUser(undefined)
+    setAuthToken(undefined)
+    setIvaoAuth(undefined)
+    setIvaoUser(undefined)
+    setBalance({ airl: undefined, airg: undefined })
+    setMission(undefined)
+    setOwnedNft([])
+    setAircraft(undefined)
+    setPilot([])
     if (router.asPath !== '/login') router.push('/login')
-  }, [router, setUser, setWallet])
+  }, [
+    router,
+    setAircraft,
+    setAuthToken,
+    setBalance,
+    setIvaoAuth,
+    setIvaoUser,
+    setMission,
+    setOwnedNft,
+    setPilot,
+    setUser,
+    setWallet
+  ])
 
   return { handleSignIn, handleSignUp, handleSignOut, status }
 }
