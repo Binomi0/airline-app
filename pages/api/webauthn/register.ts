@@ -1,11 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { verifyRegistrationResponse } from '@simplewebauthn/server'
+import { VerifiedRegistrationResponse, verifyRegistrationResponse } from '@simplewebauthn/server'
 import { Authenticator } from 'types'
 import { setCookie } from 'cookies-next'
 import jwt from 'jsonwebtoken'
 import { connectDB } from 'lib/mongoose'
 import Webauthn from 'models/Webauthn'
 import { jwtSecret } from 'config'
+import { UAParser } from 'ua-parser-js'
 
 const rpID = process.env.NEXT_PUBLIC_DOMAIN || 'localhost'
 const origin = process.env.ORIGIN || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '')
@@ -28,7 +29,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   let verified = false
-  let registrationInfo: any = null
+  let registrationInfo: VerifiedRegistrationResponse['registrationInfo']
   try {
     const verification = await verifyRegistrationResponse({
       response: data,
@@ -45,14 +46,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return
   }
 
-  console.log(`[register] Verification result for ${email}:`, {
-    verified,
-    registrationInfo: registrationInfo ? {
-      credentialID: registrationInfo.credential.id,
-      transports: data.response.transports
-    } : null
-  })
-
   if (!verified || !registrationInfo) {
     res.status(403).json({ error: 'Verification failed' })
     return
@@ -61,26 +54,53 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { credential } = registrationInfo
 
   const userAgent = req.headers['user-agent'] || ''
+  const parser = new UAParser(userAgent)
+  const result = parser.getResult()
+  const transports = data.response.transports || []
+  const isHybrid = transports.includes('hybrid')
+  const aaguid = registrationInfo?.aaguid || ''
+
+  // Common AAGUIDs for identification
+  const AAGUID_MAP: Record<string, string> = {
+    '749ba0c8-af48-4a92-8ddb-77c20973cef8': 'Apple Device',
+    'ad06a0ed-ce53-43eb-b357-123456789012': 'Windows Hello',
+    '00000000-0000-0000-0000-000000000000': 'Passkey',
+    'ea9b6d66-bf42-42d6-b922-376374c4148e': 'Google / Android',
+    'f0f624c9-66bf-42d6-b922-376374c4148e': 'Google / Android'
+  }
+
+  const knownDevice = AAGUID_MAP[aaguid.toLowerCase()]
+
   let deviceName = 'Unknown Device'
+  const osName = result.os.name || ''
+  const browserName = result.browser.name || ''
+  const deviceModel = result.device.model || ''
 
-  if (userAgent.includes('Windows')) deviceName = 'Windows'
-  else if (userAgent.includes('Android')) deviceName = 'Android'
-  else if (userAgent.includes('iPhone') || userAgent.includes('iPad')) deviceName = 'iOS'
-  else if (userAgent.includes('Macintosh')) deviceName = 'Mac'
-  else if (userAgent.includes('Linux')) deviceName = 'Linux'
+  if (isHybrid) {
+    // If it's hybrid, it's definitely a cross-device mobile registration (QR code)
+    deviceName = knownDevice && knownDevice !== 'Passkey' ? knownDevice : 'Mobile Device'
+    if (browserName) {
+      deviceName = `${deviceName} (${browserName})`
+    }
+  } else if (knownDevice && knownDevice !== 'Passkey') {
+    deviceName = knownDevice
+    if (browserName) {
+      deviceName = `${deviceName} (${browserName})`
+    }
+  } else if (osName) {
+    deviceName = osName
+    if (deviceModel) {
+      deviceName = deviceModel
+    } else if (osName === 'iOS' || userAgent.includes('iPhone') || userAgent.includes('iPad')) {
+      deviceName = userAgent.includes('iPad') ? 'iPad' : 'iPhone'
+    }
 
-  const browser =
-    userAgent.includes('Chrome') && !userAgent.includes('Edg')
-      ? 'Chrome'
-      : userAgent.includes('Safari') && !userAgent.includes('Chrome')
-        ? 'Safari'
-        : userAgent.includes('Edg')
-          ? 'Edge'
-          : userAgent.includes('Firefox')
-            ? 'Firefox'
-            : ''
-
-  if (browser) deviceName = `${deviceName} (${browser})`
+    if (browserName) {
+      deviceName = `${deviceName} (${browserName})`
+    }
+  } else if (browserName) {
+    deviceName = browserName
+  }
 
   const newAuthenticator: Authenticator = {
     credentialID: credential.id,

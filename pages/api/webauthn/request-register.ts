@@ -23,9 +23,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     userID: new TextEncoder().encode(webauthn?.id ?? id),
     userName: email,
     userDisplayName: email,
-    // Don't prompt users for additional information about the authenticator
-    // (Recommended for smoother UX)
-    attestationType: 'none',
+    // (Recommended for smoother UX, but Changed to 'direct' to get AAGUID)
+    attestationType: 'direct',
     timeout: 120000,
     // Prevent users from re-registering existing authenticators
     excludeCredentials:
