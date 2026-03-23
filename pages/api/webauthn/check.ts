@@ -10,7 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
     try {
       await connectDB()
-      const user = await Webauthn.findOne({ email: req.body.email })
+      const user = await Webauthn.findOne({ email: req.body.email }, { authenticators: 1, _id: 0 })
 
       if (!user || !user.authenticators.length) {
         res.status(200).send({ success: false })

@@ -37,13 +37,13 @@ const useWallet = (): UseWallet => {
 
       const credential = (await navigator.credentials.get({
         publicKey: {
-          challenge: new Uint8Array(32) as unknown as BufferSource,
+          challenge: new Uint8Array(32),
           timeout: 60000,
           userVerification: 'required',
           allowCredentials,
           extensions: {
             prf: {
-              eval: { first: PRF_SALT as unknown as BufferSource }
+              eval: { first: PRF_SALT }
             }
           }
         }
