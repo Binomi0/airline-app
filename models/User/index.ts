@@ -19,6 +19,7 @@ export interface IUser extends Document {
   emailVerified: boolean
   aircrafts?: ObjectId[]
   vaUser?: ObjectId
+  onboarded?: boolean
 }
 
 const userSchema: mongoose.Schema = new mongoose.Schema<IUser>(
@@ -59,6 +60,10 @@ const userSchema: mongoose.Schema = new mongoose.Schema<IUser>(
     vaUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'VirtualAirline'
+    },
+    onboarded: {
+      type: Boolean,
+      default: false
     }
   },
   {

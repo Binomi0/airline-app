@@ -10,7 +10,11 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      router.push('/')
+      if (!user.onboarded) {
+        router.push('/onboarding')
+      } else {
+        router.push('/')
+      }
     }
   }, [user, router])
 

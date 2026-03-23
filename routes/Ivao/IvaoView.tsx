@@ -36,13 +36,9 @@ const getMetar = async (callsign: string, ivaoAuthToken?: string | null) =>
     .get(`api/ivao/airports/${callsign}/metar`, { headers: { 'x-ivao-auth': `Bearer ${ivaoAuthToken}` } })
     .then((response) => response.data)
 
-function base64URLEncode(str: string) {
-  return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
-}
-
-const verifier = '123456'
+const verifier = 'dXNlci5pZA'
 const challengeMethod = 'plain' // S256
-const challenge = base64URLEncode(verifier)
+const challenge = verifier
 
 interface Props {
   user: User

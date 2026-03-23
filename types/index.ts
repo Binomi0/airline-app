@@ -212,10 +212,12 @@ export enum Collection {
 }
 
 export interface User {
+  _id?: string
   id?: string
   email?: string
   address?: string
   vaUser?: VaUser
+  onboarded?: boolean
 }
 
 export interface Authenticator {

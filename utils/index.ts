@@ -327,3 +327,9 @@ export const fetcher = (url: string) => nextApiInstance.get(url).then((res) => r
 
 export const filterByTokenAddress = (tokenAddress: string) => (nft: INft | IUserNftPopulated) =>
   nft.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
+
+export function formatSecondsToHoursMinutes(seconds: number) {
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  return `${hours} h ${minutes} m`
+}

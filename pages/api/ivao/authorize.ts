@@ -59,7 +59,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     console.log('[IVAO Authorize] Starting identity decode...')
-    const decoded = jwt.decode(code as string, { json: true, complete: true })
+    const decoded = jwt.decode(tokenData.access_token, { json: true, complete: true })
     console.log('[IVAO Authorize] Decoded identity:', decoded ? 'SUCCESS' : 'NULL')
 
     if (!decoded || !decoded.payload || typeof decoded.payload === 'string' || !decoded.payload.sub) {

@@ -4,13 +4,17 @@ import { NextApiResponse } from 'next'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    if (!req.body.address) {
+    if (req.body.address === undefined && req.body.onboarded === undefined) {
       res.status(400).end()
       return
     }
 
-    const { address } = req.body
-    const user = await User.findOneAndUpdate({ email: req.user }, { address })
+    const { address, onboarded } = req.body
+    const updateData: any = {}
+    if (address !== undefined) updateData.address = address
+    if (onboarded !== undefined) updateData.onboarded = onboarded
+
+    const user = await User.findOneAndUpdate({ email: req.user }, updateData, { new: true })
 
     res.status(200).send(user)
   }

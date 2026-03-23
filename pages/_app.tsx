@@ -25,6 +25,8 @@ import WithLoading from 'components/WithLoading'
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
 
+import { useRouter } from 'next/router'
+
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
@@ -32,6 +34,9 @@ export interface MyAppProps extends AppProps {
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache } = props
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  
+  const hideLayout = router.pathname === '/onboarding' || router.pathname === '/login'
 
   const startLoading = useCallback(() => {
     setLoading(true)
@@ -69,13 +74,13 @@ export default function MyApp(props: MyAppProps) {
           <ErrorBoundary>
             <AppProviders>
               <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                <AppBar />
-                <Sidebar />
-                <RightSidebar />
+                {!hideLayout && <AppBar />}
+                {!hideLayout && <Sidebar />}
+                {!hideLayout && <RightSidebar />}
                 <WithLoading loading={loading}>
                   <Component {...props.pageProps} />
                 </WithLoading>
-                <Footer />
+                {!hideLayout && <Footer />}
               </Box>
             </AppProviders>
           </ErrorBoundary>
