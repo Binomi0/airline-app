@@ -120,6 +120,7 @@ const useWallet = (): UseWallet => {
       if (!storedValue) throw new Error('No local key found')
 
       const raw = Buffer.from(storedValue, 'base64').toString()
+      console.log({ raw })
       try {
         const vault = JSON.parse(raw)
         if (vault.protected) {

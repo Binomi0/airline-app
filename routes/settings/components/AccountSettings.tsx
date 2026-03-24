@@ -121,15 +121,17 @@ const AccountSettings = ({ hasBackup }: Props) => {
                       </Typography>
                     </Box>
                   </Stack>
-                  <Tooltip title='Remove device'>
-                    <IconButton
-                      size='small'
-                      onClick={() => handleRemoveBackup(auth.credentialID)}
-                      sx={{ color: 'rgba(255, 255, 255, 0.4)', '&:hover': { color: '#f87171' } }}
-                    >
-                      <DeleteIcon fontSize='small' />
-                    </IconButton>
-                  </Tooltip>
+                  {backups.length > 1 && (
+                    <Tooltip title='Remove device'>
+                      <IconButton
+                        size='small'
+                        onClick={() => handleRemoveBackup(auth.credentialID)}
+                        sx={{ color: 'rgba(255, 255, 255, 0.4)', '&:hover': { color: '#f87171' } }}
+                      >
+                        <DeleteIcon fontSize='small' />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Stack>
               ))}
             </Stack>
