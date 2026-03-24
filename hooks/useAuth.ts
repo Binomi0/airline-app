@@ -45,14 +45,14 @@ const useAuth = (): UseAuthReturnType => {
     async (email: string) => {
       setStatus('loading')
       try {
-        const { verified, token } = await verifyCredential(email)
+        const { verified } = await verifyCredential(email)
         if (!verified) {
           setStatus('error')
           return
         }
 
         const { data } = await axios.get<User>('/api/user/get')
-        setAuthToken(token)
+        setAuthToken('session_active')
         setUser(data)
         loadAccount(data)
         loginSuccessSwal()
@@ -69,10 +69,10 @@ const useAuth = (): UseAuthReturnType => {
     async (email: string) => {
       setStatus('loading')
       try {
-        const { verified, token } = await createCredential(email)
+        const { verified } = await createCredential(email)
         if (verified) {
           const { data } = await axios.get<User>('/api/user/get')
-          setAuthToken(token || 'true')
+          setAuthToken('session_active')
           setUser(data)
           loadAccount(data)
           loginSuccessSwal()

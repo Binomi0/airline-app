@@ -11,6 +11,10 @@ import { UAParser } from 'ua-parser-js'
 const rpID = process.env.NEXT_PUBLIC_DOMAIN || 'localhost'
 const origin = process.env.ORIGIN || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '')
 
+if (!origin) {
+  throw new Error('ORIGIN environment variable is required in production')
+}
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
@@ -71,6 +75,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const knownDevice = AAGUID_MAP[aaguid.toLowerCase()]
 
+  // Helper function to append browser info if available
+  const appendBrowserInfo = (deviceName: string, browserName: string | undefined): string => {
+    return browserName ? `${deviceName} (${browserName})` : deviceName
+  }
+
+  // Determine device name
   let deviceName = 'Unknown Device'
   const osName = result.os.name || ''
   const browserName = result.browser.name || ''
@@ -78,26 +88,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (isHybrid) {
     // If it's hybrid, it's definitely a cross-device mobile registration (QR code)
+    // Don't append browserName here — it belongs to the initiating PC, not the mobile device
     deviceName = knownDevice && knownDevice !== 'Passkey' ? knownDevice : 'Mobile Device'
-    if (browserName) {
-      deviceName = `${deviceName} (${browserName})`
-    }
   } else if (knownDevice && knownDevice !== 'Passkey') {
-    deviceName = knownDevice
-    if (browserName) {
-      deviceName = `${deviceName} (${browserName})`
-    }
+    deviceName = appendBrowserInfo(knownDevice, browserName)
   } else if (osName) {
-    deviceName = osName
-    if (deviceModel) {
-      deviceName = deviceModel
-    } else if (osName === 'iOS' || userAgent.includes('iPhone') || userAgent.includes('iPad')) {
-      deviceName = userAgent.includes('iPad') ? 'iPad' : 'iPhone'
-    }
-
-    if (browserName) {
-      deviceName = `${deviceName} (${browserName})`
-    }
+    deviceName =
+      deviceModel ||
+      (osName === 'iOS' && (userAgent.includes('iPhone') ? 'iPhone' : userAgent.includes('iPad') ? 'iPad' : osName)) ||
+      osName
+    deviceName = appendBrowserInfo(deviceName, browserName)
   } else if (browserName) {
     deviceName = browserName
   }
@@ -112,9 +112,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const webauthnUser = await Webauthn.findOne({ email })
-
-    if (webauthnUser?.authenticators.some((a: Authenticator) => a.credentialID === newAuthenticator.credentialID)) {
+    if (user.authenticators.some((a: Authenticator) => a.credentialID === newAuthenticator.credentialID)) {
       return res.status(400).json({ error: 'Authenticator already registered' })
     }
 
@@ -122,7 +120,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       $push: { authenticators: newAuthenticator }
     }
 
-    if (!webauthnUser?.key) {
+    if (!user.key) {
       update.$set = { key: newAuthenticator.credentialID }
     }
 
@@ -154,7 +152,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     path: '/'
   })
 
-  res.status(200).json({ success: true, token })
+  res.status(200).json({ success: true })
 }
 
 export default handler

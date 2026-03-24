@@ -1,13 +1,5 @@
 import { mongoose } from 'lib/mongoose'
-
-interface Authenticator {
-  credentialPublicKey: string
-  credentialID: string
-  counter: number
-  transports?: string[]
-  name?: string
-  createdAt?: Date
-}
+import { Authenticator } from 'types'
 
 export interface IWebauthn extends Document {
   email: string

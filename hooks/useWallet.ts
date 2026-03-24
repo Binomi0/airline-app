@@ -63,6 +63,7 @@ const useWallet = (): UseWallet => {
     }
   }, [])
 
+  // #2
   const initialize = useCallback(
     async (personalAccount: Account, _user: User, isCloudSynced: boolean = false) => {
       if (!personalAccount || !_user.id) return null
@@ -144,6 +145,9 @@ const useWallet = (): UseWallet => {
     [getPRFSecret]
   )
 
+  // #3
+  // Receives a private key and encrypts it using the PRF secret
+  // Then it syncs it with the backend
   const syncWallet = useCallback(
     async (privateKey: string, _user: User) => {
       let ciphertext = ''
@@ -201,6 +205,7 @@ const useWallet = (): UseWallet => {
     [getPrivateKey, initialize]
   )
 
+  // #1
   const initWallet = useCallback(
     async (_user: User) => {
       if (!_user || !_user.id) throw new Error('Missing user while initializing wallet')
@@ -226,11 +231,10 @@ const useWallet = (): UseWallet => {
         const storedValue = _user.id ? localStorage.getItem(_user.id) : null
         if (!smartAccountAddress && !storedValue && !isCloudSynced) {
           const privateKey = generatePrivateKey()
-          const formattedKey = (privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`) as Hex
-          const personalAccount = privateKeyToAccount({ client: twClient, privateKey: formattedKey })
+          const personalAccount = privateKeyToAccount({ client: twClient, privateKey })
 
-          await syncWallet(privateKey, _user)
           await initialize(personalAccount, _user, false)
+          await syncWallet(privateKey, _user)
           return
         }
       } catch (error) {
