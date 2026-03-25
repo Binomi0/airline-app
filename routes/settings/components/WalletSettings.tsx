@@ -49,7 +49,7 @@ const WalletSettings = ({ user }: Props) => {
     } catch (error) {
       console.error('Sync wallet error:', error)
     }
-  }, [user])
+  }, [user?.id, user?.email, setWallet, verifyCredential])
 
   const handleUploadKey = useCallback(async () => {
     if (!user?.id) return
@@ -104,12 +104,14 @@ const WalletSettings = ({ user }: Props) => {
     } catch (error) {
       console.error('Export error:', error)
     }
-  }, [user?.id, wallet.smartAccountAddress])
+  }, [user?.id, user?.email, wallet.smartAccountAddress, verifyCredential])
 
   useEffect(() => {
     if (user?.id) {
       const hasLocal = localStorage.getItem(user.id) || ''
-      hasLocal && setHasLocalKey(true)
+      if (hasLocal) {
+        setHasLocalKey(true)
+      }
     }
   }, [user?.id])
 

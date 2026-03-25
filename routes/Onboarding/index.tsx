@@ -1,3 +1,5 @@
+'use client'
+
 import React, { FC, useState, useEffect, useCallback } from 'react'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
@@ -19,16 +21,16 @@ const STORAGE_KEY = 'onboarding_step'
 
 const OnboardingView: FC = () => {
   const router = useRouter()
-  const [step, setStep] = useState(() => {
-    // Persistir el paso en localStorage
-    const savedStep = localStorage.getItem(STORAGE_KEY)
-    return savedStep ? parseInt(savedStep) : 0
-  })
+  const [step, setStep] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const { initIvaoAuth, initIvaoData, isLoading: vaLoading } = useVaProviderContext()
   const ivaoAuthToken = useRecoilValue(ivaoUserAuthStore)
+
+  useEffect(() => {
+    setStep(parseInt(localStorage.getItem(STORAGE_KEY) || '0'))
+  }, [])
 
   // Guardar paso actual
   useEffect(() => {
@@ -90,7 +92,7 @@ const OnboardingView: FC = () => {
       setError('Failed to complete onboarding. Please try again or contact support.')
       // No redirigir automáticamente en caso de error
     }
-  }, [])
+  }, [router])
 
   const renderStep = useCallback(() => {
     switch (step) {

@@ -1,5 +1,5 @@
 import React, { startTransition, useEffect } from 'react'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import axios from 'config/axios'
 import { useRouter } from 'next/router'
 import { privateRoutes } from 'routes/routes'
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: Props) => {
           counter = 0
         })
     }
-  }, [token, setAuthToken, setUser])
+  }, [token, setAuthToken, setUser, initWallet])
 
   return <>{children}</>
 }

@@ -2,6 +2,7 @@ import { connectDB } from 'lib/mongoose'
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 import Webauthn from 'models/Webauthn'
 import { NextApiResponse } from 'next'
+import { Authenticator } from 'types'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -21,7 +22,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
       // Filter out the authenticator
       const updatedAuthenticators = webauthn.authenticators.filter(
-        (auth: any) => auth.credentialID !== credentialID
+        (auth: Authenticator) => auth.credentialID !== credentialID
       )
 
       if (updatedAuthenticators.length === webauthn.authenticators.length) {
@@ -31,13 +32,13 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       // Update the document
       await Webauthn.findOneAndUpdate(
         { email: req.user },
-        { 
-          $set: { 
+        {
+          $set: {
             authenticators: updatedAuthenticators,
             // If the removed one was the primary key, we might wanna update it
             // but for now let's just keep it simple as the user might add another
             ...(webauthn.key === credentialID ? { key: updatedAuthenticators[0]?.credentialID || '' } : {})
-          } 
+          }
         }
       )
 
