@@ -1,11 +1,11 @@
 import React, { startTransition, useEffect } from 'react'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import axios from 'config/axios'
 import { useRouter } from 'next/router'
 import { privateRoutes } from 'routes/routes'
 import { authStore } from 'store/auth.atom'
 import { userState } from 'store/user.atom'
-import useAccountSigner from 'hooks/useAccountSigner'
+import useWallet from 'hooks/useWallet'
 
 export const INITIAL_STATE = {
   user: undefined,
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }: Props) => {
   const router = useRouter()
   const [token, setAuthToken] = useRecoilState(authStore)
   const setUser = useSetRecoilState(userState)
-  const { loadAccount } = useAccountSigner()
+  const { initWallet } = useWallet()
 
   useEffect(() => {
     const isPrivateRoute = privateRoutes.some((route) => router.asPath.includes(route))
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: Props) => {
         .then((response) => {
           startTransition(() => {
             setUser(response.data)
-            loadAccount(response.data)
+            initWallet(response.data)
           })
         })
 
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: Props) => {
           counter = 0
         })
     }
-  }, [token, loadAccount, setAuthToken, setUser])
+  }, [token, setAuthToken, setUser])
 
   return <>{children}</>
 }

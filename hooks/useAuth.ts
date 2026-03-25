@@ -16,6 +16,7 @@ import { ownedNftStore } from 'store/ownedNft.atom'
 import { aircraftStore } from 'store/aircraft.atom'
 import { pilotStore } from 'store/pilot.atom'
 import axios from 'config/axios'
+import useWallet from 'hooks/useWallet'
 
 interface UseAuthReturnType {
   // eslint-disable-next-line no-unused-vars
@@ -27,7 +28,8 @@ interface UseAuthReturnType {
 }
 
 const useAuth = (): UseAuthReturnType => {
-  const { verifyCredential, createCredential, loadAccount } = useAccountSigner()
+  const { verifyCredential, createCredential } = useAccountSigner()
+  const { initWallet } = useWallet()
   const [status, setStatus] = useState<AccountSignerStatus>()
   const router = useRouter()
   const setWallet = useSetRecoilState(walletStore)
@@ -54,7 +56,7 @@ const useAuth = (): UseAuthReturnType => {
         const { data } = await axios.get<User>('/api/user/get')
         setAuthToken('session_active')
         setUser(data)
-        loadAccount(data)
+        initWallet(data)
         loginSuccessSwal()
       } catch (err) {
         const error = err as Error
@@ -62,7 +64,7 @@ const useAuth = (): UseAuthReturnType => {
         setStatus(error.message === 'Missing wallet key' ? 'missingKey' : 'error')
       }
     },
-    [loadAccount, setAuthToken, setUser, verifyCredential]
+    [setAuthToken, setUser, verifyCredential, initWallet]
   )
 
   const handleSignUp = useCallback(
@@ -74,7 +76,7 @@ const useAuth = (): UseAuthReturnType => {
           const { data } = await axios.get<User>('/api/user/get')
           setAuthToken('session_active')
           setUser(data)
-          loadAccount(data)
+          initWallet(data)
           loginSuccessSwal()
         }
       } catch (err) {
@@ -82,7 +84,7 @@ const useAuth = (): UseAuthReturnType => {
         setStatus('error')
       }
     },
-    [createCredential, loadAccount, setAuthToken, setUser]
+    [createCredential, setAuthToken, setUser, initWallet]
   )
 
   const handleSignOut = useCallback(() => {

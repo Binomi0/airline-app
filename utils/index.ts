@@ -25,7 +25,7 @@ export const verifySignature = async function (authenticator, response, expected
   const credentialPublicKeyBuffer = bufferFromBase64(authenticator.credentialPublicKey)
 
   try {
-    await verifyAuthenticationResponse({
+    const verification = await verifyAuthenticationResponse({
       response,
       expectedChallenge,
       expectedOrigin: origin,
@@ -40,15 +40,14 @@ export const verifySignature = async function (authenticator, response, expected
         counter: authenticator.counter,
         transports: authenticator.transports
       },
-      requireUserVerification: false
+      requireUserVerification: true
     })
 
-    return true
+    return { verification, extensionResult: response.clientExtensionResults }
   } catch (error) {
     console.error(error)
 
-    return false
-    // return res.status(400).send({ error: error.message, verified: false });
+    return { verification: null, extensionResult: null }
   }
 }
 

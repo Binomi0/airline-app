@@ -92,8 +92,7 @@ export const walletExportSwal = async (qrcode: string) =>
     imageHeight: 250,
     imageAlt: 'QR Code',
     showCancelButton: true,
-    confirmButtonText: 'Download Wallet KEY',
-    showLoaderOnConfirm: true
+    confirmButtonText: 'Download Wallet KEY'
   })
 
 export const handleStakeSwal = async (amount: string) =>

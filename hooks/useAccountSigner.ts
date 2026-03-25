@@ -3,22 +3,25 @@ import {
   startAuthentication,
   startRegistration,
   PublicKeyCredentialCreationOptionsJSON,
-  PublicKeyCredentialRequestOptionsJSON
+  PublicKeyCredentialRequestOptionsJSON,
+  base64URLStringToBuffer
 } from '@simplewebauthn/browser'
 import { backupDoneSwal, backupErrorSwal } from 'lib/swal'
-import { AccountSignerStatus, User, WebAuthnUri, Authenticator } from 'types'
+import { AccountSignerStatus, WebAuthnUri, Authenticator, LoginChallengeResponse } from 'types'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import { walletStore } from 'store/wallet.atom'
-import useWallet from './useWallet'
 import { postApi, getApi } from 'lib/api'
 
 interface UseAccountSignerReturnType {
   addBackup: () => Promise<void>
-  loadAccount: (user: User) => Promise<void>
   createCredential: (email: string) => Promise<{ verified: boolean; token?: string; error?: string }>
   // eslint-disable-next-line no-unused-vars
-  verifyCredential: (email: string) => Promise<{ verified: boolean; token?: string; error?: string }>
+  verifyCredential: (email: string) => Promise<{
+    verified: boolean
+    token?: string
+    error?: string
+    prfSecret?: ArrayBuffer
+  }>
   removeBackup: (credentialID: string) => Promise<void>
   fetchBackups: () => Promise<void>
   backups: Authenticator[]
@@ -28,8 +31,6 @@ interface UseAccountSignerReturnType {
 const useAccountSigner = (): UseAccountSignerReturnType => {
   const user = useRecoilValue(userState)
   const [status, setStatus] = useState<AccountSignerStatus>()
-  const wallet = useRecoilValue(walletStore)
-  const { initWallet } = useWallet()
 
   const createCredential = useCallback(async (email: string) => {
     try {
@@ -46,47 +47,44 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       setStatus(validation?.success ? 'success' : 'error')
 
       return { verified: Boolean(validation?.success) }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
       setStatus('error')
-      return { verified: false, error: err.message }
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+      return { verified: false, error: errorMessage }
     }
   }, [])
 
   const verifyCredential = useCallback(async (email: string) => {
     try {
-      const challenge = await postApi<PublicKeyCredentialRequestOptionsJSON>(WebAuthnUri.LOGIN, { email })
-      if (!challenge) return { verified: false }
-      const request = await startAuthentication({ optionsJSON: challenge })
-      const validation = await postApi<{ verified: boolean; token?: string }>(WebAuthnUri.LOGIN_CHALLENGE, {
-        data: request,
+      const options = await postApi<PublicKeyCredentialRequestOptionsJSON>(WebAuthnUri.LOGIN, { email })
+      if (!options) return { verified: false }
+      // @ts-expect-error prf is not defined in the type
+      if (options.extensions?.prf?.eval?.first) {
+        // @ts-expect-error prf is not defined in the type
+        options.extensions.prf.eval.first = base64URLStringToBuffer(options.extensions.prf.eval.first)
+      }
+      const data = await startAuthentication({ optionsJSON: options })
+      const validation: LoginChallengeResponse | undefined = await postApi(WebAuthnUri.LOGIN_CHALLENGE, {
+        data,
         email
       })
 
       setStatus(validation?.verified ? 'success' : 'error')
 
-      return { verified: Boolean(validation?.verified), token: validation?.token }
-    } catch (err: any) {
+      return {
+        verified: Boolean(validation?.verified),
+        token: validation?.token,
+        // @ts-expect-error prf is not defined in the type
+        prfSecret: data.clientExtensionResults.prf.results.first
+      }
+    } catch (err: unknown) {
       console.error(err)
       setStatus('error')
-      return { verified: false, error: err.message }
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+      return { verified: false, error: errorMessage }
     }
   }, [])
-
-  const loadAccount = useCallback(
-    async (_user: User) => {
-      if (wallet.isLoaded) return
-
-      try {
-        await initWallet(_user)
-        setStatus('success')
-      } catch {
-        setStatus('error')
-        throw new Error('While loading account')
-      }
-    },
-    [initWallet, wallet.isLoaded]
-  )
 
   const [backups, setBackups] = useState<Authenticator[]>([])
 
@@ -152,7 +150,6 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
 
   return {
     addBackup,
-    loadAccount,
     createCredential,
     verifyCredential,
     removeBackup,

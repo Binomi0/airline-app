@@ -406,3 +406,12 @@ export interface IvaoEvent {
   hqeAward: boolean
   routes: IvaoRoute[]
 }
+
+export type LoginChallengeResponse = {
+  verified: boolean
+  token?: string
+  id?: string
+  emailVerified?: boolean
+  error?: string
+  prfResult?: ArrayBuffer
+}

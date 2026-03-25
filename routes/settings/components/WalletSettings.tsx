@@ -21,7 +21,7 @@ interface Props {
 const WalletSettings = ({ user }: Props) => {
   const [wallet, setWallet] = useRecoilState(walletStore)
   const [hasLocalKey, setHasLocalKey] = useState(false)
-  const { getPRFSecret, getPrivateKey, syncWallet } = useWallet()
+  const { getPrivateKey, syncWallet } = useWallet()
   const { verifyCredential } = useAccountSigner()
 
   const handleDownloadKey = useCallback(async () => {
@@ -30,19 +30,22 @@ const WalletSettings = ({ user }: Props) => {
     try {
       const { isConfirmed } = await unlockWalletSwal()
       if (!isConfirmed) return
-
+      console.log('confirmado')
       const { verified } = await verifyCredential(user.email)
       if (!verified) return
 
+      console.log('verificado')
       const wallet = await getApi<IWallet>('/api/wallet')
       const isCloudSynced = !!wallet?.encryptedVault
       if (!isCloudSynced) return
 
+      console.log('sincronizado')
       const vaultData = JSON.stringify({ ciphertext: wallet.encryptedVault, iv: wallet.iv, protected: true })
 
       localStorage.setItem(user.id, Buffer.from(vaultData).toString('base64'))
       setWallet((prev) => ({ ...prev, isCloudSynced, isLoaded: true, isLocked: true }))
       setHasLocalKey(true)
+      console.log('guardado')
     } catch (error) {
       console.error('Sync wallet error:', error)
     }
@@ -59,12 +62,13 @@ const WalletSettings = ({ user }: Props) => {
   }, [user, getPrivateKey, syncWallet])
 
   const handleExportKey = useCallback(async () => {
-    if (!user?.id) return
+    if (!user?.id || !user?.email) return
 
     try {
       const storedValue = localStorage.getItem(user.id)
       if (!storedValue) {
-        return missingExportKeySwal()
+        await missingExportKeySwal()
+        return
       }
 
       const raw = Buffer.from(storedValue, 'base64').toString()
@@ -75,14 +79,19 @@ const WalletSettings = ({ user }: Props) => {
         if (vault.protected) {
           const { isConfirmed } = await unlockWalletSwal()
           if (!isConfirmed) return
-          const prfSecret = await getPRFSecret()
-          const cryptoKey = await deriveKeyFromPRF(prfSecret)
+
+          const { verified, prfSecret } = await verifyCredential(user.email)
+          if (!verified) return
+
+          const cryptoKey = await deriveKeyFromPRF(prfSecret!)
           privateKey = await decryptVault(vault.ciphertext, cryptoKey, vault.iv)
         } else {
           privateKey = raw.slice(0, 66)
         }
-      } catch {
-        privateKey = raw.slice(0, 66)
+      } catch (error) {
+        console.error('Export error:', error)
+        privateKey = ''
+        return
       }
 
       const formattedKey = (privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`) as `0x${string}`
@@ -95,7 +104,7 @@ const WalletSettings = ({ user }: Props) => {
     } catch (error) {
       console.error('Export error:', error)
     }
-  }, [user?.id, wallet.smartAccountAddress, getPRFSecret])
+  }, [user?.id, wallet.smartAccountAddress])
 
   useEffect(() => {
     if (user?.id) {

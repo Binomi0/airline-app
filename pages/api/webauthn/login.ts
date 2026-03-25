@@ -5,8 +5,6 @@ import { connectDB } from 'lib/mongoose'
 import Webauthn from 'models/Webauthn'
 import { isoBase64URL } from '@simplewebauthn/server/helpers'
 
-
-// Human-readable title for your website
 const rpID = process.env.NEXT_PUBLIC_DOMAIN || 'localhost'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -23,6 +21,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(204).end()
         return
       }
+      const baseBytes = new TextEncoder().encode('weifly-vault-v1').buffer
+      const hashBuffer = await crypto.subtle.digest('SHA-256', baseBytes)
+      const prfSaltBase64 = isoBase64URL.fromBuffer(new Uint8Array(hashBuffer))
 
       const options = await generateAuthenticationOptions({
         rpID: rpID as string,
@@ -35,16 +36,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             transports: authenticator.transports as AuthenticatorTransport[]
           }
         }),
-        userVerification: 'preferred'
+        userVerification: 'preferred',
+        extensions: {
+          // @ts-expect-error prf is not defined in the type
+          prf: {
+            eval: {
+              first: prfSaltBase64
+            }
+          }
+        }
       })
 
-      console.log(`[login] Options for ${req.body.email}:`, {
-        challenge: options.challenge,
-        allowCredentials: options.allowCredentials?.map((c) => ({
-          id: c.id,
-          transports: c.transports
-        }))
-      })
+      console.log({ options })
 
       await Webauthn.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })
       res.status(200).json(options)
