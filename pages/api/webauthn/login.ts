@@ -3,9 +3,9 @@ import { generateAuthenticationOptions, AuthenticatorTransport } from '@simplewe
 import { Authenticator } from 'types'
 import { connectDB } from 'lib/mongoose'
 import Webauthn from 'models/Webauthn'
+import { isoBase64URL } from '@simplewebauthn/server/helpers'
 
-// Human-readable title for your website
-const rpID = process.env.NEXT_PUBLIC_DOMAIN
+const rpID = process.env.NEXT_PUBLIC_DOMAIN || 'localhost'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -15,26 +15,39 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
     try {
       await connectDB()
-      const user = await Webauthn.findOne({ email: req.body.email })
+      const auth = await Webauthn.findOne({ email: req.body.email })
 
-      if (!user) {
+      if (!auth) {
         res.status(204).end()
         return
       }
+      const baseBytes = new TextEncoder().encode('weifly-vault-v1').buffer
+      const hashBuffer = await crypto.subtle.digest('SHA-256', baseBytes)
+      const prfSaltBase64 = isoBase64URL.fromBuffer(new Uint8Array(hashBuffer))
 
       const options = await generateAuthenticationOptions({
         rpID: rpID as string,
         // Require users to use a previously-registered authenticator
-        allowCredentials: user.authenticators.map((authenticator: Authenticator) => {
+        allowCredentials: auth.authenticators.map((authenticator: Authenticator) => {
           return {
-            id: (authenticator.credentialID as string).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
+            id: isoBase64URL.fromBuffer(isoBase64URL.toBuffer(authenticator.credentialID)),
             type: 'public-key',
             // Optional
             transports: authenticator.transports as AuthenticatorTransport[]
           }
         }),
-        userVerification: 'discouraged'
+        userVerification: 'preferred',
+        extensions: {
+          // @ts-expect-error prf is not defined in the type
+          prf: {
+            eval: {
+              first: prfSaltBase64
+            }
+          }
+        }
       })
+
+      console.log({ options })
 
       await Webauthn.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })
       res.status(200).json(options)

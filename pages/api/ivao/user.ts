@@ -16,7 +16,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       }
 
       if (!token) {
-        return res.status(401).json({ message: 'No IVAO session found' })
+        return res.status(401).json({ message: 'IVAO Account not linked' })
       }
 
       const response = await ivaoInstance.get('/v2/users/me', {

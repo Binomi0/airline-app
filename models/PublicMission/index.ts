@@ -1,6 +1,7 @@
 import { mongoose } from 'lib/mongoose'
 import { ObjectId } from 'mongodb'
 import { MissionType, MissionCategory, PublicMission, PublicMissionStatus } from 'types'
+import { getCallsign } from 'utils'
 
 export type IPublicMission = Document & PublicMission & { reservedBy?: ObjectId }
 
@@ -39,6 +40,15 @@ const publicMissionSchema: mongoose.Schema = new mongoose.Schema<IPublicMission>
     rewardMultiplier: {
       type: Number,
       default: 1.0
+    },
+    weight: {
+      type: Number,
+      required: true
+    },
+    callsign: {
+      type: String,
+      required: true,
+      default: () => getCallsign()
     },
     details: {
       name: { type: String, required: true },

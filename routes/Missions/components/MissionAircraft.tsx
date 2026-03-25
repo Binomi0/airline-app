@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography'
 import { MediaRenderer, useReadContract } from 'thirdweb/react'
 import { getNFT } from 'thirdweb/extensions/erc721'
 import { walletStore } from 'store/wallet.atom'
-import { postApi } from 'lib/api'
 import { useRouter } from 'next/router'
 import React, { useCallback, useMemo } from 'react'
 import { useRecoilValue } from 'recoil'
@@ -20,6 +19,7 @@ import { Mission } from 'types'
 import { getNFTAttributes } from 'utils'
 import { useAppContracts } from 'hooks/useAppContracts'
 import { twClient } from 'config'
+import useMission from 'hooks/useMission'
 
 interface AircraftAttributes {
   combustible: string
@@ -31,6 +31,7 @@ const MissionAircraft: React.FC<{ mission?: Mission; onCancel: () => void }> = (
   const router = useRouter()
   const { smartAccountAddress } = useRecoilValue(walletStore)
   const { licenseContract } = useAppContracts()
+  const { reserveMission } = useMission()
 
   const aircraftAttributes: AircraftAttributes = useMemo(() => {
     if (!mission?.aircraft) return {} as AircraftAttributes
@@ -68,15 +69,13 @@ const MissionAircraft: React.FC<{ mission?: Mission; onCancel: () => void }> = (
         showCancelButton: true
       })
       if (isConfirmed) {
-        const missionResult = await postApi('/api/missions/new', newMissionData)
-        if (!missionResult) return
-        await postApi('/api/live/new', { mission: missionResult })
+        await reserveMission(mission._id!, mission.aircraft)
         router.push('/live')
       }
     } catch (err) {
       console.error(err)
     }
-  }, [mission, router])
+  }, [mission, router, reserveMission])
 
   if (!mission) {
     return <LinearProgress />

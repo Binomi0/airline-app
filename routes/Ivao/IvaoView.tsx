@@ -24,7 +24,6 @@ import { authStore } from 'store/auth.atom'
 // import { appInstalledStore } from 'store/appInstalled.atom'
 import Destinations from './components/Destinations'
 import Swal from 'sweetalert2'
-import { postApi } from 'lib/api'
 import { hasRequirement } from 'utils'
 import axios from 'config/axios'
 import useMission from 'hooks/useMission'
@@ -37,13 +36,9 @@ const getMetar = async (callsign: string, ivaoAuthToken?: string | null) =>
     .get(`api/ivao/airports/${callsign}/metar`, { headers: { 'x-ivao-auth': `Bearer ${ivaoAuthToken}` } })
     .then((response) => response.data)
 
-function base64URLEncode(str: string) {
-  return Buffer.from(str).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
-}
-
-const verifier = '123456'
+const verifier = 'dXNlci5pZA'
 const challengeMethod = 'plain' // S256
-const challenge = base64URLEncode(verifier)
+const challenge = verifier
 
 interface Props {
   user: User
@@ -52,7 +47,7 @@ interface Props {
 const IvaoView = ({ user: _user }: Props) => {
   const { isLoading: _loading, initIvaoAuth, initIvaoData } = useVaProviderContext()
   const router = useRouter()
-  const { live, getLive } = useLiveFlightProviderContext()
+  const { live } = useLiveFlightProviderContext()
   const [start, setStart] = useState((router.query.start as string) ?? '')
   const [end, setEnd] = useState((router.query.end as string) ?? '')
   const ivaoUser = useRecoilValue(ivaoUserStore)
@@ -100,10 +95,8 @@ const IvaoView = ({ user: _user }: Props) => {
       })
 
       if (isConfirmed) {
-        const missionResult = await reserveMission(mission._id, selectedAircraftNft, mission.callsign)
+        const missionResult = await reserveMission(mission._id, selectedAircraftNft)
         if (!missionResult) return
-        await postApi('/api/live/new', { mission: missionResult })
-        await getLive()
 
         if (!ivaoUser) {
           const clearance = await Swal.fire({
@@ -129,7 +122,7 @@ const IvaoView = ({ user: _user }: Props) => {
     } catch (err) {
       console.error(err)
     }
-  }, [mission, ownedAircrafts, aircraft, reserveMission, getLive, ivaoUser, authToken, router])
+  }, [mission, ownedAircrafts, aircraft, reserveMission, ivaoUser, authToken, router])
 
   const handleBooking = useCallback(
     (hasFuel: boolean) => {

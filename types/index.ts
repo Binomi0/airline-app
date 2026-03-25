@@ -44,6 +44,7 @@ export interface FRoute {
 }
 
 export enum MissionStatus {
+  RESERVED = 'RESERVED',
   STARTED = 'STARTED',
   COMPLETED = 'COMPLETED',
   ABORTED = 'ABORTED'
@@ -134,6 +135,7 @@ export interface IBaseMission {
   expiresAt?: Date
   startedAt?: Date
   callsign?: string
+  weight: number
 }
 
 export interface PublicMission extends IBaseMission {
@@ -150,7 +152,6 @@ export interface Mission extends IBaseMission {
   aircraftId: string
   // pilot callsign
   callsign: string
-  weight: number
   status: MissionStatus
   remote: boolean
   rewards?: number
@@ -211,10 +212,12 @@ export enum Collection {
 }
 
 export interface User {
+  _id?: string
   id?: string
   email?: string
   address?: string
   vaUser?: VaUser
+  onboarded?: boolean
 }
 
 export interface Authenticator {
@@ -222,6 +225,8 @@ export interface Authenticator {
   credentialPublicKey: string
   counter: number
   transports?: string[]
+  name?: string
+  createdAt?: Date
 }
 
 export interface WebAuthnUser {
@@ -400,4 +405,13 @@ export interface IvaoEvent {
   eventType: IvaoEventType
   hqeAward: boolean
   routes: IvaoRoute[]
+}
+
+export type LoginChallengeResponse = {
+  verified: boolean
+  token?: string
+  id?: string
+  emailVerified?: boolean
+  error?: string
+  prfResult?: ArrayBuffer
 }

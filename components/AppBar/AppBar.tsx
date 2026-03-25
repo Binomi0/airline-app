@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MenuIcon from '@mui/icons-material/Menu'
 import Alert from '@mui/material/Alert'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import Tooltip from '@mui/material/Tooltip'
 import Stack from '@mui/material/Stack'
 import useScrollTrigger from '@mui/material/useScrollTrigger'
-import Download from '@mui/icons-material/Download'
+
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Snackbar from '@mui/material/Snackbar'
 import { useMainProviderContext } from 'context/MainProvider'
@@ -21,7 +20,7 @@ import { smartAccountAddressStore } from 'store/wallet.atom'
 import { themeStore } from 'store/theme.atom'
 import { useTokenProviderContext } from 'context/TokenProvider'
 import styles from './appbar.module.css'
-import { AlertTitle, Box, Container } from '@mui/material'
+import { AlertTitle, Container, Box, Button } from '@mui/material'
 import Link from 'next/link'
 
 function base64URLEncode(str: string) {
@@ -46,8 +45,6 @@ const CustomAppBar = () => {
   const theme = useRecoilValue(themeStore)
   const [userActionStarted, setUserActionStarted] = useState<UserActionStatus>()
   const [snack, setSnack] = useState<AppBarSnack>(initialSnackState)
-
-  const handleDownloadApp = useCallback(() => {}, [])
 
   useEffect(() => {
     setSnack({ open: status === 'missingKey', message: 'Missing Key', status: 'error' })
@@ -75,19 +72,13 @@ const CustomAppBar = () => {
       </Snackbar>
       <AppBar
         position='sticky'
+        elevation={trigger ? 4 : 0}
         sx={{
-          background: trigger
-            ? theme === 'dark'
-              ? 'rgba(11, 15, 25, 0.8)'
-              : 'rgba(255, 255, 255, 0.8)'
-            : theme === 'dark'
-              ? 'rgba(11, 15, 25, 0.7)'
-              : 'rgba(255, 255, 255, 0.95)',
+          background: (t) => (t.palette.mode === 'dark' ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.85)'),
           backdropFilter: 'blur(12px)',
+          color: (t) => t.palette.text.primary,
           backgroundImage: 'none',
-          boxShadow: 'none',
-          color: theme === 'dark' ? '#fff' : '#1e293b',
-          borderBottom: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`
+          zIndex: 1100
         }}
       >
         <Toolbar sx={{ m: 0, p: 0 }}>
@@ -114,11 +105,11 @@ const CustomAppBar = () => {
           )}
           {user && (
             <Box mr={2}>
-              <Tooltip title='Download App'>
-                <IconButton color='inherit' onClick={handleDownloadApp}>
-                  <Download color='inherit' />
-                </IconButton>
-              </Tooltip>
+              <Link href='/download'>
+                <Button color='inherit' size='small' variant='outlined' sx={{ borderRadius: 3 }}>
+                  Descargar App
+                </Button>
+              </Link>
             </Box>
           )}
           {matches && smartAccountAddress && (

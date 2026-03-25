@@ -30,11 +30,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const user = await User.findOne({ email: req.body.email })
 
-      if (user && user.emailVerified) {
-        res.status(200).send({ success: false })
-        return
-      }
-
       const randomNumber = Math.floor(Math.random() * 9000 + 1000)
 
       if (!user) {
@@ -54,20 +49,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         res.status(200).send({ success: true })
         return
-      } else if (!user.emailVerified) {
-        if (moment().isAfter(moment(user.verificationDate))) {
-          const sendEmail = sendVerifyEmail(req.body.email, randomNumber.toString())
-          const updateUser = User.findOneAndUpdate(
-            { email: req.body.email },
-            { $set: { verificationCode: randomNumber, verificationDate: moment().add('5', 'minutes').unix() } }
-          )
+      } else {
+        const sendEmail = sendVerifyEmail(req.body.email, randomNumber.toString())
+        const updateUser = User.findOneAndUpdate(
+          { email: req.body.email },
+          { $set: { verificationCode: randomNumber, verificationDate: moment().add('5', 'minutes').unix() } }
+        )
 
-          await Promise.all([sendEmail, updateUser])
-        }
+        await Promise.all([sendEmail, updateUser])
         res.status(200).send({ success: true })
         return
       }
-      res.status(400).end()
       return
     } catch (err) {
       console.error('[handler] create() ERROR =>', err)

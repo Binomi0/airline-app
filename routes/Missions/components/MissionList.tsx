@@ -1,7 +1,6 @@
 import MissionRow from './MissionRow'
 import React, { useCallback } from 'react'
 import { PublicMission, Mission } from 'types'
-import { getCallsign } from 'utils'
 import Fade from '@mui/material/Fade'
 import { useRecoilValue } from 'recoil'
 import { smartAccountAddressStore } from 'store/wallet.atom'
@@ -9,7 +8,7 @@ import { INft } from 'models/Nft'
 import { Box, Stack, Typography, useTheme, alpha } from '@mui/material'
 
 type Props = {
-  reserveMission: (missionId: string, aircraft: INft, callsign: string) => Promise<Mission>
+  reserveMission: (missionId: string, aircraft: INft) => Promise<Mission>
   pool: PublicMission[]
   aircraft?: INft
 }
@@ -25,7 +24,7 @@ const MissionList = ({ reserveMission, pool, aircraft }: Props) => {
         return
       }
       try {
-        await reserveMission(mission._id!, aircraft, getCallsign())
+        await reserveMission(mission._id!, aircraft)
       } catch {
         alert('No se pudo reservar la misión. Es posible que otro piloto la haya tomado.')
       }

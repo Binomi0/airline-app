@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Box, Button, Divider, Stack, Tooltip, Typography } from '@mui/material'
 import BackupIcon from '@mui/icons-material/Backup'
 import { walletStore } from 'store/wallet.atom'
@@ -8,18 +8,48 @@ import { useRecoilState } from 'recoil'
 import useWallet from 'hooks/useWallet'
 import { decryptVault, deriveKeyFromPRF } from 'utils/crypto'
 import { Check, Close, Info } from '@mui/icons-material'
-
 import { User } from 'types'
-
 import styles from 'styles/Settings.module.css'
+import { getApi } from 'lib/api'
+import { IWallet } from 'models/Wallet'
+import useAccountSigner from 'hooks/useAccountSigner'
 
 interface Props {
   user: User
 }
 
 const WalletSettings = ({ user }: Props) => {
-  const [wallet] = useRecoilState(walletStore)
-  const { getPRFSecret, getPrivateKey, syncWallet } = useWallet()
+  const [wallet, setWallet] = useRecoilState(walletStore)
+  const [hasLocalKey, setHasLocalKey] = useState(false)
+  const { getPrivateKey, syncWallet } = useWallet()
+  const { verifyCredential } = useAccountSigner()
+
+  const handleDownloadKey = useCallback(async () => {
+    if (!user?.id || !user?.email) return
+
+    try {
+      const { isConfirmed } = await unlockWalletSwal()
+      if (!isConfirmed) return
+      console.log('confirmado')
+      const { verified } = await verifyCredential(user.email)
+      if (!verified) return
+
+      console.log('verificado')
+      const wallet = await getApi<IWallet>('/api/wallet')
+      const isCloudSynced = !!wallet?.encryptedVault
+      if (!isCloudSynced) return
+
+      console.log('sincronizado')
+      const vaultData = JSON.stringify({ ciphertext: wallet.encryptedVault, iv: wallet.iv, protected: true })
+
+      localStorage.setItem(user.id, Buffer.from(vaultData).toString('base64'))
+      setWallet((prev) => ({ ...prev, isCloudSynced, isLoaded: true, isLocked: true }))
+      setHasLocalKey(true)
+      console.log('guardado')
+    } catch (error) {
+      console.error('Sync wallet error:', error)
+    }
+  }, [user?.id, user?.email, setWallet, verifyCredential])
 
   const handleUploadKey = useCallback(async () => {
     if (!user?.id) return
@@ -32,12 +62,13 @@ const WalletSettings = ({ user }: Props) => {
   }, [user, getPrivateKey, syncWallet])
 
   const handleExportKey = useCallback(async () => {
-    if (!user?.id) return
+    if (!user?.id || !user?.email) return
 
     try {
       const storedValue = localStorage.getItem(user.id)
       if (!storedValue) {
-        return missingExportKeySwal()
+        await missingExportKeySwal()
+        return
       }
 
       const raw = Buffer.from(storedValue, 'base64').toString()
@@ -48,14 +79,19 @@ const WalletSettings = ({ user }: Props) => {
         if (vault.protected) {
           const { isConfirmed } = await unlockWalletSwal()
           if (!isConfirmed) return
-          const prfSecret = await getPRFSecret()
-          const cryptoKey = await deriveKeyFromPRF(prfSecret)
+
+          const { verified, prfSecret } = await verifyCredential(user.email)
+          if (!verified) return
+
+          const cryptoKey = await deriveKeyFromPRF(prfSecret!)
           privateKey = await decryptVault(vault.ciphertext, cryptoKey, vault.iv)
         } else {
           privateKey = raw.slice(0, 66)
         }
-      } catch {
-        privateKey = raw.slice(0, 66)
+      } catch (error) {
+        console.error('Export error:', error)
+        privateKey = ''
+        return
       }
 
       const formattedKey = (privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`) as `0x${string}`
@@ -68,7 +104,16 @@ const WalletSettings = ({ user }: Props) => {
     } catch (error) {
       console.error('Export error:', error)
     }
-  }, [user?.id, wallet.smartAccountAddress, getPRFSecret])
+  }, [user?.id, user?.email, wallet.smartAccountAddress, verifyCredential])
+
+  useEffect(() => {
+    if (user?.id) {
+      const hasLocal = localStorage.getItem(user.id) || ''
+      if (hasLocal) {
+        setHasLocalKey(true)
+      }
+    }
+  }, [user?.id])
 
   return (
     <Box className={styles.glassCard} sx={{ height: '100%' }}>
@@ -138,6 +183,23 @@ const WalletSettings = ({ user }: Props) => {
                 '&:hover': { borderColor: '#fff', background: 'rgba(251, 191, 36, 0.05)' }
               }}
               onClick={handleUploadKey}
+            >
+              <Stack spacing={1} direction='row' alignItems='center'>
+                <BackupIcon sx={{ fontSize: '1rem' }} />
+                <Typography variant='button'>Sync</Typography>
+              </Stack>
+            </Button>
+          )}
+          {wallet.isCloudSynced && !hasLocalKey && (
+            <Button
+              size='small'
+              variant='outlined'
+              sx={{
+                borderColor: '#fbbf24',
+                color: '#fbbf24',
+                '&:hover': { borderColor: '#fff', background: 'rgba(251, 191, 36, 0.05)' }
+              }}
+              onClick={handleDownloadKey}
             >
               <Stack spacing={1} direction='row' alignItems='center'>
                 <BackupIcon sx={{ fontSize: '1rem' }} />

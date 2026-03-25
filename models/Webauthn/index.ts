@@ -1,11 +1,5 @@
 import { mongoose } from 'lib/mongoose'
-
-interface Authenticator {
-  credentialPublicKey: string
-  credentialID: string
-  counter: number
-  transports?: string[]
-}
+import { Authenticator } from 'types'
 
 export interface IWebauthn extends Document {
   email: string
@@ -47,7 +41,9 @@ const webauthSchema: mongoose.Schema = new mongoose.Schema<IWebauthn>(
         counter: {
           type: Number
         },
-        transports: [{ type: String }]
+        transports: [{ type: String }],
+        name: { type: String },
+        createdAt: { type: Date, default: Date.now }
       }
     ],
     createdAt: Date,

@@ -1,20 +1,33 @@
 import mongoose from 'mongoose'
 
-// MongoDB connection URL
-const mongoURI = process.env.MONGODB_URI
+let cachedPromise: Promise<typeof import('mongoose')> | null = null
 
-const connectDB = async () => {
+export const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) {
+    return mongoose.connection
+  }
+
+  if (cachedPromise) {
+    return cachedPromise
+  }
+
+  const mongoURI = process.env.MONGODB_URI
+  if (!mongoURI) {
+    throw new Error('Please define the MONGODB_URI environment variable inside .env.local')
+  }
+
+  console.info('MongoDB Connecting...')
+  cachedPromise = mongoose.connect(mongoURI, {
+    dbName: process.env.MONGODB_NAME
+  })
+
   try {
-    if (mongoose.connection.readyState === 0) {
-      console.info('MongoDB Connecting...')
-      await mongoose.connect(mongoURI, {
-        dbName: process.env.MONGODB_NAME
-      })
-      console.info('New MongoDB Connected')
-    }
-    console.info('MongoDB already connected')
+    const conn = await cachedPromise
+    console.info('New MongoDB Connected')
+    return conn
   } catch (error) {
-    console.error('Error connecting to MongoDB:', error)
+    cachedPromise = null // Reset on error
+    throw error
   }
 }
 
@@ -27,4 +40,4 @@ const dbDisconnect = async () => {
   }
 }
 
-export { mongoose, connectDB, dbDisconnect }
+export { mongoose, dbDisconnect }

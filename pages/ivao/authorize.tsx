@@ -15,8 +15,12 @@ const IVAOPage = () => {
   const { authorize, error } = useIvao()
 
   const redirect = useCallback(() => {
-    router.replace('/ivao')
-  }, [router])
+    if (user && !user.onboarded) {
+      router.replace('/onboarding')
+    } else {
+      router.replace('/ivao')
+    }
+  }, [router, user])
 
   useEffect(() => {
     if (router.isReady && router.query.code) {

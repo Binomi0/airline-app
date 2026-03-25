@@ -15,6 +15,7 @@ export interface IVirtualAirline extends Document {
   refreshToken?: string
   tokenExpiry?: Date
   lastLandedAt?: string // ICAO code
+  division?: string[]
 }
 
 const virtualAirlineSchema: mongoose.Schema = new mongoose.Schema<IVirtualAirline>(
@@ -30,6 +31,7 @@ const virtualAirlineSchema: mongoose.Schema = new mongoose.Schema<IVirtualAirlin
       required: true,
       unique: true
     },
+    division: [{ type: String }],
     type: {
       type: String,
       required: true,

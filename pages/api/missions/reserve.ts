@@ -1,36 +1,46 @@
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
+import mongoose from 'mongoose'
 import { NextApiResponse } from 'next'
 import PublicMissionModel from 'models/PublicMission'
 import MissionModel from 'models/Mission'
 import AtcModel from 'models/Atc'
 import NftModel from 'models/Nft'
+import LiveModel from 'models/Live'
 import { PublicMissionStatus, MissionStatus, aircraftNameToIcaoCode } from 'types'
-import { getEstimatedTimeMinutes } from 'utils'
-import { ObjectId } from 'mongodb'
+import { getEstimatedTimeMinutes, getMissionWeight } from 'utils'
+import { INft } from 'models/Nft'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return res.status(405).end()
   }
 
-  const { missionId, aircraftId, callsign, weight } = req.body
+  const { missionId, aircraftId } = req.body
 
-  if (!missionId || !aircraftId || !callsign) {
+  if (!missionId || !aircraftId) {
     return res.status(400).json({ error: 'Missing required fields' })
   }
 
   try {
     // 0. Single-Reservation Check: User can only have one active mission or reservation
+    console.info('[RESERVE] Checking existing missions for user:', req.id)
     const [hasActiveMission, hasPoolReservation] = await Promise.all([
-      MissionModel.exists({ userId: req.id, status: MissionStatus.STARTED }),
+      MissionModel.exists({
+        userId: req.id,
+        status: { $in: [MissionStatus.STARTED, MissionStatus.RESERVED] }
+      }),
       PublicMissionModel.exists({
-        reservedBy: new ObjectId(req.id as string),
+        reservedBy: new mongoose.Types.ObjectId(req.id as string),
         status: { $in: [PublicMissionStatus.RESERVED, PublicMissionStatus.ACTIVE] }
       })
     ])
 
     if (hasActiveMission || hasPoolReservation) {
-      return res.status(400).json({ error: 'You already have an active mission or reservation' })
+      console.warn('[RESERVE] User already has an active mission or reservation', {
+        hasActiveMission,
+        hasPoolReservation
+      })
+      return res.status(204).json({ error: 'Ya tienes una misión activa o una reserva pendiente.' })
     }
 
     // 1. Fetch aircraft details to calculate performance
@@ -54,7 +64,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           reservedAt: new Date()
         }
       },
-      { new: true }
+      { returnDocument: 'after' }
     ).lean()
 
     if (!publicMission) {
@@ -68,6 +78,12 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     ])
 
     // 4. Create the personal mission record for tracking
+    const reservationTimeout = 20 * 60000 // 20 minutes
+    const expiresAt = new Date(Date.now() + reservationTimeout)
+
+    // Update public mission to avoid TTL deletion while reserved
+    await PublicMissionModel.updateOne({ _id: publicMission._id }, { $set: { expiresAt } })
+
     const userMission = await MissionModel.create({
       userId: req.id,
       origin: publicMission.origin,
@@ -79,19 +95,35 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       rewardMultiplier: publicMission.rewardMultiplier,
       details: publicMission.details,
       prize: publicMission.prize,
-      expiresAt: publicMission.expiresAt,
+      expiresAt: expiresAt,
       originCoords: publicMission.originCoords,
       destinationCoords: publicMission.destinationCoords,
       aircraftId,
-      callsign,
-      weight: weight || 1500, // Default weight if not provided
-      status: MissionStatus.STARTED,
+      callsign: publicMission.callsign,
+      weight: getMissionWeight(aircraftNft as unknown as INft),
+      status: MissionStatus.RESERVED,
       remote: false,
       isRewarded: false,
       estimatedTimeMinutes: getEstimatedTimeMinutes(publicMission.distance, cruiseSpeedIcao),
       originAtcOnStart: !!originAtc,
       destinationAtcOnStart: !!destAtc
     })
+
+    // 5. Create Live session record (initial state)
+    await LiveModel.findOneAndUpdate(
+      { userId: req.id },
+      {
+        $set: {
+          missionId: userMission._id,
+          userId: req.id,
+          aircraftId: userMission.aircraftId,
+          callsign: userMission.callsign,
+          isCompleted: false,
+          track: { name: PublicMissionStatus.RESERVED, value: new Date() }
+        }
+      },
+      { upsert: true, returnDocument: 'after' }
+    )
 
     res.status(201).json(userMission)
   } catch (error) {

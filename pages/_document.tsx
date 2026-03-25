@@ -43,7 +43,7 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
         <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons' />
         <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Sora:wght@200;400;600&display=swap' />
         <link
-          href='https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=Inter:wght@200;400;600&family=Trispace:wght@200;400;600&family=VT323&display=swap'
+          href='https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=Inter:wght@200;400;600&family=Trispace:wght@200;400;600&display=swap'
           rel='stylesheet'
         />
       </Head>

@@ -8,27 +8,37 @@ import User from 'models/User'
 import { jwtSecret } from 'config'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { body } = req
+  if (req.method !== 'POST') {
+    res.status(405).end()
+    return
+  }
 
-  if (!body.data.response.signature) {
-    res.status(500).end()
+  const { data, email } = req.body
+  console.log({ data, email })
+
+  if (!data.response.signature) {
+    res.status(400).send('Signature not found')
     return
   }
 
   await connectDB()
-  const auth = await Webauthn.findOne({ email: req.body.email })
+  const auth = await Webauthn.findOne({ email }, { authenticators: 1, challenge: 1 })
 
   if (!auth) {
-    throw new Error(`Could not find authenticator ${body.data.id} for auth ${auth?._id}`)
+    throw new Error(`Could not find authenticator ${data.id} for auth ${auth?._id}`)
   }
 
   let verified = false
+  let prfResult
 
   try {
     for (const authenticator of auth.authenticators) {
-      const result = await verifySignature(authenticator, body.data, auth.challenge)
-      if (result) {
+      const { extensionResult, verification } = await verifySignature(authenticator, data, auth.challenge)
+      console.log({ extensionResult, verification })
+      if (verification?.verified) {
+        console.log({ extensionResult })
         verified = true
+        prfResult = extensionResult?.prf?.results?.first
         break
       }
     }
@@ -43,12 +53,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const user = await User.findOne({ email: req.body.email })
+    const user = await User.findOne({ email })
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
     }
 
-    const token = jwt.sign({ data: { email: req.body.email, id: user.id } }, jwtSecret as string, {
+    const token = jwt.sign({ data: { email, id: user.id } }, jwtSecret as string, {
       expiresIn: '1d'
     })
 
@@ -73,8 +83,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       path: '/'
     })
 
-    // Return token in body to allow frontend to pass it to Electron app
-    return res.status(200).json({ verified: true, id: user.id, emailVerified: user.emailVerified, token })
+    res.status(200).json({
+      verified: true,
+      id: user.id,
+      emailVerified: user.emailVerified,
+      prfResult: prfResult?.results?.first
+    })
   } catch (err) {
     console.error('login-response error =>', err)
     return res.status(500).json({ error: 'Internal server error' })

@@ -8,7 +8,7 @@ import { ObjectId } from 'mongodb'
 
 const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    const missionData = req.body
+    const { missionId, aircraftId } = req.body
 
     try {
       // 0. Single-Reservation Check: User can only have one active mission or reservation
@@ -25,9 +25,15 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         return
       }
 
+      const missionReady = await Mission.findOne({ _id: missionId, reservedBy: req.id })
+      if (!missionReady) {
+        res.status(404).send({ error: 'Mission not found or not in READY status' })
+        return
+      }
       const newMission = await Mission.create({
-        ...missionData,
+        ...missionReady,
         userId: req.id,
+        aircraftId,
         status: MissionStatus.STARTED
       })
 

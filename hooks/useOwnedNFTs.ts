@@ -1,6 +1,6 @@
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
-import useSWR from 'swr'
+import { useQuery } from '@tanstack/react-query'
 import { fetcher } from 'utils'
 import { IUserNftPopulated } from 'models/UserNft'
 
@@ -12,7 +12,11 @@ const useOwnedNfts = () => {
     data: userNfts,
     error,
     isLoading
-  } = useSWR<IUserNftPopulated[]>(smartAccountAddress ? '/api/nft/owned' : null, fetcher)
+  } = useQuery<IUserNftPopulated[]>({
+    queryKey: ['ownedNfts', smartAccountAddress],
+    queryFn: () => fetcher('/api/nft/owned'),
+    enabled: !!smartAccountAddress
+  })
 
   // console.log({ ownedNFTs: data })
   // const filteredData = useMemo(() => {

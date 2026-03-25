@@ -1,4 +1,4 @@
-import { Roboto, Sora, VT323, B612_Mono } from 'next/font/google'
+import { Roboto, Sora, B612_Mono } from 'next/font/google'
 import { createTheme, responsiveFontSizes, ThemeOptions, alpha } from '@mui/material/styles'
 import { grey, red } from '@mui/material/colors'
 
@@ -14,11 +14,7 @@ export const sora = Sora({
   display: 'swap',
   fallback: ['Helvetica', 'Arial', 'sans-serif']
 })
-export const vt323 = VT323({
-  weight: ['400'],
-  subsets: ['latin'],
-  display: 'swap'
-})
+
 export const b612Mono = B612_Mono({
   weight: ['400', '700'],
   subsets: ['latin'],
@@ -61,6 +57,15 @@ const commonTypography: ThemeOptions['typography'] = {
 }
 
 const commonComponents: ThemeOptions['components'] = {
+  MuiDrawer: {
+    styleOverrides: {
+      paper: {
+        borderRadius: 0,
+        border: 'none',
+        backgroundImage: 'none'
+      }
+    }
+  },
   MuiButton: {
     styleOverrides: {
       root: {
@@ -112,7 +117,7 @@ const commonComponents: ThemeOptions['components'] = {
         style: ({ theme }) => ({
           '& .MuiOutlinedInput-root': {
             height: 32,
-            fontFamily: vt323.style.fontFamily,
+            fontFamily: b612Mono.style.fontFamily,
             fontSize: '1rem',
             backgroundColor: alpha(theme.palette.primary.main, 0.05),
             '& fieldset': {
@@ -138,7 +143,7 @@ const commonComponents: ThemeOptions['components'] = {
       {
         props: { variant: 'h4' }, // Apply to h4 if it's used for headers
         style: {
-          fontFamily: vt323.style.fontFamily
+          fontFamily: b612Mono.style.fontFamily
         }
       },
       {

@@ -17,7 +17,7 @@ import { IUserNftPopulated } from 'models/UserNft'
 // A unique identifier for your website
 const rpID = process.env.NEXT_PUBLIC_DOMAIN
 // The URL at which registrations and authentications should occur
-const origin = process.env.ORIGIN
+const origin = [process.env.ORIGIN, process.env.ORIGIN_MAIN]
 
 // @ts-expect-error: simplewebauthn types are complex and sometimes mismatch with older stored authenticators
 export const verifySignature = async function (authenticator, response, expectedChallenge) {
@@ -25,7 +25,7 @@ export const verifySignature = async function (authenticator, response, expected
   const credentialPublicKeyBuffer = bufferFromBase64(authenticator.credentialPublicKey)
 
   try {
-    await verifyAuthenticationResponse({
+    const verification = await verifyAuthenticationResponse({
       response,
       expectedChallenge,
       expectedOrigin: origin,
@@ -39,15 +39,15 @@ export const verifySignature = async function (authenticator, response, expected
         ) as Uint8Array<ArrayBuffer>,
         counter: authenticator.counter,
         transports: authenticator.transports
-      }
+      },
+      requireUserVerification: true
     })
 
-    return true
+    return { verification, extensionResult: response.clientExtensionResults }
   } catch (error) {
     console.error(error)
 
-    return false
-    // return res.status(400).send({ error: error.message, verified: false });
+    return { verification: null, extensionResult: null }
   }
 }
 
@@ -82,6 +82,10 @@ export const getDistanceByCoords = (
 
 export function randomIntFromInterval(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min) / 100
+}
+
+export function getRandomWeight(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 export function getRandomInt(max: number) {
@@ -323,3 +327,9 @@ export const fetcher = (url: string) => nextApiInstance.get(url).then((res) => r
 
 export const filterByTokenAddress = (tokenAddress: string) => (nft: INft | IUserNftPopulated) =>
   nft.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
+
+export function formatSecondsToHoursMinutes(seconds: number) {
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  return `${hours} h ${minutes} m`
+}

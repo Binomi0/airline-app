@@ -213,6 +213,8 @@ const HomeView = () => {
 
       <div className={styles.divider} />
 
+      <div className={styles.divider} />
+
       {/* ── Nav Cards ──────────────────────────────────────────── */}
       <div className={styles.section}>
         <div className={styles.sectionHeader}>

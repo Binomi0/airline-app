@@ -34,21 +34,34 @@ const LoginView: FC = () => {
 
   const handleSignUpInit = useCallback(async (value: string) => {
     if (!validateEmail(value)) return
+
     setLoading(true)
     try {
       const check = await postApi<{ success: boolean; emailVerified?: boolean }>('/api/user/check', { email: value })
-      if (check?.success && check?.emailVerified) {
-        setMode('signin')
-        setEmail(value)
+
+      // Si hay error en la verificación
+      if (check?.success) {
+        // Si el email ya está verificado, no permitir registro
+        if (check.emailVerified) {
+          // Mostrar mensaje: "Este email ya está registrado y verificado. ¿Deseas iniciar sesión?"
+          return
+        }
         return
       }
+
+      // Si el email existe pero no está verificado, o no existe, proceder con creación
       const create = await postApi<{ success: boolean }>('/api/user/create', { email: value })
+
       if (create?.success) {
         setEmail(value)
         setMode('verify')
+      } else {
+        // Manejar error de creación
+        console.error('User creation failed')
       }
     } catch (error) {
       console.error('Signup init failed', error)
+      // Mostrar mensaje de error al usuario
     } finally {
       setLoading(false)
     }
@@ -86,7 +99,7 @@ const LoginView: FC = () => {
         return (
           <Fade in timeout={500}>
             <Stack spacing={3} alignItems='center'>
-              <Typography variant='h4' fontWeight={700} align='center' gutterBottom>
+              <Typography variant='h4' className={styles.mainTitle} align='center' gutterBottom>
                 Eleva tu Trayecto
               </Typography>
               <Typography variant='body1' align='center' color='text.secondary' sx={{ mb: 2 }}>
