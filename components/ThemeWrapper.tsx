@@ -72,11 +72,11 @@ const ThemeWrapper = ({ children }: Props) => {
           },
           '.leaflet-tooltip': {
             background: `${currentTheme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`,
-            border: `1px solid ${currentTheme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(0,0,0,0.1)'} !important`,
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1) !important',
+            border: `1px solid ${currentTheme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(0,0,0,0.1)'} !important`,
+            boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px ${currentTheme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.08)' : 'rgba(0,0,0,0.05)'} !important`,
             color: `${currentTheme.palette.text.primary} !important`,
-            padding: '8px !important',
-            borderRadius: '8px !important'
+            padding: '12px !important',
+            borderRadius: '10px !important'
           },
           '.leaflet-tooltip-top:before': {
             borderTopColor: `${currentTheme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`

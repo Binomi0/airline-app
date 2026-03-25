@@ -29,12 +29,12 @@ const NAV_ITEMS = [
     link: '/missions',
     emoji: '🗺️',
     title: 'Misiones',
-    desc: 'Vuelos dinámicos. Encuentra misiones basadas en el tráfico aéreo real de IVAO.'
+    desc: 'Vuelos dinámicos. Encuentra misiones basadas en rutas aéreas optimizadas.'
   },
   {
     link: '/ivao',
     emoji: '🌐',
-    title: 'IVAO',
+    title: 'Red de Vuelo',
     desc: 'Sincronización total. Valida tus vuelos en tiempo real y recibe tus recompensas.'
   }
 ]
@@ -71,13 +71,13 @@ const STEPS = [
   {
     n: '03',
     title: 'Vuela y Progresa',
-    desc: 'Completa misiones, gestiona tu combustible y destaca como piloto en IVAO.'
+    desc: 'Completa misiones, gestiona tu combustible y destaca como piloto en la red de vuelo.'
   }
 ]
 
 const STATS = [
   { value: 'NFT', label: 'Aeronaves Únicas' },
-  { value: 'IVAO', label: 'Tráfico en Real' },
+  { value: 'En Vivo', label: 'Tráfico en Real' },
   { value: 'AIRL', label: 'Utility Token' },
   { value: 'L2', label: 'Red Arbitrum' }
 ]
@@ -133,7 +133,7 @@ const HomeView = () => {
         <p className={styles.heroSubtitle}>La Aerolínea Virtual Evolucionada</p>
         <p className={styles.heroDescription}>
           WeiFly es la evolución de las aerolíneas virtuales. Posee activos reales, gestiona tu combustible mediante
-          staking y vuela misiones sincronizadas con el tráfico real de IVAO.
+          staking y vuela misiones sincronizadas con rutas aéreas en tiempo real.
         </p>
 
         <div className={styles.heroCtas}>
