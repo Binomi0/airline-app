@@ -72,11 +72,18 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
       setSelectedAircraftId(ownedAircrafts[0].nft.id.toString())
     }
   }, [ownedAircrafts, selectedAircraftId])
+
   const media = aircraftImageMap[selectedAircraftId as keyof typeof aircraftImageMap]
 
   const currentAircraft = useMemo(
     () => ownedAircrafts.find((a) => a.nft?.id.toString() === selectedAircraftId)?.nft as INft,
     [ownedAircrafts, selectedAircraftId]
+  )
+  const maxFuelCapacity = useMemo(
+    () =>
+      currentAircraft &&
+      Number(getNFTAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value || 0),
+    [currentAircraft]
   )
 
   const fuelRequired = useMemo(() => {
@@ -87,7 +94,8 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
   }, [currentAircraft, mission.distance])
 
   const fuelBalance = Number(balance.airg !== undefined ? Number(balance.airg) / 1e18 : 0)
-  const hasEnoughFuel = fuelRequired <= fuelBalance
+  const hasEnoughFuel = fuelBalance >= fuelRequired
+  const hasFuelCapacity = fuelBalance <= maxFuelCapacity
 
   const handleAircraftChange = (event: SelectChangeEvent) => {
     setSelectedAircraftId(event.target.value as string)
@@ -244,41 +252,47 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
               <Box flex={1}>
                 <Typography variant='subtitle2'>{currentAircraft.metadata.name}</Typography>
                 <Typography variant='caption' color='text.secondary'>
-                  Capacidad:{' '}
-                  {formatNumber(
-                    gallonsToLiters(
-                      Number(getNFTAttributes(currentAircraft).find((a) => a.trait_type === 'combustible')?.value || 0)
-                    ),
-                    0
-                  )}{' '}
-                  L
+                  Capacidad: {formatNumber(maxFuelCapacity, 0)} L
                 </Typography>
               </Box>
             </Stack>
           </Box>
         )}
 
-        <Box>
-          <Stack direction='row' justifyContent='space-between' mb={1}>
-            <Typography variant='body2' display='flex' alignItems='center'>
-              <GasMeterIcon sx={{ mr: 1, fontSize: 18 }} /> Combustible Requerido
+        {hasFuelCapacity ? (
+          <Box>
+            <Stack direction='row' justifyContent='space-between' mb={1}>
+              <Typography variant='body2' display='flex' alignItems='center'>
+                <GasMeterIcon sx={{ mr: 1, fontSize: 18 }} /> Combustible Requerido
+              </Typography>
+              <Typography variant='body2' fontWeight='bold'>
+                {formatNumber(fuelRequired, 0)} L
+              </Typography>
+            </Stack>
+            <LinearProgress
+              variant='determinate'
+              value={Math.min(100, (fuelRequired / fuelBalance) * 100)}
+              color={hasEnoughFuel ? 'success' : 'error'}
+              sx={{ height: 8, borderRadius: 4 }}
+            />
+            <Typography
+              variant='caption'
+              color={hasEnoughFuel ? 'text.secondary' : 'error.main'}
+              mt={1}
+              display='block'
+            >
+              {hasEnoughFuel
+                ? `Balance: ${formatNumber(fuelBalance, 0)} L (Suficiente)`
+                : `Balance insuficiente: ${formatNumber(fuelBalance, 0)} L`}
             </Typography>
-            <Typography variant='body2' fontWeight='bold'>
-              {formatNumber(fuelRequired, 0)} L
+          </Box>
+        ) : (
+          <Alert severity='warning'>
+            <Typography color='warning.main' variant='body2' textAlign='center'>
+              Has excedido la capacidad de combustible de tu aeronave. Por favor, selecciona otra aeronave.
             </Typography>
-          </Stack>
-          <LinearProgress
-            variant='determinate'
-            value={Math.min(100, (fuelRequired / fuelBalance) * 100)}
-            color={hasEnoughFuel ? 'success' : 'error'}
-            sx={{ height: 8, borderRadius: 4 }}
-          />
-          <Typography variant='caption' color={hasEnoughFuel ? 'text.secondary' : 'error.main'} mt={1} display='block'>
-            {hasEnoughFuel
-              ? `Balance: ${formatNumber(fuelBalance, 0)} L (Suficiente)`
-              : `Balance insuficiente: ${formatNumber(fuelBalance, 0)} L`}
-          </Typography>
-        </Box>
+          </Alert>
+        )}
 
         {!hasEnoughFuel && (
           <Alert severity='warning'>
@@ -299,7 +313,7 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
             fullWidth
             variant='contained'
             size='large'
-            disabled={!hasEnoughFuel || !currentAircraft}
+            disabled={!hasEnoughFuel || !currentAircraft || !hasFuelCapacity}
             onClick={handleBookFlight}
           >
             DESPACHAR VUELO

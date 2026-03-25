@@ -28,6 +28,8 @@ import { userState } from 'store/user.atom'
 import { themeStore } from 'store/theme.atom'
 import { useTheme } from '@mui/material/styles'
 
+import EventIcon from '@mui/icons-material/Event'
+
 const Sidebar: React.FC = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
@@ -57,6 +59,12 @@ const Sidebar: React.FC = () => {
       <Divider />
       <List>
         <SidebarItem onLink={handleClick('/')} text='Inicio' Icon={HomeIcon} selected={router.pathname === '/'} />
+        <SidebarItem
+          onLink={handleClick('/events')}
+          text='Eventos'
+          Icon={EventIcon}
+          selected={router.pathname === '/events'}
+        />
         <SidebarItem
           onLink={handleClick('/missions')}
           text='Misiones'

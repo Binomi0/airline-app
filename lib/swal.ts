@@ -193,3 +193,11 @@ export const unlockWalletSwal = async () =>
     cancelButtonText: 'Cancel',
     allowOutsideClick: false
   })
+
+export const eventBookingSuccessSwal = async (callsign: string) =>
+  Swal.fire({
+    title: 'VUELO RESERVADO',
+    text: `Has reservado el vuelo ${callsign} con éxito. Abre la WeiFly Desktop App para iniciar la simulación.`,
+    icon: 'success',
+    confirmButtonText: 'ENTENDIDO'
+  })

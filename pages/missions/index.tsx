@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic'
 const OperationsCenter = dynamic(() => import('routes/Missions/OperationsCenter'), { ssr: false })
 import Disconnected from 'components/Disconnected'
 import { useRouter } from 'next/router'
-import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
 import LinearProgress from '@mui/material/LinearProgress'
 import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
@@ -20,11 +19,6 @@ const MissionsPage = () => {
   const router = useRouter()
   const user = useRecoilValue(userState)
   const { data: userNfts, isLoading } = useOwnedNfts()
-  const { live } = useLiveFlightProviderContext()
-
-  React.useEffect(() => {
-    if (live) router.push('/live')
-  }, [live, router])
 
   if (!user) {
     return <Disconnected />
@@ -57,7 +51,8 @@ const MissionsPage = () => {
               No tienes aeronaves disponibles
             </Typography>
             <Typography variant='body1' paragraph sx={{ color: 'text.secondary', mb: 4, maxWidth: 500, mx: 'auto' }}>
-              Para acceder al centro de operaciones y comenzar a volar misiones, necesitas tener al menos una aeronave en tu flota. Puedes adquirir una en el Hangar usando tus tokens AIRL.
+              Para acceder al centro de operaciones y comenzar a volar misiones, necesitas tener al menos una aeronave
+              en tu flota. Puedes adquirir una en el Hangar usando tus tokens AIRL.
             </Typography>
             <Button
               variant='contained'
