@@ -1,1 +1,1 @@
-export * from "./atcs";
+export * from './atcs'

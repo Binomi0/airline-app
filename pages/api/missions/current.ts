@@ -41,10 +41,10 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       activeMission.callsign = getCallsign()
     }
 
-    res.status(200).json(activeMission)
+    return res.status(200).json(activeMission)
   } catch (error) {
     console.error('Fetch Active Mission ERROR =>', error)
-    res.status(500).end()
+    return res.status(500).end()
   }
 }
 

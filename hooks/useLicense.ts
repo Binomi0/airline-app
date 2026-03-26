@@ -1,18 +1,15 @@
-import { nftLicenseTokenAddress } from 'contracts/address'
-import useOwnedNfts from 'hooks/useOwnedNFTs'
+import usePilotProgress from 'hooks/usePilotProgress'
 
 type UseLicenseReturnType = {
   hasLicense: boolean
 }
 
-const useLicense = (tokenId: string): UseLicenseReturnType => {
-  const { data: ownedNfts } = useOwnedNfts()
+const useLicense = (licenseId: string): UseLicenseReturnType => {
+  const { unlockedLicenses } = usePilotProgress()
 
-  const hasLicense = ownedNfts?.some(
-    (n) => n.tokenId === tokenId && n.tokenAddress.toLowerCase() === nftLicenseTokenAddress.toLowerCase()
-  )
+  const hasLicense = unlockedLicenses.includes(licenseId)
 
-  return { hasLicense: !!hasLicense }
+  return { hasLicense }
 }
 
 export default useLicense

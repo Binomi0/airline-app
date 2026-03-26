@@ -28,12 +28,14 @@ const StepTutorial: FC<Props> = ({ onComplete, onBack }) => {
         Welcome to WeiFly
       </Typography>
       <Typography variant='body1' paragraph color='text.secondary'>
-        You can earn <b>licenses</b> by completing flights and milestones. Use <b>AIRL</b> tokens to purchase new advanced aircraft in the Hangar.
+        You can earn <b>licenses</b> by completing flights and milestones. Use <b>AIRL</b> tokens to purchase new
+        advanced aircraft in the Hangar.
       </Typography>
       <Typography variant='body2' paragraph color='text.secondary'>
-        Remember: <b>AIRL</b> is the governance token to buy assets, while <b>AIRG</b> is the utility token earned purely through flying! Have safe flights!
+        Remember: <b>AIRL</b> is the governance token to buy assets, while <b>AIRG</b> is the utility token earned
+        purely through flying! Have safe flights!
       </Typography>
-      
+
       <Box mt={6} display='flex' justifyContent='space-between'>
         <Button onClick={onBack} variant='outlined' size='large' disabled={loading}>
           Back

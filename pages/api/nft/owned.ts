@@ -49,7 +49,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
                 tokenAddress: tokenAddress.toLowerCase(),
                 tokenURI: tokenUri,
                 type: ownedNft.tokenType === 'ERC1155' ? 'ERC1155' : 'ERC721',
-                chainId: 11155111, // Sepolia
+                chainId: activeChain.id, // Sepolia
                 metadata: {
                   uri: tokenUri,
                   name: ownedNft.name || ownedNft.raw.metadata?.name || '',
@@ -74,7 +74,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
                 address,
                 tokenId,
                 tokenAddress: tokenAddress.toLowerCase(),
-                chainId: activeChain // Sepolia
+                chainId: activeChain.id // Sepolia
               },
               { upsert: true, returnDocument: 'after' }
             )
@@ -89,13 +89,11 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       return res.status(200).json(ownedNftsInDb)
     } catch (error) {
       console.error('[owned.ts] Error:', error)
-      return res.status(500).json({ error: 'Internal server error' })
+      return res.status(500).json({ error: 'Internal server error', details: error })
     }
   }
 
   res.status(405).end()
 }
 
-export default function withAuthOwnedHandler(req: CustomNextApiRequest, res: NextApiResponse) {
-  return withAuth(handler)(req, res)
-}
+export default withAuth(handler)

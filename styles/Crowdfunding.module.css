@@ -1,16 +1,15 @@
-
 .root {
-  --cf-bg-from: #0A0F1F;
-  --cf-bg-to: #1A1F35;
-  --cf-primary: #0A1E3C;
-  --cf-secondary: #2A7DE1;
-  --cf-accent: #FF6B35;
-  --cf-text: #FFFFFF;
-  --cf-text-muted: #E0E0E0;
+  --cf-bg-from: #0a0f1f;
+  --cf-bg-to: #1a1f35;
+  --cf-primary: #0a1e3c;
+  --cf-secondary: #2a7de1;
+  --cf-accent: #ff6b35;
+  --cf-text: #ffffff;
+  --cf-text-muted: #e0e0e0;
   --cf-glass-bg: rgba(255, 255, 255, 0.05);
   --cf-glass-border: rgba(255, 255, 255, 0.1);
   --cf-nav-bg: rgba(10, 15, 31, 0.8);
-  
+
   background: linear-gradient(135deg, var(--cf-bg-from) 0%, var(--cf-bg-to) 100%);
   color: var(--cf-text);
   font-family: 'Inter', 'Open Sans', sans-serif;
@@ -20,8 +19,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animateFadeIn {
@@ -91,9 +96,18 @@
 }
 
 @keyframes logoTrailAnim {
-  0% { transform: scaleX(0.5); opacity: 0.5; }
-  50% { transform: scaleX(1.5); opacity: 1; }
-  100% { transform: scaleX(0.5); opacity: 0.5; }
+  0% {
+    transform: scaleX(0.5);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleX(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(0.5);
+    opacity: 0.5;
+  }
 }
 
 .navList {
@@ -281,7 +295,7 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--cf-secondary), #60A5FA);
+  background: linear-gradient(90deg, var(--cf-secondary), #60a5fa);
   width: 45%; /* Dynamic */
   box-shadow: 0 0 20px rgba(42, 125, 225, 0.5);
   transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);

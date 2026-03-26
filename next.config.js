@@ -8,9 +8,9 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.ipfs.io',
-      },
-    ],
+        hostname: '**.ipfs.io'
+      }
+    ]
   },
   eslint: {
     dirs: ['pages', 'components', 'lib', 'src', 'routes', 'store', 'types', 'utils', 'hooks', 'models', 'context'],

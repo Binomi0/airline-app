@@ -321,9 +321,8 @@ export const gallonsToLiters = (gallons?: number): number => {
   return gallons * litersPerGallon
 }
 
-export const fetcherGET = (url: string) => nextApiInstance.get(url).then((res) => res.data)
-export const fetcherPOST = (url: string, body: unknown) => nextApiInstance.post(url, body).then((res) => res.data)
-export const fetcher = (url: string) => nextApiInstance.get(url).then((res) => res.data)
+export const fetcher = <T>(url: string) => nextApiInstance.get(url).then((res) => res.data as T)
+export const fetcherPOST = <T, B>(url: string, body: B) => nextApiInstance.post(url, body).then((res) => res.data as T)
 
 export const filterByTokenAddress = (tokenAddress: string) => (nft: INft | IUserNftPopulated) =>
   nft.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()

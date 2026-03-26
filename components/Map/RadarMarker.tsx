@@ -120,47 +120,216 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
       <Tooltip
         key={`${isOrigin || isDestination}`}
         direction='top'
-        offset={[0, -10]}
-        opacity={0.9}
+        offset={[0, -14]}
+        opacity={1}
         permanent={isOrigin || isDestination}
+        className='radar-tooltip-premium'
       >
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 0.2
+            minWidth: 220,
+            fontFamily: '"Inter", "Roboto", sans-serif'
           }}
         >
-          <Typography
-            variant='caption'
+          {/* ── Header with branding ── */}
+          <Box
             sx={{
-              fontWeight: 900,
-              display: 'block',
-              color: isOrigin ? '#10b981' : isDestination ? '#ef4444' : '#38bdf8',
-              fontFamily: 'monospace',
-              fontSize: 11,
-              lineHeight: 1
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 0.8,
+              pb: 1,
+              mb: 1,
+              borderBottom: '1px solid rgba(255,255,255,0.08)'
             }}
           >
-            {tower.atcPosition?.airport?.icao || tower.callsign.split('_')[0]}
-          </Typography>
-          <Typography
-            variant='caption'
+            <Typography
+              sx={{
+                fontSize: 13,
+                fontWeight: 900,
+                background: 'linear-gradient(135deg, #f97316, #10b981)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                letterSpacing: 1.5,
+                textTransform: 'uppercase',
+                lineHeight: 1
+              }}
+            >
+              WeiFly Air
+            </Typography>
+            <Box
+              sx={{
+                fontSize: 12,
+                lineHeight: 1,
+                filter: 'drop-shadow(0 0 4px rgba(249,115,22,0.5))'
+              }}
+            >
+              ✈️
+            </Box>
+          </Box>
+
+          {/* ── Callsign + Position badge ── */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 0.6 }}>
+            <Typography
+              sx={{
+                fontSize: 13,
+                fontWeight: 900,
+                color: '#f8fafc',
+                fontFamily: 'monospace',
+                letterSpacing: 0.5,
+                lineHeight: 1
+              }}
+            >
+              {tower.callsign}
+            </Typography>
+            {tower.atcSession?.position && (
+              <Box
+                sx={{
+                  bgcolor: isOrigin ? '#10b981' : isDestination ? '#ef4444' : '#f97316',
+                  color: '#000',
+                  px: 0.7,
+                  py: 0.15,
+                  borderRadius: '4px',
+                  fontSize: 9,
+                  fontWeight: 900,
+                  lineHeight: 1.2,
+                  letterSpacing: 0.5
+                }}
+              >
+                {tower.atcSession.position}
+              </Box>
+            )}
+          </Box>
+
+          {/* ── VID + Frequency row ── */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, mb: 1 }}>
+            {tower.userId && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+                <Box sx={{ fontSize: 10, lineHeight: 1 }}>🎧</Box>
+                <Typography
+                  sx={{
+                    fontSize: 10,
+                    color: '#10b981',
+                    fontWeight: 700,
+                    fontFamily: 'monospace',
+                    lineHeight: 1
+                  }}
+                >
+                  {tower.userId}
+                </Typography>
+              </Box>
+            )}
+            {tower.atcSession?.frequency && (
+              <Typography
+                sx={{
+                  fontSize: 10,
+                  color: '#94a3b8',
+                  fontFamily: 'monospace',
+                  lineHeight: 1,
+                  ml: 'auto'
+                }}
+              >
+                [COM1]:{' '}
+                <span style={{ color: '#38bdf8', fontWeight: 800 }}>{tower.atcSession.frequency.toFixed(3)}</span>
+              </Typography>
+            )}
+          </Box>
+
+          {/* ── ICAO destination row ── */}
+          <Box
             sx={{
-              fontWeight: 600,
-              display: 'block',
-              color: theme === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
-              fontSize: 8,
-              maxWidth: 100,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              lineHeight: 1
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.8,
+              py: 0.8,
+              borderTop: '1px solid rgba(255,255,255,0.06)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              mb: 1
             }}
           >
-            {tower.atcPosition?.airport?.name || tower.atis?.lines?.[1] || 'Unknown'}
-          </Typography>
+            <Typography
+              sx={{
+                fontSize: 15,
+                fontWeight: 900,
+                color: isOrigin ? '#10b981' : isDestination ? '#ef4444' : '#f8fafc',
+                fontFamily: 'monospace',
+                letterSpacing: 1,
+                lineHeight: 1
+              }}
+            >
+              {tower.atcPosition?.airport?.icao || tower.callsign.split('_')[0]}
+            </Typography>
+            <Box sx={{ fontSize: 11, lineHeight: 1, transform: 'scaleX(-1)' }}>✈</Box>
+            <Typography
+              sx={{
+                fontSize: 10,
+                color: '#64748b',
+                fontWeight: 600,
+                lineHeight: 1,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: 120
+              }}
+            >
+              {tower.atcPosition?.airport?.name || tower.atis?.lines?.[1] || '-'}
+            </Typography>
+          </Box>
+
+          {/* ── Stats row ── */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: 1
+            }}
+          >
+            {[
+              { label: 'Rating', value: tower.rating ? `${tower.rating}` : '-' },
+              {
+                label: 'Status',
+                value: tower.createdAt ? '● ON' : 'OFF'
+              },
+              {
+                label: 'Active',
+                value: tower.createdAt
+                  ? (() => {
+                      const diff = Math.floor((Date.now() - new Date(tower.createdAt).getTime()) / 60000)
+                      const h = Math.floor(diff / 60)
+                      const m = diff % 60
+                      return h > 0 ? `${h}h ${m}m` : `${m}m`
+                    })()
+                  : '-'
+              }
+            ].map((stat) => (
+              <Box key={stat.label} sx={{ textAlign: 'center', flex: 1 }}>
+                <Typography
+                  sx={{
+                    fontSize: 8,
+                    color: '#64748b',
+                    textTransform: 'uppercase',
+                    fontWeight: 700,
+                    letterSpacing: 0.5,
+                    lineHeight: 1,
+                    mb: 0.3
+                  }}
+                >
+                  {stat.label}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: 11,
+                    color: stat.label === 'Status' && tower.createdAt ? '#10b981' : '#f8fafc',
+                    fontWeight: 800,
+                    fontFamily: 'monospace',
+                    lineHeight: 1
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
         </Box>
       </Tooltip>
 

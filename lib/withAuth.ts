@@ -45,7 +45,8 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
             req.user = decoded.data.email
             req.id = user._id
             req.userId = user.id
-            return handler(req, res)
+            await handler(req, res)
+            return
           } else {
             console.warn(`[withAuth] User not found in database for email: ${decoded.data.email}`)
           }
@@ -58,7 +59,7 @@ const withAuth = (handler: NextApiHandler) => async (req: CustomNextApiRequest, 
     console.error('[withAuth] Unexpected Error:', (err as Error).message)
   }
 
-  res.status(401).end()
+  return res.status(401).end()
 }
 
 export default withAuth

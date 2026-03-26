@@ -22,9 +22,10 @@ const StepSmartAccount: FC<Props> = ({ onNext, onBack }) => {
         WeiFly uses decentralized <b>Smart Accounts</b> to ensure only you have access to your funds and assets.
       </Typography>
       <Typography variant='body2' paragraph color='text.secondary'>
-        Unlike traditional platforms, this provides total security and true ownership of your hard-earned rewards. We <b>cannot</b> access your wallet!
+        Unlike traditional platforms, this provides total security and true ownership of your hard-earned rewards. We{' '}
+        <b>cannot</b> access your wallet!
       </Typography>
-      
+
       <Box mt={6} display='flex' justifyContent='space-between'>
         <Button onClick={onBack} variant='outlined' size='large'>
           Back

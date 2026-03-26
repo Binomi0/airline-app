@@ -1819,16 +1819,7 @@
                         "alternative": "YW8862"
                       },
                       "callsign": "ANE81XM",
-                      "codeshare": [
-                        "AA8610",
-                        "AT5322",
-                        "AV6006",
-                        "BA7122",
-                        "BT5150",
-                        "LA1724",
-                        "QR6529",
-                        "VY5576"
-                      ]
+                      "codeshare": ["AA8610", "AT5322", "AV6006", "BA7122", "BT5150", "LA1724", "QR6529", "VY5576"]
                     },
                     "status": {
                       "live": false,
@@ -12774,13 +12765,7 @@
                         "alternative": "YW8863"
                       },
                       "callsign": "ANE12RU",
-                      "codeshare": [
-                        "AV6003",
-                        "LA1725",
-                        "VY5577",
-                        "QR5062",
-                        "DT6863"
-                      ]
+                      "codeshare": ["AV6003", "LA1725", "VY5577", "QR5062", "DT6863"]
                     },
                     "status": {
                       "live": false,
@@ -18930,16 +18915,7 @@
                         "alternative": "YW8859"
                       },
                       "callsign": null,
-                      "codeshare": [
-                        "AA8501",
-                        "AT5320",
-                        "AV6051",
-                        "BA7123",
-                        "BT5174",
-                        "CX1848",
-                        "QR6856",
-                        "VY5573"
-                      ]
+                      "codeshare": ["AA8501", "AT5320", "AV6051", "BA7123", "BT5174", "CX1848", "QR6856", "VY5573"]
                     },
                     "status": {
                       "live": false,

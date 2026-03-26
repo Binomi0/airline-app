@@ -5,8 +5,6 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
 import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork'
 import LocalAirportIcon from '@mui/icons-material/LocalAirport'
-import DarkModeIcon from '@mui/icons-material/DarkMode'
-import LightModeIcon from '@mui/icons-material/LightMode'
 import ComputerIcon from '@mui/icons-material/Computer'
 import SchoolIcon from '@mui/icons-material/School'
 import { useMainProviderContext } from 'context/MainProvider'
@@ -17,24 +15,15 @@ import Drawer from '@mui/material/Drawer'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItem from '@mui/material/ListItem'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
 import Image from 'next/image'
 import { Stack } from '@mui/material'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { userState } from 'store/user.atom'
-import { themeStore } from 'store/theme.atom'
-import { useTheme } from '@mui/material/styles'
+
+import EventIcon from '@mui/icons-material/Event'
 
 const Sidebar: React.FC = () => {
   const router = useRouter()
-  const user = useRecoilValue(userState)
   const { sidebarOpen: open, toggleSidebar } = useMainProviderContext()
   const { live } = useLiveFlightProviderContext()
-  const muiTheme = useTheme()
-  const setTheme = useSetRecoilState(themeStore)
 
   const handleClick = useCallback(
     (route: string) => () => {
@@ -44,9 +33,9 @@ const Sidebar: React.FC = () => {
     [router, toggleSidebar]
   )
 
-  const handleToggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
-  }, [setTheme])
+  // const handleToggleTheme = useCallback(() => {
+  //   setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
+  // }, [setTheme])
 
   return (
     <Drawer open={open} onClose={() => toggleSidebar('left')}>
@@ -57,6 +46,12 @@ const Sidebar: React.FC = () => {
       <Divider />
       <List>
         <SidebarItem onLink={handleClick('/')} text='Inicio' Icon={HomeIcon} selected={router.pathname === '/'} />
+        <SidebarItem
+          onLink={handleClick('/events')}
+          text='Eventos'
+          Icon={EventIcon}
+          selected={router.pathname === '/events'}
+        />
         <SidebarItem
           onLink={handleClick('/missions')}
           text='Misiones'
@@ -80,13 +75,6 @@ const Sidebar: React.FC = () => {
           text='Gasolinera'
           Icon={LocalGasStationIcon}
           selected={router.pathname === '/gas'}
-        />
-        <SidebarItem
-          disabled={!user?.vaUser}
-          onLink={handleClick('/ivao')}
-          text='IVAO'
-          Icon={LocalAirportIcon}
-          selected={router.pathname === '/ivao'}
         />
         {live && (
           <SidebarItem
@@ -113,25 +101,6 @@ const Sidebar: React.FC = () => {
           Icon={SchoolIcon}
           selected={router.pathname === '/guide'}
         />
-      </List>
-
-      <Divider />
-
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton onClick={handleToggleTheme}>
-            <ListItemIcon>
-              {muiTheme.palette.mode === 'dark' ? <LightModeIcon color='warning' /> : <DarkModeIcon color='primary' />}
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <Typography fontWeight={400}>
-                  {muiTheme.palette.mode === 'dark' ? 'Modo claro' : 'Modo oscuro'}
-                </Typography>
-              }
-            />
-          </ListItemButton>
-        </ListItem>
       </List>
     </Drawer>
   )

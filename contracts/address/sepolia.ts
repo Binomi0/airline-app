@@ -1,4 +1,4 @@
-import { Hex } from "thirdweb"
+import { Hex } from 'thirdweb'
 
 export const stakingAddress: Hex = '0x3F9a442fA17D47aDB8B002F8F62DB85309fff31d'
 export const coinTokenAddress: Hex = '0x773F0e20Ab2E9afC479C82105E924C2E0Ada5aa9'

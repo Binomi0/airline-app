@@ -24,12 +24,12 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       )
       await User.findOneAndUpdate({ email: req.user }, { address: req.body.smartAccountAddress })
 
-      // const wallet = await Wallet.findOne({ email: req.user })
+      const wallet = await Wallet.findOne({ email: req.user })
       // FIXME: Remember to change initialization of startGift to true if wallet is funded
-      // if (!wallet?.starterGift) {
-      //   res.redirect('/api/request-funds')
-      //   return
-      // }
+      if (!wallet?.starterGift) {
+        res.redirect('/api/request-funds')
+        return
+      }
 
       res.status(202).end()
       return

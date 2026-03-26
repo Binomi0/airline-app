@@ -107,6 +107,43 @@ const commonComponents: ThemeOptions['components'] = {
           border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
           boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)'
         })
+      },
+      {
+        props: { variant: 'license' },
+        style: ({ theme }) => ({
+          background: 'rgba(255, 255, 255, 0.02)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          borderRadius: '16px',
+          padding: theme.spacing(2),
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: theme.spacing(1.5),
+          cursor: 'pointer',
+          '&:hover': {
+            background: 'rgba(255, 255, 255, 0.05)',
+            transform: 'translateY(-5px)',
+            borderColor: 'rgba(255, 255, 255, 0.2)'
+          }
+        })
+      },
+      {
+        props: { variant: 'licenseActive' },
+        style: ({ theme }) => ({
+          background: `${alpha(theme.palette.primary.main, 0.1)}`,
+          backdropFilter: 'blur(20px)',
+          border: `1px solid ${theme.palette.primary.main}`,
+          borderRadius: '16px',
+          padding: theme.spacing(2),
+          boxShadow: `0 0 25px ${alpha(theme.palette.primary.main, 0.15)}`,
+          transform: 'translateY(-5px)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: theme.spacing(1.5),
+          cursor: 'pointer',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        })
       }
     ]
   },
@@ -161,6 +198,8 @@ declare module '@mui/material/Paper' {
   interface PaperPropsVariantOverrides {
     terminal: true
     glass: true
+    license: true
+    licenseActive: true
   }
 }
 
@@ -200,11 +239,6 @@ const lTheme = createTheme({
   }
 })
 
-// Add custom properties to the extended themes if needed, 
-// but for CssVarsProvider we'll rely on the palette structure.
-// @ts-expect-error - Custom property for AppBar
-lTheme.palette.AppBar = { darkBg: 'rgba(255, 255, 255, 0.8)' };
-
 const dTheme = createTheme({
   palette: {
     mode: 'dark',
@@ -242,9 +276,13 @@ const dTheme = createTheme({
 })
 
 // @ts-expect-error - Custom property for AppBar
-dTheme.palette.AppBar = { darkBg: 'rgba(11, 15, 25, 0.7)' };
+dTheme.palette.AppBar = { darkBg: 'rgba(11, 15, 25, 0.7)' }
 
 export const darkTheme = responsiveFontSizes(dTheme)
 export const lightTheme = responsiveFontSizes(lTheme)
 
-export default darkTheme
+const theme = {
+  darkTheme,
+  lightTheme
+}
+export default theme

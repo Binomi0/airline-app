@@ -7,31 +7,27 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
     try {
       const live = await Live.findOne({ userId: req.id, isCompleted: false })
       if (!live) {
-        res.status(204).end()
-        return
+        return res.status(204).end()
       }
 
-      res.status(200).send(live)
-      return
+      return res.status(200).send(live)
     } catch (error) {
       console.error('get Live ERROR =>', error)
-      res.status(500).send(error)
-      return
+      return res.status(500).send(error)
     }
   } else if (req.method === 'DELETE') {
     try {
       await Live.findOneAndDelete({ userId: req.id })
 
-      res.status(202).end()
-      return
+      return res.status(202).end()
     } catch (error) {
       console.error('get Live ERROR =>', error)
-      res.status(500).end()
-      return
+
+      return res.status(500).end()
     }
   }
 
-  res.status(405).end()
+  return res.status(405).end()
 }
 
 export default withAuth(handler)

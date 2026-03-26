@@ -1,0 +1,4 @@
+
+> weifly-app@0.4.1 lint C:\Users\king_\Proyectos\Airline\airline-app
+> next lint
+

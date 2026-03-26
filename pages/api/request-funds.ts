@@ -37,10 +37,10 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   const { smartAccountAddress, id, signerAddress } = validation.data
 
   try {
-    const requested = await Wallet.findOne({ smartAccountAddress })
-    if (requested) {
-      return res.status(202).json({ message: 'Funds already requested' })
-    }
+    // const requested = await Wallet.findOne({ smartAccountAddress })
+    // if (requested) {
+    //   return res.status(202).json({ message: 'Funds already requested' })
+    // }
 
     const serverAccount = privateKeyToAccount({
       client: twServer,

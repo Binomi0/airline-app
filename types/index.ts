@@ -136,6 +136,7 @@ export interface IBaseMission {
   startedAt?: Date
   callsign?: string
   weight: number
+  airlineId?: string
 }
 
 export interface PublicMission extends IBaseMission {
