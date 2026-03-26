@@ -26,12 +26,14 @@ import moment from 'moment'
 import 'moment/locale/es'
 import nextApiInstance from 'config/axios'
 import { PublicMission } from 'types'
-import { formatNumber } from 'utils'
+import { fetcher, formatNumber } from 'utils'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import { AIRLINES } from 'config/airlines'
 import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import { errorSwal } from 'lib/swal'
 
 moment.locale('es')
 
@@ -48,9 +50,6 @@ const AirlineEventPage = () => {
   const router = useRouter()
   const { airline } = router.query
 
-  const [flights, setFlights] = useState<PublicMission[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
   const airlineConfig = useMemo(() => {
     if (!airline || typeof airline !== 'string') return null
     const config = AIRLINES[airline.toLowerCase()]
@@ -61,25 +60,21 @@ const AirlineEventPage = () => {
     return config
   }, [airline])
 
+  const {
+    data: flights,
+    isLoading: flightsIsLoading,
+    error: flightsError
+  } = useQuery({
+    queryKey: ['events', airline],
+    queryFn: async () => await fetcher<PublicMission[]>(`/api/events/puente-aereo?airline=${airline}`)
+  })
+
   useEffect(() => {
-    if (!airline) return
-    const fetchFlights = async () => {
-      try {
-        const { data } = await nextApiInstance.get<PublicMission[]>(`/api/events/puente-aereo?airline=${airline}`)
-        if (Array.isArray(data)) {
-          setFlights(data)
-        } else {
-          console.error('Invalid data format received')
-          setFlights([])
-        }
-      } catch (error) {
-        console.error('Error fetching event flights:', error)
-      } finally {
-        setIsLoading(false)
-      }
+    if (flightsError) {
+      errorSwal('Error', 'No se pudo cargar la información del evento.')
+      router.push('/events')
     }
-    fetchFlights()
-  }, [airline])
+  }, [flightsError])
 
   const getFlightStatus = React.useCallback(
     (startTime: string | Date | undefined) => {
@@ -169,7 +164,7 @@ const AirlineEventPage = () => {
       </Box>
 
       <Container maxWidth='xl'>
-        {isLoading ? (
+        {flightsIsLoading ? (
           <TableContainer component={Paper} variant='glass' sx={{ borderRadius: 4, mt: 4 }}>
             <Table>
               <TableBody>
@@ -185,7 +180,7 @@ const AirlineEventPage = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        ) : flights.length === 0 ? (
+        ) : flights?.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 10 }}>
             <Typography variant='h5' color='text.secondary' gutterBottom>
               No hay vuelos disponibles en este momento
@@ -233,7 +228,7 @@ const AirlineEventPage = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {flights.map((flight) => {
+                  {flights?.map((flight) => {
                     const status = getFlightStatus(flight.startTime)
                     const isNext = status.label === 'PUERTA ABIERTA' || status.label === 'EMBARCANDO'
 

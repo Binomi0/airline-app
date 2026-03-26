@@ -201,3 +201,13 @@ export const eventBookingSuccessSwal = async (callsign: string) =>
     icon: 'success',
     confirmButtonText: 'ENTENDIDO'
   })
+
+export const confirmSwal = async (title: string, text: string) =>
+  Swal.fire({
+    title,
+    text,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Confirmar',
+    cancelButtonText: 'Cancelar'
+  })

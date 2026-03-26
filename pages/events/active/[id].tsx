@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import {
   Box,
   Container,
@@ -29,8 +29,8 @@ import nextApiInstance from 'config/axios'
 import { PublicMission } from 'types'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
 import { nftAircraftTokenAddress } from 'contracts/address'
-import { filterByTokenAddress, formatNumber } from 'utils'
-import { eventBookingSuccessSwal, errorSwal } from 'lib/swal'
+import { fetcher, filterByTokenAddress, formatNumber } from 'utils'
+import { eventBookingSuccessSwal, errorSwal, confirmSwal } from 'lib/swal'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
@@ -40,6 +40,7 @@ import AirIcon from '@mui/icons-material/Air'
 import Image from 'next/image'
 import { AIRLINES } from 'config/airlines'
 import { AxiosError } from 'axios'
+import { useQuery } from '@tanstack/react-query'
 
 moment.locale('es')
 
@@ -49,10 +50,16 @@ const EventDetailPage = () => {
   const { id } = router.query
   const { data: userNfts } = useOwnedNfts()
 
-  const [event, setEvent] = useState<PublicMission | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [selectedAircraftId, setSelectedAircraftId] = useState<string>('')
   const [isBooking, setIsBooking] = useState(false)
+  const {
+    data: event,
+    isLoading: eventIsLoading,
+    error: eventError
+  } = useQuery({
+    queryKey: ['event', id],
+    queryFn: async () => await fetcher<PublicMission>(`/api/events/detail?id=${id}`)
+  })
 
   const airlineConfig = useMemo(() => {
     if (!event?.airlineId) return AIRLINES.iberia
@@ -66,28 +73,12 @@ const EventDetailPage = () => {
     [userNfts]
   )
 
-  useEffect(() => {
-    if (!id) return
-    const fetchDetail = async () => {
-      try {
-        const { data } = await nextApiInstance.get<PublicMission>(`/api/events/detail?id=${id}`)
-        setEvent(data)
-        if (ownedAircrafts.length > 0) {
-          setSelectedAircraftId(ownedAircrafts[0].nft.id.toString())
-        }
-      } catch (error) {
-        console.error('Error fetching event details:', error)
-        errorSwal('Error', 'No se pudo cargar la información del evento.')
-        router.push('/events')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    fetchDetail()
-  }, [id, ownedAircrafts, router])
-
-  const handleBook = async () => {
+  const handleBook = useCallback(async () => {
     if (!event || !selectedAircraftId) return
+
+    const result = await confirmSwal('Confirmar Vuelo', '¿Estás seguro de que quieres reservar este vuelo?')
+    if (!result.isConfirmed) return
+
     setIsBooking(true)
     try {
       await nextApiInstance.post('/api/missions/reserve-event', {
@@ -104,9 +95,22 @@ const EventDetailPage = () => {
     } finally {
       setIsBooking(false)
     }
-  }
+  }, [event, selectedAircraftId, router])
 
-  if (isLoading || !event) {
+  useEffect(() => {
+    if (ownedAircrafts.length > 0) {
+      setSelectedAircraftId(ownedAircrafts[0].nft.id.toString())
+    }
+  }, [ownedAircrafts])
+
+  useEffect(() => {
+    if (eventError) {
+      errorSwal('Error', 'No se pudo cargar la información del evento.')
+      router.push('/events')
+    }
+  }, [eventError])
+
+  if (eventIsLoading || !event) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <LinearProgress
