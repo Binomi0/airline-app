@@ -69,19 +69,11 @@ const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
       <Paper variant='gasCard' sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, opacity: 0.6 }}>
           <AccountBalanceWalletIcon fontSize='small' />
-          <Typography
-            variant='subtitle2'
-            fontWeight={800}
-            sx={{ textTransform: 'uppercase', letterSpacing: '1.5px' }}
-          >
+          <Typography variant='subtitle2' fontWeight={800} sx={{ textTransform: 'uppercase', letterSpacing: '1.5px' }}>
             Disponible
           </Typography>
         </Box>
-        <Typography
-          variant='h3'
-          fontWeight={900}
-          sx={{ mb: 1, display: 'flex', alignItems: 'baseline', gap: 1 }}
-        >
+        <Typography variant='h3' fontWeight={900} sx={{ mb: 1, display: 'flex', alignItems: 'baseline', gap: 1 }}>
           {formatNumber(balance)}{' '}
           <Typography component='span' variant='h6' sx={{ opacity: 0.5, fontWeight: 700 }}>
             AIRL

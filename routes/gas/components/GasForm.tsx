@@ -99,12 +99,7 @@ const GasForm: React.FC<{
           )
         }}
       />
-      <Button
-        disabled={loading || !value || Number(value) <= 0}
-        onClick={handleClick}
-        variant='premium'
-        fullWidth
-      >
+      <Button disabled={loading || !value || Number(value) <= 0} onClick={handleClick} variant='premium' fullWidth>
         {loading ? <CircularProgress size={24} color='inherit' /> : buttonText}
       </Button>
     </Stack>

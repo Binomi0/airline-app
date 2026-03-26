@@ -6,6 +6,7 @@ import { INft } from 'models/Nft'
 import { getNFTAttributes } from 'utils'
 import styles from 'styles/Hangar.module.css'
 import { useNFTProviderContext } from 'context/NFTProvider'
+import CreateListingModal from 'routes/marketplace/components/CreateListingModal'
 
 interface Props {
   nft: INft
@@ -36,9 +37,15 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
   const license = useMemo(() => licenses.find((license) => license.id === licenseId), [licenses, licenseId])
 
   const price = useMemo(() => attributes.find((attr) => attr.trait_type.toLowerCase() === 'price')?.value, [attributes])
+  const [isListingModalOpen, setIsListingModalOpen] = React.useState(false)
 
   return (
     <Box className={styles.showcaseContainer}>
+      <CreateListingModal 
+        open={isListingModalOpen} 
+        onClose={() => setIsListingModalOpen(false)} 
+        nft={nft} 
+      />
       {/* Cinematic Image Showcase */}
       <AnimatePresence mode='wait'>
         <motion.div
@@ -122,7 +129,18 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
           })}
         </Box>
 
-        {!hasAircraft && (
+        {hasAircraft ? (
+          <Button
+            fullWidth
+            variant='contained'
+            size='large'
+            className={styles.claimButton}
+            onClick={() => setIsListingModalOpen(true)}
+            sx={{ mt: 2, background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' }}
+          >
+            Listar en Marketplace
+          </Button>
+        ) : (
           <Button
             fullWidth
             variant='contained'

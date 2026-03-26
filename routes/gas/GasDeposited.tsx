@@ -57,11 +57,7 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
       <Paper variant='gasCard' sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, opacity: 0.6 }}>
           <LockIcon fontSize='small' />
-          <Typography
-            variant='subtitle2'
-            fontWeight={800}
-            sx={{ textTransform: 'uppercase', letterSpacing: '1.5px' }}
-          >
+          <Typography variant='subtitle2' fontWeight={800} sx={{ textTransform: 'uppercase', letterSpacing: '1.5px' }}>
             Depositado
           </Typography>
         </Box>

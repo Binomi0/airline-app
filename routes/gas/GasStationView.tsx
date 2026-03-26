@@ -97,7 +97,8 @@ const GasStationView = ({ airl, staking, getAirlBalance, getAirgBalance, getStak
               </Typography>
             </Box>
             <Typography sx={{ opacity: 0.9 }}>
-              Obtendrás <b style={{ color: '#10B981' }}>100 Litros</b> por cada <b style={{ color: '#3B82F6' }}>1 token AIRL</b> stakeado durante 24 horas.
+              Obtendrás <b style={{ color: '#10B981' }}>100 Litros</b> por cada{' '}
+              <b style={{ color: '#3B82F6' }}>1 token AIRL</b> stakeado durante 24 horas.
             </Typography>
           </Box>
           <Box

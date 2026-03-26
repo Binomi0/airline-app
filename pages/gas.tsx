@@ -97,30 +97,58 @@ const Gas = () => {
         </Box>
 
         <TitleSection>
-          <Typography
-            variant='h1'
-            fontWeight={900}
+          <Box
             sx={{
-              letterSpacing: '-0.05em',
-              mb: 1,
-              background: 'linear-gradient(135deg, #fff 0%, #cbd5e1 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
+              display: 'inline-flex',
+              alignItems: 'center',
+              px: 2,
+              py: 0.5,
+              borderRadius: '30px',
+              background: (theme) => (theme.palette.mode === 'dark' ? alpha(theme.palette.primary.main, 0.1) : '#fff'),
+              border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+              color: 'primary.main',
+              mb: 3,
+              backdropFilter: 'blur(8px)',
+              boxShadow: (theme) => `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`
             }}
           >
-            Gas <span style={{ color: '#6366f1' }}>Station</span>
+            <Typography variant='caption' fontWeight={900} sx={{ letterSpacing: '2px', textTransform: 'uppercase' }}>
+              Logística & Suministros
+            </Typography>
+          </Box>
+
+          <Typography
+            variant='h1'
+            fontWeight={950}
+            sx={{
+              letterSpacing: '-0.06em',
+              mb: 2,
+              background: 'linear-gradient(135deg, #fff 0%, #cbd5e1 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontSize: { xs: '3rem', md: '5.5rem' },
+              lineHeight: 0.9,
+              textShadow: '0 10px 30px rgba(0,0,0,0.2)'
+            }}
+          >
+            Centro de <span style={{ color: '#6366f1' }}>Abastecimiento</span>
           </Typography>
+
           <Typography
             variant='h6'
             sx={{
-              opacity: 0.8,
-              maxWidth: '600px',
+              opacity: 0.9,
+              maxWidth: '750px',
               margin: '0 auto',
               fontWeight: 500,
-              lineHeight: 1.6
+              lineHeight: 1.6,
+              fontSize: '1.25rem',
+              color: 'text.secondary',
+              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
           >
-            Reposta tus tanques y mantén tu flota en el aire convirtiendo AIRL en combustible.
+            Optimiza tu despliegue logístico convirtiendo tokens AIRL en combustible de alto rendimiento. Asegura la
+            operatividad de tu flota y mantén el dominio de los cielos con reabastecimiento estratégico.
           </Typography>
         </TitleSection>
 
