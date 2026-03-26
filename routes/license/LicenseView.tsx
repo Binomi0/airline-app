@@ -1,77 +1,24 @@
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import LicenseShowcase from './components/LicenseShowcase'
 import LicenseItemThumbnail from './components/LicenseItemThumbnail'
-import useClaimNFT from 'hooks/useClaimNFT'
-import { useTokenProviderContext } from 'context/TokenProvider'
-import Swal from 'sweetalert2'
-import { getNFTAttributes } from 'utils'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import { useRecoilValue } from 'recoil'
-import { tokenBalanceStore } from 'store/balance.atom'
-import { useNFTProviderContext } from 'context/NFTProvider'
-import { INft } from 'models/Nft'
-import useOwnedNfts from 'hooks/useOwnedNFTs'
+import { LICENSES, License } from 'config/licenses'
+import usePilotProgress from 'hooks/usePilotProgress'
 import styles from 'styles/License.module.css'
 
 const LicenseView: React.FC = () => {
-  const { licenses } = useNFTProviderContext()
-  const { data: ownedLicenses } = useOwnedNfts()
-  const { claimLicenseNFT, isClaiming } = useClaimNFT()
-  const { getAirlBalance } = useTokenProviderContext()
-  const balance = useRecoilValue(tokenBalanceStore)
-
-  const [selectedLicense, setSelectedLicense] = useState<INft | null>(null)
+  const { unlockedLicenses, totalHours, progressToNext, nextLicense } = usePilotProgress()
+  const [selectedLicense, setSelectedLicense] = useState<License | null>(null)
 
   useEffect(() => {
-    if (licenses && licenses.length > 0 && !selectedLicense) {
-      setSelectedLicense(licenses[0])
+    if (LICENSES.length > 0 && !selectedLicense) {
+      setSelectedLicense(LICENSES[0])
     }
-  }, [licenses, selectedLicense])
+  }, [selectedLicense])
 
-  const handleClaim = useCallback(
-    async (nft: INft) => {
-      if (!balance.airl) return
-
-      const attribute = getNFTAttributes(nft).find((attr) => attr.trait_type === 'price')
-      const { name } = nft.metadata
-
-      const hasEnough = balance.airl !== undefined && Number(balance.airl) / 1e18 >= Number(attribute?.value || 0)
-
-      if (hasEnough) {
-        const { isConfirmed } = await Swal.fire({
-          title: name as string,
-          text: `¿Quieres adquirir esta licencia por ${attribute?.value} AIRL?`,
-          icon: 'question',
-          showCancelButton: true
-        })
-
-        if (isConfirmed) {
-          try {
-            await claimLicenseNFT(nft)
-            Swal.fire({
-              title: name as string,
-              text: '¡Licencia adquirida! Ahora tienes acceso a nuevas aeronaves.',
-              icon: 'success'
-            })
-            await getAirlBalance()
-          } catch (err) {
-            console.error(err)
-          }
-        }
-      } else {
-        Swal.fire({
-          title: 'Tokens insuficientes',
-          text: `Necesitas al menos ${attribute?.value} AIRL para adquirir esta licencia.`,
-          icon: 'error'
-        })
-      }
-    },
-    [balance.airl, claimLicenseNFT, getAirlBalance]
-  )
-
-  if (!licenses) {
+  if (!LICENSES) {
     return (
       <Box display='flex' justifyContent='center' alignItems='center' minHeight='50vh'>
         <CircularProgress size={60} color='primary' />
@@ -87,32 +34,38 @@ const LicenseView: React.FC = () => {
         {/* Header Section */}
         <Box mb={2}>
           <Typography variant='h3' fontWeight={800} sx={{ letterSpacing: '-1px' }}>
-            Tus <span style={{ color: '#6366f1' }}>Licencias</span>
+            Tu <span style={{ color: '#6366f1' }}>Carrera Piloto</span>
           </Typography>
           <Typography variant='h6' color='rgba(255,255,255,0.5)'>
-            Progresa en tu carrera aeronáutica desbloqueando nuevos rangos y aeronaves.
+            Has acumulado <strong>{totalHours.toFixed(1)} horas</strong> de vuelo. 
+            {nextLicense ? (
+              ` Te faltan ${(nextLicense.minHours - totalHours).toFixed(1)} horas para tu próxima licencia.`
+            ) : (
+              ' ¡Has alcanzado el rango máximo!'
+            )}
           </Typography>
         </Box>
 
         {/* Selected License Showcase */}
         {selectedLicense && (
           <LicenseShowcase
-            nft={selectedLicense}
-            isClaiming={isClaiming}
-            owned={ownedLicenses?.some((n) => BigInt(selectedLicense.id) === BigInt(n.tokenId)) ?? false}
-            onClaim={() => handleClaim(selectedLicense)}
+            license={selectedLicense}
+            isUnlocked={unlockedLicenses.includes(selectedLicense.id)}
+            totalHours={totalHours}
+            progressToNext={selectedLicense.id === nextLicense?.id ? progressToNext : 0}
           />
         )}
 
         {/* Carousel Selector */}
         <Box className={styles.carouselSection}>
-          <Typography className={styles.carouselTitle}>Explorar Rangos</Typography>
+          <Typography className={styles.carouselTitle}>Progreso de Licencias</Typography>
           <Box className={styles.carouselScroll}>
-            {licenses.map((license) => (
+            {LICENSES.map((license) => (
               <LicenseItemThumbnail
-                key={license.id.toString()}
-                nft={license}
+                key={license.id}
+                license={license}
                 isActive={selectedLicense?.id === license.id}
+                isUnlocked={unlockedLicenses.includes(license.id)}
                 onClick={() => setSelectedLicense(license)}
               />
             ))}
