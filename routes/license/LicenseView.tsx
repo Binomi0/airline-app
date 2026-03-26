@@ -32,16 +32,16 @@ const LicenseView: React.FC = () => {
 
       <Box className={styles.contentWrapper}>
         {/* Header Section */}
-        <Box mb={2}>
-          <Typography variant='h3' fontWeight={800} sx={{ letterSpacing: '-1px' }}>
+        <Box mb={6}>
+          <Typography variant='h3' fontWeight={900} sx={{ letterSpacing: '-2px', mb: 1 }}>
             Tu <span style={{ color: '#6366f1' }}>Carrera Piloto</span>
           </Typography>
-          <Typography variant='h6' color='rgba(255,255,255,0.5)'>
+          <Typography variant='body1' sx={{ color: 'rgba(255,255,255,0.5)', maxWidth: '600px' }}>
             Has acumulado <strong>{totalHours.toFixed(1)} horas</strong> de vuelo. 
             {nextLicense ? (
               ` Te faltan ${(nextLicense.minHours - totalHours).toFixed(1)} horas para tu próxima licencia.`
             ) : (
-              ' ¡Has alcanzado el rango máximo!'
+              ' ¡Has alcanzado el rango máximo de la aviación comercial!'
             )}
           </Typography>
         </Box>

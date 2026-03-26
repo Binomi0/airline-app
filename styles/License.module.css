@@ -20,8 +20,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%),
-    url('/img/airport_bg.png');
+  background-image:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%), url('/img/airport_bg.png');
   background-size: cover;
   background-position: center;
   z-index: 0;
@@ -55,22 +55,32 @@
 }
 
 .mainLicenseImage {
+  position: relative;
+  width: 100%;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 
+  box-shadow:
     0 10px 30px -10px rgba(0, 0, 0, 0.7),
     0 0 20px rgba(99, 102, 241, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
-  transition: transform 0.3s ease;
-  aspect-ratio: 4 / 3;
+  background: transparent;
+  transition:
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s ease;
+  aspect-ratio: 1 / 1;
   max-width: 500px;
   margin: 0 auto;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .mainLicenseImage:hover {
-  transform: scale(1.02);
-  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.02) translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 20px 40px -15px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(99, 102, 241, 0.2);
 }
 
 .glassCard {
@@ -171,15 +181,16 @@
 /* Item Thumbnail */
 .itemThumbnail {
   min-width: 240px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 140px;
+  flex: 0 0 auto;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
 .itemThumbnail:hover {
@@ -188,23 +199,42 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.activeThumbnail {
-  background: rgba(99, 102, 241, 0.05);
-  border-color: #6366f1;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
-}
+/* Note: activeThumbnail styles are handled by the theme variant licenseActive */
 
 .thumbImageWrapper {
   position: relative;
-  width: 100%;
-  aspect-ratio: 4/3;
-  border-radius: 8px;
+  width: 100px;
+  height: 100px;
+  min-width: 100px;
+  border-radius: 12px;
   overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.itemThumbnail:hover .thumbImageWrapper {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .thumbTitle {
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.3;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Buttons */
