@@ -20,12 +20,14 @@ import 'lib/alchemy'
 import createEmotionCache from '../src/createEmotionCache'
 import '../styles/globals.css'
 import 'leaflet/dist/leaflet.css'
+import 'sweetalert2/themes/material-ui.css'
 import WithLoading from 'components/WithLoading'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
 
 import { useRouter } from 'next/router'
+import Swal from 'sweetalert2'
 
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
@@ -35,7 +37,7 @@ export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache } = props
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  
+
   const hideLayout = router.pathname === '/onboarding' || router.pathname === '/login'
 
   const startLoading = useCallback(() => {

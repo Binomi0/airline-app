@@ -200,11 +200,6 @@ const lTheme = createTheme({
   }
 })
 
-// Add custom properties to the extended themes if needed, 
-// but for CssVarsProvider we'll rely on the palette structure.
-// @ts-expect-error - Custom property for AppBar
-lTheme.palette.AppBar = { darkBg: 'rgba(255, 255, 255, 0.8)' };
-
 const dTheme = createTheme({
   palette: {
     mode: 'dark',
@@ -242,9 +237,13 @@ const dTheme = createTheme({
 })
 
 // @ts-expect-error - Custom property for AppBar
-dTheme.palette.AppBar = { darkBg: 'rgba(11, 15, 25, 0.7)' };
+dTheme.palette.AppBar = { darkBg: 'rgba(11, 15, 25, 0.7)' }
 
 export const darkTheme = responsiveFontSizes(dTheme)
 export const lightTheme = responsiveFontSizes(lTheme)
 
-export default darkTheme
+const theme = {
+  darkTheme,
+  lightTheme
+}
+export default theme

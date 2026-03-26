@@ -89,13 +89,6 @@ const Sidebar: React.FC = () => {
           Icon={LocalGasStationIcon}
           selected={router.pathname === '/gas'}
         />
-        <SidebarItem
-          disabled={!user?.vaUser}
-          onLink={handleClick('/ivao')}
-          text='IVAO'
-          Icon={LocalAirportIcon}
-          selected={router.pathname === '/ivao'}
-        />
         {live && (
           <SidebarItem
             onLink={handleClick('/live')}
@@ -121,25 +114,6 @@ const Sidebar: React.FC = () => {
           Icon={SchoolIcon}
           selected={router.pathname === '/guide'}
         />
-      </List>
-
-      <Divider />
-
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton onClick={handleToggleTheme}>
-            <ListItemIcon>
-              {muiTheme.palette.mode === 'dark' ? <LightModeIcon color='warning' /> : <DarkModeIcon color='primary' />}
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <Typography fontWeight={400}>
-                  {muiTheme.palette.mode === 'dark' ? 'Modo claro' : 'Modo oscuro'}
-                </Typography>
-              }
-            />
-          </ListItemButton>
-        </ListItem>
       </List>
     </Drawer>
   )

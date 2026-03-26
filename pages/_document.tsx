@@ -5,7 +5,7 @@ import { AppType } from 'next/app'
 import theme, { roboto } from '../src/theme'
 import createEmotionCache from '../src/createEmotionCache'
 import { MyAppProps } from './_app'
-import { getInitColorSchemeScript } from '@mui/material/styles'
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 
 interface MyDocumentProps extends DocumentProps {
   emotionStyleTags: JSX.Element[]
@@ -16,7 +16,12 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
     <Html lang='en' data-color-scheme='dark' className={roboto.className}>
       <Head>
         {/* PWA primary color */}
-        <meta name='theme-color' content={theme.palette.primary.main} />
+        <meta
+          name='theme-color'
+          content={theme.lightTheme.palette.primary.main}
+          media='(prefers-color-scheme: light)'
+        />
+        <meta name='theme-color' content={theme.darkTheme.palette.primary.main} media='(prefers-color-scheme: dark)' />
         <link rel='canonical' href='https://weifly.com/' />
         <meta
           name='description'
@@ -48,7 +53,7 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
         />
       </Head>
       <body>
-        {getInitColorSchemeScript()}
+        {InitColorSchemeScript()}
         <Main />
         <NextScript />
       </body>

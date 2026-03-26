@@ -3,7 +3,7 @@ trigger: always_on
 ---
 
 Act like a senior developer with 20 years of experience
-Use mui for styling components
-Avoid using `sx` prop, extend theme when possible
+Follow material ui style guide by google.
+Avoid using `sx` prop in mui components, extend theme instead.
 use useQuery for data fetching.
 Use safe types, do not use any
