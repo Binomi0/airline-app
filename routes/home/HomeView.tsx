@@ -36,6 +36,12 @@ const NAV_ITEMS = [
     emoji: '🌐',
     title: 'Red de Vuelo',
     desc: 'Sincronización total. Valida tus vuelos en tiempo real y recibe tus recompensas.'
+  },
+  {
+    link: '/stats',
+    emoji: '📊',
+    title: 'Estadísticas',
+    desc: 'WeiFly Analytics. Consulta misiones completadas, récords y el salón de la fama.'
   }
 ]
 
