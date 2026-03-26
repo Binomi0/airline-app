@@ -7,7 +7,21 @@ import { handleUnStakeSwal, maxWithdrawExceeded, unstakedSwal } from 'lib/swal'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import styles from 'styles/Gas.module.css'
+import Paper from '@mui/material/Paper'
+import LockIcon from '@mui/icons-material/Lock'
+
+import LinearProgress from '@mui/material/LinearProgress'
+import { styled, alpha } from '@mui/material/styles'
+
+const StorageProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+  '& .MuiLinearProgress-bar': {
+    borderRadius: 4,
+    backgroundColor: theme.palette.secondary.main
+  }
+}))
 
 interface Props {
   getAirlBalance: () => void
@@ -17,7 +31,8 @@ interface Props {
 
 const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
   const { withdraw, isLoading } = useStaking()
-  const maxAmount = (Number(staking?.[0] || 0) / 1e18).toString()
+  const stakedAmount = Number(staking?.[0] || 0) / 1e18
+  const maxAmount = stakedAmount.toString()
 
   const handleUnStake = useCallback(
     async (unstakeAmount: string) => {
@@ -39,26 +54,51 @@ const GasDeposited = ({ staking, getAirlBalance, getStakingInfo }: Props) => {
 
   return (
     <Grid item xs={12} md={4}>
-      <Box className={styles.glassCard}>
+      <Paper variant='gasCard' sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, opacity: 0.6 }}>
+          <LockIcon fontSize='small' />
+          <Typography
+            variant='subtitle2'
+            fontWeight={800}
+            sx={{ textTransform: 'uppercase', letterSpacing: '1.5px' }}
+          >
+            Depositado
+          </Typography>
+        </Box>
         <Typography
-          variant='subtitle1'
-          fontWeight={700}
-          sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}
+          variant='h3'
+          fontWeight={900}
+          sx={{
+            mb: 1,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 1,
+            color: 'secondary.main'
+          }}
         >
-          Depositado
+          {formatNumber(stakedAmount)}{' '}
+          <Typography component='span' variant='h6' sx={{ opacity: 0.5, fontWeight: 700 }}>
+            sAIRL
+          </Typography>
         </Typography>
-        <Typography variant='h4' fontWeight={800} sx={{ my: 1 }}>
-          {staking ? formatNumber(Number(staking[0].toString()) / 1e18) : formatNumber()}{' '}
-          <span style={{ fontSize: '1rem', opacity: 0.5 }}>sAIRL</span>
-        </Typography>
-        <GasForm
-          max={maxAmount}
-          onClick={handleUnStake}
-          loading={isLoading}
-          label='Cantidad a Retirar'
-          buttonText='Retirar del Staking'
-        />
-      </Box>
+
+        <Box sx={{ mt: 1, mb: 3 }}>
+          <Typography variant='caption' sx={{ opacity: 0.5, fontWeight: 700, mb: 0.5, display: 'block' }}>
+            Estado de Almacenamiento
+          </Typography>
+          <StorageProgress variant='determinate' value={stakedAmount > 0 ? 100 : 0} />
+        </Box>
+
+        <Box sx={{ mt: 'auto' }}>
+          <GasForm
+            max={maxAmount}
+            onClick={handleUnStake}
+            loading={isLoading}
+            label='Cantidad a Retirar'
+            buttonText='Retirar del Staking'
+          />
+        </Box>
+      </Paper>
     </Grid>
   )
 }

@@ -10,7 +10,21 @@ import { amountExceedBalanceSwal, handleStakeSwal, stakedSwal } from 'lib/swal'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import styles from 'styles/Gas.module.css'
+import Paper from '@mui/material/Paper'
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
+
+import LinearProgress from '@mui/material/LinearProgress'
+import { styled, alpha } from '@mui/material/styles'
+
+const WalletProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+  '& .MuiLinearProgress-bar': {
+    borderRadius: 4,
+    backgroundColor: theme.palette.primary.main
+  }
+}))
 
 interface Props {
   airl?: Readonly<bigint>
@@ -48,28 +62,49 @@ const GasAvailable = ({ airl, getAirlBalance, getStakingInfo }: Props) => {
     [airl, getAirlBalance, getAllowance, getStakingInfo, setAllowance, stake]
   )
 
+  const balance = Number(toEther(airl || 0n))
+
   return (
     <Grid item xs={12} md={4}>
-      <Box className={styles.glassCard}>
+      <Paper variant='gasCard' sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, opacity: 0.6 }}>
+          <AccountBalanceWalletIcon fontSize='small' />
+          <Typography
+            variant='subtitle2'
+            fontWeight={800}
+            sx={{ textTransform: 'uppercase', letterSpacing: '1.5px' }}
+          >
+            Disponible
+          </Typography>
+        </Box>
         <Typography
-          variant='subtitle1'
-          fontWeight={700}
-          sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}
+          variant='h3'
+          fontWeight={900}
+          sx={{ mb: 1, display: 'flex', alignItems: 'baseline', gap: 1 }}
         >
-          Disponible para Depósito
+          {formatNumber(balance)}{' '}
+          <Typography component='span' variant='h6' sx={{ opacity: 0.5, fontWeight: 700 }}>
+            AIRL
+          </Typography>
         </Typography>
-        <Typography variant='h4' fontWeight={800} sx={{ my: 1 }}>
-          {airl !== undefined ? formatNumber(Number(toEther(airl || 0n))) : formatNumber()}{' '}
-          <span style={{ fontSize: '1rem', opacity: 0.5 }}>AIRL</span>
-        </Typography>
-        <GasForm
-          max={airl !== undefined ? toEther(airl).toString() : '0'}
-          onClick={handleStake}
-          loading={loading}
-          label='Cantidad a Stakear'
-          buttonText='Añadir al Staking'
-        />
-      </Box>
+
+        <Box sx={{ mt: 1, mb: 3 }}>
+          <Typography variant='caption' sx={{ opacity: 0.5, fontWeight: 700, mb: 0.5, display: 'block' }}>
+            Balance en Wallet
+          </Typography>
+          <WalletProgress variant='determinate' value={balance > 0 ? 100 : 0} />
+        </Box>
+
+        <Box sx={{ mt: 'auto' }}>
+          <GasForm
+            max={airl !== undefined ? toEther(airl).toString() : '0'}
+            onClick={handleStake}
+            loading={loading}
+            label='Cantidad a Stakear'
+            buttonText='Añadir al Staking'
+          />
+        </Box>
+      </Paper>
     </Grid>
   )
 }

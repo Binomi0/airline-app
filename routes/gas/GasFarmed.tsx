@@ -11,10 +11,39 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
+import Paper from '@mui/material/Paper'
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
 import { stakingClaimRewardsSwal, stakingInsufficientRewardsSwal, stakingRewardsClaimedSwal } from 'lib/swal'
-import styles from 'styles/Gas.module.css'
+
+import LinearProgress from '@mui/material/LinearProgress'
+import { styled, alpha, keyframes } from '@mui/material/styles'
 
 const MIN_REWARDS_CLAIM = '100000000000000000000'
+
+const pulse = keyframes`
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+`
+
+const FuelProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 10,
+  borderRadius: 5,
+  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+  '& .MuiLinearProgress-bar': {
+    borderRadius: 5,
+    background: 'linear-gradient(90deg, #6366f1 0%, #a855f7 100%)'
+  }
+}))
+
+const StatusDot = styled('div')<{ active?: boolean }>(({ theme, active }) => ({
+  width: 8,
+  height: 8,
+  borderRadius: '50%',
+  backgroundColor: active ? '#10B981' : alpha(theme.palette.text.primary, 0.2),
+  boxShadow: active ? '0 0 10px #10B981' : 'none',
+  animation: active ? `${pulse} 2s infinite ease-in-out` : 'none'
+}))
 
 interface Props {
   getAirgBalance: () => void
@@ -41,6 +70,9 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
 
   const { claimRewards, isLoading: isClaiming } = useStaking()
 
+  const stakedAmount = Number(stakeInfo?.[0] || 0) / 1e18
+  const rewards = Number(stakeInfo?.[1] || 0) / 1e18
+  const progress = Math.min((rewards / 100) * 100, 100)
   const canClaimMin = stakeInfo && stakeInfo[1] >= BigInt(MIN_REWARDS_CLAIM)
 
   const handleClaimRewards = useCallback(async () => {
@@ -64,35 +96,61 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
 
   return (
     <Grid item xs={12} md={4}>
-      <Box className={styles.glassCard}>
+      <Paper variant='gasCard' sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, opacity: 0.6 }}>
+            <LocalGasStationIcon fontSize='small' color='primary' />
+            <Typography
+              variant='subtitle2'
+              fontWeight={800}
+              sx={{ textTransform: 'uppercase', letterSpacing: '1.5px' }}
+            >
+              Generado
+            </Typography>
+          </Box>
+          <StatusDot active={Number(stakeInfo?.[0] || 0) > 0} title='Generando combustible...' />
+        </Box>
+
+        <Typography variant='caption' sx={{ opacity: 0.8, fontWeight: 600, mb: 2 }}>
+          Generando actualmente <b style={{ color: '#10B981' }}>{formatNumber(stakedAmount * 100, 0)} Litros/día</b>
+        </Typography>
+
         <Typography
-          variant='subtitle1'
-          fontWeight={700}
-          sx={{ opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}
+          variant='h2'
+          fontWeight={900}
+          sx={{
+            my: 1,
+            color: 'primary.main',
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 1,
+            textShadow: (theme) => `0 0 20px ${alpha(theme.palette.primary.main, 0.2)}`
+          }}
         >
-          Combustible Generado (AIRG)
-        </Typography>
-        <Typography variant='caption' sx={{ opacity: 0.8, mb: 1 }}>
-          Gana <b>100 Litros/día</b> por cada AIRL stakeado
-        </Typography>
-
-        <Typography variant='h3' fontWeight={800} sx={{ my: 2, color: '#6366f1' }}>
-          {formatNumber(Number(stakeInfo?.[1] || 0) / 1e18)}{' '}
-          <span style={{ fontSize: '1.2rem', opacity: 0.6 }}>Liters</span>
+          {formatNumber(rewards)}{' '}
+          <Typography component='span' variant='h5' sx={{ opacity: 0.6, fontWeight: 700 }}>
+            Liters
+          </Typography>
         </Typography>
 
-        <Stack>
-          <Button
-            className={styles.premiumButton}
-            disabled={isClaiming || !canClaimMin}
-            variant='contained'
-            onClick={handleClaimRewards}
-            fullWidth
-          >
+        <Box sx={{ mt: 2, mb: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Typography variant='caption' fontWeight={700} sx={{ opacity: 0.5 }}>
+              Progreso de Recolección
+            </Typography>
+            <Typography variant='caption' fontWeight={800} color={canClaimMin ? 'secondary' : 'inherit'}>
+              {canClaimMin ? 'LISTO' : `${progress.toFixed(0)}%`}
+            </Typography>
+          </Box>
+          <FuelProgress variant='determinate' value={progress} />
+        </Box>
+
+        <Stack sx={{ mt: 'auto' }}>
+          <Button disabled={isClaiming || !canClaimMin} onClick={handleClaimRewards} fullWidth variant='premium'>
             Recolectar Combustible
           </Button>
         </Stack>
-      </Box>
+      </Paper>
     </Grid>
   )
 }

@@ -66,15 +66,6 @@ const commonComponents: ThemeOptions['components'] = {
       }
     }
   },
-  MuiButton: {
-    styleOverrides: {
-      root: {
-        borderRadius: '8px',
-        textTransform: 'none',
-        fontWeight: 600
-      }
-    }
-  },
   MuiCard: {
     styleOverrides: {
       root: {
@@ -144,6 +135,62 @@ const commonComponents: ThemeOptions['components'] = {
           cursor: 'pointer',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
         })
+      },
+      {
+        props: { variant: 'gasCard' },
+        style: ({ theme }) => ({
+          background: theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+          border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
+          borderRadius: '24px',
+          padding: theme.spacing(4),
+          transition: 'all 0.3s ease-in-out',
+          boxShadow:
+            theme.palette.mode === 'dark'
+              ? '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)'
+              : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          '&:hover': {
+            borderColor: theme.palette.primary.main,
+            boxShadow: `0 0 20px ${alpha(theme.palette.primary.main, 0.1)}`
+          }
+        })
+      }
+    ]
+  },
+  MuiButton: {
+    styleOverrides: {
+      root: {
+        borderRadius: '8px',
+        textTransform: 'none',
+        fontWeight: 600
+      }
+    },
+    variants: [
+      {
+        props: { variant: 'premium' },
+        style: ({ theme }) => ({
+          background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+          color: '#fff',
+          borderRadius: '12px',
+          fontWeight: 700,
+          textTransform: 'none',
+          padding: '10px 24px',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 8px 20px rgba(99, 102, 241, 0.4)',
+            background: 'linear-gradient(135deg, #4f46e5 0%, #9333ea 100%)'
+          },
+          '&:disabled': {
+            background:
+              theme.palette.mode === 'dark'
+                ? alpha(theme.palette.text.primary, 0.05)
+                : alpha(theme.palette.text.primary, 0.03),
+            color: alpha(theme.palette.text.primary, 0.2),
+            border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+            boxShadow: 'none'
+          }
+        })
       }
     ]
   },
@@ -178,9 +225,25 @@ const commonComponents: ThemeOptions['components'] = {
   MuiTypography: {
     variants: [
       {
-        props: { variant: 'h4' }, // Apply to h4 if it's used for headers
+        props: { variant: 'h4' },
         style: {
-          fontFamily: b612Mono.style.fontFamily
+          fontFamily: sora.style.fontFamily,
+          letterSpacing: '-0.02em',
+          fontWeight: 800
+        }
+      },
+      {
+        props: { variant: 'h5' },
+        style: {
+          fontFamily: sora.style.fontFamily,
+          fontWeight: 700
+        }
+      },
+      {
+        props: { variant: 'h6' },
+        style: {
+          fontFamily: sora.style.fontFamily,
+          fontWeight: 700
         }
       },
       {
@@ -200,6 +263,13 @@ declare module '@mui/material/Paper' {
     glass: true
     license: true
     licenseActive: true
+    gasCard: true
+  }
+}
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsVariantOverrides {
+    premium: true
   }
 }
 
