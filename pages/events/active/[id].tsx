@@ -6,12 +6,9 @@ import {
   Paper,
   Stack,
   Button,
-  IconButton,
   LinearProgress,
   useTheme,
   alpha,
-  Breadcrumbs,
-  Link as MuiLink,
   Grid,
   Divider,
   FormControl,
@@ -20,7 +17,8 @@ import {
   MenuItem,
   Avatar,
   Card,
-  CardContent
+  CardContent,
+  Link as MuiLink
 } from '@mui/material'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -35,13 +33,13 @@ import { filterByTokenAddress, formatNumber } from 'utils'
 import { eventBookingSuccessSwal, errorSwal } from 'lib/swal'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
-import FlightLandIcon from '@mui/icons-material/FlightLand'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
 import ThermostatIcon from '@mui/icons-material/Thermostat'
 import AirIcon from '@mui/icons-material/Air'
 import Image from 'next/image'
 import { AIRLINES } from 'config/airlines'
+import { AxiosError } from 'axios'
 
 moment.locale('es')
 
@@ -86,7 +84,7 @@ const EventDetailPage = () => {
       }
     }
     fetchDetail()
-  }, [id, ownedAircrafts])
+  }, [id, ownedAircrafts, router])
 
   const handleBook = async () => {
     if (!event || !selectedAircraftId) return
@@ -98,9 +96,11 @@ const EventDetailPage = () => {
       })
       await eventBookingSuccessSwal(event.callsign || 'EVENTO')
       router.push('/live')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Booking error:', error)
-      errorSwal('Error', error.response?.data?.error || 'No se pudo realizar la reserva.')
+      if (error instanceof AxiosError) {
+        errorSwal('Error', error.response?.data?.error || 'No se pudo realizar la reserva.')
+      }
     } finally {
       setIsBooking(false)
     }
@@ -119,7 +119,9 @@ const EventDetailPage = () => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pb: 10 }}>
       <Head>
-        <title>{event.callsign} | Detalles del Evento {airlineConfig.name}</title>
+        <title>
+          {event.callsign} | Detalles del Evento {airlineConfig.name}
+        </title>
       </Head>
 
       {/* Large Hero */}
@@ -336,8 +338,8 @@ const EventDetailPage = () => {
                   Instrucciones de Misión
                 </Typography>
                 <Typography variant='body1' color='text.secondary' paragraph>
-                  Este vuelo es un evento patrocinado diseñado para maximizar tus ganancias. Deberás
-                  completar la ruta entre {event.origin} y {event.destination} siguiendo las reglas de la aerolínea.
+                  Este vuelo es un evento patrocinado diseñado para maximizar tus ganancias. Deberás completar la ruta
+                  entre {event.origin} y {event.destination} siguiendo las reglas de la aerolínea.
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
                   1. Asegúrate de tener combustible suficiente.

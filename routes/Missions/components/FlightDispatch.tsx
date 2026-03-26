@@ -23,7 +23,6 @@ import {
   getFuelForFlight,
   getIcaoCodeFromAircraftNFT,
   getNFTAttributes,
-  gallonsToLiters,
   filterByTokenAddress
 } from 'utils'
 import { nftAircraftTokenAddress } from 'contracts/address'

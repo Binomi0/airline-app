@@ -7,18 +7,8 @@ import {
   Stack,
   Button,
   Chip,
-  IconButton,
-  LinearProgress,
   useTheme,
   alpha,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -27,7 +17,8 @@ import {
   TableRow,
   Avatar,
   Breadcrumbs,
-  Link as MuiLink
+  Link as MuiLink,
+  Skeleton
 } from '@mui/material'
 import Head from 'next/head'
 import { motion } from 'framer-motion'
@@ -35,49 +26,52 @@ import moment from 'moment'
 import 'moment/locale/es'
 import nextApiInstance from 'config/axios'
 import { PublicMission } from 'types'
-import useOwnedNfts from 'hooks/useOwnedNFTs'
-import { nftAircraftTokenAddress } from 'contracts/address'
-import { filterByTokenAddress, formatNumber } from 'utils'
-import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
-import CloseIcon from '@mui/icons-material/Close'
+import { formatNumber } from 'utils'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { eventBookingSuccessSwal, errorSwal } from 'lib/swal'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
-import { AIRLINES, AirlineConfig } from 'config/airlines'
+import { AIRLINES } from 'config/airlines'
 import Link from 'next/link'
 
 moment.locale('es')
+
+const STATUS_CONFIG = {
+  FINALIZADO: { threshold: -60, label: 'FINALIZADO' },
+  EN_VUELO: { threshold: 0, label: 'EN VUELO' },
+  EMBARCANDO: { threshold: 15, label: 'EMBARCANDO' },
+  PUERTA_ABIERTA: { threshold: 30, label: 'PUERTA ABIERTA' },
+  PROGRAMADO: { label: 'PROGRAMADO' }
+} as const
 
 const AirlineEventPage = () => {
   const theme = useTheme()
   const router = useRouter()
   const { airline } = router.query
-  const { data: userNfts } = useOwnedNfts()
 
   const [flights, setFlights] = useState<PublicMission[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedFlight, setSelectedFlight] = useState<PublicMission | null>(null)
-  const [bookingOpen, setBookingOpen] = useState(false)
-  const [selectedAircraftId, setSelectedAircraftId] = useState<string>('')
 
   const airlineConfig = useMemo(() => {
     if (!airline || typeof airline !== 'string') return null
-    return AIRLINES[airline.toLowerCase()] || AIRLINES.iberia
+    const config = AIRLINES[airline.toLowerCase()]
+    if (!config) {
+      console.warn(`No airline config found for: ${airline}`)
+      return AIRLINES.iberia // Fallback
+    }
+    return config
   }, [airline])
-
-  const ownedAircrafts = useMemo(
-    () => userNfts?.filter(filterByTokenAddress(nftAircraftTokenAddress)) || [],
-    [userNfts]
-  )
 
   useEffect(() => {
     if (!airline) return
     const fetchFlights = async () => {
       try {
         const { data } = await nextApiInstance.get<PublicMission[]>(`/api/events/puente-aereo?airline=${airline}`)
-        setFlights(data)
+        if (Array.isArray(data)) {
+          setFlights(data)
+        } else {
+          console.error('Invalid data format received')
+          setFlights([])
+        }
       } catch (error) {
         console.error('Error fetching event flights:', error)
       } finally {
@@ -87,37 +81,25 @@ const AirlineEventPage = () => {
     fetchFlights()
   }, [airline])
 
-  const getFlightStatus = (startTime: string | Date | undefined) => {
-    if (!startTime) return { label: 'PROGRAMADO', color: theme.palette.success.main }
-    const now = moment()
-    const start = moment(startTime)
-    const diff = start.diff(now, 'minutes')
+  const getFlightStatus = React.useCallback(
+    (startTime: string | Date | undefined) => {
+      if (!startTime) return { label: STATUS_CONFIG.PROGRAMADO.label, color: theme.palette.success.main }
+      const now = moment()
+      const start = moment(startTime)
+      const diff = start.diff(now, 'minutes')
 
-    if (diff < -60) return { label: 'FINALIZADO', color: theme.palette.grey[600] }
-    if (diff < 0) return { label: 'EN VUELO', color: theme.palette.info.main }
-    if (diff < 15) return { label: 'EMBARCANDO', color: theme.palette.error.main, pulse: true }
-    if (diff < 30) return { label: 'PUERTA ABIERTA', color: theme.palette.warning.main }
-    return { label: 'PROGRAMADO', color: theme.palette.success.main }
-  }
-
-  const handleBook = async () => {
-    if (!selectedFlight || !selectedAircraftId) return
-
-    try {
-      setBookingOpen(false)
-      await nextApiInstance.post('/api/missions/reserve-event', {
-        eventData: selectedFlight,
-        aircraftId: selectedAircraftId
-      })
-
-      await eventBookingSuccessSwal(selectedFlight.callsign || 'EVENTO')
-
-      router.push('/live')
-    } catch (error: any) {
-      console.error('Booking error:', error)
-      errorSwal('Error', error.response?.data?.error || 'No se pudo realizar la reserva.')
-    }
-  }
+      if (diff < STATUS_CONFIG.FINALIZADO.threshold)
+        return { label: STATUS_CONFIG.FINALIZADO.label, color: theme.palette.grey[600] }
+      if (diff < STATUS_CONFIG.EN_VUELO.threshold)
+        return { label: STATUS_CONFIG.EN_VUELO.label, color: theme.palette.info.main }
+      if (diff < STATUS_CONFIG.EMBARCANDO.threshold)
+        return { label: STATUS_CONFIG.EMBARCANDO.label, color: theme.palette.error.main, pulse: true }
+      if (diff < STATUS_CONFIG.PUERTA_ABIERTA.threshold)
+        return { label: STATUS_CONFIG.PUERTA_ABIERTA.label, color: theme.palette.warning.main }
+      return { label: STATUS_CONFIG.PROGRAMADO.label, color: theme.palette.success.main }
+    },
+    [theme.palette]
+  )
 
   if (!airlineConfig) return null
 
@@ -127,6 +109,13 @@ const AirlineEventPage = () => {
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pb: 10, color: 'text.primary' }}>
       <Head>
         <title>{airlineConfig.name} Events | WeiFly FIDS</title>
+        <meta
+          name='description'
+          content={`Reservar vuelos de eventos especiales de ${airlineConfig.name} y gana recompensas extra.`}
+        />
+        <meta property='og:title' content={`Vuelos de Eventos de ${airlineConfig.name}`} />
+        <meta property='og:image' content={airlineConfig.logo} />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
       </Head>
 
       {/* Modern, Slim Hero */}
@@ -134,10 +123,10 @@ const AirlineEventPage = () => {
         <Image
           src={airlineConfig.hero}
           alt={`${airlineConfig.name} Hero`}
-          layout='fill'
-          objectFit='cover'
+          fill
+          sizes='100vw'
           priority
-          style={{ opacity: 0.2, filter: 'grayscale(0.5)' }}
+          style={{ objectFit: 'cover', opacity: 0.2, filter: 'grayscale(0.5)' }}
         />
         <Box
           sx={{
@@ -181,10 +170,33 @@ const AirlineEventPage = () => {
 
       <Container maxWidth='xl'>
         {isLoading ? (
-          <Box sx={{ width: '100%', mt: 4 }}>
-            <LinearProgress
-              sx={{ bgcolor: alpha(BRAND_COLOR, 0.1), '& .MuiLinearProgress-bar': { bgcolor: BRAND_COLOR } }}
-            />
+          <TableContainer component={Paper} variant='glass' sx={{ borderRadius: 4, mt: 4 }}>
+            <Table>
+              <TableBody>
+                {Array(5)
+                  .fill(0)
+                  .map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Skeleton variant='text' width='100%' height={66} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : flights.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 10 }}>
+            <Typography variant='h5' color='text.secondary' gutterBottom>
+              No hay vuelos disponibles en este momento
+            </Typography>
+            <Button
+              variant='outlined'
+              onClick={() => router.push('/events')}
+              sx={{ color: BRAND_COLOR, borderColor: BRAND_COLOR }}
+            >
+              Volver a Eventos
+            </Button>
           </Box>
         ) : (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -193,7 +205,10 @@ const AirlineEventPage = () => {
               variant='glass'
               sx={{
                 borderRadius: 4,
-                overflow: 'hidden'
+                overflow: 'auto',
+                '& .MuiTableCell-root': {
+                  whiteSpace: 'nowrap'
+                }
               }}
             >
               <Table sx={{ minWidth: 650 }}>
@@ -255,13 +270,19 @@ const AirlineEventPage = () => {
                           <Chip
                             label={status.label}
                             size='small'
+                            aria-label={`Estado del vuelo: ${status.label}`}
                             sx={{
                               bgcolor: alpha(status.color as string, 0.1),
                               color: status.color,
                               fontWeight: 'bold',
                               fontSize: '0.7rem',
                               border: `1px solid ${alpha(status.color as string, 0.2)}`,
-                              animation: status.pulse ? 'pulse 2s infinite' : 'none'
+                              animation: status.pulse ? 'pulse 2s infinite' : 'none',
+                              '@keyframes pulse': {
+                                '0%': { opacity: 1, transform: 'scale(1)' },
+                                '50%': { opacity: 0.7, transform: 'scale(0.98)' },
+                                '100%': { opacity: 1, transform: 'scale(1)' }
+                              }
                             }}
                           />
                         </TableCell>
@@ -302,9 +323,9 @@ const AirlineEventPage = () => {
 
       <style>{`
         @keyframes pulse {
-          0% { opacity: 1; }
-          50% { opacity: 0.5; }
-          100% { opacity: 1; }
+          0% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(0.98); }
+          100% { opacity: 1; transform: scale(1); }
         }
       `}</style>
     </Box>
