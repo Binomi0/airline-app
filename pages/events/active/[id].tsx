@@ -11,7 +11,7 @@ import {
   useTheme,
   alpha,
   Breadcrumbs,
-  Link,
+  Link as MuiLink,
   Grid,
   Divider,
   FormControl,
@@ -41,10 +41,9 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
 import ThermostatIcon from '@mui/icons-material/Thermostat'
 import AirIcon from '@mui/icons-material/Air'
 import Image from 'next/image'
+import { AIRLINES } from 'config/airlines'
 
 moment.locale('es')
-
-const IBERIA_RED = '#b01d21'
 
 const EventDetailPage = () => {
   const theme = useTheme()
@@ -56,6 +55,13 @@ const EventDetailPage = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedAircraftId, setSelectedAircraftId] = useState<string>('')
   const [isBooking, setIsBooking] = useState(false)
+
+  const airlineConfig = useMemo(() => {
+    if (!event?.airlineId) return AIRLINES.iberia
+    return AIRLINES[event.airlineId] || AIRLINES.iberia
+  }, [event])
+
+  const BRAND_COLOR = airlineConfig.color
 
   const ownedAircrafts = useMemo(
     () => userNfts?.filter(filterByTokenAddress(nftAircraftTokenAddress)) || [],
@@ -104,7 +110,7 @@ const EventDetailPage = () => {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <LinearProgress
-          sx={{ width: '200px', bgcolor: alpha(IBERIA_RED, 0.1), '& .MuiLinearProgress-bar': { bgcolor: IBERIA_RED } }}
+          sx={{ width: '200px', bgcolor: alpha('#b01d21', 0.1), '& .MuiLinearProgress-bar': { bgcolor: '#b01d21' } }}
         />
       </Box>
     )
@@ -113,14 +119,14 @@ const EventDetailPage = () => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pb: 10 }}>
       <Head>
-        <title>{event.callsign} | Detalles del Evento Iberia</title>
+        <title>{event.callsign} | Detalles del Evento {airlineConfig.name}</title>
       </Head>
 
       {/* Large Hero */}
       <Box sx={{ position: 'relative', height: '45vh', overflow: 'hidden' }}>
         <Image
-          src='/img/events/iberia_hero.png'
-          alt='Iberia Aero'
+          src={airlineConfig.hero}
+          alt={airlineConfig.name}
           layout='fill'
           objectFit='cover'
           priority
@@ -143,19 +149,19 @@ const EventDetailPage = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <Button
                 startIcon={<ArrowBackIcon />}
-                onClick={() => router.push('/events')}
-                sx={{ color: 'text.secondary', mb: 2, '&:hover': { color: IBERIA_RED } }}
+                onClick={() => router.push(`/events/${airlineConfig.id}`)}
+                sx={{ color: 'text.secondary', mb: 2, '&:hover': { color: BRAND_COLOR } }}
               >
-                Volver al Panel FIDS
+                Volver al Panel {airlineConfig.name}
               </Button>
               <Stack direction='row' alignItems='center' spacing={2}>
                 <Avatar
-                  src='/img/logos/iberia_icon.png'
-                  sx={{ width: 80, height: 80, border: `3px solid ${IBERIA_RED}` }}
+                  src={airlineConfig.logo}
+                  sx={{ width: 80, height: 80, border: `3px solid ${BRAND_COLOR}`, bgcolor: 'white' }}
                 />
                 <Box>
-                  <Typography variant='overline' sx={{ color: IBERIA_RED, fontWeight: 900, letterSpacing: 4 }}>
-                    MISIÓN PATROCINADA
+                  <Typography variant='overline' sx={{ color: BRAND_COLOR, fontWeight: 900, letterSpacing: 4 }}>
+                    {airlineConfig.overlay}
                   </Typography>
                   <Typography variant='h1' sx={{ fontWeight: 900, textTransform: 'uppercase', lineHeight: 1 }}>
                     {event.callsign}
@@ -218,7 +224,7 @@ const EventDetailPage = () => {
                           bgcolor: 'background.default',
                           p: 0.5,
                           borderRadius: '50%',
-                          color: IBERIA_RED
+                          color: BRAND_COLOR
                         }}
                       />
                     </Box>
@@ -290,23 +296,23 @@ const EventDetailPage = () => {
                     sx={{
                       height: '100%',
                       borderRadius: 3,
-                      bgcolor: alpha(IBERIA_RED, 0.03),
-                      borderColor: alpha(IBERIA_RED, 0.2)
+                      bgcolor: alpha(BRAND_COLOR, 0.03),
+                      borderColor: alpha(BRAND_COLOR, 0.2)
                     }}
                   >
                     <CardContent>
                       <Stack spacing={2}>
                         <Stack direction='row' spacing={1} alignItems='center'>
-                          <WorkspacePremiumIcon sx={{ color: IBERIA_RED }} />
-                          <Typography variant='h6' sx={{ color: IBERIA_RED }}>
-                            Premios Iberia
+                          <WorkspacePremiumIcon sx={{ color: BRAND_COLOR }} />
+                          <Typography variant='h6' sx={{ color: BRAND_COLOR }}>
+                            Premios {airlineConfig.name}
                           </Typography>
                         </Stack>
-                        <Divider sx={{ borderColor: alpha(IBERIA_RED, 0.1) }} />
+                        <Divider sx={{ borderColor: alpha(BRAND_COLOR, 0.1) }} />
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Typography color='text.secondary'>Multiplicador</Typography>
                           <Typography fontWeight='900' sx={{ color: 'success.main' }}>
-                            2.0X
+                            {event.rewardMultiplier}X
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -330,10 +336,10 @@ const EventDetailPage = () => {
                   Instrucciones de Misión
                 </Typography>
                 <Typography variant='body1' color='text.secondary' paragraph>
-                  Este vuelo del Puente Aéreo es un evento patrocinado diseñado para maximizar tus ganancias. Deberás
+                  Este vuelo es un evento patrocinado diseñado para maximizar tus ganancias. Deberás
                   completar la ruta entre {event.origin} y {event.destination} siguiendo las reglas de la aerolínea.
                 </Typography>
-                <Typography variant='body1' color='text.secondary'>
+                <Typography variant='body2' color='text.secondary'>
                   1. Asegúrate de tener combustible suficiente.
                   <br />
                   2. Inicia la simulación desde la Desktop App.
@@ -353,7 +359,7 @@ const EventDetailPage = () => {
                 borderRadius: 4,
                 position: 'sticky',
                 top: 80,
-                border: `2px solid ${alpha(IBERIA_RED, 0.2)}`
+                border: `2px solid ${alpha(BRAND_COLOR, 0.2)}`
               }}
             >
               <Typography variant='h5' fontWeight={900} gutterBottom>
@@ -379,7 +385,7 @@ const EventDetailPage = () => {
                   </Select>
                 </FormControl>
 
-                <Box sx={{ p: 2, bgcolor: alpha(IBERIA_RED, 0.05), borderRadius: 2 }}>
+                <Box sx={{ p: 2, bgcolor: alpha(BRAND_COLOR, 0.05), borderRadius: 2 }}>
                   <Typography variant='caption' display='block' color='text.secondary'>
                     AERONAVE RECOMENDADA
                   </Typography>
@@ -396,10 +402,10 @@ const EventDetailPage = () => {
                   onClick={handleBook}
                   sx={{
                     height: 56,
-                    bgcolor: IBERIA_RED,
+                    bgcolor: BRAND_COLOR,
                     fontWeight: 900,
                     fontSize: '1.1rem',
-                    '&:hover': { bgcolor: alpha(IBERIA_RED, 0.8) }
+                    '&:hover': { bgcolor: alpha(BRAND_COLOR, 0.8) }
                   }}
                 >
                   {isBooking ? 'PROCESANDO...' : 'CONFIRMAR VUELO'}
@@ -407,11 +413,11 @@ const EventDetailPage = () => {
 
                 <Stack direction='row' spacing={1} justifyContent='center'>
                   <Typography variant='caption' color='text.secondary'>
-                    Sujeto a términos de patrocinio de Iberia •
+                    Sujeto a términos de patrocinio de {airlineConfig.name} •
                   </Typography>
-                  <Link href='#' sx={{ fontSize: '0.75rem', color: IBERIA_RED }}>
+                  <MuiLink href='#' sx={{ fontSize: '0.75rem', color: BRAND_COLOR }}>
                     Ver términos
-                  </Link>
+                  </MuiLink>
                 </Stack>
               </Stack>
             </Paper>
