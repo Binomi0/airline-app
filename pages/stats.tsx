@@ -8,10 +8,9 @@ import {
   Typography,
   Avatar,
   LinearProgress,
-  Divider,
-  Stack,
   Chip,
   IconButton,
+  Stack,
   useTheme,
   alpha
 } from '@mui/material'
@@ -28,7 +27,6 @@ import {
   Timer
 } from '@mui/icons-material'
 import moment from 'moment'
-import axios from 'axios'
 import Link from 'next/link'
 import Head from 'next/head'
 import { fetcher } from 'utils'
@@ -88,15 +86,69 @@ const RecentMissionItem = styled(Box)(({ theme }) => ({
   alignItems: 'center'
 }))
 
+interface HubStat {
+  _id: string
+  total: number
+}
+
+interface AircraftStat {
+  _id: string
+  count: number
+}
+
+interface MissionTypeStat {
+  _id: string
+  count: number
+}
+
+interface RecentActivity {
+  _id: string
+  callsign: string
+  origin: string
+  destination: string
+  aircraftId: string
+  distance: number
+  rewards: number
+  updatedAt: string
+}
+
+interface RankingItem {
+  _id: string
+  value: number
+  pilotId: string
+  count?: number
+}
+
+interface Rankings {
+  effective: RankingItem[]
+  traveled: RankingItem[]
+  fastest: RankingItem[]
+  topScorers: RankingItem[]
+}
+
+interface GlobalStats {
+  totals: {
+    totalMissions: number
+    totalDistance: number
+    totalRewards: number
+  }
+  aircraftPopularity: AircraftStat[]
+  hubs: { _id: string; total: number }[]
+  typeDistribution: MissionTypeStat[]
+  successRate: { completed: number; total: number }
+  avgDuration: number
+  recentActivity: RecentActivity[]
+}
+
 const StatsPage = () => {
   const theme = useTheme()
 
-  const { data: globalStats, isLoading: globalLoading } = useQuery({
+  const { data: globalStats, isLoading: globalLoading } = useQuery<GlobalStats>({
     queryKey: ['globalStats'],
     queryFn: async () => await fetcher('/api/stats/global')
   })
 
-  const { data: rankings, isLoading: rankingsLoading } = useQuery({
+  const { data: rankings, isLoading: rankingsLoading } = useQuery<Rankings>({
     queryKey: ['rankings'],
     queryFn: async () => await fetcher('/api/stats/rankings')
   })
@@ -189,7 +241,7 @@ const StatsPage = () => {
             Ranking de Pilotos de Élite
           </Typography>
           <Grid container spacing={2}>
-            {rankings?.effective?.slice(0, 3).map((pilot: any, index: number) => (
+            {rankings?.effective?.slice(0, 3).map((pilot: RankingItem, index: number) => (
               <Grid item xs={12} key={pilot._id}>
                 <RankItem>
                   <Typography variant='h6' sx={{ minWidth: 40, fontWeight: 800, color: theme.palette.primary.main }}>
@@ -203,7 +255,7 @@ const StatsPage = () => {
                       {pilot.pilotId}
                     </Typography>
                     <Typography variant='caption' color='textSecondary'>
-                      {pilot.count} misiones completadas
+                      {pilot.count || 0} misiones completadas
                     </Typography>
                   </Box>
                   <Box textAlign='right'>
@@ -222,7 +274,7 @@ const StatsPage = () => {
               Hubs Más Concurridos
             </Typography>
             <Box display='flex' flexWrap='wrap' gap={1}>
-              {globalStats?.hubs?.map((hub: any) => (
+              {globalStats?.hubs?.map((hub: HubStat) => (
                 <Chip
                   key={hub._id}
                   icon={<Hub />}
@@ -259,7 +311,7 @@ const StatsPage = () => {
                     TASA DE ÉXITO
                   </Typography>
                   <Typography variant='h5' fontWeight={800} mt={1}>
-                    {globalStats?.successRate?.total > 0
+                    {globalStats?.successRate && globalStats.successRate.total > 0
                       ? Math.round((globalStats.successRate.completed / globalStats.successRate.total) * 100)
                       : 100}
                     %
@@ -276,7 +328,7 @@ const StatsPage = () => {
             Popularidad de Flota
           </Typography>
           <StatsCard variant='glass'>
-            {globalStats?.aircraftPopularity?.map((ac: any) => (
+            {globalStats?.aircraftPopularity?.map((ac: AircraftStat) => (
               <Box key={ac._id} mb={2.5}>
                 <ProgressLabel>
                   <Typography variant='body2' fontWeight={600}>
@@ -300,7 +352,7 @@ const StatsPage = () => {
               Tipos de Misión
             </Typography>
             <StatsCard variant='glass'>
-              {globalStats?.typeDistribution?.map((type: any) => (
+              {globalStats?.typeDistribution?.map((type: MissionTypeStat) => (
                 <Box key={type._id} display='flex' justifyContent='space-between' alignItems='center' mb={1.5}>
                   <Box display='flex' alignItems='center' gap={1}>
                     <Box
@@ -333,7 +385,7 @@ const StatsPage = () => {
             Actividad Reciente en la Red
           </Typography>
         </Stack>
-        {globalStats?.recentActivity?.map((mission: any) => (
+        {globalStats?.recentActivity?.map((mission: RecentActivity) => (
           <RecentMissionItem key={mission._id}>
             <Box display='flex' alignItems='center' gap={2}>
               <IconWrapper sx={{ mb: 0, width: 40, height: 40, borderRadius: '50%' }}>

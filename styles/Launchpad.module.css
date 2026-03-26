@@ -9,10 +9,14 @@
   --lp-glass-border: rgba(255, 255, 255, 0.08);
   --lp-nav-bg: rgba(3, 7, 18, 0.8);
   --lp-card-bg: rgba(17, 24, 39, 0.7);
-  
+
   background-color: var(--lp-bg);
   color: var(--lp-text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   overflow-x: hidden;
 }
 
@@ -85,7 +89,9 @@
   font-weight: 600;
   font-size: 0.9rem;
   text-decoration: none;
-  transition: transform 0.2s, background 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.2s;
 }
 
 .navCta:hover {
@@ -657,11 +663,11 @@
   .navLinks {
     display: none;
   }
-  
+
   .tokensGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .footerContent {
     grid-template-columns: 1fr 1fr;
   }
@@ -671,7 +677,7 @@
   .footerContent {
     grid-template-columns: 1fr;
   }
-  
+
   .heroTitle {
     font-size: 2.5rem;
   }

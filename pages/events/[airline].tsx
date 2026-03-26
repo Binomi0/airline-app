@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import {
   Box,
   Container,
@@ -24,7 +24,6 @@ import Head from 'next/head'
 import { motion } from 'framer-motion'
 import moment from 'moment'
 import 'moment/locale/es'
-import nextApiInstance from 'config/axios'
 import { PublicMission } from 'types'
 import { fetcher, formatNumber } from 'utils'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
@@ -74,7 +73,7 @@ const AirlineEventPage = () => {
       errorSwal('Error', 'No se pudo cargar la información del evento.')
       router.push('/events')
     }
-  }, [flightsError])
+  }, [flightsError, router])
 
   const getFlightStatus = React.useCallback(
     (startTime: string | Date | undefined) => {

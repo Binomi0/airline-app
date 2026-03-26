@@ -37,12 +37,10 @@ const LicenseView: React.FC = () => {
             Tu <span style={{ color: '#6366f1' }}>Carrera Piloto</span>
           </Typography>
           <Typography variant='body1' sx={{ color: 'rgba(255,255,255,0.5)', maxWidth: '600px' }}>
-            Has acumulado <strong>{totalHours.toFixed(1)} horas</strong> de vuelo. 
-            {nextLicense ? (
-              ` Te faltan ${(nextLicense.minHours - totalHours).toFixed(1)} horas para tu próxima licencia.`
-            ) : (
-              ' ¡Has alcanzado el rango máximo de la aviación comercial!'
-            )}
+            Has acumulado <strong>{totalHours.toFixed(1)} horas</strong> de vuelo.
+            {nextLicense
+              ? ` Te faltan ${(nextLicense.minHours - totalHours).toFixed(1)} horas para tu próxima licencia.`
+              : ' ¡Has alcanzado el rango máximo de la aviación comercial!'}
           </Typography>
         </Box>
 

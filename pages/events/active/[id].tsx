@@ -108,7 +108,7 @@ const EventDetailPage = () => {
       errorSwal('Error', 'No se pudo cargar la información del evento.')
       router.push('/events')
     }
-  }, [eventError])
+  }, [eventError, router])
 
   if (eventIsLoading || !event) {
     return (

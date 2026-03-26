@@ -230,9 +230,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                 }}
               >
                 [COM1]:{' '}
-                <span style={{ color: '#38bdf8', fontWeight: 800 }}>
-                  {tower.atcSession.frequency.toFixed(3)}
-                </span>
+                <span style={{ color: '#38bdf8', fontWeight: 800 }}>{tower.atcSession.frequency.toFixed(3)}</span>
               </Typography>
             )}
           </Box>

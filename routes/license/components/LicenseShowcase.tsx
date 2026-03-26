@@ -28,17 +28,17 @@ const LicenseShowcase: React.FC<Props> = ({ license, isUnlocked, totalHours, pro
           className={styles.imageShowcase}
         >
           <Box className={styles.mainLicenseImage}>
-            <Image 
-              src={image} 
-              alt={name} 
-              fill 
-              style={{ 
+            <Image
+              src={image}
+              alt={name}
+              fill
+              style={{
                 objectFit: 'cover',
                 filter: isUnlocked ? 'none' : 'grayscale(1) brightness(0.3) contrast(1.2)'
-              }} 
-              priority 
+              }}
+              priority
             />
-            
+
             {!isUnlocked && (
               <Box
                 sx={(theme) => ({
@@ -59,10 +59,10 @@ const LicenseShowcase: React.FC<Props> = ({ license, isUnlocked, totalHours, pro
                   pointerEvents: 'none'
                 })}
               >
-                <Typography 
-                  variant="h5" 
-                  fontWeight={800} 
-                  sx={{ 
+                <Typography
+                  variant='h5'
+                  fontWeight={800}
+                  sx={{
                     letterSpacing: '2px',
                     textShadow: '0 4px 12px rgba(0,0,0,0.5)',
                     color: 'rgba(255,255,255,0.9)'
@@ -97,18 +97,14 @@ const LicenseShowcase: React.FC<Props> = ({ license, isUnlocked, totalHours, pro
         transition={{ delay: 0.3, duration: 0.6 }}
         style={{ display: 'flex' }}
       >
-        <Paper 
-          variant="glass" 
-          className={styles.glassCard}
-          sx={{ flex: 1 }}
-        >
+        <Paper variant='glass' className={styles.glassCard} sx={{ flex: 1 }}>
           <Stack spacing={2}>
             <Box>
-              <Typography 
-                variant='h4' 
-                fontWeight={800} 
-                sx={{ 
-                  fontFamily: 'Sora, sans-serif', 
+              <Typography
+                variant='h4'
+                fontWeight={800}
+                sx={{
+                  fontFamily: 'Sora, sans-serif',
                   lineHeight: 1.1,
                   letterSpacing: '-1px',
                   mb: 1
@@ -134,46 +130,46 @@ const LicenseShowcase: React.FC<Props> = ({ license, isUnlocked, totalHours, pro
                 <Typography className={styles.specLabel}>REQUISITO DE VUELO</Typography>
                 <Typography className={styles.specValue}>{minHours} HORAS</Typography>
               </Box>
-              
+
               {!isUnlocked && progressToNext > 0 && (
                 <Box mt={4}>
-                  <Box display='flex' justifyContent='space-between' mb={1.5} alignItems="flex-end">
-                    <Typography variant="caption" fontWeight={700} color="primary" sx={{ letterSpacing: '1px' }}>
+                  <Box display='flex' justifyContent='space-between' mb={1.5} alignItems='flex-end'>
+                    <Typography variant='caption' fontWeight={700} color='primary' sx={{ letterSpacing: '1px' }}>
                       PROGRESO DE CARRERA
                     </Typography>
-                    <Typography variant="h6" fontWeight={800} color="white">
+                    <Typography variant='h6' fontWeight={800} color='white'>
                       {totalHours.toFixed(1)} <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>/ {minHours}h</span>
                     </Typography>
                   </Box>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={Math.min(progressToNext, 100)} 
-                    sx={{ 
-                      height: 10, 
-                      borderRadius: 5, 
+                  <LinearProgress
+                    variant='determinate'
+                    value={Math.min(progressToNext, 100)}
+                    sx={{
+                      height: 10,
+                      borderRadius: 5,
                       bgcolor: 'rgba(255,255,255,0.05)',
                       border: '1px solid rgba(255,255,255,0.05)',
                       '& .MuiLinearProgress-bar': {
                         borderRadius: 5,
                         background: 'linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6)'
                       }
-                    }} 
+                    }}
                   />
                 </Box>
               )}
             </Box>
 
             {isUnlocked && (
-              <Box 
-                sx={{ 
-                  p: 2.5, 
-                  borderRadius: '16px', 
-                  bgcolor: 'rgba(34, 197, 94, 0.05)', 
+              <Box
+                sx={{
+                  p: 2.5,
+                  borderRadius: '16px',
+                  bgcolor: 'rgba(34, 197, 94, 0.05)',
                   border: '1px solid rgba(34, 197, 94, 0.15)',
                   mt: 'auto'
                 }}
               >
-                <Typography variant="body2" fontWeight={600} color="#4ade80" textAlign="center">
+                <Typography variant='body2' fontWeight={600} color='#4ade80' textAlign='center'>
                   Operando bajo normativa vigente.
                 </Typography>
               </Box>

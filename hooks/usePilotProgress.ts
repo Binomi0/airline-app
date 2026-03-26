@@ -35,15 +35,13 @@ const usePilotProgress = (): PilotProgress => {
 
   const progressToNext = useMemo(() => {
     if (!nextLicense) return 100
-    const currentLicense = [...LICENSES]
-      .reverse()
-      .find((license) => totalHours >= license.minHours)
-    
+    const currentLicense = [...LICENSES].reverse().find((license) => totalHours >= license.minHours)
+
     const min = currentLicense ? currentLicense.minHours : 0
     const max = nextLicense.minHours
-    
+
     if (max === min) return 100
-    
+
     const progress = ((totalHours - min) / (max - min)) * 100
     return Math.min(Math.max(progress, 0), 100)
   }, [totalHours, nextLicense])

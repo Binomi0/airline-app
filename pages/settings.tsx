@@ -9,10 +9,11 @@ import Link from '@mui/material/Link'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
 import { useQuery } from '@tanstack/react-query'
 import { fetcher } from 'utils'
+import { WebAuthnUser } from 'types'
 
 const SettingsPage = () => {
   const user = useRecoilValue(userState)
-  const { data } = useQuery({
+  const { data } = useQuery<WebAuthnUser>({
     queryKey: ['api/webauthn/get'],
     queryFn: () => fetcher('api/webauthn/get')
   })
@@ -37,7 +38,7 @@ const SettingsPage = () => {
           </Typography>
         </Box>
 
-        <SettingsView hasBackup={data?.authenticators.length > 1} user={user} />
+        <SettingsView hasBackup={(data?.authenticators?.length ?? 0) > 1} user={user} />
       </Container>
     </Box>
   ) : null

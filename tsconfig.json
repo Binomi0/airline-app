@@ -19,6 +19,6 @@
       "material": ["./lib/mui/"]
     }
   },
-  "include": ["next-env.d.ts", "next-auth.d.ts", "**/*.ts", "**/*.tsx", "global.d.ts"],
+  "include": ["next-env.d.ts", "next-auth.d.ts", "**/*.ts", "**/*.tsx", "global.d.ts", "next.config.js"],
   "exclude": ["node_modules", "staking-contract"]
 }

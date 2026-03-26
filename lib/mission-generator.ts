@@ -135,18 +135,18 @@ export const generatePublicMissionPool = async (targetOrigin?: string) => {
 
   // 4. Distribution Loop: Guarantee at least ONE mission for EVERY active ATC before generating more
   const shuffledOrigins = uniqueAtcOrigins.sort(() => Math.random() - 0.5)
-  
+
   // First pass: 1 mission per ATC
   for (const origin of shuffledOrigins) {
     if (newMissions.length + existingMissions.length >= MISSION_POOL_SIZE) break
-    
+
     // Check if it already has missions in this specific generation OR globally
-    const hasExisting = existingMissions.some(m => m.origin === origin.icao)
+    const hasExisting = existingMissions.some((m) => m.origin === origin.icao)
     if (hasExisting) continue
 
-    const possibleDests = uniqueDestinations.filter(d => 
-      d.icao !== origin.icao && !existingRoutes.has(`${origin.icao}-${d.icao}`)
-    ).sort(() => Math.random() - 0.5)
+    const possibleDests = uniqueDestinations
+      .filter((d) => d.icao !== origin.icao && !existingRoutes.has(`${origin.icao}-${d.icao}`))
+      .sort(() => Math.random() - 0.5)
 
     if (possibleDests.length > 0) {
       const destination = possibleDests[0]
@@ -167,7 +167,7 @@ export const generatePublicMissionPool = async (targetOrigin?: string) => {
 
     for (const tier of tiers) {
       if (newMissions.length + existingMissions.length >= MISSION_POOL_SIZE) break
-      
+
       const possibleDests = uniqueDestinations.filter((d) => {
         if (d.icao === origin.icao) return false
         if (existingRoutes.has(`${origin.icao}-${d.icao}`)) return false
@@ -454,8 +454,8 @@ export const generateMissionsForUser = async (user_id: string, aircraftId?: stri
       },
       aircraftId,
       callsign: getCallsign(),
-    // Initial weight is 0 until an aircraft is selected during reservation
-    weight: 0,
+      // Initial weight is 0 until an aircraft is selected during reservation
+      weight: 0,
       prize: Math.round((basePrize * rewardMultiplier) / 100),
       status: MissionStatus.STARTED,
       remote: false,

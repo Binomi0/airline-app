@@ -27,7 +27,6 @@ import WithLoading from 'components/WithLoading'
 const clientSideEmotionCache = createEmotionCache()
 
 import { useRouter } from 'next/router'
-import Swal from 'sweetalert2'
 
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
