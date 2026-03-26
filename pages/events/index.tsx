@@ -285,9 +285,9 @@ const EventPage = () => {
                               fontSize: '0.75rem',
                               fontWeight: 'bold'
                             }}
-                            onClick={() => handleOpenBooking(flight)}
+                            onClick={() => router.push(`/events/${flight._id}`)}
                           >
-                            RESERVAR
+                            INFO / RESERVAR
                           </Button>
                         </TableCell>
                       </TableRow>
