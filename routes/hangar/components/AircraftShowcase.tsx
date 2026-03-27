@@ -1,12 +1,124 @@
 import React, { useMemo } from 'react'
 import Image from 'next/image'
 import { Box, Typography, Button, Stack } from '@mui/material'
+import { styled, alpha } from '@mui/material/styles'
 import { motion, AnimatePresence } from 'framer-motion'
 import { INft } from 'models/Nft'
 import { getNFTAttributes } from 'utils'
-import styles from 'styles/Hangar.module.css'
 import { useNFTProviderContext } from 'context/NFTProvider'
 import CreateListingModal from 'routes/marketplace/components/CreateListingModal'
+
+const ShowcaseContainer = styled(Box)(({ theme }) => ({
+  display: 'grid',
+  gridTemplateColumns: '1fr 400px',
+  gap: theme.spacing(5),
+  alignItems: 'center',
+  minHeight: '500px',
+  [theme.breakpoints.down('md')]: {
+    gridTemplateColumns: '1fr',
+    gap: theme.spacing(3)
+  }
+}))
+
+const ImageShowcase = styled(Box)(() => ({
+  position: 'relative',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+}))
+
+const MainAircraftImageContainer = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  width: '100%',
+  aspectRatio: '4 / 3',
+  maxWidth: '500px',
+  borderRadius: '24px',
+  overflow: 'hidden',
+  boxShadow: `0 20px 40px -15px ${alpha('#000', 0.5)}, 0 0 30px ${alpha(theme.palette.primary.main, 0.1)}`,
+  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+  background: alpha(theme.palette.background.paper, 0.02),
+  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  margin: '0 auto',
+  '&:hover': {
+    transform: 'translateY(-5px) scale(1.02)',
+    borderColor: alpha(theme.palette.primary.main, 0.4),
+    boxShadow: `0 30px 60px -20px ${alpha('#000', 0.6)}, 0 0 40px ${alpha(theme.palette.primary.main, 0.2)}`
+  }
+}))
+
+const GlassCard = styled(Box)(({ theme }) => ({
+  background:
+    theme.palette.mode === 'dark'
+      ? alpha(theme.palette.background.paper, 0.4)
+      : alpha(theme.palette.background.paper, 0.8),
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+  borderRadius: '24px',
+  padding: theme.spacing(4),
+  boxShadow:
+    theme.palette.mode === 'dark' ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)' : '0 25px 50px -12px rgba(0, 0, 0, 0.1)',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(2.5)
+}))
+
+const SpecRow = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: theme.spacing(1.5, 0),
+  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+  '&:last-child': {
+    borderBottom: 'none'
+  }
+}))
+
+const SpecLabel = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  fontSize: '0.75rem',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '1px'
+}))
+
+const SpecValue = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  fontSize: '0.9rem'
+}))
+
+const StatusBadge = styled(Box)<{ owned?: boolean }>(({ theme, owned }) => ({
+  padding: '6px 12px',
+  borderRadius: '8px',
+  fontSize: '0.75rem',
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: '1px',
+  width: 'fit-content',
+  background: owned ? alpha(theme.palette.success.main, 0.1) : alpha(theme.palette.primary.main, 0.1),
+  color: owned ? theme.palette.success.main : theme.palette.primary.main,
+  border: `1px solid ${alpha(owned ? theme.palette.success.main : theme.palette.primary.main, 0.2)}`
+}))
+
+const PremiumButton = styled(Button)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+  color: '#fff',
+  borderRadius: '12px',
+  fontWeight: 700,
+  textTransform: 'none',
+  padding: theme.spacing(1.5),
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`
+  },
+  '&:disabled': {
+    opacity: 0.7,
+    color: alpha('#fff', 0.5)
+  }
+}))
 
 interface Props {
   nft: INft
@@ -40,13 +152,9 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
   const [isListingModalOpen, setIsListingModalOpen] = React.useState(false)
 
   return (
-    <Box className={styles.showcaseContainer}>
-      <CreateListingModal 
-        open={isListingModalOpen} 
-        onClose={() => setIsListingModalOpen(false)} 
-        nft={nft} 
-      />
-      {/* Cinematic Image Showcase */}
+    <ShowcaseContainer>
+      <CreateListingModal open={isListingModalOpen} onClose={() => setIsListingModalOpen(false)} nft={nft} />
+
       <AnimatePresence mode='wait'>
         <motion.div
           key={nft.id.toString()}
@@ -54,18 +162,10 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: -20, scale: 0.95 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className={styles.imageShowcase}
+          style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
-          <Box className={styles.mainAircraftImageContainer}>
-            <Image
-              src={image}
-              alt={name}
-              fill
-              style={{ objectFit: 'cover' }}
-              className={styles.mainAircraftImage}
-              priority
-            />
-            {/* Glossy Overlay */}
+          <MainAircraftImageContainer>
+            <Image src={image} alt={name} fill style={{ objectFit: 'cover' }} priority />
             <Box
               sx={{
                 position: 'absolute',
@@ -79,81 +179,67 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
                 opacity: 0.4
               }}
             />
-          </Box>
+          </MainAircraftImageContainer>
         </motion.div>
       </AnimatePresence>
 
-      {/* Technical Specs Panel */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        className={styles.glassCard}
       >
-        <Stack spacing={1}>
-          <Box display='flex' justifyContent='space-between' alignItems='flex-start'>
-            <Typography variant='h4' fontWeight={700} sx={{ fontFamily: 'Sora, sans-serif' }}>
-              {name}
-            </Typography>
-            <Box className={`${styles.statusBadge} ${hasAircraft ? styles.ownedBadge : styles.lockedBadge}`}>
-              {hasAircraft ? 'Propiedad' : 'Disponible'}
+        <GlassCard>
+          <Stack spacing={1}>
+            <Box display='flex' justifyContent='space-between' alignItems='flex-start'>
+              <Typography variant='h4' fontWeight={800} sx={{ letterSpacing: '-1px' }}>
+                {name}
+              </Typography>
+              <StatusBadge owned={hasAircraft}>{hasAircraft ? 'Propiedad' : 'Disponible'}</StatusBadge>
             </Box>
+            <Typography variant='body2' color='text.secondary'>
+              {description}
+            </Typography>
+          </Stack>
+
+          <Box mt={1}>
+            {specs.map((spec) => {
+              if (hasAircraft && spec.trait_type.toLowerCase() === 'price') return null
+              return (
+                <SpecRow key={spec.trait_type}>
+                  <SpecLabel>{spec.trait_type.replace('_', ' ')}</SpecLabel>
+                  {spec.trait_type.toLowerCase() === 'license' ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      {license && (
+                        <Image
+                          src={license.metadata.image as string}
+                          alt={license.metadata.name as string}
+                          width={24}
+                          height={24}
+                          style={{ borderRadius: '4px' }}
+                        />
+                      )}
+                    </Box>
+                  ) : (
+                    <SpecValue>
+                      {spec.trait_type.toLowerCase() === 'price' ? `${spec.value} AIRL` : spec.value}
+                    </SpecValue>
+                  )}
+                </SpecRow>
+              )
+            })}
           </Box>
-          <Typography variant='body2' color='rgba(255,255,255,0.6)' sx={{ mb: 2 }}>
-            {description}
-          </Typography>
-        </Stack>
 
-        <Box>
-          {specs.map((spec) => {
-            if (hasAircraft && spec.trait_type.toLowerCase() === 'price') return null
-            return (
-              <Box key={spec.trait_type} className={styles.specRow}>
-                <Typography className={styles.specLabel}>{spec.trait_type.replace('_', ' ')}</Typography>
-                {spec.trait_type.toLowerCase() === 'license' ? (
-                  <Box className={styles.specValue}>
-                    <Image
-                      src={license?.metadata.image as string}
-                      alt={license?.metadata.name as string}
-                      width={20}
-                      height={20}
-                    />
-                  </Box>
-                ) : (
-                  <Typography className={styles.specValue}>
-                    {spec.trait_type.toLowerCase() === 'price' ? `${spec.value} AIRL` : spec.value}
-                  </Typography>
-                )}
-              </Box>
-            )
-          })}
-        </Box>
-
-        {hasAircraft ? (
-          <Button
+          <PremiumButton
             fullWidth
-            variant='contained'
-            size='large'
-            className={styles.claimButton}
-            onClick={() => setIsListingModalOpen(true)}
-            sx={{ mt: 2, background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' }}
+            onClick={hasAircraft ? () => setIsListingModalOpen(true) : onClaim}
+            disabled={!hasAircraft && isClaiming}
+            sx={{ mt: 2 }}
           >
-            Listar en Marketplace
-          </Button>
-        ) : (
-          <Button
-            fullWidth
-            variant='contained'
-            size='large'
-            className={styles.claimButton}
-            onClick={onClaim}
-            disabled={isClaiming}
-          >
-            {isClaiming ? 'Procesando...' : `Adquirir por ${price} AIRL`}
-          </Button>
-        )}
+            {hasAircraft ? 'Listar en Marketplace' : isClaiming ? 'Procesando...' : `Adquirir por ${price} AIRL`}
+          </PremiumButton>
+        </GlassCard>
       </motion.div>
-    </Box>
+    </ShowcaseContainer>
   )
 }
 

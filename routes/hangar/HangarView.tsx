@@ -8,12 +8,88 @@ import AircraftShowcase from './components/AircraftShowcase'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
+import { styled, alpha } from '@mui/material/styles'
 import { INft } from 'models/Nft'
 import { useNFTProviderContext } from 'context/NFTProvider'
 import { tokenBalanceStore } from 'store/balance.atom'
 import { getNFTAttributes } from 'utils'
 import useAircraft from 'hooks/useAircraft'
-import styles from 'styles/Hangar.module.css'
+
+const PageContainer = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  minHeight: 'calc(100vh - 64px)',
+  padding: theme.spacing(0, 3),
+  color: theme.palette.text.primary,
+  overflowX: 'hidden',
+  background: theme.palette.background.default,
+  display: 'flex',
+  flexDirection: 'column'
+}))
+
+const BackgroundOverlay = styled(Box)(({ theme }) => ({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundImage: theme.palette.mode === 'dark'
+    ? `linear-gradient(135deg, ${alpha('#0f172a', 0.95)} 0%, ${alpha('#1e293b', 0.9)} 100%), url('/img/airport_bg.png')`
+    : `linear-gradient(135deg, ${alpha('#f8fafc', 0.9)} 0%, ${alpha('#f1f5f9', 0.85)} 100%), url('/img/airport_bg.png')`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  zIndex: 0,
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: `radial-gradient(circle at 50% 50%, ${alpha(theme.palette.primary.main, 0.1)} 0%, transparent 80%)`,
+    animation: 'pulse 8s infinite alternate ease-in-out'
+  },
+  '@keyframes pulse': {
+    '0%': { opacity: 0.3, transform: 'scale(1)' },
+    '100%': { opacity: 0.7, transform: 'scale(1.1)' }
+  }
+}))
+
+const ContentWrapper = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  zIndex: 1,
+  maxWidth: '1400px',
+  width: '100%',
+  margin: '0 auto',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  flex: 1,
+  gap: theme.spacing(5),
+  padding: theme.spacing(8, 0, 5, 0)
+}))
+
+const CarouselSection = styled(Box)(({ theme }) => ({
+  marginTop: theme.spacing(3)
+}))
+
+const CarouselScroll = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  gap: theme.spacing(3),
+  overflowX: 'auto',
+  padding: theme.spacing(1, 0.5, 4, 0.5),
+  scrollbarWidth: 'thin',
+  scrollbarColor: `${alpha(theme.palette.text.primary, 0.1)} transparent`,
+  '&::-webkit-scrollbar': {
+    height: 6
+  },
+  '&::-webkit-scrollbar-track': {
+    background: 'transparent'
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: alpha(theme.palette.text.primary, 0.1),
+    borderRadius: 10
+  }
+}))
 
 const HangarView: React.FC = () => {
   const { aircrafts, refetch: refetchNFTs } = useNFTProviderContext()
@@ -41,7 +117,7 @@ const HangarView: React.FC = () => {
       if (!hasEnough) {
         Swal.fire({
           title: name,
-          text: `You don't have enough AIRL to get this aircraft`,
+          text: `No tienes suficiente AIRL para adquirir esta aeronave`,
           icon: 'error'
         })
         return
@@ -49,7 +125,7 @@ const HangarView: React.FC = () => {
 
       const { isConfirmed } = await Swal.fire({
         title: aircraftNFT.metadata.name as string,
-        text: `Do you want to get this aircraft?`,
+        text: `¿Deseas adquirir esta aeronave?`,
         icon: 'question',
         showCancelButton: true
       })
@@ -59,7 +135,7 @@ const HangarView: React.FC = () => {
           await claimAircraftNFT(aircraftNFT)
           Swal.fire({
             title: aircraftNFT.metadata.name as string,
-            text: 'Claimed Aircraft! Enjoy your flights!',
+            text: '¡Aeronave adquirida! ¡Disfruta tus vuelos!',
             icon: 'success'
           })
           refetchNFTs()
@@ -81,16 +157,16 @@ const HangarView: React.FC = () => {
   }
 
   return (
-    <Box className={styles.pageContainer}>
-      <div className={styles.backgroundOverlay} />
+    <PageContainer>
+      <BackgroundOverlay />
 
-      <Box className={styles.contentWrapper}>
+      <ContentWrapper sx={{ maxWidth: '1400px' }}>
         {/* Header */}
         <Box mb={2}>
-          <Typography variant='h3' fontWeight={800} sx={{ letterSpacing: '-2px' }}>
+          <Typography variant='h3' fontWeight={900} sx={{ letterSpacing: '-2px' }}>
             Tu <span style={{ color: '#6366f1' }}>Flota</span>
           </Typography>
-          <Typography variant='body1' color='rgba(255,255,255,0.5)' sx={{ maxWidth: '600px' }}>
+          <Typography variant='body1' color='text.secondary' sx={{ maxWidth: '600px', fontWeight: 500 }}>
             Gestiona tus aeronaves y adquiere nuevas unidades para tu carrera.
           </Typography>
         </Box>
@@ -106,9 +182,11 @@ const HangarView: React.FC = () => {
         )}
 
         {/* Carousel Selector */}
-        <Box className={styles.carouselSection}>
-          <Typography className={styles.carouselTitle}>Explorar Aeronaves</Typography>
-          <Box className={styles.carouselScroll}>
+        <CarouselSection>
+          <Typography variant="h6" fontWeight={700} sx={{ mb: 2, opacity: 0.9 }}>
+            Explorar Aeronaves
+          </Typography>
+          <CarouselScroll>
             {aircrafts.map((aircraft) => (
               <AircraftItem
                 nft={aircraft}
@@ -117,10 +195,10 @@ const HangarView: React.FC = () => {
                 onClick={() => setSelectedAircraft(aircraft)}
               />
             ))}
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+          </CarouselScroll>
+        </CarouselSection>
+      </ContentWrapper>
+    </PageContainer>
   )
 }
 

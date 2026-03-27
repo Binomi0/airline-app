@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -7,10 +7,16 @@ import TextField from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import CircularProgress from '@mui/material/CircularProgress'
+import Chip from '@mui/material/Chip'
+import Select from '@mui/material/Select'
+import InputLabel from '@mui/material/InputLabel'
+import FormControl from '@mui/material/FormControl'
+import OutlinedInput from '@mui/material/OutlinedInput'
 import { styled, alpha } from '@mui/material/styles'
 import { INft } from 'models/Nft'
-import axios from 'axios'
 import Swal from 'sweetalert2'
+import { useMutation } from '@tanstack/react-query'
+import { fetcherPOST } from 'utils'
 
 const ModalContent = styled(Box)(({ theme }) => ({
   position: 'absolute',
@@ -41,28 +47,20 @@ interface CreateListingModalProps {
 }
 
 const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onClose, nft }) => {
-  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     price: '',
     currency: 'AIRL',
     type: 'SALE',
-    expiresIn: '7' // days
+    expiresIn: ['7'] // days
   })
 
-  if (!nft) return null
-
-  const handleSubmit = async () => {
-    if (!formData.price || isNaN(Number(formData.price))) {
-      Swal.fire('Error', 'Por favor ingresa un precio válido', 'error')
-      return
-    }
-
-    setLoading(true)
-    try {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (nft: INft) => {
+      const maxDays = Math.max(...formData.expiresIn.map(Number))
       const expiresAt = new Date()
-      expiresAt.setDate(expiresAt.getDate() + Number(formData.expiresIn))
+      expiresAt.setDate(expiresAt.getDate() + maxDays)
 
-      await axios.post('/api/marketplace', {
+      return await fetcherPOST('/api/marketplace', {
         nftId: nft._id,
         price: formData.price,
         currency: formData.currency,
@@ -70,35 +68,51 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onClose, 
         tokenId: nft.id.toString(),
         tokenAddress: nft.tokenAddress,
         chainId: nft.chainId,
-        expiresAt
+        expiresAt,
+        allowedDurations: formData.expiresIn
       })
-
+    },
+    onSuccess: () => {
       Swal.fire('¡Listado Creado!', 'Tu aeronave ya está disponible en el mercado.', 'success')
       onClose()
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       console.error(error)
       Swal.fire('Error', error.response?.data?.error || 'No se pudo crear el listado', 'error')
-    } finally {
-      setLoading(false)
     }
-  }
+  })
+
+  if (!nft) return null
+
+  const handleSubmit = useCallback(async () => {
+    if (!formData.price || isNaN(Number(formData.price))) {
+      Swal.fire('Error', 'Por favor ingresa un precio válido', 'error')
+      return
+    }
+
+    if (!isPending) mutate(nft)
+  }, [formData, isPending, mutate, nft])
 
   return (
     <Modal open={open} onClose={onClose}>
       <ModalContent>
-        <Typography variant="h5" fontWeight={800} mb={3}>
+        <Typography variant='h5' fontWeight={800} mb={3}>
           Listar <span style={{ color: '#6366f1' }}>Aeronave</span>
         </Typography>
 
-        <Box display="flex" gap={2} mb={3} alignItems="center">
-          <img 
-            src={nft.metadata.image} 
-            alt={nft.metadata.name as string} 
-            style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: '12px' }} 
+        <Box display='flex' gap={2} mb={3} alignItems='center'>
+          <img
+            src={nft.metadata.image}
+            alt={nft.metadata.name as string}
+            style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: '12px' }}
           />
           <Box>
-            <Typography variant="subtitle1" fontWeight={700}>{nft.metadata.name}</Typography>
-            <Typography variant="caption" color="text.secondary">ID: {nft.id.toString()}</Typography>
+            <Typography variant='subtitle1' fontWeight={700}>
+              {nft.metadata.name}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              ID: {nft.id.toString()}
+            </Typography>
           </Box>
         </Box>
 
@@ -106,64 +120,77 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onClose, 
           <StyledTextField
             select
             fullWidth
-            label="Tipo de Listado"
+            label='Tipo de Listado'
             value={formData.type}
             onChange={(e) => setFormData({ ...formData, type: e.target.value })}
           >
-            <MenuItem value="SALE">Venta Directa</MenuItem>
-            <MenuItem value="RENT">Alquiler Operativo</MenuItem>
+            <MenuItem value='SALE'>Venta Directa</MenuItem>
+            <MenuItem value='RENT'>Alquiler Operativo</MenuItem>
           </StyledTextField>
 
-          <Box display="flex" gap={2}>
+          <Box display='flex' gap={2}>
             <StyledTextField
               fullWidth
-              label="Precio"
-              placeholder="0.00"
+              label='Precio'
+              placeholder='0.00'
               value={formData.price}
+              focused
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
             />
             <StyledTextField
               select
               sx={{ width: 120 }}
-              label="Moneda"
+              label='Moneda'
               value={formData.currency}
               onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
             >
-              <MenuItem value="AIRL">AIRL</MenuItem>
-              <MenuItem value="AIRG">AIRG</MenuItem>
+              <MenuItem value='AIRL'>AIRL</MenuItem>
+              <MenuItem value='AIRG'>AIRG</MenuItem>
             </StyledTextField>
           </Box>
 
-          <StyledTextField
-            select
+          <FormControl
             fullWidth
-            label="Duración del Listado"
-            value={formData.expiresIn}
-            onChange={(e) => setFormData({ ...formData, expiresIn: e.target.value })}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '12px',
+                backgroundColor: (theme) => alpha(theme.palette.action.hover, 0.05)
+              }
+            }}
           >
-            <MenuItem value="1">1 día</MenuItem>
-            <MenuItem value="3">3 días</MenuItem>
-            <MenuItem value="7">7 días</MenuItem>
-            <MenuItem value="30">30 días</MenuItem>
-          </StyledTextField>
-
-          <Box display="flex" gap={2} mt={2}>
-            <Button 
-              fullWidth 
-              variant="outlined" 
-              onClick={onClose}
-              sx={{ borderRadius: '12px', fontWeight: 700 }}
+            <InputLabel id='duration-label'>Duración del Listado</InputLabel>
+            <Select
+              labelId='duration-label'
+              multiple
+              value={formData.expiresIn}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  expiresIn: typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value
+                })
+              }
+              input={<OutlinedInput label='Duración del Listado' />}
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {(selected as string[]).map((value) => (
+                    <Chip key={value} label={`${value} días`} size='small' sx={{ borderRadius: '6px' }} />
+                  ))}
+                </Box>
+              )}
             >
+              <MenuItem value='1'>1 día</MenuItem>
+              <MenuItem value='3'>3 días</MenuItem>
+              <MenuItem value='7'>7 días</MenuItem>
+              <MenuItem value='30'>30 días</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Box display='flex' gap={2} mt={2}>
+            <Button fullWidth variant='outlined' onClick={onClose} sx={{ borderRadius: '12px', fontWeight: 700 }}>
               Cancelar
             </Button>
-            <Button 
-              fullWidth 
-              variant="premium" 
-              onClick={handleSubmit}
-              disabled={loading}
-              sx={{ py: 1.5 }}
-            >
-              {loading ? <CircularProgress size={24} color="inherit" /> : 'Confirmar Listado'}
+            <Button fullWidth variant='premium' onClick={handleSubmit} disabled={isPending} sx={{ py: 1.5 }}>
+              {isPending ? <CircularProgress size={24} color='inherit' /> : 'Confirmar Listado'}
             </Button>
           </Box>
         </Stack>

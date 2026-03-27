@@ -30,7 +30,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
   else if (req.method === 'POST') {
     try {
-      const { nftId, price, currency, type, tokenId, tokenAddress, chainId, expiresAt } = req.body
+      const { nftId, price, currency, type, tokenId, tokenAddress, chainId, expiresAt, allowedDurations } = req.body
 
       // Basic validation
       if (!nftId || !price || !tokenId || !tokenAddress) {
@@ -47,7 +47,8 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         tokenId,
         tokenAddress,
         chainId,
-        expiresAt
+        expiresAt,
+        allowedDurations
       })
 
       await listing.save()

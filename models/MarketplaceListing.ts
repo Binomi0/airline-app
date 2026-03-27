@@ -16,6 +16,7 @@ export interface IMarketplaceListing extends Document {
   tokenAddress: string
   chainId: number
   expiresAt?: Date
+  allowedDurations?: string[]
 }
 
 const marketplaceListingSchema: mongoose.Schema = new mongoose.Schema(
@@ -71,6 +72,10 @@ const marketplaceListingSchema: mongoose.Schema = new mongoose.Schema(
     },
     expiresAt: {
       type: Date
+    },
+    allowedDurations: {
+      type: [String],
+      default: ['7']
     }
   },
   {

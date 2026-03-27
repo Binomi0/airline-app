@@ -390,9 +390,9 @@ const EventDetailPage = () => {
                 <FormControl fullWidth>
                   <InputLabel>Tu Aeronave</InputLabel>
                   <Select
-                    value={selectedAircraftId}
+                    value={selectedAircraftId || ''}
                     label='Tu Aeronave'
-                    onChange={(e) => setSelectedAircraftId(e.target.value)}
+                    onChange={(e) => setSelectedAircraftId(e.target.value || '')}
                   >
                     {compatibleAircrafts.map((owned) => (
                       <MenuItem key={owned.nft.id.toString()} value={owned.nft.id.toString()}>
@@ -419,7 +419,8 @@ const EventDetailPage = () => {
 
                 {hasAnyAircraft && !hasCompatibleAircraft && (
                   <Alert severity='warning' sx={{ borderRadius: 2 }}>
-                    No tienes una aeronave compatible para este evento. Se requiere: {event.requiredAircrafts?.join(', ')}.
+                    No tienes una aeronave compatible para este evento. Se requiere:{' '}
+                    {event.requiredAircrafts?.join(', ')}.
                   </Alert>
                 )}
 
