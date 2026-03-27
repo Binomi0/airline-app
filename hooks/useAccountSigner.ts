@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState } from 'react'
 import {
   startAuthentication,
   startRegistration,
@@ -10,7 +10,9 @@ import { backupDoneSwal, backupErrorSwal } from 'lib/swal'
 import { AccountSignerStatus, WebAuthnUri, Authenticator, LoginChallengeResponse } from 'types'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
-import { postApi, getApi } from 'lib/api'
+import { postApi } from 'lib/api'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { fetcher } from 'utils'
 
 interface UseAccountSignerReturnType {
   addBackup: () => Promise<void>
@@ -31,6 +33,16 @@ interface UseAccountSignerReturnType {
 const useAccountSigner = (): UseAccountSignerReturnType => {
   const user = useRecoilValue(userState)
   const [status, setStatus] = useState<AccountSignerStatus>()
+  const queryClient = useQueryClient()
+
+  const { data: backupsData, refetch: fetchBackups } = useQuery<{ authenticators: Authenticator[] }>({
+    queryKey: ['webauthn-backups', user?.email],
+    queryFn: () => fetcher('/api/webauthn/get'),
+    enabled: !!user?.email,
+    staleTime: 1000 * 60 * 5 // 5 minutes cache
+  })
+
+  const backups = backupsData?.authenticators || []
 
   const createCredential = useCallback(async (email: string) => {
     try {
@@ -86,19 +98,6 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
     }
   }, [])
 
-  const [backups, setBackups] = useState<Authenticator[]>([])
-
-  const fetchBackups = useCallback(async () => {
-    try {
-      const response = await getApi<{ authenticators: Authenticator[] }>('/api/webauthn/get')
-      if (response?.authenticators) {
-        setBackups(response.authenticators)
-      }
-    } catch (err) {
-      console.error('Error fetching backups:', err)
-    }
-  }, [])
-
   const addBackup = useCallback(async () => {
     if (!user?.email || !user?.id) {
       if (!user?.id) {
@@ -117,7 +116,7 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       const { verified: created, error: createError } = await createCredential(user.email)
       if (created) {
         backupDoneSwal()
-        fetchBackups()
+        queryClient.invalidateQueries({ queryKey: ['webauthn-backups', user.email] })
       } else {
         backupErrorSwal(createError as string)
       }
@@ -126,34 +125,30 @@ const useAccountSigner = (): UseAccountSignerReturnType => {
       console.error('[addBackup] Error =>', err)
       setStatus(error.message === 'Missing private key' ? 'missingKey' : 'error')
     }
-  }, [createCredential, fetchBackups, user?.email, user?.id, verifyCredential])
+  }, [createCredential, queryClient, user?.email, user?.id, verifyCredential])
 
   const removeBackup = useCallback(
     async (credentialID: string) => {
       try {
         const response = await postApi<{ success: boolean }>('/api/webauthn/remove', { credentialID })
-        if (response?.success) {
-          fetchBackups()
+        if (response?.success && user?.email) {
+          queryClient.invalidateQueries({ queryKey: ['webauthn-backups', user.email] })
         }
       } catch (err) {
         console.error('Error removing backup:', err)
       }
     },
-    [fetchBackups]
+    [queryClient, user?.email]
   )
-
-  useEffect(() => {
-    if (user?.email) {
-      fetchBackups()
-    }
-  }, [fetchBackups, user?.email])
 
   return {
     addBackup,
     createCredential,
     verifyCredential,
     removeBackup,
-    fetchBackups,
+    fetchBackups: async () => {
+      await fetchBackups()
+    },
     backups,
     status
   }

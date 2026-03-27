@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import styles from '../../../styles/Home.module.css'
+import { useQuery } from '@tanstack/react-query'
+import { fetcher } from 'utils'
+import { ILive } from 'models/Live'
 
 interface ActiveFlight {
   _id: string
@@ -18,30 +21,13 @@ interface ActiveFlight {
 }
 
 const LiveDashboard = () => {
-  const [flights, setFlights] = useState<ActiveFlight[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: flights, isLoading } = useQuery<ActiveFlight[]>({
+    queryKey: ['/api/stats/active-flights'],
+    queryFn: () => fetcher('/api/stats/active-flights'),
+    staleTime: 1000 * 60 * 5 // 5 minutes cache
+  })
 
-  useEffect(() => {
-    const fetchFlights = async () => {
-      try {
-        const res = await fetch('/api/stats/active-flights')
-        if (res.ok) {
-          const data = await res.json()
-          setFlights(data)
-        }
-      } catch (error) {
-        console.error('Error fetching live flights:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchFlights()
-    const interval = setInterval(fetchFlights, 30000) // Refresh every 30s
-    return () => clearInterval(interval)
-  }, [])
-
-  if (loading && flights.length === 0) return null
+  if (isLoading || !flights || flights.length === 0) return null
 
   return (
     <section className={styles.liveDashboard}>

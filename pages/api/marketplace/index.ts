@@ -1,21 +1,19 @@
 import { connectDB } from 'lib/mongoose'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiResponse } from 'next'
 import MarketplaceListing from 'models/MarketplaceListing'
-import Nft from 'models/Nft'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from 'pages/api/auth/[...nextauth]'
+import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   await connectDB()
 
   if (req.method === 'GET') {
     try {
       const { type, status = 'ACTIVE' } = req.query
-      const query: any = { status }
+      if (!type) {
+        return res.status(400).end()
+      }
 
-      if (type) query.type = type
-
-      const listings = await MarketplaceListing.find(query)
+      const listings = await MarketplaceListing.find({ status, type })
         .populate('nft')
         .populate({
           path: 'seller',
@@ -30,12 +28,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   }
 
-  if (req.method === 'POST') {
-    const session = await getServerSession(req, res, authOptions)
-    if (!session) {
-      return res.status(401).json({ error: 'No autorizado' })
-    }
-
+  else if (req.method === 'POST') {
     try {
       const { nftId, price, currency, type, tokenId, tokenAddress, chainId, expiresAt } = req.body
 
@@ -46,7 +39,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const listing = new MarketplaceListing({
         nft: nftId,
-        seller: (session.user as any).id,
+        seller: req.id,
         price,
         currency: currency || 'AIRL',
         type: type || 'SALE',
@@ -68,4 +61,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(405).end()
 }
 
-export default handler
+export default withAuth(handler)
