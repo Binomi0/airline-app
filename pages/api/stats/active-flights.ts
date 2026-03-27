@@ -1,5 +1,5 @@
 import withAuth, { CustomNextApiRequest } from 'lib/withAuth'
-import Live from 'models/Live'
+import Live, { ILive } from 'models/Live'
 import User from 'models/User'
 import VirtualAirline from 'models/VirtualAirline'
 import Mission from 'models/Mission'
@@ -11,7 +11,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const activeFlights = await Live.find({ isCompleted: false })
+    const activeFlights: ILive[] = await Live.find({ isCompleted: false })
       .populate({
         path: 'userId',
         model: User,

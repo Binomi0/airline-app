@@ -150,7 +150,6 @@ const OperationsCenter = () => {
                     setError(null)
                   }
                 }}
-                theme={theme.palette.mode as 'light' | 'dark'}
               />
             </Box>
 

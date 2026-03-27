@@ -219,7 +219,7 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
           <Typography variant='overline' color='text.secondary'>
             CALLSIGN ASIGNADO
           </Typography>
-          <Paper variant='outlined' sx={{ p: 1, textAlign: 'center', bgcolor: 'primary.dark', color: 'white' }}>
+          <Paper variant='outlined' sx={{ p: 1, textAlign: 'center', bgcolor: 'primary.dark', color: 'common.white' }}>
             <Typography variant='h4' sx={{ letterSpacing: 4, fontWeight: 'bold' }}>
               {mission.callsign}
             </Typography>
@@ -243,7 +243,7 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
         </FormControl>
 
         {currentAircraft && (
-          <Box p={2} sx={{ bgcolor: alpha('#000', 0.05), borderRadius: 2 }}>
+          <Box p={2} sx={{ bgcolor: (theme) => alpha(theme.palette.common.black, 0.05), borderRadius: 2 }}>
             <Stack direction='row' spacing={2} alignItems='center'>
               <Box sx={{ width: 64, height: 64, borderRadius: 1, overflow: 'hidden' }}>
                 <MediaRenderer client={twClient!} src={media as string} width='64px' height='64px' />

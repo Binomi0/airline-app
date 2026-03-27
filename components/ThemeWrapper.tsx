@@ -5,7 +5,8 @@ import {
   ThemeProvider,
   Experimental_CssVarsProvider as CssVarsProvider,
   useColorScheme,
-  experimental_extendTheme as extendTheme
+  experimental_extendTheme as extendTheme,
+  alpha
 } from '@mui/material/styles'
 import { darkTheme, lightTheme } from '../src/theme'
 import { useRecoilValue } from 'recoil'
@@ -46,16 +47,16 @@ const ThemeWrapper = ({ children }: Props) => {
       <GlobalStyles
         styles={{
           '.radar-popup .leaflet-popup-content-wrapper': {
-            background: `${currentTheme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`,
+            background: `${currentTheme.palette.background.paper} !important`,
             color: `${currentTheme.palette.text.primary} !important`,
             padding: '0 !important',
             borderRadius: '12px !important',
-            border: `1px solid ${currentTheme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(0,0,0,0.1)'} !important`,
+            border: `1px solid ${currentTheme.palette.mode === 'dark' ? alpha(currentTheme.palette.sky.main, 0.3) : alpha(currentTheme.palette.common.black, 0.1)} !important`,
             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important'
           },
           '.radar-popup .leaflet-popup-tip': {
-            background: `${currentTheme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`,
-            border: `1px solid ${currentTheme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(0,0,0,0.1)'} !important`
+            background: `${currentTheme.palette.background.paper} !important`,
+            border: `1px solid ${currentTheme.palette.mode === 'dark' ? alpha(currentTheme.palette.sky.main, 0.3) : alpha(currentTheme.palette.common.black, 0.1)} !important`
           },
           '.radar-popup .leaflet-popup-content': {
             margin: '0 !important',
@@ -71,24 +72,24 @@ const ThemeWrapper = ({ children }: Props) => {
             zIndex: 1000
           },
           '.leaflet-tooltip': {
-            background: `${currentTheme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`,
-            border: `1px solid ${currentTheme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(0,0,0,0.1)'} !important`,
-            boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px ${currentTheme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.08)' : 'rgba(0,0,0,0.05)'} !important`,
+            background: `${currentTheme.palette.background.paper} !important`,
+            border: `1px solid ${currentTheme.palette.mode === 'dark' ? alpha(currentTheme.palette.sky.main, 0.2) : alpha(currentTheme.palette.common.black, 0.1)} !important`,
+            boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px ${currentTheme.palette.mode === 'dark' ? alpha(currentTheme.palette.sky.main, 0.08) : alpha(currentTheme.palette.common.black, 0.05)} !important`,
             color: `${currentTheme.palette.text.primary} !important`,
             padding: '12px !important',
             borderRadius: '10px !important'
           },
           '.leaflet-tooltip-top:before': {
-            borderTopColor: `${currentTheme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`
+            borderTopColor: `${currentTheme.palette.background.paper} !important`
           },
           '.leaflet-tooltip-bottom:before': {
-            borderBottomColor: `${currentTheme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`
+            borderBottomColor: `${currentTheme.palette.background.paper} !important`
           },
           '.leaflet-tooltip-left:before': {
-            borderLeftColor: `${currentTheme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`
+            borderLeftColor: `${currentTheme.palette.background.paper} !important`
           },
           '.leaflet-tooltip-right:before': {
-            borderRightColor: `${currentTheme.palette.mode === 'dark' ? '#0f172a' : '#fff'} !important`
+            borderRightColor: `${currentTheme.palette.background.paper} !important`
           }
         }}
       />

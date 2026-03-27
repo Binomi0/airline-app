@@ -2,9 +2,8 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import { Box, CircularProgress, Typography } from '@mui/material'
+import { useTheme, alpha } from '@mui/material/styles'
 import dynamic from 'next/dynamic'
-import { useRecoilValue } from 'recoil'
-import { themeStore } from 'store/theme.atom'
 import { useVaProvider } from 'context/VaProvider'
 import { Atc } from 'types'
 import { getCoords, calculateDistance } from './utils'
@@ -20,7 +19,7 @@ const RadarMap = dynamic<RadarMapProps>(() => import('./RadarMap'), {
       sx={{
         height: '100vh',
         width: '100%',
-        bgcolor: '#030712',
+        bgcolor: 'background.default',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -28,8 +27,8 @@ const RadarMap = dynamic<RadarMapProps>(() => import('./RadarMap'), {
         borderRadius: 3
       }}
     >
-      <CircularProgress size={24} sx={{ mb: 2, color: '#38bdf8' }} />
-      <Typography variant='body2' sx={{ color: '#94a3b8', letterSpacing: 1 }}>
+      <CircularProgress size={24} sx={{ mb: 2, color: 'info.main' }} />
+      <Typography variant='body2' sx={{ color: 'text.secondary', letterSpacing: 1 }}>
         STARTING RADAR ENGINE...
       </Typography>
     </Box>
@@ -38,7 +37,7 @@ const RadarMap = dynamic<RadarMapProps>(() => import('./RadarMap'), {
 
 const TowerControlMap = () => {
   const { atcs = [], initIvaoData, isLoading } = useVaProvider()
-  const theme = useRecoilValue(themeStore)
+  const muiTheme = useTheme()
   const [origin, setOrigin] = useState<Atc | null>(null)
   const [destination, setDestination] = useState<Atc | null>(null)
 
@@ -76,7 +75,7 @@ const TowerControlMap = () => {
         width: '100%',
         height: '100%',
         overflow: 'hidden',
-        bgcolor: '#030712'
+        bgcolor: 'background.default'
       }}
     >
       <RadarInfoPanel
@@ -85,10 +84,9 @@ const TowerControlMap = () => {
         distance={distance}
         isLoading={isLoading}
         onReset={handleReset}
-        theme={theme}
       />
 
-      <RadarMap towers={atcs} origin={origin} destination={destination} onTowerClick={handleTowerClick} theme={theme} />
+      <RadarMap towers={atcs} origin={origin} destination={destination} onTowerClick={handleTowerClick} />
 
       {!origin && <StatusOverlay />}
 
@@ -104,27 +102,27 @@ const TowerControlMap = () => {
         }
         .flight-path {
           animation: flight-path-flow 1.5s linear infinite;
-          filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.6));
+          filter: drop-shadow(0 0 3px ${muiTheme.palette.mode === 'dark' ? alpha(muiTheme.palette.sky.light, 0.6) : alpha(muiTheme.palette.info.main, 0.6)});
         }
         .leaflet-container {
-          background: ${theme === 'dark' ? '#020617' : '#f1f5f9'} !important;
+          background: ${muiTheme.palette.background.default} !important;
         }
         .leaflet-tile {
           filter: ${
-            theme === 'dark'
+            muiTheme.palette.mode === 'dark'
               ? 'brightness(1.1) contrast(1.1) saturate(0.5) hue-rotate(180deg)'
               : 'brightness(1) contrast(1.1) saturate(0.3) hue-rotate(0deg)'
           } !important;
         }
         .radar-popup .leaflet-popup-content-wrapper {
-          background: ${theme === 'dark' ? '#0f172a' : '#fff'} !important;
-          color: ${theme === 'dark' ? '#f8fafc' : '#1e293b'} !important;
-          border: 1px solid ${theme === 'dark' ? 'rgba(56, 189, 248, 0.4)' : 'rgba(56, 189, 248, 0.2)'};
+          background: ${muiTheme.palette.background.paper} !important;
+          color: ${muiTheme.palette.text.primary} !important;
+          border: 1px solid ${muiTheme.palette.mode === 'dark' ? alpha(muiTheme.palette.sky.light, 0.4) : alpha(muiTheme.palette.info.main, 0.2)};
           border-radius: 8px;
         }
         .radar-popup .leaflet-popup-tip {
-          background: ${theme === 'dark' ? '#0f172a' : '#fff'} !important;
-          border: 1px solid ${theme === 'dark' ? 'rgba(56, 189, 248, 0.4)' : 'rgba(56, 189, 248, 0.2)'};
+          background: ${muiTheme.palette.background.paper} !important;
+          border: 1px solid ${muiTheme.palette.mode === 'dark' ? alpha(muiTheme.palette.sky.light, 0.4) : alpha(muiTheme.palette.info.main, 0.2)};
         }
       `}</style>
     </Box>

@@ -4,13 +4,13 @@ import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet'
 import { Atc } from 'types'
 import RadarMarker from './RadarMarker'
 import { getCoords, getCurvePath } from './utils'
+import { useTheme, alpha } from '@mui/material/styles'
 
 export interface RadarMapProps {
   towers: readonly Atc[]
   origin: Atc | null
   destination: Atc | null
   onTowerClick: (tower: Atc) => void
-  theme: 'light' | 'dark'
 }
 
 interface MapBoundsControllerProps {
@@ -34,7 +34,9 @@ const MapBoundsController: React.FC<MapBoundsControllerProps> = ({ origin, desti
   return null
 }
 
-const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowerClick, theme }) => {
+const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowerClick }) => {
+  const muiTheme = useTheme()
+  const mode = muiTheme.palette.mode
   const polylinePath = React.useMemo(() => {
     if (!origin || !destination) return null
     const c1 = getCoords(origin)
@@ -45,10 +47,29 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
 
   return (
     <Box sx={{ height: '100%', width: '100%', zIndex: 1 }}>
+      {/* RADAR OVERLAY FILTER - Moved outside MapContainer for correct layering */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 400,
+          background: `radial-gradient(circle, transparent 20%, ${alpha(muiTheme.palette.background.default, 0.4)} 100%)`,
+          boxShadow: `inset 0 0 100px ${alpha(muiTheme.palette.info.main, 0.15)}`
+        }}
+      />
+
       <MapContainer
         center={[20, 0]}
         zoom={2.5}
-        style={{ height: '100%', width: '100%', background: theme === 'dark' ? '#020617' : '#f1f5f9' }}
+        style={{
+          height: '100%',
+          width: '100%',
+          background: muiTheme.palette.background.default
+        }}
         zoomControl={false}
         maxBounds={[
           [-85, -180],
@@ -60,25 +81,10 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
           url={
-            theme === 'dark'
+            mode === 'dark'
               ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
               : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
           }
-        />
-
-        {/* RADAR OVERLAY FILTER */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none',
-            zIndex: 400,
-            background: 'radial-gradient(circle, transparent 20%, rgba(2, 6, 23, 0.2) 100%)',
-            boxShadow: 'inset 0 0 100px rgba(56, 189, 248, 0.1)'
-          }}
         />
 
         {towers.map((tower, idx) => {
@@ -93,7 +99,6 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
               isOrigin={origin?.callsign === tower.callsign}
               isDestination={destination?.callsign === tower.callsign}
               onTowerClick={onTowerClick}
-              theme={theme}
             />
           )
         })}
@@ -103,7 +108,7 @@ const RadarMap: React.FC<RadarMapProps> = ({ towers, origin, destination, onTowe
             positions={polylinePath}
             className='flight-path'
             pathOptions={{
-              color: '#38bdf8',
+              color: muiTheme.palette.info.main,
               weight: 3,
               opacity: 0.8,
               dashArray: '10, 10',

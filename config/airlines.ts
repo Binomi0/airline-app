@@ -1,3 +1,5 @@
+import { AIRLINE_COLORS } from 'src/theme'
+
 export interface AirlineConfig {
   id: string
   name: string
@@ -13,8 +15,8 @@ export const AIRLINES: Record<string, AirlineConfig> = {
   iberia: {
     id: 'iberia',
     name: 'Iberia',
-    color: '#b01d21',
-    secondaryColor: '#ffffff',
+    color: AIRLINE_COLORS.iberia,
+    secondaryColor: AIRLINE_COLORS.iberia_secondary,
     logo: '/img/logos/iberia_icon.png',
     hero: '/img/events/iberia_hero.png',
     overlay: 'PUENTE AÉREO • EXCLUSIVO IBERIA',
@@ -23,8 +25,8 @@ export const AIRLINES: Record<string, AirlineConfig> = {
   vueling: {
     id: 'vueling',
     name: 'Vueling',
-    color: '#ffcc00', // Vueling Yellow
-    secondaryColor: '#333333',
+    color: AIRLINE_COLORS.vueling, // Vueling Yellow
+    secondaryColor: AIRLINE_COLORS.vueling_secondary,
     logo: '/img/logos/vueling_icon.png',
     hero: '/img/events/vueling_hero.png',
     overlay: 'VUELOS NACIONALES • EXCLUSIVO VUELING',
@@ -33,8 +35,8 @@ export const AIRLINES: Record<string, AirlineConfig> = {
   ryanair: {
     id: 'ryanair',
     name: 'Ryanair',
-    color: '#003399', // Ryanair Blue
-    secondaryColor: '#f1c400', // Ryanair Yellow
+    color: AIRLINE_COLORS.ryanair, // Ryanair Blue
+    secondaryColor: AIRLINE_COLORS.ryanair_secondary, // Ryanair Yellow
     logo: '/img/logos/ryanair_icon.png',
     hero: '/img/events/ryanair_hero.png',
     overlay: 'LOW COST • EXCLUSIVO RYANAIR',

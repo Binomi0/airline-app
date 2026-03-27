@@ -18,7 +18,8 @@ import {
   Avatar,
   Card,
   CardContent,
-  Link as MuiLink
+  Link as MuiLink,
+  Alert
 } from '@mui/material'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -26,10 +27,10 @@ import { motion } from 'framer-motion'
 import moment from 'moment'
 import 'moment/locale/es'
 import nextApiInstance from 'config/axios'
-import { PublicMission } from 'types'
+import { PublicMission, aircraftNameToIcaoCode } from 'types'
 import useOwnedNfts from 'hooks/useOwnedNFTs'
 import { nftAircraftTokenAddress } from 'contracts/address'
-import { fetcher, filterByTokenAddress, formatNumber } from 'utils'
+import { fetcher, filterByTokenAddress, formatNumber, getIcaoCodeFromAircraftNFT } from 'utils'
 import { eventBookingSuccessSwal, errorSwal, confirmSwal } from 'lib/swal'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
@@ -66,12 +67,23 @@ const EventDetailPage = () => {
     return AIRLINES[event.airlineId] || AIRLINES.iberia
   }, [event])
 
-  const BRAND_COLOR = airlineConfig.color
+  const BRAND_COLOR =
+    theme.palette.airlines[airlineConfig.id as keyof typeof theme.palette.airlines] || theme.palette.primary.main
 
   const ownedAircrafts = useMemo(
     () => userNfts?.filter(filterByTokenAddress(nftAircraftTokenAddress)) || [],
     [userNfts]
   )
+  const compatibleAircrafts = useMemo(() => {
+    if (!event?.requiredAircrafts || event.requiredAircrafts.length === 0) return ownedAircrafts
+    return ownedAircrafts.filter((owned) => {
+      const icaoCode = getIcaoCodeFromAircraftNFT(owned.nft.metadata?.name as keyof typeof aircraftNameToIcaoCode)
+      return icaoCode && event.requiredAircrafts?.includes(icaoCode)
+    })
+  }, [ownedAircrafts, event?.requiredAircrafts])
+
+  const hasAnyAircraft = ownedAircrafts.length > 0
+  const hasCompatibleAircraft = compatibleAircrafts.length > 0
 
   const handleBook = useCallback(async () => {
     if (!event || !selectedAircraftId) return
@@ -98,10 +110,10 @@ const EventDetailPage = () => {
   }, [event, selectedAircraftId, router])
 
   useEffect(() => {
-    if (ownedAircrafts.length > 0) {
-      setSelectedAircraftId(ownedAircrafts[0].nft.id.toString())
+    if (compatibleAircrafts.length > 0 && !selectedAircraftId) {
+      setSelectedAircraftId(compatibleAircrafts[0].nft.id.toString())
     }
-  }, [ownedAircrafts])
+  }, [compatibleAircrafts, selectedAircraftId])
 
   useEffect(() => {
     if (eventError) {
@@ -114,7 +126,11 @@ const EventDetailPage = () => {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <LinearProgress
-          sx={{ width: '200px', bgcolor: alpha('#b01d21', 0.1), '& .MuiLinearProgress-bar': { bgcolor: '#b01d21' } }}
+          sx={{
+            width: '200px',
+            bgcolor: alpha(theme.palette.error.main, 0.1),
+            '& .MuiLinearProgress-bar': { bgcolor: theme.palette.error.main }
+          }}
         />
       </Box>
     )
@@ -163,7 +179,7 @@ const EventDetailPage = () => {
               <Stack direction='row' alignItems='center' spacing={2}>
                 <Avatar
                   src={airlineConfig.logo}
-                  sx={{ width: 80, height: 80, border: `3px solid ${BRAND_COLOR}`, bgcolor: 'white' }}
+                  sx={{ width: 80, height: 80, border: `3px solid ${BRAND_COLOR}`, bgcolor: 'background.paper' }}
                 />
                 <Box>
                   <Typography variant='overline' sx={{ color: BRAND_COLOR, fontWeight: 900, letterSpacing: 4 }}>
@@ -379,11 +395,11 @@ const EventDetailPage = () => {
                 <FormControl fullWidth>
                   <InputLabel>Tu Aeronave</InputLabel>
                   <Select
-                    value={selectedAircraftId}
+                    value={selectedAircraftId || ''}
                     label='Tu Aeronave'
-                    onChange={(e) => setSelectedAircraftId(e.target.value)}
+                    onChange={(e) => setSelectedAircraftId(e.target.value || '')}
                   >
-                    {ownedAircrafts.map((owned) => (
+                    {compatibleAircrafts.map((owned) => (
                       <MenuItem key={owned.nft.id.toString()} value={owned.nft.id.toString()}>
                         {owned.nft.metadata?.name || `Aircraft #${owned.nft.id}`}
                       </MenuItem>
@@ -393,18 +409,31 @@ const EventDetailPage = () => {
 
                 <Box sx={{ p: 2, bgcolor: alpha(BRAND_COLOR, 0.05), borderRadius: 2 }}>
                   <Typography variant='caption' display='block' color='text.secondary'>
-                    AERONAVE RECOMENDADA
+                    AERONAVES COMPATIBLES
                   </Typography>
                   <Typography variant='subtitle1' fontWeight='bold'>
-                    Airbus A320 / Boeing 737
+                    {event.requiredAircrafts?.join(' / ') || 'Cualquiera'}
                   </Typography>
                 </Box>
+
+                {!hasAnyAircraft && (
+                  <Alert severity='error' sx={{ borderRadius: 2 }}>
+                    No tienes ninguna aeronave en tu hangar. Visita el marketplace para adquirir una.
+                  </Alert>
+                )}
+
+                {hasAnyAircraft && !hasCompatibleAircraft && (
+                  <Alert severity='warning' sx={{ borderRadius: 2 }}>
+                    No tienes una aeronave compatible para este evento. Se requiere:{' '}
+                    {event.requiredAircrafts?.join(', ')}.
+                  </Alert>
+                )}
 
                 <Button
                   variant='contained'
                   fullWidth
                   size='large'
-                  disabled={!selectedAircraftId || isBooking}
+                  disabled={!selectedAircraftId || isBooking || !hasCompatibleAircraft}
                   onClick={handleBook}
                   sx={{
                     height: 56,

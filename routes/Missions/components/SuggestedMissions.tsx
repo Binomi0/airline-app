@@ -49,7 +49,7 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
             height: '4px'
           },
           '&::-webkit-scrollbar-track': {
-            background: 'rgba(255,255,255,0.05)'
+            background: alpha(theme.palette.divider, 0.05)
           },
           '&::-webkit-scrollbar-thumb': {
             background: alpha(primaryColor, 0.3),
@@ -67,7 +67,7 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
                 variant='rectangular'
                 width={280}
                 height={160}
-                sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
+                sx={{ borderRadius: 2, bgcolor: alpha(theme.palette.divider, 0.05) }}
               />
             ))
           : missions.map((mission, index) => {
@@ -87,10 +87,10 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
                     position: 'relative',
                     background: isSelected
                       ? `linear-gradient(135deg, ${alpha(primaryColor, 0.15)} 0%, ${alpha(primaryColor, 0.05)} 100%)`
-                      : 'rgba(20, 20, 25, 0.6)',
+                      : alpha(theme.palette.background.paper, 0.6),
                     backdropFilter: 'blur(10px)',
                     border: '1px solid',
-                    borderColor: isSelected ? alpha(primaryColor, 0.6) : 'rgba(255,255,255,0.08)',
+                    borderColor: isSelected ? alpha(primaryColor, 0.6) : alpha(theme.palette.divider, 0.1),
                     borderRadius: 2,
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
@@ -98,7 +98,7 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
                       borderColor: alpha(primaryColor, 0.6),
                       boxShadow: `0 8px 24px ${alpha(primaryColor, 0.2)}`,
                       '& .mission-icon': {
-                        color: '#fff',
+                        color: 'common.white',
                         transform: 'scale(1.1) rotate(-10deg)'
                       }
                     },
@@ -112,7 +112,7 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
                         top: -10,
                         right: 12,
                         bgcolor: 'success.main',
-                        color: '#000',
+                        color: 'common.black',
                         px: 1,
                         py: 0.2,
                         borderRadius: 1,
@@ -121,7 +121,7 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
                         display: 'flex',
                         alignItems: 'center',
                         gap: 0.5,
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                        boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.common.black, 0.5)}`,
                         zIndex: 2
                       }}
                     >
@@ -136,13 +136,21 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
                         <Typography sx={{ color: 'text.secondary', fontSize: '0.65rem', mb: -0.5 }}>ROUTE</Typography>
                         <Stack direction='row' spacing={1} alignItems='center'>
                           <Typography
-                            sx={{ fontWeight: 'bold', fontSize: '1.1rem', color: isSelected ? '#fff' : 'primary.main' }}
+                            sx={{
+                              fontWeight: 'bold',
+                              fontSize: '1.1rem',
+                              color: isSelected ? 'common.white' : 'primary.main'
+                            }}
                           >
                             {mission.origin}
                           </Typography>
                           <Typography sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>→</Typography>
                           <Typography
-                            sx={{ fontWeight: 'bold', fontSize: '1.1rem', color: isSelected ? '#fff' : 'primary.main' }}
+                            sx={{
+                              fontWeight: 'bold',
+                              fontSize: '1.1rem',
+                              color: isSelected ? 'common.white' : 'primary.main'
+                            }}
                           >
                             {mission.destination}
                           </Typography>

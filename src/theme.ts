@@ -1,6 +1,16 @@
 import { Roboto, Sora, B612_Mono } from 'next/font/google'
 import { createTheme, responsiveFontSizes, ThemeOptions, alpha } from '@mui/material/styles'
-import { grey, red } from '@mui/material/colors'
+import { grey } from '@mui/material/colors'
+
+export const AIRLINE_COLORS = {
+  iberia: '#E81D2E',
+  iberia_secondary: '#ffffff',
+  vueling: '#FFD700',
+  vueling_secondary: '#333333',
+  ryanair: '#073590',
+  ryanair_secondary: '#F1C933',
+  ryanair_yellow: '#F1C400'
+}
 
 export const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -66,15 +76,6 @@ const commonComponents: ThemeOptions['components'] = {
       }
     }
   },
-  MuiButton: {
-    styleOverrides: {
-      root: {
-        borderRadius: '8px',
-        textTransform: 'none',
-        fontWeight: 600
-      }
-    }
-  },
   MuiCard: {
     styleOverrides: {
       root: {
@@ -93,9 +94,9 @@ const commonComponents: ThemeOptions['components'] = {
       {
         props: { variant: 'terminal' },
         style: ({ theme }) => ({
-          background: '#000',
+          background: theme.palette.common.black,
           border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-          boxShadow: `0 20px 25px -5px rgba(0, 0, 0, 0.5)`,
+          boxShadow: `0 20px 25px -5px ${alpha(theme.palette.common.black, 0.5)}`,
           padding: theme.spacing(2)
         })
       },
@@ -144,6 +145,83 @@ const commonComponents: ThemeOptions['components'] = {
           cursor: 'pointer',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
         })
+      },
+      {
+        props: { variant: 'gasCard' },
+        style: ({ theme }) => ({
+          background: theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+          border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
+          borderRadius: '24px',
+          padding: theme.spacing(4),
+          transition: 'all 0.3s ease-in-out',
+          boxShadow:
+            theme.palette.mode === 'dark'
+              ? '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)'
+              : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          '&:hover': {
+            borderColor: theme.palette.primary.main,
+            boxShadow: `0 0 20px ${alpha(theme.palette.primary.main, 0.1)}`
+          }
+        })
+      },
+      {
+        props: { variant: 'showcaseImage' },
+        style: ({ theme }) => ({
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '4 / 3',
+          maxWidth: '500px',
+          borderRadius: '24px',
+          overflow: 'hidden',
+          boxShadow: `0 20px 40px -15px ${alpha(theme.palette.common.black, 0.5)}, 0 0 30px ${alpha(theme.palette.primary.main, 0.1)}`,
+          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          background: alpha(theme.palette.background.paper, 0.02),
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          margin: '0 auto',
+          '&:hover': {
+            transform: 'translateY(-5px) scale(1.02)',
+            borderColor: alpha(theme.palette.primary.main, 0.4),
+            boxShadow: `0 30px 60px -20px ${alpha(theme.palette.common.black, 0.6)}, 0 0 40px ${alpha(theme.palette.primary.main, 0.2)}`
+          }
+        })
+      }
+    ]
+  },
+  MuiButton: {
+    styleOverrides: {
+      root: {
+        borderRadius: '8px',
+        textTransform: 'none',
+        fontWeight: 600
+      }
+    },
+    variants: [
+      {
+        props: { variant: 'premium' },
+        style: ({ theme }) => ({
+          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+          color: theme.palette.common.white,
+          borderRadius: '12px',
+          fontWeight: 700,
+          textTransform: 'none',
+          padding: '10px 24px',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`
+          },
+          '&:disabled': {
+            background:
+              theme.palette.mode === 'dark'
+                ? alpha(theme.palette.text.primary, 0.05)
+                : alpha(theme.palette.text.primary, 0.03),
+            color: alpha(theme.palette.text.primary, 0.2),
+            border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+            boxShadow: 'none'
+          }
+        })
       }
     ]
   },
@@ -178,9 +256,25 @@ const commonComponents: ThemeOptions['components'] = {
   MuiTypography: {
     variants: [
       {
-        props: { variant: 'h4' }, // Apply to h4 if it's used for headers
+        props: { variant: 'h4' },
         style: {
-          fontFamily: b612Mono.style.fontFamily
+          fontFamily: sora.style.fontFamily,
+          letterSpacing: '-0.02em',
+          fontWeight: 800
+        }
+      },
+      {
+        props: { variant: 'h5' },
+        style: {
+          fontFamily: sora.style.fontFamily,
+          fontWeight: 700
+        }
+      },
+      {
+        props: { variant: 'h6' },
+        style: {
+          fontFamily: sora.style.fontFamily,
+          fontWeight: 700
         }
       },
       {
@@ -200,6 +294,163 @@ declare module '@mui/material/Paper' {
     glass: true
     license: true
     licenseActive: true
+    gasCard: true
+    showcaseImage: true
+  }
+}
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsVariantOverrides {
+    premium: true
+  }
+}
+
+declare module '@mui/material/styles' {
+  interface Palette {
+    indigo: Palette['primary']
+    violet: Palette['primary']
+    slate: Palette['primary']
+    ivao: {
+      hq_event: string
+      rfe: string
+      pde: string
+      generic: string
+    }
+    purple: Palette['primary']
+    pink: Palette['primary']
+    sky: Palette['primary']
+    amber: Palette['primary']
+    airlines: {
+      iberia: string
+      vueling: string
+      ryanair: string
+      ryanair_yellow: string
+    }
+    weifly: {
+      home: {
+        hero: {
+          from: string
+          mid: string
+          to: string
+        }
+      }
+      crowdfunding: {
+        bg: {
+          from: string
+          to: string
+        }
+        primary: string
+        secondary: string
+        accent: string
+        glass: {
+          bg: string
+          border: string
+        }
+        nav: string
+      }
+      legal: {
+        bg: string
+        overlay: {
+          from: string
+          to: string
+        }
+        glass: {
+          bg: string
+        }
+      }
+      launchpad: {
+        bg: string
+        hero: {
+          from: string
+          to: string
+        }
+        primary: string
+        primaryHover: string
+        accent: string
+        glass: {
+          bg: string
+          border: string
+        }
+        nav: string
+        card: string
+      }
+      status: {
+        live: string
+      }
+    }
+  }
+  interface PaletteOptions {
+    indigo?: PaletteOptions['primary']
+    violet?: PaletteOptions['primary']
+    slate?: PaletteOptions['primary']
+    ivao?: {
+      hq_event?: string
+      rfe?: string
+      pde?: string
+      generic?: string
+    }
+    purple?: PaletteOptions['primary']
+    pink?: PaletteOptions['primary']
+    sky?: PaletteOptions['primary']
+    amber?: PaletteOptions['primary']
+    airlines?: {
+      iberia?: string
+      vueling?: string
+      ryanair?: string
+      ryanair_yellow?: string
+    }
+    weifly?: {
+      home?: {
+        hero?: {
+          from?: string
+          mid?: string
+          to?: string
+        }
+      }
+      crowdfunding?: {
+        bg?: {
+          from?: string
+          to?: string
+        }
+        primary?: string
+        secondary?: string
+        accent?: string
+        glass?: {
+          bg?: string
+          border?: string
+        }
+        nav?: string
+      }
+      legal?: {
+        bg?: string
+        overlay?: {
+          from?: string
+          to?: string
+        }
+        glass?: {
+          bg?: string
+        }
+      }
+      launchpad?: {
+        bg?: string
+        hero?: {
+          from?: string
+          to?: string
+        }
+        primary?: string
+        primaryHover?: string
+        accent?: string
+        glass?: {
+          bg?: string
+          border?: string
+        }
+        nav?: string
+        card?: string
+      }
+      status?: {
+        live?: string
+      }
+    }
   }
 }
 
@@ -208,17 +459,137 @@ const lTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#3B82F6'
+      main: '#3B82F6',
+      light: '#60a5fa',
+      dark: '#2563eb'
     },
     secondary: {
-      main: '#10B981'
+      main: '#10B981',
+      light: '#34d399',
+      dark: '#059669'
+    },
+    success: {
+      main: '#10B981',
+      light: '#4ade80',
+      dark: '#059669'
     },
     error: {
-      main: red.A400
+      main: '#ef4444',
+      light: '#f87171',
+      dark: '#dc2626'
+    },
+    warning: {
+      main: '#f59e0b',
+      light: '#fbbf24',
+      dark: '#d97706'
+    },
+    info: {
+      main: '#3b82f6',
+      light: '#38bdf8',
+      dark: '#1d4ed8'
     },
     background: {
       default: '#F3F4F6',
       paper: '#FFFFFF'
+    },
+    indigo: {
+      main: '#6366f1',
+      light: '#818cf8',
+      dark: '#4f46e5'
+    },
+    violet: {
+      main: '#a855f7',
+      light: '#c084fc',
+      dark: '#9333ea'
+    },
+    slate: {
+      main: '#1e293b',
+      light: '#64748b',
+      dark: '#0f172a'
+    },
+    ivao: {
+      hq_event: '#ff4081',
+      rfe: '#7c4dff',
+      pde: '#00e676',
+      generic: '#2196f3'
+    },
+    amber: {
+      main: '#F59E0B',
+      light: '#fbbf24',
+      dark: '#d97706'
+    },
+    sky: {
+      main: '#0ea5e9',
+      light: '#38bdf8',
+      dark: '#0284c7'
+    },
+    purple: {
+      main: '#8B5CF6',
+      light: '#a78bfa',
+      dark: '#7c3aed'
+    },
+    pink: {
+      main: '#EC4899',
+      light: '#f472b6',
+      dark: '#db2777'
+    },
+    airlines: {
+      iberia: AIRLINE_COLORS.iberia,
+      vueling: AIRLINE_COLORS.vueling,
+      ryanair: AIRLINE_COLORS.ryanair,
+      ryanair_yellow: AIRLINE_COLORS.ryanair_yellow
+    },
+    weifly: {
+      home: {
+        hero: {
+          from: '#312e81',
+          mid: '#4f46e5',
+          to: '#6366f1'
+        }
+      },
+      crowdfunding: {
+        bg: {
+          from: '#0a0f1f',
+          to: '#1a1f35'
+        },
+        primary: '#0a1e3c',
+        secondary: '#2a7de1',
+        accent: '#ff6b35',
+        glass: {
+          bg: 'rgba(255, 255, 255, 0.05)',
+          border: 'rgba(255, 255, 255, 0.1)'
+        },
+        nav: 'rgba(10, 15, 31, 0.8)'
+      },
+      legal: {
+        bg: '#f8fafc',
+        overlay: {
+          from: 'rgba(241, 245, 249, 0.95)',
+          to: 'rgba(226, 232, 240, 0.9)'
+        },
+        glass: {
+          bg: 'rgba(255, 255, 255, 0.7)'
+        }
+      },
+      launchpad: {
+        bg: '#f8fafc',
+        hero: {
+          from: '#fff',
+          to: '#94a3b8'
+        },
+        primary: '#3B82F6',
+        primaryHover: '#2563eb',
+        accent: '#ff6b35',
+        glass: {
+          bg: 'rgba(255, 255, 255, 0.7)',
+          border: 'rgba(0, 0, 0, 0.1)'
+        },
+        nav: 'rgba(255, 255, 255, 0.8)',
+        card: '#ffffff'
+      },
+      status: {
+        live: '#10b981'
+      }
     }
   },
   typography: commonTypography,
@@ -226,50 +597,172 @@ const lTheme = createTheme({
     ...commonComponents,
     MuiAppBar: {
       styleOverrides: {
-        root: {
-          background: 'rgba(255, 255, 255, 0.8)',
+        root: ({ theme }) => ({
+          background: alpha(theme.palette.background.paper, 0.8),
           backdropFilter: 'blur(12px)',
           boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
-          color: '#1e293b',
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+          color: theme.palette.slate.main,
           borderRadius: 0
-        }
+        })
       }
     }
   }
 })
 
+// Need to define Theme type for casting since it's recursive otherwise
+
 const dTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#3B82F6'
+      main: '#3B82F6',
+      light: '#60a5fa',
+      dark: '#2563eb'
     },
     secondary: {
-      main: '#10B981'
+      main: '#10B981',
+      light: '#34d399',
+      dark: '#059669'
+    },
+    success: {
+      main: '#10B981',
+      light: '#4ade80',
+      dark: '#059669'
     },
     error: {
-      main: red.A400
+      main: '#ef4444',
+      light: '#f87171',
+      dark: '#dc2626'
+    },
+    warning: {
+      main: '#f59e0b',
+      light: '#fbbf24',
+      dark: '#d97706'
+    },
+    info: {
+      main: '#3b82f6',
+      light: '#38bdf8',
+      dark: '#1d4ed8'
     },
     background: {
       default: '#0B0F19',
       paper: '#111827'
     },
-    grey
+    grey,
+    indigo: {
+      main: '#6366f1',
+      light: '#818cf8',
+      dark: '#4f46e5'
+    },
+    violet: {
+      main: '#a855f7',
+      light: '#c084fc',
+      dark: '#9333ea'
+    },
+    slate: {
+      main: '#1e293b',
+      light: '#64748b',
+      dark: '#0f172a'
+    },
+    ivao: {
+      hq_event: '#ff4081',
+      rfe: '#7c4dff',
+      pde: '#00e676',
+      generic: '#2196f3'
+    },
+    amber: {
+      main: '#F59E0B',
+      light: '#fbbf24',
+      dark: '#d97706'
+    },
+    sky: {
+      main: '#0ea5e9',
+      light: '#38bdf8',
+      dark: '#0284c7'
+    },
+    purple: {
+      main: '#8B5CF6',
+      light: '#a78bfa',
+      dark: '#7c3aed'
+    },
+    pink: {
+      main: '#EC4899',
+      light: '#f472b6',
+      dark: '#db2777'
+    },
+    airlines: {
+      iberia: AIRLINE_COLORS.iberia,
+      vueling: AIRLINE_COLORS.vueling,
+      ryanair: AIRLINE_COLORS.ryanair,
+      ryanair_yellow: AIRLINE_COLORS.ryanair_yellow
+    },
+    weifly: {
+      home: {
+        hero: {
+          from: '#e0e7ff',
+          mid: '#a5b4fc',
+          to: '#818cf8'
+        }
+      },
+      crowdfunding: {
+        bg: {
+          from: '#0a0f1f',
+          to: '#1a1f35'
+        },
+        primary: '#0a1e3c',
+        secondary: '#2a7de1',
+        accent: '#ff6b35',
+        glass: {
+          bg: 'rgba(255, 255, 255, 0.05)',
+          border: 'rgba(255, 255, 255, 0.1)'
+        },
+        nav: 'rgba(10, 15, 31, 0.8)'
+      },
+      legal: {
+        bg: '#0b0f19',
+        overlay: {
+          from: 'rgba(15, 23, 42, 0.95)',
+          to: 'rgba(30, 41, 59, 0.9)'
+        },
+        glass: {
+          bg: 'rgba(255, 255, 255, 0.03)'
+        }
+      },
+      launchpad: {
+        bg: '#0b0f19',
+        hero: {
+          from: '#fff',
+          to: '#94a3b8'
+        },
+        primary: '#3B82F6',
+        primaryHover: '#2563eb',
+        accent: '#ff6b35',
+        glass: {
+          bg: 'rgba(17, 24, 39, 0.4)',
+          border: 'rgba(255, 255, 255, 0.1)'
+        },
+        nav: 'rgba(11, 15, 25, 0.8)',
+        card: '#111827'
+      },
+      status: {
+        live: '#10b981'
+      }
+    }
   },
   typography: commonTypography,
   components: {
     ...commonComponents,
     MuiAppBar: {
       styleOverrides: {
-        root: {
-          background: 'rgba(11, 15, 25, 0.7)',
+        root: ({ theme }) => ({
+          background: alpha(theme.palette.background.default, 0.7),
           backdropFilter: 'blur(10px)',
           boxShadow: 'none',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-          color: '#fff',
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          color: theme.palette.common.white,
           borderRadius: 0
-        }
+        })
       }
     }
   }

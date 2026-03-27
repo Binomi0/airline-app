@@ -137,6 +137,7 @@ export interface IBaseMission {
   callsign?: string
   weight: number
   airlineId?: string
+  requiredAircrafts?: string[]
 }
 
 export interface PublicMission extends IBaseMission {

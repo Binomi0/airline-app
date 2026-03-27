@@ -1,5 +1,6 @@
 import React from 'react'
-import { Box, Paper, CardContent, Typography, Stack, Divider, Button, alpha, CircularProgress } from '@mui/material'
+import { Box, Paper, CardContent, Typography, Stack, Divider, Button, CircularProgress } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import { FlightTakeoff, FlightLand, RestartAlt, Radar } from '@mui/icons-material'
 import { Atc } from 'types'
 
@@ -9,17 +10,9 @@ interface RadarInfoPanelProps {
   distance: number | null
   isLoading: boolean
   onReset: () => void
-  theme: 'light' | 'dark'
 }
 
-const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
-  origin,
-  destination,
-  distance,
-  isLoading,
-  onReset,
-  theme
-}) => {
+const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({ origin, destination, distance, isLoading, onReset }) => {
   return (
     <Paper
       variant='glass'
@@ -39,7 +32,7 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
               variant='subtitle2'
               sx={{
                 fontWeight: 800,
-                color: '#38bdf8',
+                color: 'info.main',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1.5,
@@ -50,10 +43,17 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
               <Radar sx={{ fontSize: 20 }} />
               Flight Planner
             </Typography>
-            {isLoading && <CircularProgress size={12} sx={{ color: '#38bdf8' }} />}
+            {isLoading && <CircularProgress size={12} sx={{ color: 'info.main' }} />}
           </Box>
 
-          <Divider sx={{ borderColor: theme === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(56, 189, 248, 0.05)' }} />
+          <Divider
+            sx={{
+              borderColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.info.main, 0.1)
+                  : alpha(theme.palette.info.main, 0.05)
+            }}
+          />
 
           <Stack spacing={2}>
             {/* DEPARTURE */}
@@ -61,16 +61,23 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
               sx={{
                 p: 1.5,
                 borderRadius: 2,
-                bgcolor: origin
-                  ? alpha('#10b981', 0.1)
-                  : theme === 'dark'
-                    ? 'rgba(30, 41, 59, 0.5)'
-                    : 'rgba(0, 0, 0, 0.03)',
-                border: `1px solid ${origin ? alpha('#10b981', 0.4) : theme === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`
+                bgcolor: (theme) =>
+                  origin
+                    ? alpha(theme.palette.success.main, 0.1)
+                    : theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.slate.main, 0.5)
+                      : alpha(theme.palette.common.black, 0.03),
+                border: (theme) =>
+                  `1px solid ${origin ? alpha(theme.palette.success.main, 0.4) : theme.palette.mode === 'dark' ? alpha(theme.palette.info.main, 0.1) : alpha(theme.palette.common.black, 0.05)}`
               }}
             >
               <Stack direction='row' spacing={1.5} alignItems='center'>
-                <FlightTakeoff sx={{ color: origin ? '#10b981' : '#475569', fontSize: 20 }} />
+                <FlightTakeoff
+                  sx={{
+                    color: (theme) => (origin ? theme.palette.success.main : theme.palette.text.disabled),
+                    fontSize: 20
+                  }}
+                />
                 <Box>
                   <Typography
                     variant='caption'
@@ -78,7 +85,7 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
                       fontSize: 9,
                       fontWeight: 900,
                       textTransform: 'uppercase',
-                      color: '#94a3b8',
+                      color: 'text.secondary',
                       letterSpacing: 1
                     }}
                   >
@@ -86,7 +93,11 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
                   </Typography>
                   <Typography
                     variant='body2'
-                    sx={{ fontWeight: 700, color: origin ? '#10b981' : '#64748b', fontFamily: 'monospace' }}
+                    sx={{
+                      fontWeight: 700,
+                      color: (theme) => (origin ? theme.palette.success.main : theme.palette.text.secondary),
+                      fontFamily: 'monospace'
+                    }}
                   >
                     {origin ? origin.callsign : '---'}
                   </Typography>
@@ -99,16 +110,23 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
               sx={{
                 p: 1.5,
                 borderRadius: 2,
-                bgcolor: destination
-                  ? alpha('#ef4444', 0.1)
-                  : theme === 'dark'
-                    ? 'rgba(30, 41, 59, 0.5)'
-                    : 'rgba(0, 0, 0, 0.03)',
-                border: `1px solid ${destination ? alpha('#ef4444', 0.4) : theme === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`
+                bgcolor: (theme) =>
+                  destination
+                    ? alpha(theme.palette.error.main, 0.1)
+                    : theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.slate.main, 0.5)
+                      : alpha(theme.palette.common.black, 0.03),
+                border: (theme) =>
+                  `1px solid ${destination ? alpha(theme.palette.error.main, 0.4) : theme.palette.mode === 'dark' ? alpha(theme.palette.info.main, 0.1) : alpha(theme.palette.common.black, 0.05)}`
               }}
             >
               <Stack direction='row' spacing={1.5} alignItems='center'>
-                <FlightLand sx={{ color: destination ? '#ef4444' : '#475569', fontSize: 20 }} />
+                <FlightLand
+                  sx={{
+                    color: (theme) => (destination ? theme.palette.error.main : theme.palette.text.disabled),
+                    fontSize: 20
+                  }}
+                />
                 <Box>
                   <Typography
                     variant='caption'
@@ -116,7 +134,7 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
                       fontSize: 9,
                       fontWeight: 900,
                       textTransform: 'uppercase',
-                      color: '#94a3b8',
+                      color: 'text.secondary',
                       letterSpacing: 1
                     }}
                   >
@@ -124,7 +142,11 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
                   </Typography>
                   <Typography
                     variant='body2'
-                    sx={{ fontWeight: 700, color: destination ? '#ef4444' : '#64748b', fontFamily: 'monospace' }}
+                    sx={{
+                      fontWeight: 700,
+                      color: (theme) => (destination ? theme.palette.error.main : theme.palette.text.secondary),
+                      fontFamily: 'monospace'
+                    }}
                   >
                     {destination ? destination.callsign : '---'}
                   </Typography>
@@ -136,22 +158,19 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
           {origin && destination && (
             <Box
               sx={{
-                bgcolor: alpha('#38bdf8', 0.1),
+                bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
                 p: 2,
                 borderRadius: 2,
                 textAlign: 'center',
-                border: '1px solid #38bdf8'
+                border: (theme) => `1px solid ${theme.palette.info.main}`
               }}
             >
-              <Typography
-                variant='h5'
-                sx={{ color: theme === 'dark' ? '#e2e8f0' : '#1e293b', fontWeight: 900, fontFamily: 'monospace' }}
-              >
-                {distance} <span style={{ fontSize: 12, color: '#38bdf8' }}>NM</span>
+              <Typography variant='h5' sx={{ color: 'text.primary', fontWeight: 900, fontFamily: 'monospace' }}>
+                {distance} <span style={{ fontSize: 12, color: 'inherit', opacity: 0.8 }}>NM</span>
               </Typography>
               <Typography
                 variant='caption'
-                sx={{ color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}
+                sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}
               >
                 Est. Distance
               </Typography>
@@ -171,12 +190,15 @@ const RadarInfoPanel: React.FC<RadarInfoPanelProps> = ({
               fontWeight: 900,
               fontSize: 11,
               letterSpacing: 1,
-              borderColor: theme === 'dark' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(56, 189, 248, 0.2)',
-              color: '#94a3b8',
+              borderColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.info.main, 0.3)
+                  : alpha(theme.palette.info.main, 0.2),
+              color: 'text.secondary',
               '&:hover': {
-                borderColor: '#38bdf8',
-                color: theme === 'dark' ? '#f8fafc' : '#1e293b',
-                bgcolor: alpha('#38bdf8', 0.05)
+                borderColor: 'info.main',
+                color: 'text.primary',
+                bgcolor: (theme) => alpha(theme.palette.info.main, 0.05)
               }
             }}
           >
