@@ -18,8 +18,8 @@
   height: 120%;
   background:
     radial-gradient(circle at 20% 30%, var(--home-accent-soft) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 80% 70%, rgba(var(--home-accent-rgb, 99, 102, 241), 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(var(--home-accent-rgb, 99, 102, 241), 0.05) 0%, transparent 50%);
   filter: blur(80px);
   z-index: 0;
   pointer-events: none;
@@ -131,7 +131,7 @@
 
 .card:hover {
   border-color: var(--home-accent);
-  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 20px 40px rgba(var(--home-accent-rgb, 99, 102, 241), 0.1);
   transform: translateY(-5px);
 }
 
@@ -201,4 +201,28 @@
     margin-left: 40px;
     max-width: calc(100% - 40px);
   }
+}
+.ctaSection {
+  margin-top: 8rem;
+  text-align: center;
+  padding: 5rem 2rem;
+  background: rgba(var(--home-accent-rgb, 99, 102, 241), 0.05);
+  border-radius: 3rem;
+  border: 1px solid var(--home-border-card);
+  backdrop-filter: blur(20px);
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 3rem;
+  background: linear-gradient(135deg, var(--home-hero-from), var(--home-hero-to));
+  color: white;
+  border-radius: 1.5rem;
+  font-weight: 800;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(var(--home-accent-rgb, 99, 102, 241), 0.3);
+  text-decoration: none;
 }

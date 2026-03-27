@@ -22,7 +22,7 @@ import { useSetRecoilState } from 'recoil'
 import { liveStore } from 'store/live.atom'
 import { bookingStore } from 'store/booking.atom'
 import { Mission, ActiveAtc } from 'types'
-import { useTheme } from '@mui/material/styles'
+import { useTheme, alpha } from '@mui/material/styles'
 
 type Props = {
   mission: Mission
@@ -105,7 +105,7 @@ const CountdownTimer = ({ expiresAt, onExpire }: { expiresAt: string | Date; onE
         sx={{
           height: 8,
           borderRadius: 4,
-          bgcolor: 'rgba(255,255,255,0.05)',
+          bgcolor: (theme) => alpha(theme.palette.divider, 0.05),
           '& .MuiLinearProgress-bar': {
             borderRadius: 4,
             transition: 'transform 0.5s linear'
@@ -214,16 +214,23 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
               width: '100%',
               p: 1,
               borderRadius: 6,
-              background: 'linear-gradient(135deg, rgba(26, 35, 126, 0.4) 0%, rgba(13, 71, 161, 0.2) 100%)',
+              background: (theme) =>
+                `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.4)} 0%, ${alpha(theme.palette.primary.main, 0.2)} 100%)`,
               backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+              border: (theme) => `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              boxShadow: (theme) => `0 20px 50px ${alpha(theme.palette.common.black, 0.5)}`,
               overflow: 'hidden',
               position: 'relative'
             }}
           >
             {/* Header / Callsign */}
-            <Box sx={{ p: 4, textAlign: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <Box
+              sx={{
+                p: 4,
+                textAlign: 'center',
+                borderBottom: (theme) => `1px solid ${alpha(theme.palette.divider, 0.1)}`
+              }}
+            >
               {mission.expiresAt && <CountdownTimer expiresAt={mission.expiresAt} onExpire={handleExpire} />}
               <Typography variant='overline' sx={{ opacity: 0.6, letterSpacing: 2, fontWeight: 'bold' }}>
                 IDENTIFICATIVO DE VUELO
@@ -234,7 +241,8 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                 sx={{
                   fontSize: { xs: '3.5rem', md: '5rem' },
                   letterSpacing: { xs: 8, md: 16 },
-                  background: 'linear-gradient(to bottom, #fff 0%, #aaa 100%)',
+                  background: (theme) =>
+                    `linear-gradient(to bottom, ${theme.palette.common.white} 0%, ${theme.palette.grey[400]} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   lineHeight: 1,
@@ -266,7 +274,8 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                     sx={{
                       width: '100%',
                       height: '2px',
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)',
+                      background: (theme) =>
+                        `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.divider, 0.2)} 50%, transparent 100%)`,
                       position: 'absolute',
                       '&::after': {
                         content: '""',
@@ -278,7 +287,7 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                         top: -5,
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        boxShadow: '0 0 15px #1a237e'
+                        boxShadow: (theme) => `0 0 15px ${theme.palette.primary.main}`
                       }
                     }}
                   />
@@ -289,7 +298,7 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                       top: -15,
                       fontWeight: 'bold',
                       color: 'primary.light',
-                      bgcolor: 'rgba(0,0,0,0.3)',
+                      bgcolor: (theme) => alpha(theme.palette.common.black, 0.3),
                       px: 2,
                       py: 0.5,
                       borderRadius: 10
@@ -316,8 +325,8 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
               justifyContent='space-around'
               sx={{
                 p: 3,
-                bgcolor: 'rgba(0,0,0,0.3)',
-                borderTop: '1px solid rgba(255, 255, 255, 0.05)'
+                bgcolor: (theme) => alpha(theme.palette.common.black, 0.3),
+                borderTop: (theme) => `1px solid ${alpha(theme.palette.divider, 0.05)}`
               }}
             >
               <Box textAlign='center'>
@@ -326,14 +335,22 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                 </Typography>
                 <Typography sx={{ fontWeight: 'bold' }}>{mission.weight} KG</Typography>
               </Box>
-              <Divider orientation='vertical' flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+              <Divider
+                orientation='vertical'
+                flexItem
+                sx={{ borderColor: (theme) => alpha(theme.palette.divider, 0.1) }}
+              />
               <Box textAlign='center'>
                 <Typography variant='caption' display='block' color='text.secondary' sx={{ fontWeight: 'bold' }}>
                   RECOMPENSA
                 </Typography>
                 <Typography sx={{ color: 'success.main', fontWeight: 'bold' }}>{mission.prize} AIRL</Typography>
               </Box>
-              <Divider orientation='vertical' flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+              <Divider
+                orientation='vertical'
+                flexItem
+                sx={{ borderColor: (theme) => alpha(theme.palette.divider, 0.1) }}
+              />
               <Box textAlign='center'>
                 <Typography variant='caption' display='block' color='text.secondary' sx={{ fontWeight: 'bold' }}>
                   TIPO
@@ -381,10 +398,13 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                     gap: 3,
                     p: 3,
                     borderRadius: 4,
-                    bgcolor: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.05)',
+                    bgcolor: (theme) => alpha(theme.palette.divider, 0.03),
+                    border: (theme) => `1px solid ${alpha(theme.palette.divider, 0.05)}`,
                     transition: 'all 0.2s ease',
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)' }
+                    '&:hover': {
+                      bgcolor: (theme) => alpha(theme.palette.divider, 0.05),
+                      borderColor: (theme) => alpha(theme.palette.divider, 0.1)
+                    }
                   }}
                 >
                   <Box
@@ -397,7 +417,7 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
-                      boxShadow: '0 4px 15px rgba(26, 35, 126, 0.4)'
+                      boxShadow: (theme) => `0 4px 15px ${alpha(theme.palette.primary.main, 0.4)}`
                     }}
                   >
                     {step.icon}
@@ -421,8 +441,8 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
             sx={{
               width: '100%',
               borderRadius: 3,
-              bgcolor: 'rgba(2, 136, 209, 0.05)',
-              borderColor: 'rgba(2, 136, 209, 0.2)',
+              bgcolor: (theme) => alpha(theme.palette.info.main, 0.05),
+              borderColor: (theme) => alpha(theme.palette.info.main, 0.2),
               '& .MuiAlert-icon': { color: 'primary.light' }
             }}
           >
@@ -443,8 +463,9 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                 fontSize: '1.1rem',
                 fontWeight: '900',
                 borderRadius: 4,
-                background: 'linear-gradient(45deg, #1a237e 30%, #283593 90%)',
-                boxShadow: '0 8px 25px rgba(26, 35, 126, 0.5)',
+                background: (theme) =>
+                  `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`,
+                boxShadow: (theme) => `0 8px 25px ${alpha(theme.palette.primary.main, 0.5)}`,
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'translateY(-2px)',
@@ -467,7 +488,7 @@ const LiveView: React.FC<Props> = ({ mission, isLoading }) => {
                 borderRadius: 4,
                 borderWidth: '2px',
                 fontWeight: 'bold',
-                '&:hover': { borderWidth: '2px', bgcolor: 'rgba(255,255,255,0.05)' }
+                '&:hover': { borderWidth: '2px', bgcolor: (theme) => alpha(theme.palette.divider, 0.05) }
               }}
             >
               Descargar App

@@ -21,9 +21,9 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       sx={{
         cursor: 'pointer',
         mb: '2px',
-        background: isSelected ? alpha(primaryColor, 0.08) : 'rgba(0,0,0,0.8)',
+        background: isSelected ? alpha(primaryColor, 0.08) : alpha(theme.palette.background.paper, 0.8),
         border: '1px solid',
-        borderColor: isSelected ? alpha(primaryColor, 0.4) : 'rgba(255,255,255,0.05)',
+        borderColor: isSelected ? alpha(primaryColor, 0.4) : alpha(theme.palette.divider, 0.1),
         display: 'flex',
         alignItems: 'center',
         px: 2,
@@ -34,7 +34,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           background: alpha(primaryColor, 0.05),
           borderColor: alpha(primaryColor, 0.3),
           '& .dot-text': {
-            color: '#fff',
+            color: 'common.white',
             textShadow: `0 0 10px ${primaryColor}`
           }
         },
@@ -49,7 +49,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           left: 0,
           right: 0,
           height: '1px',
-          bgcolor: 'rgba(255,255,255,0.015)',
+          bgcolor: alpha(theme.palette.divider, 0.02),
           zIndex: 1,
           pointerEvents: 'none'
         }}
@@ -61,7 +61,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            color: isSelected ? '#fff' : primaryColor,
+            color: isSelected ? 'common.white' : primaryColor,
             lineHeight: 1,
             opacity: isSelected ? 1 : 0.8
           }}
@@ -76,7 +76,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            color: isSelected ? '#fff' : primaryColor,
+            color: isSelected ? 'common.white' : primaryColor,
             lineHeight: 1,
             fontWeight: 'bold',
             opacity: 0.9
@@ -102,7 +102,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           sx={{
             fontFamily: 'inherit',
             fontWeight: 'bold',
-            color: isSelected ? '#fff' : 'primary.main',
+            color: isSelected ? 'common.white' : 'primary.main',
             width: 70,
             textAlign: 'left',
             letterSpacing: 1
@@ -116,7 +116,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           sx={{
             fontFamily: 'inherit',
             fontWeight: 'bold',
-            color: isSelected ? '#fff' : 'primary.main',
+            color: isSelected ? 'common.white' : 'primary.main',
             width: 70,
             textAlign: 'left',
             letterSpacing: 1
@@ -134,7 +134,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           sx={{
             fontFamily: 'inherit',
             bgcolor: alpha(primaryColor, 0.15),
-            color: isSelected ? '#fff' : 'primary.main',
+            color: isSelected ? 'common.white' : 'primary.main',
             border: '1px solid',
             borderColor: alpha(primaryColor, 0.4),
             borderRadius: 1,
@@ -150,7 +150,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            color: isSelected ? '#fff' : 'primary.main'
+            color: isSelected ? 'common.white' : 'primary.main'
           }}
         >
           {mission.distance.toString().padStart(4, '0')} NM
@@ -163,7 +163,7 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
           className='dot-text'
           sx={{
             fontFamily: 'inherit',
-            color: isSelected ? '#fff' : 'primary.main',
+            color: isSelected ? 'common.white' : 'primary.main',
             letterSpacing: 0.5
           }}
         >

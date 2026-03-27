@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import styles from '../../../styles/Home.module.css'
 import { useQuery } from '@tanstack/react-query'
 import { fetcher } from 'utils'
-import { ILive } from 'models/Live'
+import styles from 'styles/Home.module.css'
 
 interface ActiveFlight {
   _id: string

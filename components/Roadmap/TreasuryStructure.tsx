@@ -1,4 +1,5 @@
-import { Box, Typography, Paper, Stack, styled, useTheme } from '@mui/material'
+import { Box, Typography, Paper, Stack } from '@mui/material'
+import { styled, useTheme, alpha } from '@mui/material/styles'
 import SecurityIcon from '@mui/icons-material/Security'
 import HowToVoteIcon from '@mui/icons-material/HowToVote'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
@@ -7,7 +8,7 @@ import WalletIcon from '@mui/icons-material/AccountBalanceWallet'
 const ToolCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
   borderRadius: theme.spacing(2),
-  backgroundColor: 'rgba(255,255,255,0.05)',
+  backgroundColor: alpha(theme.palette.common.white, 0.05),
   border: `1px solid ${theme.palette.divider}`,
   textAlign: 'center',
   flex: 1
@@ -68,13 +69,22 @@ const TreasuryStructure = () => {
             Gasto aprobado para:
           </Typography>
           <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center' }}>
-            <Typography variant='caption' sx={{ px: 1, py: 0.25, bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 1 }}>
+            <Typography
+              variant='caption'
+              sx={{ px: 1, py: 0.25, bgcolor: (theme) => alpha(theme.palette.common.white, 0.1), borderRadius: 1 }}
+            >
               Devs
             </Typography>
-            <Typography variant='caption' sx={{ px: 1, py: 0.25, bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 1 }}>
+            <Typography
+              variant='caption'
+              sx={{ px: 1, py: 0.25, bgcolor: (theme) => alpha(theme.palette.common.white, 0.1), borderRadius: 1 }}
+            >
               Audits
             </Typography>
-            <Typography variant='caption' sx={{ px: 1, py: 0.25, bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 1 }}>
+            <Typography
+              variant='caption'
+              sx={{ px: 1, py: 0.25, bgcolor: (theme) => alpha(theme.palette.common.white, 0.1), borderRadius: 1 }}
+            >
               Growth
             </Typography>
           </Box>

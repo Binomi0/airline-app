@@ -26,9 +26,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       console.error('Marketplace GET error:', error)
       return res.status(500).json({ error: 'Error al obtener listados del marketplace' })
     }
-  }
-
-  else if (req.method === 'POST') {
+  } else if (req.method === 'POST') {
     try {
       const { nftId, price, currency, type, tokenId, tokenAddress, chainId, expiresAt, allowedDurations } = req.body
 

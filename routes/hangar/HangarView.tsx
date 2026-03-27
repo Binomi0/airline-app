@@ -8,7 +8,7 @@ import AircraftShowcase from './components/AircraftShowcase'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
-import { styled, alpha } from '@mui/material/styles'
+import { styled, alpha, useTheme } from '@mui/material/styles'
 import { INft } from 'models/Nft'
 import { useNFTProviderContext } from 'context/NFTProvider'
 import { tokenBalanceStore } from 'store/balance.atom'
@@ -32,9 +32,10 @@ const BackgroundOverlay = styled(Box)(({ theme }) => ({
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundImage: theme.palette.mode === 'dark'
-    ? `linear-gradient(135deg, ${alpha('#0f172a', 0.95)} 0%, ${alpha('#1e293b', 0.9)} 100%), url('/img/airport_bg.png')`
-    : `linear-gradient(135deg, ${alpha('#f8fafc', 0.9)} 0%, ${alpha('#f1f5f9', 0.85)} 100%), url('/img/airport_bg.png')`,
+  backgroundImage:
+    theme.palette.mode === 'dark'
+      ? `linear-gradient(135deg, ${alpha(theme.palette.slate.dark, 0.95)} 0%, ${alpha(theme.palette.slate.main, 0.9)} 100%), url('/img/airport_bg.png')`
+      : `linear-gradient(135deg, ${alpha(theme.palette.slate.light, 0.9)} 0%, ${alpha(theme.palette.slate.main, 0.85)} 100%), url('/img/airport_bg.png')`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   zIndex: 0,
@@ -92,6 +93,7 @@ const CarouselScroll = styled(Box)(({ theme }) => ({
 }))
 
 const HangarView: React.FC = () => {
+  const theme = useTheme()
   const { aircrafts, refetch: refetchNFTs } = useNFTProviderContext()
   const { claimAircraftNFT, isClaiming } = useClaimNFT()
   const { getAirlBalance } = useTokenProviderContext()
@@ -164,7 +166,7 @@ const HangarView: React.FC = () => {
         {/* Header */}
         <Box mb={2}>
           <Typography variant='h3' fontWeight={900} sx={{ letterSpacing: '-2px' }}>
-            Tu <span style={{ color: '#6366f1' }}>Flota</span>
+            Tu <span style={{ color: theme.palette.indigo.main }}>Flota</span>
           </Typography>
           <Typography variant='body1' color='text.secondary' sx={{ maxWidth: '600px', fontWeight: 500 }}>
             Gestiona tus aeronaves y adquiere nuevas unidades para tu carrera.
@@ -183,7 +185,7 @@ const HangarView: React.FC = () => {
 
         {/* Carousel Selector */}
         <CarouselSection>
-          <Typography variant="h6" fontWeight={700} sx={{ mb: 2, opacity: 0.9 }}>
+          <Typography variant='h6' fontWeight={700} sx={{ mb: 2, opacity: 0.9 }}>
             Explorar Aeronaves
           </Typography>
           <CarouselScroll>

@@ -12,11 +12,12 @@ import Select from '@mui/material/Select'
 import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl'
 import OutlinedInput from '@mui/material/OutlinedInput'
-import { styled, alpha } from '@mui/material/styles'
+import { styled, alpha, useTheme } from '@mui/material/styles'
 import { INft } from 'models/Nft'
 import Swal from 'sweetalert2'
 import { useMutation } from '@tanstack/react-query'
 import { fetcherPOST } from 'utils'
+import { AxiosError } from 'axios'
 
 const ModalContent = styled(Box)(({ theme }) => ({
   position: 'absolute',
@@ -25,9 +26,9 @@ const ModalContent = styled(Box)(({ theme }) => ({
   transform: 'translate(-50%, -50%)',
   width: 450,
   maxWidth: '90vw',
-  background: theme.palette.mode === 'dark' ? '#111827' : '#fff',
+  background: theme.palette.background.paper,
   borderRadius: '24px',
-  boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
+  boxShadow: `0 24px 48px ${alpha(theme.palette.common.black, 0.4)}`,
   padding: theme.spacing(4),
   border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
   outline: 'none'
@@ -47,6 +48,7 @@ interface CreateListingModalProps {
 }
 
 const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onClose, nft }) => {
+  const theme = useTheme()
   const [formData, setFormData] = useState({
     price: '',
     currency: 'AIRL',
@@ -76,13 +78,12 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onClose, 
       Swal.fire('¡Listado Creado!', 'Tu aeronave ya está disponible en el mercado.', 'success')
       onClose()
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error(error)
-      Swal.fire('Error', error.response?.data?.error || 'No se pudo crear el listado', 'error')
+      const err = error as AxiosError<{ error?: string }>
+      Swal.fire('Error', err.response?.data?.error || 'No se pudo crear el listado', 'error')
     }
   })
-
-  if (!nft) return null
 
   const handleSubmit = useCallback(async () => {
     if (!formData.price || isNaN(Number(formData.price))) {
@@ -90,14 +91,15 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ open, onClose, 
       return
     }
 
-    if (!isPending) mutate(nft)
+    if (nft && !isPending) mutate(nft)
   }, [formData, isPending, mutate, nft])
+  if (!nft) return null
 
   return (
     <Modal open={open} onClose={onClose}>
       <ModalContent>
         <Typography variant='h5' fontWeight={800} mb={3}>
-          Listar <span style={{ color: '#6366f1' }}>Aeronave</span>
+          Listar <span style={{ color: theme.palette.indigo.main }}>Aeronave</span>
         </Typography>
 
         <Box display='flex' gap={2} mb={3} alignItems='center'>

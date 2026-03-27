@@ -3,13 +3,14 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import CircularProgress from '@mui/material/CircularProgress'
-import { styled, alpha } from '@mui/material/styles'
+import { styled } from '@mui/material/styles'
 import { useQuery } from '@tanstack/react-query'
 import { fetcher } from 'utils'
 import MarketplaceHeader from './components/MarketplaceHeader'
 import { IMarketplaceListing } from 'models/MarketplaceListing'
 import ListingFilters from 'routes/marketplace/components/ListingFilters'
 import AircraftListingCard from 'routes/marketplace/components/AircraftListingCard'
+import { INft } from 'models/Nft'
 
 const ViewContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -26,7 +27,7 @@ const ListingsSection = styled(Box)(({ theme }) => ({
   }
 }))
 
-const ListingsGrid = styled(Box)(({ theme }) => ({
+const ListingsGrid = styled(Box)(() => ({
   flexGrow: 1
 }))
 
@@ -45,8 +46,8 @@ const MarketplaceListingView: React.FC = () => {
     queryFn: () => fetcher(`/api/marketplace?type=${filters.type}`)
   })
 
-  const filteredListings = listings?.filter((listing: any) =>
-    listing.nft?.metadata?.name?.toLowerCase().includes(filters.search.toLowerCase())
+  const filteredListings = listings?.filter((listing: IMarketplaceListing) =>
+    (listing.nft as INft)?.metadata?.name?.toLowerCase().includes(filters.search.toLowerCase())
   )
 
   return (

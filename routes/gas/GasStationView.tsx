@@ -3,7 +3,7 @@ import GasAvailable from './GasAvailable'
 import GasDeposited from './GasDeposited'
 import GasFarmed from './GasFarmed'
 import GasSupply from './components/GasSupply'
-import Box from '@mui/material/Box'
+import { Box, useTheme } from '@mui/material'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -17,7 +17,7 @@ const StyledSectionHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing(1.5),
   marginBottom: theme.spacing(1),
-  color: '#6366f1'
+  color: theme.palette.indigo.main
 }))
 
 interface Props {
@@ -29,6 +29,7 @@ interface Props {
 }
 
 const GasStationView = ({ airl, staking, getAirlBalance, getAirgBalance, getStakingInfo }: Props) => {
+  const theme = useTheme()
   return (
     <Box mt={4}>
       <Paper variant='gasCard' sx={{ mb: 6 }}>
@@ -97,8 +98,8 @@ const GasStationView = ({ airl, staking, getAirlBalance, getAirgBalance, getStak
               </Typography>
             </Box>
             <Typography sx={{ opacity: 0.9 }}>
-              Obtendrás <b style={{ color: '#10B981' }}>100 Litros</b> por cada{' '}
-              <b style={{ color: '#3B82F6' }}>1 token AIRL</b> stakeado durante 24 horas.
+              Obtendrás <b style={{ color: theme.palette.secondary.main }}>100 Litros</b> por cada{' '}
+              <b style={{ color: theme.palette.primary.main }}>1 token AIRL</b> stakeado durante 24 horas.
             </Typography>
           </Box>
           <Box

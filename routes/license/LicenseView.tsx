@@ -4,6 +4,7 @@ import LicenseItemThumbnail from './components/LicenseItemThumbnail'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { useTheme, alpha } from '@mui/material/styles'
 import { LICENSES, License } from 'config/licenses'
 import usePilotProgress from 'hooks/usePilotProgress'
 import styles from 'styles/License.module.css'
@@ -11,6 +12,22 @@ import styles from 'styles/License.module.css'
 const LicenseView: React.FC = () => {
   const { unlockedLicenses, totalHours, progressToNext, nextLicense } = usePilotProgress()
   const [selectedLicense, setSelectedLicense] = useState<License | null>(null)
+  const theme = useTheme()
+
+  const themeVars = React.useMemo(
+    () =>
+      ({
+        '--bg-default': theme.palette.background.default,
+        '--text-primary': theme.palette.text.primary,
+        '--text-secondary': theme.palette.text.secondary,
+        '--alpha-bg-90': alpha(theme.palette.background.default, 0.9),
+        '--alpha-bg-80': alpha(theme.palette.background.paper, 0.8),
+        '--primary-main': theme.palette.primary.main,
+        '--divider-10': alpha(theme.palette.divider, 0.1),
+        '--divider-05': alpha(theme.palette.divider, 0.05)
+      }) as React.CSSProperties,
+    [theme]
+  )
 
   useEffect(() => {
     if (LICENSES.length > 0 && !selectedLicense) {
@@ -27,16 +44,19 @@ const LicenseView: React.FC = () => {
   }
 
   return (
-    <Box className={styles.pageContainer}>
+    <Box className={styles.pageContainer} style={themeVars}>
       <div className={styles.backgroundOverlay} />
 
       <Box className={styles.contentWrapper}>
         {/* Header Section */}
         <Box mb={6}>
           <Typography variant='h3' fontWeight={900} sx={{ letterSpacing: '-2px', mb: 1 }}>
-            Tu <span style={{ color: '#6366f1' }}>Carrera Piloto</span>
+            Tu{' '}
+            <Typography component='span' variant='inherit' sx={{ color: 'primary.main' }}>
+              Carrera Piloto
+            </Typography>
           </Typography>
-          <Typography variant='body1' sx={{ color: 'rgba(255,255,255,0.5)', maxWidth: '600px' }}>
+          <Typography variant='body1' sx={{ color: 'text.secondary', maxWidth: '600px' }}>
             Has acumulado <strong>{totalHours.toFixed(1)} horas</strong> de vuelo.
             {nextLicense
               ? ` Te faltan ${(nextLicense.minHours - totalHours).toFixed(1)} horas para tu próxima licencia.`

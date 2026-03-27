@@ -1,7 +1,7 @@
 import React from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import { styled, alpha } from '@mui/material/styles'
+import { styled, alpha, useTheme } from '@mui/material/styles'
 
 const HeaderContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(4),
@@ -18,7 +18,7 @@ const Badge = styled(Box)(({ theme }) => ({
   px: 2,
   py: 0.5,
   borderRadius: '30px',
-  background: theme.palette.mode === 'dark' ? alpha(theme.palette.primary.main, 0.1) : '#fff',
+  background: theme.palette.mode === 'dark' ? alpha(theme.palette.primary.main, 0.1) : theme.palette.common.white,
   border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
   color: theme.palette.primary.main,
   marginBottom: theme.spacing(3),
@@ -59,16 +59,16 @@ const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({ totalListings }) 
             mb: 2,
             background:
               theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #fff 0%, #cbd5e1 100%)'
-                : 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+                ? `linear-gradient(135deg, ${theme.palette.common.white} 0%, ${theme.palette.slate.light} 100%)`
+                : `linear-gradient(135deg, ${theme.palette.slate.dark} 0%, ${theme.palette.slate.main} 100%)`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             fontSize: { xs: '3rem', md: '5.5rem' },
             lineHeight: 0.9,
-            textShadow: '0 10px 30px rgba(0,0,0,0.1)'
+            textShadow: `0 10px 30px ${alpha(theme.palette.common.black, 0.1)}`
           })}
         >
-          Mercado de <span style={{ color: '#6366f1' }}>Flotas</span>
+          Mercado de <span style={{ color: useTheme().palette.indigo.main }}>Flotas</span>
         </Typography>
 
         <Typography

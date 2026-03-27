@@ -20,8 +20,8 @@ const BackgroundOverlay = styled('div')(({ theme }) => ({
   bottom: 0,
   backgroundImage:
     theme.palette.mode === 'dark'
-      ? `linear-gradient(135deg, ${alpha('#0f172a', 0.95)} 0%, ${alpha('#1e293b', 0.85)} 100%), url('/img/airport_bg.png')`
-      : `linear-gradient(135deg, ${alpha('#f8fafc', 0.8)} 0%, ${alpha('#cbd5e1', 0.6)} 100%), url('/img/airport_bg.png')`,
+      ? `linear-gradient(135deg, ${alpha(theme.palette.slate.dark, 0.95)} 0%, ${alpha(theme.palette.slate.main, 0.85)} 100%), url('/img/airport_bg.png')`
+      : `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.8)} 0%, ${alpha(theme.palette.divider, 0.6)} 100%), url('/img/airport_bg.png')`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   zIndex: 0

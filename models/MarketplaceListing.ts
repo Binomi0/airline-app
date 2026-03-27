@@ -1,13 +1,15 @@
 import { mongoose } from 'lib/mongoose'
+import { INft } from 'models/Nft'
+import { IUser } from 'models/User'
 import { Document } from 'mongoose'
 
 export type ListingType = 'SALE' | 'RENT'
 export type ListingStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
 
 export interface IMarketplaceListing extends Document {
-  nft: mongoose.Schema.Types.ObjectId
-  seller: mongoose.Schema.Types.ObjectId
-  buyer?: mongoose.Schema.Types.ObjectId
+  nft: mongoose.Schema.Types.ObjectId | INft
+  seller: mongoose.Schema.Types.ObjectId | IUser
+  buyer?: mongoose.Schema.Types.ObjectId | IUser
   price: string
   currency: 'AIRL' | 'AIRG'
   type: ListingType

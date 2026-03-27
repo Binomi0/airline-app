@@ -2,7 +2,7 @@
   height: 100vh;
 }
 .form {
-  border: 1px solid #aaaaaa;
+  border: 1px solid var(--mui-palette-divider);
   padding: 16px;
   border-radius: 8px;
 }

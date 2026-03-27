@@ -2,26 +2,26 @@
   width: 100%;
   margin-top: auto;
   transition: all 0.3s ease;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--mui-palette-divider);
   font-family: 'Sora', sans-serif;
 }
 
 .dark {
-  background: rgba(11, 15, 25, 0.8);
+  background: var(--mui-palette-background-paper);
   backdrop-filter: blur(12px);
-  color: #ffffff;
+  color: var(--mui-palette-common-white);
 }
 
 .light {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--mui-palette-background-paper);
   backdrop-filter: blur(12px);
-  color: #1e293b;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--mui-palette-slate-main);
+  border-top: 1px solid var(--mui-palette-divider);
 }
 
 .brandTitle {
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  background: linear-gradient(135deg, var(--mui-palette-indigo-main) 0%, var(--mui-palette-violet-main) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -38,7 +38,7 @@
 
 .link:hover {
   opacity: 1;
-  color: #6366f1;
+  color: var(--mui-palette-indigo-main);
   transform: translateX(4px);
 }
 
@@ -49,17 +49,17 @@
 
 .socialIcon:hover {
   opacity: 1;
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
+  background: var(--mui-palette-action-hover);
+  color: var(--mui-palette-indigo-main);
 }
 
 .ivaoBadge {
   display: inline-block;
   padding: 4px 12px;
   border-radius: 20px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  color: #6366f1;
+  background: linear-gradient(135deg, var(--mui-palette-action-hover) 0%, var(--mui-palette-action-selected) 100%);
+  border: 1px solid var(--mui-palette-divider);
+  color: var(--mui-palette-indigo-main);
   text-transform: uppercase;
   letter-spacing: 1px;
 }

@@ -24,10 +24,10 @@ import { useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 
 const eventTypeColors: Record<string, string> = {
-  hq_event: '#ff4081',
-  rfe: '#7c4dff',
-  pde: '#00e676',
-  generic: '#2196f3'
+  hq_event: 'ivao.hq_event',
+  rfe: 'ivao.rfe',
+  pde: 'ivao.pde',
+  generic: 'ivao.generic'
 }
 
 const IvaoEvents: React.FC = () => {
@@ -136,7 +136,7 @@ const IvaoEvents: React.FC = () => {
                   left: 0,
                   width: '100%',
                   height: '100%',
-                  bgcolor: 'rgba(0,0,0,0.4)',
+                  bgcolor: (theme) => alpha(theme.palette.common.black, 0.4),
                   opacity: 0,
                   transition: 'opacity 0.3s ease',
                   display: 'flex',
@@ -167,7 +167,7 @@ const IvaoEvents: React.FC = () => {
                   top: 12,
                   left: 12,
                   bgcolor: eventTypeColors[event.eventType] || theme.palette.primary.main,
-                  color: '#fff',
+                  color: theme.palette.common.white,
                   fontWeight: 700,
                   fontSize: '0.65rem'
                 }}

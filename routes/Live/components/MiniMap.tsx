@@ -38,13 +38,49 @@ interface Props {
   pilot: IvaoPilot
 }
 
+import { useTheme } from '@mui/material'
+
 const MiniMap = ({ pilot }: Props) => {
+  const theme = useTheme()
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY
   })
   const [_map, setMap] = React.useState<google.maps.Map | undefined>(undefined)
   const { atcs } = useVaProviderContext()
+
+  const mapOptions = React.useMemo(
+    () => ({
+      disableDefaultUI: true,
+      styles: [
+        {
+          elementType: 'geometry',
+          stylers: [
+            {
+              color: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.grey[200]
+            }
+          ]
+        },
+        {
+          elementType: 'labels.text.stroke',
+          stylers: [
+            {
+              color: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.grey[200]
+            }
+          ]
+        },
+        {
+          elementType: 'labels.text.fill',
+          stylers: [
+            {
+              color: theme.palette.text.secondary
+            }
+          ]
+        }
+      ]
+    }),
+    [theme]
+  )
 
   const onLoad = React.useCallback(
     function callback(newMap: google.maps.Map) {
@@ -81,9 +117,9 @@ const MiniMap = ({ pilot }: Props) => {
           <Polyline
             path={[getOriginCoords(pilot, atcs), { lat: pilot.lastTrack.latitude, lng: pilot.lastTrack.longitude }]}
             options={{
-              strokeColor: 'blue', // Customize the line color
+              strokeColor: theme.palette.primary.main,
               strokeOpacity: 1.0,
-              strokeWeight: 3 // Adjust the line thickness
+              strokeWeight: 3
             }}
           />
           <Polyline
@@ -92,8 +128,8 @@ const MiniMap = ({ pilot }: Props) => {
               getDestinationCoords(pilot, atcs)
             ]}
             options={{
-              strokeColor: 'green', // Customize the line color
-              strokeOpacity: 1.0,
+              strokeColor: theme.palette.success.main,
+              strokeOpacity: 1.0, // Customize the line color
               strokeWeight: 3 // Adjust the line thickness
             }}
           />
@@ -106,34 +142,3 @@ const MiniMap = ({ pilot }: Props) => {
 }
 
 export default MiniMap
-
-const mapOptions = {
-  disableDefaultUI: true,
-  styles: [
-    {
-      elementType: 'geometry',
-      stylers: [
-        {
-          color: '#242f3e'
-        }
-      ]
-    },
-    {
-      elementType: 'labels.text.stroke',
-      stylers: [
-        {
-          color: '#242f3e'
-        }
-      ]
-    },
-    {
-      elementType: 'labels.text.fill',
-      stylers: [
-        {
-          color: '#746855'
-        }
-      ]
-    }
-    // Add more style rules for night mode here
-  ]
-}

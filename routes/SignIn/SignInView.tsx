@@ -55,7 +55,7 @@ const SignInView: FC = () => {
               <Box className={classes.form}>
                 <EmailInput color='primary' onCancel={() => {}} onSubmit={handleAccess} loading={false} />
                 <Box component={Link} href='/signup'>
-                  <Typography color='primary.light' align='right' sx={{ '&:hover': { color: 'white' } }}>
+                  <Typography color='primary.light' align='right' sx={{ '&:hover': { color: 'text.primary' } }}>
                     or create a new account here.
                   </Typography>
                 </Box>
@@ -64,8 +64,8 @@ const SignInView: FC = () => {
                   alignItems='center'
                   spacing={1}
                   mt={2}
-                  color='#555555'
-                  sx={{ '&:hover': { color: 'white' }, cursor: 'default' }}
+                  color='text.secondary'
+                  sx={{ '&:hover': { color: 'text.primary' }, cursor: 'default' }}
                 >
                   <Lock fontSize='small' color='inherit' />
                   <Typography variant='caption' color='inherit'>

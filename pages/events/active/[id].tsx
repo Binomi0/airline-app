@@ -67,7 +67,8 @@ const EventDetailPage = () => {
     return AIRLINES[event.airlineId] || AIRLINES.iberia
   }, [event])
 
-  const BRAND_COLOR = airlineConfig.color
+  const BRAND_COLOR =
+    theme.palette.airlines[airlineConfig.id as keyof typeof theme.palette.airlines] || theme.palette.primary.main
 
   const ownedAircrafts = useMemo(
     () => userNfts?.filter(filterByTokenAddress(nftAircraftTokenAddress)) || [],
@@ -125,7 +126,11 @@ const EventDetailPage = () => {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <LinearProgress
-          sx={{ width: '200px', bgcolor: alpha('#b01d21', 0.1), '& .MuiLinearProgress-bar': { bgcolor: '#b01d21' } }}
+          sx={{
+            width: '200px',
+            bgcolor: alpha(theme.palette.error.main, 0.1),
+            '& .MuiLinearProgress-bar': { bgcolor: theme.palette.error.main }
+          }}
         />
       </Box>
     )
@@ -174,7 +179,7 @@ const EventDetailPage = () => {
               <Stack direction='row' alignItems='center' spacing={2}>
                 <Avatar
                   src={airlineConfig.logo}
-                  sx={{ width: 80, height: 80, border: `3px solid ${BRAND_COLOR}`, bgcolor: 'white' }}
+                  sx={{ width: 80, height: 80, border: `3px solid ${BRAND_COLOR}`, bgcolor: 'background.paper' }}
                 />
                 <Box>
                   <Typography variant='overline' sx={{ color: BRAND_COLOR, fontWeight: 900, letterSpacing: 4 }}>

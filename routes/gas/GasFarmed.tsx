@@ -16,7 +16,7 @@ import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
 import { stakingClaimRewardsSwal, stakingInsufficientRewardsSwal, stakingRewardsClaimedSwal } from 'lib/swal'
 
 import LinearProgress from '@mui/material/LinearProgress'
-import { styled, alpha, keyframes } from '@mui/material/styles'
+import { styled, alpha, keyframes, Theme } from '@mui/material/styles'
 
 const MIN_REWARDS_CLAIM = '100000000000000000000'
 
@@ -32,7 +32,8 @@ const FuelProgress = styled(LinearProgress)(({ theme }) => ({
   backgroundColor: alpha(theme.palette.primary.main, 0.1),
   '& .MuiLinearProgress-bar': {
     borderRadius: 5,
-    background: 'linear-gradient(90deg, #6366f1 0%, #a855f7 100%)'
+    background: (theme: Theme) =>
+      `linear-gradient(90deg, ${theme.palette.indigo.main} 0%, ${theme.palette.violet.main} 100%)`
   }
 }))
 
@@ -40,8 +41,8 @@ const StatusDot = styled('div')<{ active?: boolean }>(({ theme, active }) => ({
   width: 8,
   height: 8,
   borderRadius: '50%',
-  backgroundColor: active ? '#10B981' : alpha(theme.palette.text.primary, 0.2),
-  boxShadow: active ? '0 0 10px #10B981' : 'none',
+  backgroundColor: active ? theme.palette.success.main : alpha(theme.palette.text.primary, 0.2),
+  boxShadow: active ? `0 0 10px ${theme.palette.success.main}` : 'none',
   animation: active ? `${pulse} 2s infinite ease-in-out` : 'none'
 }))
 
@@ -112,7 +113,10 @@ const GasFarmed = ({ getAirgBalance }: Props) => {
         </Box>
 
         <Typography variant='caption' sx={{ opacity: 0.8, fontWeight: 600, mb: 2 }}>
-          Generando actualmente <b style={{ color: '#10B981' }}>{formatNumber(stakedAmount * 100, 0)} Litros/día</b>
+          Generando actualmente{' '}
+          <Box component='span' sx={{ color: 'success.main' }}>
+            {formatNumber(stakedAmount * 100, 0)} Litros/día
+          </Box>
         </Typography>
 
         <Typography

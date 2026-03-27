@@ -47,7 +47,7 @@ const MissionBoard: React.FC<MissionBoardProps> = ({ missions, onSelect, selecte
               justifyContent: 'center'
             }}
           >
-            <FlightTakeoffIcon sx={{ color: '#000', fontSize: 18 }} />
+            <FlightTakeoffIcon sx={{ color: 'common.black', fontSize: 18 }} />
           </Box>
           <Typography variant='h6' color='primary' sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
             OPERATIONS CENTER

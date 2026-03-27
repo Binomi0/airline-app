@@ -9,11 +9,13 @@ import { styled, alpha } from '@mui/material/styles'
 import { IMarketplaceListing } from 'models/MarketplaceListing'
 import { formatNumber, getNFTAttributes } from 'utils'
 import Swal from 'sweetalert2'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
 import FlightIcon from '@mui/icons-material/Flight'
 import PersonIcon from '@mui/icons-material/Person'
 import SpeedIcon from '@mui/icons-material/Speed'
+import { INft } from 'models/Nft'
+import { IUser } from 'models/User'
 
 const Card = styled(Paper)(({ theme }) => ({
   borderRadius: '24px',
@@ -39,7 +41,7 @@ const ImageContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
   paddingTop: '60%',
   overflow: 'hidden',
-  background: theme.palette.mode === 'dark' ? '#000' : '#f1f5f9',
+  background: theme.palette.mode === 'dark' ? theme.palette.common.black : theme.palette.grey[100],
   '& img': {
     position: 'absolute',
     top: 0,
@@ -89,7 +91,7 @@ interface AircraftListingCardProps {
 
 const AircraftListingCard: React.FC<AircraftListingCardProps> = ({ listing, onPurchaseSuccess }) => {
   const [isPurchasing, setIsPurchasing] = useState(false)
-  const nft = listing.nft as any
+  const nft = listing.nft as INft
   const attributes = getNFTAttributes(nft)
 
   const licenseType = attributes.find((a) => a.trait_type === 'license')?.value || 'N/A'
@@ -113,8 +115,9 @@ const AircraftListingCard: React.FC<AircraftListingCardProps> = ({ listing, onPu
         await axios.post('/api/marketplace/buy', { listingId: listing._id })
         Swal.fire('¡Éxito!', 'La aeronave ha sido transferida a tu hangar.', 'success')
         onPurchaseSuccess()
-      } catch (error: any) {
-        Swal.fire('Error', error.response?.data?.error || 'No se pudo completar la compra', 'error')
+      } catch (error: unknown) {
+        const err = error as AxiosError<{ error?: string }>
+        Swal.fire('Error', err.response?.data?.error || 'No se pudo completar la compra', 'error')
       } finally {
         setIsPurchasing(false)
       }
@@ -132,10 +135,10 @@ const AircraftListingCard: React.FC<AircraftListingCardProps> = ({ listing, onPu
             top: 16,
             right: 16,
             fontWeight: 800,
-            background: 'rgba(0,0,0,0.6)',
-            color: '#fff',
+            background: (theme) => alpha(theme.palette.common.black, 0.6),
+            color: 'common.white',
             backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255,255,255,0.2)'
+            border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.2)}`
           }}
         />
       </ImageContainer>
@@ -150,7 +153,7 @@ const AircraftListingCard: React.FC<AircraftListingCardProps> = ({ listing, onPu
             color='text.secondary'
             sx={{ textTransform: 'uppercase', fontWeight: 700, letterSpacing: 1 }}
           >
-            Vendedor: {(listing.seller as any)?.email.split('@')[0]}
+            Vendedor: {(listing.seller as IUser)?.email.split('@')[0]}
           </Typography>
         </Box>
 

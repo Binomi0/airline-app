@@ -1,6 +1,6 @@
-import { Box, Paper, Stack, Typography, darken } from '@mui/material'
+import { Box, Paper, Stack, Typography, useTheme, alpha } from '@mui/material'
 import Image from 'next/image'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { useRecoilValue } from 'recoil'
 import { ivaoUserStore } from 'store/ivao-user.atom'
 import IvaoConnection from './IvaoConnection'
@@ -8,9 +8,9 @@ import { pilotStore } from 'store/pilot.atom'
 import { userState } from 'store/user.atom'
 
 const IvaoLogin = () => {
+  const theme = useTheme()
   const ivaoUser = useRecoilValue(ivaoUserStore)
   const user = useRecoilValue(userState)
-  const [color, setColor] = useState('#fff')
   const pilots = useRecoilValue(pilotStore)
 
   const isFlying = useMemo(
@@ -18,19 +18,17 @@ const IvaoLogin = () => {
     [pilots, user?.vaUser?.pilotId]
   )
 
-  useEffect(() => {
-    setColor(isFlying ? '#00FF00' : '#FFF000')
-  }, [isFlying])
+  const statusColor = isFlying ? theme.palette.success.main : theme.palette.warning.main
 
   return ivaoUser ? (
     <Stack direction='row' spacing={2} alignItems='center' mt={2}>
-      <div
-        style={{
+      <Box
+        sx={{
           width: 32,
           height: 32,
-          border: `1px solid ${darken(color, 0.3)}`,
+          border: `1px solid ${alpha(statusColor, 0.7)}`,
           borderRadius: '50%',
-          background: `linear-gradient(270deg, ${darken(color, 0.1)}, ${darken(color, 0.7)}`
+          background: `linear-gradient(270deg, ${statusColor}, ${alpha(statusColor, 0.3)})`
         }}
       />
       <Typography>Estás Conectado a IVAO {ivaoUser.firstName}</Typography>

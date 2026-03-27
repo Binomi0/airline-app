@@ -11,7 +11,7 @@ import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import { smartAccountAddressStore } from 'store/wallet.atom'
 import { tokenBalanceStore } from 'store/balance.atom'
-import { styled, alpha } from '@mui/material/styles'
+import { styled, alpha, useTheme } from '@mui/material/styles'
 import Paper from '@mui/material/Paper'
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation'
 
@@ -32,8 +32,8 @@ const BackgroundOverlay = styled('div')(({ theme }) => ({
   bottom: 0,
   backgroundImage:
     theme.palette.mode === 'dark'
-      ? `linear-gradient(135deg, ${alpha('#0f172a', 0.95)} 0%, ${alpha('#1e293b', 0.85)} 100%), url('/img/airport_bg.png')`
-      : `linear-gradient(135deg, ${alpha('#f8fafc', 0.8)} 0%, ${alpha('#cbd5e1', 0.6)} 100%), url('/img/airport_bg.png')`,
+      ? `linear-gradient(135deg, ${alpha(theme.palette.slate.dark, 0.95)} 0%, ${alpha(theme.palette.slate.main, 0.85)} 100%), url('/img/airport_bg.png')`
+      : `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.8)} 0%, ${alpha(theme.palette.divider, 0.6)} 100%), url('/img/airport_bg.png')`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   zIndex: 0
@@ -65,6 +65,7 @@ const Gas = () => {
   const user = useRecoilValue(userState)
   const address = useRecoilValue(smartAccountAddressStore)
   const balance = useRecoilValue(tokenBalanceStore)
+  const theme = useTheme()
   const { getAirlBalance, getAirgBalance } = useTokenProviderContext()
   const { stakingContract: contract } = useAppContracts()
 
@@ -104,7 +105,8 @@ const Gas = () => {
               px: 2,
               py: 0.5,
               borderRadius: '30px',
-              background: (theme) => (theme.palette.mode === 'dark' ? alpha(theme.palette.primary.main, 0.1) : '#fff'),
+              background: (theme) =>
+                theme.palette.mode === 'dark' ? alpha(theme.palette.primary.main, 0.1) : theme.palette.common.white,
               border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
               color: 'primary.main',
               mb: 3,
@@ -123,15 +125,16 @@ const Gas = () => {
             sx={{
               letterSpacing: '-0.06em',
               mb: 2,
-              background: 'linear-gradient(135deg, #fff 0%, #cbd5e1 100%)',
+              background: (theme) =>
+                `linear-gradient(135deg, ${theme.palette.common.white} 0%, ${theme.palette.divider} 100%)`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               fontSize: { xs: '3rem', md: '5.5rem' },
               lineHeight: 0.9,
-              textShadow: '0 10px 30px rgba(0,0,0,0.2)'
+              textShadow: (theme) => `0 10px 30px ${alpha(theme.palette.common.black, 0.2)}`
             }}
           >
-            Centro de <span style={{ color: '#6366f1' }}>Abastecimiento</span>
+            Centro de <span style={{ color: theme.palette.indigo.main }}>Abastecimiento</span>
           </Typography>
 
           <Typography
@@ -144,7 +147,7 @@ const Gas = () => {
               lineHeight: 1.6,
               fontSize: '1.25rem',
               color: 'text.secondary',
-              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              textShadow: (theme) => `0 2px 4px ${alpha(theme.palette.common.black, 0.1)}`
             }}
           >
             Optimiza tu despliegue logístico convirtiendo tokens AIRL en combustible de alto rendimiento. Asegura la
