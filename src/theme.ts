@@ -94,7 +94,7 @@ const commonComponents: ThemeOptions['components'] = {
       {
         props: { variant: 'terminal' },
         style: ({ theme }) => ({
-          background: theme.palette.common.black,
+          background: theme.palette.mode === 'dark' ? theme.palette.common.black : theme.palette.common.white,
           border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
           boxShadow: `0 20px 25px -5px ${alpha(theme.palette.common.black, 0.5)}`,
           padding: theme.spacing(2)
@@ -149,20 +149,36 @@ const commonComponents: ThemeOptions['components'] = {
       {
         props: { variant: 'gasCard' },
         style: ({ theme }) => ({
-          background: theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(20px)',
-          border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
-          borderRadius: '24px',
-          padding: theme.spacing(4),
-          transition: 'all 0.3s ease-in-out',
-          boxShadow:
-            theme.palette.mode === 'dark'
-              ? '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)'
-              : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          padding: theme.spacing(3),
+          background: theme.palette.mode === 'dark' ? 'rgba(31, 41, 55, 0.4)' : 'rgba(255, 255, 255, 0.4)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: 16,
+          border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`
+        })
+      },
+      {
+        props: { variant: 'missionsCard' },
+        style: ({ theme }) => ({
+          padding: theme.spacing(2),
+          background: theme.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.6)' : 'rgba(255, 255, 255, 0.6)',
+          backdropFilter: 'blur(10px)',
+          border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
+          borderRadius: theme.shape.borderRadius * 2,
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
-            borderColor: theme.palette.primary.main,
-            boxShadow: `0 0 20px ${alpha(theme.palette.primary.main, 0.1)}`
+            transform: 'translateY(-4px)',
+            borderColor: alpha(theme.palette.primary.main, 0.5),
+            boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`
           }
+        })
+      },
+      {
+        props: { variant: 'dispatch' },
+        style: ({ theme }) => ({
+          padding: theme.spacing(3),
+          borderRadius: theme.shape.borderRadius * 3,
+          backgroundColor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`
         })
       },
       {
@@ -235,8 +251,8 @@ const commonComponents: ThemeOptions['components'] = {
             fontFamily: b612Mono.style.fontFamily,
             fontSize: '1rem',
             backgroundColor: alpha(theme.palette.primary.main, 0.05),
-            '& fieldset': {
-              borderColor: alpha(theme.palette.primary.main, 0.2)
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: alpha(theme.palette.primary.main, 0.3)
             },
             '&:hover fieldset': {
               borderColor: alpha(theme.palette.primary.main, 0.4)
@@ -248,6 +264,13 @@ const commonComponents: ThemeOptions['components'] = {
           '& .MuiInputBase-input::placeholder': {
             color: alpha(theme.palette.primary.main, 0.5),
             opacity: 1
+          },
+          '& .MuiFormHelperText-root': {
+            position: 'absolute',
+            bottom: -20,
+            fontWeight: 'bold',
+            fontSize: '0.65rem',
+            margin: 0
           }
         })
       }
@@ -290,6 +313,8 @@ const commonComponents: ThemeOptions['components'] = {
 // Module augmentation for custom variants
 declare module '@mui/material/Paper' {
   interface PaperPropsVariantOverrides {
+    missionsCard: true
+    dispatch: true
     terminal: true
     glass: true
     license: true

@@ -20,11 +20,21 @@ const BackgroundOverlay = styled('div')(({ theme }) => ({
   bottom: 0,
   backgroundImage:
     theme.palette.mode === 'dark'
-      ? `linear-gradient(135deg, ${alpha(theme.palette.slate.dark, 0.95)} 0%, ${alpha(theme.palette.slate.main, 0.85)} 100%), url('/img/airport_bg.png')`
-      : `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.8)} 0%, ${alpha(theme.palette.divider, 0.6)} 100%), url('/img/airport_bg.png')`,
+      ? `linear-gradient(135deg, ${alpha(theme.palette.slate.dark, 0.98)} 0%, ${alpha(theme.palette.slate.main, 0.92)} 100%), url('/img/airport_bg.png')`
+      : `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.94)} 0%, ${alpha(theme.palette.background.paper, 0.85)} 100%), url('/img/airport_bg.png')`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
-  zIndex: 0
+  zIndex: 0,
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: `radial-gradient(circle at 50% 50%, ${alpha(theme.palette.primary.main, 0.15)} 0%, transparent 80%)`,
+    pointerEvents: 'none'
+  }
 }))
 
 const Marketplace = () => {

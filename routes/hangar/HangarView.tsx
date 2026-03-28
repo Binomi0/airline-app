@@ -35,7 +35,7 @@ const BackgroundOverlay = styled(Box)(({ theme }) => ({
   backgroundImage:
     theme.palette.mode === 'dark'
       ? `linear-gradient(135deg, ${alpha(theme.palette.slate.dark, 0.95)} 0%, ${alpha(theme.palette.slate.main, 0.9)} 100%), url('/img/airport_bg.png')`
-      : `linear-gradient(135deg, ${alpha(theme.palette.slate.light, 0.9)} 0%, ${alpha(theme.palette.slate.main, 0.85)} 100%), url('/img/airport_bg.png')`,
+      : `linear-gradient(135deg, ${alpha(theme.palette.background.default, 0.94)} 0%, ${alpha(theme.palette.background.paper, 0.85)} 100%), url('/img/airport_bg.png')`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   zIndex: 0,

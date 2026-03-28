@@ -21,13 +21,22 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
   if (!isLoading && missions.length === 0) return null
 
   return (
-    <Box sx={{ mb: 4 }}>
-      <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 1, px: 1 }}>
-        <WorkspacePremiumIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+    <Box style={{ marginBottom: theme.spacing(4) }}>
+      <Stack
+        direction='row'
+        alignItems='center'
+        spacing={1}
+        style={{
+          marginBottom: theme.spacing(1),
+          paddingLeft: theme.spacing(1),
+          paddingRight: theme.spacing(1)
+        }}
+      >
+        <WorkspacePremiumIcon color='primary' style={{ fontSize: 20 }} />
         <Typography
           variant='overline'
-          sx={{
-            color: 'primary.main',
+          color='primary'
+          style={{
             fontWeight: 'bold',
             letterSpacing: 2,
             textShadow: `0 0 10px ${alpha(primaryColor, 0.3)}`
@@ -38,26 +47,15 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
       </Stack>
 
       <Box
-        sx={{
+        style={{
           display: 'flex',
-          gap: 2,
+          gap: theme.spacing(2),
           overflowX: 'auto',
-          pb: 2,
-          pt: 1,
-          px: 1,
-          '&::-webkit-scrollbar': {
-            height: '4px'
-          },
-          '&::-webkit-scrollbar-track': {
-            background: alpha(theme.palette.divider, 0.05)
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: alpha(primaryColor, 0.3),
-            borderRadius: '10px'
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: alpha(primaryColor, 0.5)
-          }
+          paddingBottom: theme.spacing(2),
+          paddingTop: theme.spacing(1),
+          paddingLeft: theme.spacing(1),
+          paddingRight: theme.spacing(1),
+          scrollbarWidth: 'thin'
         }}
       >
         {isLoading
@@ -67,7 +65,10 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
                 variant='rectangular'
                 width={280}
                 height={160}
-                sx={{ borderRadius: 2, bgcolor: alpha(theme.palette.divider, 0.05) }}
+                style={{
+                  borderRadius: theme.shape.borderRadius * 2,
+                  backgroundColor: alpha(theme.palette.divider, 0.05)
+                }}
               />
             ))
           : missions.map((mission, index) => {
@@ -80,76 +81,64 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
                   key={`${mission.destination}-${index}`}
                   onClick={() => onSelect(mission)}
                   elevation={0}
-                  sx={{
+                  variant='missionsCard'
+                  style={{
                     minWidth: 280,
-                    cursor: 'pointer',
-                    p: 2,
-                    position: 'relative',
                     background: isSelected
                       ? `linear-gradient(135deg, ${alpha(primaryColor, 0.15)} 0%, ${alpha(primaryColor, 0.05)} 100%)`
-                      : alpha(theme.palette.background.paper, 0.6),
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid',
-                    borderColor: isSelected ? alpha(primaryColor, 0.6) : alpha(theme.palette.divider, 0.1),
-                    borderRadius: 2,
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      borderColor: alpha(primaryColor, 0.6),
-                      boxShadow: `0 8px 24px ${alpha(primaryColor, 0.2)}`,
-                      '& .mission-icon': {
-                        color: 'common.white',
-                        transform: 'scale(1.1) rotate(-10deg)'
-                      }
-                    },
+                      : undefined,
+                    borderColor: isSelected ? alpha(primaryColor, 0.6) : undefined,
                     fontFamily: b612Mono.style.fontFamily
                   }}
                 >
                   {isHighReward && (
                     <Box
-                      sx={{
+                      style={{
                         position: 'absolute',
                         top: -10,
                         right: 12,
-                        bgcolor: 'success.main',
-                        color: 'common.black',
-                        px: 1,
-                        py: 0.2,
-                        borderRadius: 1,
+                        backgroundColor: theme.palette.success.main,
+                        color: theme.palette.common.black,
+                        padding: '2px 8px',
+                        borderRadius: theme.shape.borderRadius,
                         fontSize: '0.65rem',
-                        fontWeight: 'black',
+                        fontWeight: 900,
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 0.5,
-                        boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.common.black, 0.5)}`,
+                        gap: 4,
+                        boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.5)}`,
                         zIndex: 2
                       }}
                     >
-                      <LocalFireDepartmentIcon sx={{ fontSize: 12 }} />
+                      <LocalFireDepartmentIcon style={{ fontSize: 12 }} />
                       TOP FLIGHT
                     </Box>
                   )}
 
                   <Stack spacing={1.5}>
                     <Stack direction='row' justifyContent='space-between' alignItems='flex-start'>
-                      <Box>
-                        <Typography sx={{ color: 'text.secondary', fontSize: '0.65rem', mb: -0.5 }}>ROUTE</Typography>
+                      <Box style={{ flex: 1 }}>
+                        <Typography color='text.secondary' style={{ fontSize: '0.65rem', marginBottom: -4 }}>
+                          ROUTE
+                        </Typography>
                         <Stack direction='row' spacing={1} alignItems='center'>
                           <Typography
-                            sx={{
+                            style={{
                               fontWeight: 'bold',
                               fontSize: '1.1rem',
-                              color: isSelected ? 'common.white' : 'primary.main'
+                              color: isSelected ? theme.palette.common.white : primaryColor
                             }}
                           >
                             {mission.origin}
                           </Typography>
-                          <Typography sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>→</Typography>
+                          <Typography color='text.disabled' style={{ fontSize: '0.8rem' }}>
+                            →
+                          </Typography>
                           <Typography
-                            sx={{
+                            style={{
                               fontWeight: 'bold',
                               fontSize: '1.1rem',
-                              color: isSelected ? 'common.white' : 'primary.main'
+                              color: isSelected ? theme.palette.common.white : primaryColor
                             }}
                           >
                             {mission.destination}
@@ -157,18 +146,22 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
                         </Stack>
                       </Box>
                       <Box
-                        className='mission-icon'
-                        sx={{ transition: 'all 0.3s ease', color: alpha(primaryColor, 0.6) }}
+                        style={{
+                          transition: 'all 0.3s ease',
+                          color: isSelected ? theme.palette.common.white : alpha(primaryColor, 0.6)
+                        }}
                       >
                         <FlightTakeoffIcon />
                       </Box>
                     </Stack>
 
                     <Box>
-                      <Typography sx={{ color: 'text.secondary', fontSize: '0.65rem', mb: -0.5 }}>PRIZE</Typography>
-                      <Typography sx={{ variant: 'h6', fontWeight: 'bold', color: 'success.main' }}>
+                      <Typography color='text.secondary' style={{ fontSize: '0.65rem', marginBottom: -4 }}>
+                        PRIZE
+                      </Typography>
+                      <Typography variant='h6' style={{ fontWeight: 'bold', color: theme.palette.success.main }}>
                         {formatNumber(mission.prize, 0)}{' '}
-                        <Typography component='span' sx={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                        <Typography component='span' style={{ fontSize: '0.75rem', opacity: 0.8 }}>
                           AIRL
                         </Typography>
                       </Typography>
@@ -176,14 +169,20 @@ const SuggestedMissions: React.FC<SuggestedMissionsProps> = ({ missions, onSelec
 
                     <Stack direction='row' justifyContent='space-between' alignItems='flex-end'>
                       <Box>
-                        <Typography sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>TYPE</Typography>
-                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
+                        <Typography color='text.secondary' style={{ fontSize: '0.65rem' }}>
+                          TYPE
+                        </Typography>
+                        <Typography style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
                           {mission.type || 'CARGO'}
                         </Typography>
                       </Box>
-                      <Box sx={{ textAlign: 'right' }}>
-                        <Typography sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>DIST</Typography>
-                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>{mission.distance} NM</Typography>
+                      <Box style={{ textAlign: 'right' }}>
+                        <Typography color='text.secondary' style={{ fontSize: '0.65rem' }}>
+                          DIST
+                        </Typography>
+                        <Typography style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
+                          {mission.distance} NM
+                        </Typography>
                       </Box>
                     </Stack>
                   </Stack>
