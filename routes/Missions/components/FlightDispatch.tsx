@@ -51,8 +51,8 @@ const aircraftImageMap = [
 ]
 
 const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) => {
-  const router = useRouter()
   const theme = useTheme()
+  const router = useRouter()
   const balance = useRecoilValue(tokenBalanceStore)
   const { data: userNfts } = useOwnedNFTs()
   const { twClient } = useRecoilValue(walletStore)
@@ -112,8 +112,6 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
       cancelButtonText: 'Cancelar'
     })
 
-    // await reserveMission(mission._id!, currentAircraft)
-
     if (isConfirmed) {
       try {
         await reserveMission(mission._id!, currentAircraft)
@@ -126,10 +124,10 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
   }, [mission, currentAircraft, router, reserveMission])
 
   return (
-    <Paper elevation={6} sx={{ p: 2, borderRadius: 3 }}>
+    <Paper variant='dispatch' elevation={6}>
       <Stack spacing={2}>
         <Box display='flex' justifyContent='space-between' alignItems='flex-start'>
-          <Typography variant='h6' fontWeight='bold'>
+          <Typography variant='h6' style={{ fontWeight: 'bold' }}>
             ORDEN DE VUELO
           </Typography>
           <Stack direction='row' spacing={1} alignItems='center'>
@@ -139,7 +137,7 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
                 color={mission.rewardMultiplier >= 1.9 ? 'success' : 'primary'}
                 variant='filled'
                 size='small'
-                sx={{ fontWeight: 'bold' }}
+                style={{ fontWeight: 'bold' }}
               />
             )}
             <Chip
@@ -152,7 +150,7 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
               }
               variant='outlined'
               size='small'
-              sx={{ color: 'text.secondary', borderColor: 'divider' }}
+              style={{ color: theme.palette.text.secondary, borderColor: theme.palette.divider }}
             />
           </Stack>
         </Box>
@@ -163,52 +161,60 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
           <Typography variant='overline' color='text.secondary'>
             DETALLES DE RUTA
           </Typography>
-          <Stack direction='row' spacing={2} alignItems='center' mt={1}>
-            <Box textAlign='center'>
-              <Typography variant='h5' color={mission.originAtcOnStart ? 'info.main' : 'inherit'}>
-                {mission.origin}
-              </Typography>
-              <Typography variant='caption' sx={{ display: 'block', mt: -0.5, fontSize: '0.7rem' }}>
-                {mission.originAtcOnStart ? 'ATC ACTIVE (+40%)' : 'ORIGEN'}
-              </Typography>
-            </Box>
-            <Box flex={1} textAlign='center' position='relative'>
-              <Typography variant='body2' color='text.secondary'>
-                {formatNumber(mission.distance, 0)} NM
-              </Typography>
-              <Box sx={{ borderBottom: '2px solid', borderColor: 'divider', my: 0.5 }} />
-              <FlightTakeoffIcon
-                sx={{
-                  fontSize: 30,
-                  color: 'primary.main',
-                  opacity: 0.1,
-                  position: 'absolute',
-                  top: 0,
-                  left: '50%',
-                  transform: 'translateX(-50%)'
-                }}
-              />
-            </Box>
-            <Box textAlign='center'>
-              <Typography variant='h5' color={mission.isSponsored ? 'success.main' : 'inherit'}>
-                {mission.destination}
-              </Typography>
-              <Typography variant='caption' sx={{ display: 'block', mt: -0.5, fontSize: '0.7rem' }}>
-                {mission.isSponsored ? 'ATC ACTIVE (+70%)' : 'DESTINO'}
-              </Typography>
-            </Box>
-          </Stack>
+          <Box style={{ marginTop: theme.spacing(1) }}>
+            <Stack direction='row' spacing={2} alignItems='center'>
+              <Box style={{ textAlign: 'center' }}>
+                <Typography
+                  variant='h5'
+                  style={{ color: mission.originAtcOnStart ? theme.palette.info.main : 'inherit' }}
+                >
+                  {mission.origin}
+                </Typography>
+                <Typography variant='caption' style={{ display: 'block', marginTop: -4, fontSize: '0.7rem' }}>
+                  {mission.originAtcOnStart ? 'ATC ACTIVE (+40%)' : 'ORIGEN'}
+                </Typography>
+              </Box>
+              <Box style={{ flex: 1, textAlign: 'center', position: 'relative' }}>
+                <Typography variant='body2' color='text.secondary'>
+                  {formatNumber(mission.distance, 0)} NM
+                </Typography>
+                <Box style={{ borderBottom: `2px solid ${theme.palette.divider}`, marginTop: 4, marginBottom: 4 }} />
+                <FlightTakeoffIcon
+                  style={{
+                    fontSize: 30,
+                    color: theme.palette.primary.main,
+                    opacity: 0.1,
+                    position: 'absolute',
+                    top: 0,
+                    left: '50%',
+                    transform: 'translateX(-50%)'
+                  }}
+                />
+              </Box>
+              <Box style={{ textAlign: 'center' }}>
+                <Typography
+                  variant='h5'
+                  style={{ color: mission.isSponsored ? theme.palette.success.main : 'inherit' }}
+                >
+                  {mission.destination}
+                </Typography>
+                <Typography variant='caption' style={{ display: 'block', marginTop: -4, fontSize: '0.7rem' }}>
+                  {mission.isSponsored ? 'ATC ACTIVE (+70%)' : 'DESTINO'}
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
           {mission.rewardMultiplier > 0.8 && (
             <Alert
               icon={false}
               severity='info'
-              sx={{
-                mt: 2,
-                bgcolor: alpha(theme.palette.info.main, 0.05),
+              style={{
+                marginTop: theme.spacing(2),
+                backgroundColor: alpha(theme.palette.info.main, 0.05),
                 border: `1px solid ${alpha(theme.palette.info.main, 0.1)}`
               }}
             >
-              <Typography variant='caption' sx={{ color: 'info.main', fontWeight: 'bold' }}>
+              <Typography variant='caption' style={{ color: theme.palette.info.main, fontWeight: 'bold' }}>
                 RECOMPENSAS MEJORADAS: {Math.round((mission.rewardMultiplier - 0.8) * 100)}% BONUS POR ATC
               </Typography>
             </Alert>
@@ -219,8 +225,16 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
           <Typography variant='overline' color='text.secondary'>
             CALLSIGN ASIGNADO
           </Typography>
-          <Paper variant='outlined' sx={{ p: 1, textAlign: 'center', bgcolor: 'primary.dark', color: 'white' }}>
-            <Typography variant='h4' sx={{ letterSpacing: 4, fontWeight: 'bold' }}>
+          <Paper
+            variant='outlined'
+            style={{
+              padding: theme.spacing(1),
+              textAlign: 'center',
+              backgroundColor: theme.palette.primary.dark,
+              color: theme.palette.common.white
+            }}
+          >
+            <Typography variant='h4' style={{ letterSpacing: 4, fontWeight: 'bold' }}>
               {mission.callsign}
             </Typography>
           </Paper>
@@ -243,9 +257,15 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
         </FormControl>
 
         {currentAircraft && (
-          <Box p={2} sx={{ bgcolor: alpha('#000', 0.05), borderRadius: 2 }}>
+          <Box
+            style={{
+              padding: theme.spacing(2),
+              backgroundColor: alpha(theme.palette.common.black, 0.05),
+              borderRadius: theme.spacing(2)
+            }}
+          >
             <Stack direction='row' spacing={2} alignItems='center'>
-              <Box sx={{ width: 64, height: 64, borderRadius: 1, overflow: 'hidden' }}>
+              <Box style={{ width: 64, height: 64, borderRadius: 8, overflow: 'hidden' }}>
                 <MediaRenderer client={twClient!} src={media as string} width='64px' height='64px' />
               </Box>
               <Box flex={1}>
@@ -262,9 +282,9 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
           <Box>
             <Stack direction='row' justifyContent='space-between' mb={1}>
               <Typography variant='body2' display='flex' alignItems='center'>
-                <GasMeterIcon sx={{ mr: 1, fontSize: 18 }} /> Combustible Requerido
+                <GasMeterIcon style={{ marginRight: 8, fontSize: 18 }} /> Combustible Requerido
               </Typography>
-              <Typography variant='body2' fontWeight='bold'>
+              <Typography variant='body2' style={{ fontWeight: 'bold' }}>
                 {formatNumber(fuelRequired, 0)} L
               </Typography>
             </Stack>
@@ -272,13 +292,15 @@ const FlightDispatch: React.FC<FlightDispatchProps> = ({ mission, onCancel }) =>
               variant='determinate'
               value={Math.min(100, (fuelRequired / fuelBalance) * 100)}
               color={hasEnoughFuel ? 'success' : 'error'}
-              sx={{ height: 8, borderRadius: 4 }}
+              style={{ height: 8, borderRadius: 4 }}
             />
             <Typography
               variant='caption'
-              color={hasEnoughFuel ? 'text.secondary' : 'error.main'}
-              mt={1}
-              display='block'
+              style={{
+                color: hasEnoughFuel ? theme.palette.text.secondary : theme.palette.error.main,
+                marginTop: 8,
+                display: 'block'
+              }}
             >
               {hasEnoughFuel
                 ? `Balance: ${formatNumber(fuelBalance, 0)} L (Suficiente)`

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { Grid, Box, Stack, Typography, useTheme, TextField, InputAdornment, Paper } from '@mui/material'
+import React, { useState, useEffect, useMemo } from 'react'
+import { Grid, Box, Stack, Typography, TextField, InputAdornment, Paper } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import Map from 'components/Map/RadarMap'
 import MissionBoard from './components/MissionBoard'
@@ -13,9 +13,11 @@ import { nftAircraftTokenAddress } from 'contracts/address'
 import { filterByTokenAddress } from 'utils'
 import { useRecoilValue } from 'recoil'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
+import { useQuery } from '@tanstack/react-query'
+
+import PageContainer from 'components/ui/PageContainer'
 
 const OperationsCenter = () => {
-  const theme = useTheme()
   const { atcs, initIvaoAuth, initIvaoData } = useVaProviderContext()
   const { data: userNfts } = useOwnedNFTs()
   const ivaoAuthToken = useRecoilValue(ivaoUserAuthStore)
@@ -32,8 +34,6 @@ const OperationsCenter = () => {
     [userNfts]
   )
 
-  const [missions, setMissions] = useState<PublicMission[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [selectedMission, setSelectedMission] = useState<PublicMission | null>(null)
   const [originInput, setOriginInput] = useState<string>('')
   const [origin, setOrigin] = useState<string>('')
@@ -50,26 +50,16 @@ const OperationsCenter = () => {
     return true
   }
 
-  const fetchMissions = useCallback(async () => {
-    setIsLoading(true)
-    console.log('Fetching missions with origin:', origin)
-    try {
+  const { data: missions = [], isLoading } = useQuery({
+    queryKey: ['missions', ownedAircrafts[0]?.nft?.id, origin],
+    queryFn: async () => {
       // We pass the first owned aircraft ID if available, otherwise it works with fallback
       const aircraftId = ownedAircrafts[0]?.nft?.id.toString() || ''
       const url = `/api/missions?aircraftId=${aircraftId}${origin ? `&origin=${encodeURIComponent(origin)}` : ''}`
-      console.log('API URL:', url)
       const response = await nextApiInstance.get<PublicMission[]>(url)
-      setMissions(response.data)
-    } catch (error) {
-      console.error('Failed to fetch missions:', error)
-    } finally {
-      setIsLoading(false)
+      return response.data
     }
-  }, [ownedAircrafts, origin])
-
-  useEffect(() => {
-    fetchMissions()
-  }, [fetchMissions, origin])
+  })
 
   // Find origin/destination objects for the map based on mission selection
   const mapSelection = useMemo(() => {
@@ -122,7 +112,7 @@ const OperationsCenter = () => {
   }, [missions])
 
   return (
-    <Box component='main' sx={{ height: 'calc(100vh - 64px)', p: 3, overflowY: 'auto', bgcolor: 'background.default' }}>
+    <PageContainer>
       <SuggestedMissions
         missions={suggestedMissions}
         onSelect={(m) => setSelectedMission(m)}
@@ -133,7 +123,7 @@ const OperationsCenter = () => {
       <Grid container spacing={4}>
         <Grid item xs={12} lg={8}>
           <Stack spacing={4}>
-            <Box sx={{ height: 400, borderRadius: 3, overflow: 'hidden', boxShadow: theme.shadows[4] }}>
+            <Box style={{ height: 400, borderRadius: 24, overflow: 'hidden' }}>
               <Map
                 towers={atcs}
                 origin={mapSelection.origin}
@@ -150,7 +140,6 @@ const OperationsCenter = () => {
                     setError(null)
                   }
                 }}
-                theme={theme.palette.mode as 'light' | 'dark'}
               />
             </Box>
 
@@ -185,24 +174,16 @@ const OperationsCenter = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position='start'>
-                        <SearchIcon sx={{ color: 'primary.main', fontSize: 18, opacity: 0.7 }} />
+                        <SearchIcon color='primary' style={{ fontSize: 18, opacity: 0.7 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
                       <InputAdornment position='end'>
-                        <Typography variant='caption' color='primary' sx={{ opacity: 0.5 }}>
+                        <Typography variant='caption' color='primary' style={{ opacity: 0.5 }}>
                           ENTER
                         </Typography>
                       </InputAdornment>
                     )
-                  }}
-                  sx={{
-                    '& .MuiFormHelperText-root': {
-                      position: 'absolute',
-                      bottom: -20,
-                      fontWeight: 'bold',
-                      fontSize: '0.65rem'
-                    }
                   }}
                 />
               }
@@ -211,37 +192,41 @@ const OperationsCenter = () => {
         </Grid>
 
         <Grid item xs={12} lg={4}>
-          <Box sx={{ position: 'sticky', top: 0 }}>
+          <Box style={{ position: 'sticky', top: 0 }}>
             {selectedMission ? (
               <FlightDispatch mission={selectedMission} onCancel={() => setSelectedMission(null)} />
             ) : (
-              <Paper
-                variant='outlined'
-                sx={{
-                  p: 3,
-                  minHeight: 300,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderStyle: 'dashed',
-                  borderWidth: 2,
-                  bgcolor: 'transparent'
-                }}
-              >
-                <Typography variant='h6' color='text.secondary' align='center'>
-                  SELECCIONA UNA MISIÓN PARA EMPEZAR EL DESPACHO
-                </Typography>
-                <Typography variant='caption' color='text.secondary' align='center' mt={1}>
-                  Elige un destino patrocinado para obtener más recompensas.
-                </Typography>
-              </Paper>
+              <EmptyDispatch />
             )}
           </Box>
         </Grid>
       </Grid>
-    </Box>
+    </PageContainer>
   )
 }
+
+const EmptyDispatch = () => (
+  <Paper
+    variant='outlined'
+    style={{
+      padding: '24px',
+      minHeight: 300,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderStyle: 'dashed',
+      borderWidth: 2,
+      backgroundColor: 'transparent'
+    }}
+  >
+    <Typography variant='h6' color='text.secondary' align='center'>
+      SELECCIONA UNA MISIÓN PARA EMPEZAR EL DESPACHO
+    </Typography>
+    <Typography variant='caption' color='text.secondary' align='center' mt={1}>
+      Elige un destino patrocinado para obtener más recompensas.
+    </Typography>
+  </Paper>
+)
 
 export default OperationsCenter

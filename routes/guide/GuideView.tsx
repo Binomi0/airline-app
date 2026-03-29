@@ -1,10 +1,9 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useRecoilValue } from 'recoil'
-import { themeStore } from 'store/theme.atom'
 import styles from '../../styles/guide.module.css'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import { useTheme, alpha } from '@mui/material'
 
 const STEPS = [
   {
@@ -54,42 +53,35 @@ const STEPS = [
   }
 ]
 
-const THEME_TOKENS: Record<'dark' | 'light', React.CSSProperties> = {
-  dark: {
-    '--home-bg': '#0b0f19',
-    '--home-bg-alt': 'rgba(15,18,28,0.6)',
-    '--home-bg-alt-rgb': '15, 18, 28',
-    '--home-border': 'rgba(255,255,255,0.06)',
-    '--home-border-card': 'rgba(255,255,255,0.07)',
-    '--home-accent': '#6366f1',
-    '--home-accent-soft': 'rgba(99,102,241,0.12)',
-    '--home-accent-text': '#a5b4fc',
-    '--home-title': '#f8fafc',
-    '--home-muted': '#94a3b8',
-    '--home-hero-from': '#818cf8',
-    '--home-hero-to': '#6366f1'
-  } as React.CSSProperties,
-  light: {
-    '--home-bg': '#f8fafc',
-    '--home-bg-alt': 'rgba(255,255,255,0.8)',
-    '--home-bg-alt-rgb': '255, 255, 255',
-    '--home-border': 'rgba(0,0,0,0.05)',
-    '--home-border-card': 'rgba(0,0,0,0.05)',
-    '--home-accent': '#4f46e5',
-    '--home-accent-soft': 'rgba(79,70,229,0.05)',
-    '--home-accent-text': '#4338ca',
-    '--home-title': '#0f172a',
-    '--home-muted': '#64748b',
-    '--home-hero-from': '#4f46e5',
-    '--home-hero-to': '#3730a3'
-  } as React.CSSProperties
-}
-
 const GuideView = () => {
-  const theme = useRecoilValue(themeStore)
+  const theme = useTheme()
+
+  const dynamicTokens = useMemo(
+    () =>
+      ({
+        '--home-bg': theme.palette.background.default,
+        '--home-bg-alt':
+          theme.palette.mode === 'dark'
+            ? alpha(theme.palette.background.paper, 0.6)
+            : alpha(theme.palette.background.paper, 0.65),
+        '--home-bg-alt-rgb': theme.palette.mode === 'dark' ? '15, 18, 28' : '255, 255, 255',
+        '--home-border': alpha(theme.palette.divider, 0.07),
+        '--home-border-card': alpha(theme.palette.divider, 0.08),
+        '--home-accent': theme.palette.primary.main,
+        '--home-accent-soft': alpha(theme.palette.primary.main, 0.12),
+        '--home-accent-text': theme.palette.primary.light,
+        '--home-title': theme.palette.text.primary,
+        '--home-muted': alpha(theme.palette.text.secondary, 0.85),
+        '--home-hero-from': theme.palette.weifly.home.hero.from,
+        '--home-hero-to': theme.palette.weifly.home.hero.to,
+        '--home-accent-rgb':
+          theme.palette.mode === 'dark' ? '99, 102, 241' : '79, 70, 229' /* Values for Indigo 500 and 600 */
+      }) as React.CSSProperties,
+    [theme]
+  )
 
   return (
-    <div className={styles.root} style={THEME_TOKENS[theme]}>
+    <div className={styles.root} style={dynamicTokens}>
       <div className={styles.container}>
         <motion.header
           className={styles.header}
@@ -140,15 +132,6 @@ const GuideView = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          style={{
-            marginTop: '8rem',
-            textAlign: 'center',
-            padding: '5rem 2rem',
-            background: 'rgba(99, 102, 241, 0.05)',
-            borderRadius: '3rem',
-            border: '1px solid var(--home-border-card)',
-            backdropFilter: 'blur(20px)'
-          }}
         >
           <h2 className={styles.stepTitle}>Despegue Inmediato Patrocinado</h2>
           <p className={styles.stepDesc} style={{ margin: '0 auto 3rem', maxWidth: '600px' }}>
@@ -156,23 +139,7 @@ const GuideView = () => {
             comisiones de red. Conecta tu Passkey y empieza hoy mismo.
           </p>
           <Link href='/missions'>
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '1rem',
-                padding: '1.2rem 3rem',
-                background: 'linear-gradient(135deg, var(--home-hero-from), var(--home-hero-to))',
-                color: 'white',
-                borderRadius: '1.5rem',
-                fontWeight: 800,
-                fontSize: '1.4rem',
-                cursor: 'pointer',
-                boxShadow: '0 10px 30px rgba(99, 102, 241, 0.3)'
-              }}
-            >
+            <motion.span whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className={styles.ctaButton}>
               INICIAR OPERACIONES <ArrowForwardIcon />
             </motion.span>
           </Link>

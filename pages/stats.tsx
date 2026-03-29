@@ -202,7 +202,9 @@ const StatsPage = () => {
         </Grid>
         <Grid item xs={12} md={4}>
           <StatsCard variant='glass'>
-            <IconWrapper sx={{ color: '#10B981', background: alpha('#10B981', 0.1) }}>
+            <IconWrapper
+              sx={{ color: theme.palette.secondary.main, background: alpha(theme.palette.secondary.main, 0.1) }}
+            >
               <Timeline fontSize='large' />
             </IconWrapper>
             <Typography variant='body2' color='textSecondary' fontWeight={600}>
@@ -218,7 +220,7 @@ const StatsPage = () => {
         </Grid>
         <Grid item xs={12} md={4}>
           <StatsCard variant='glass'>
-            <IconWrapper sx={{ color: '#F59E0B', background: alpha('#F59E0B', 0.1) }}>
+            <IconWrapper sx={{ color: theme.palette.amber.main, background: alpha(theme.palette.amber.main, 0.1) }}>
               <AccountBalanceWallet fontSize='large' />
             </IconWrapper>
             <Typography variant='body2' color='textSecondary' fontWeight={600}>
@@ -291,7 +293,9 @@ const StatsPage = () => {
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <StatsCard variant='glass'>
-                  <IconWrapper sx={{ color: '#8B5CF6', background: alpha('#8B5CF6', 0.1) }}>
+                  <IconWrapper
+                    sx={{ color: theme.palette.purple.main, background: alpha(theme.palette.purple.main, 0.1) }}
+                  >
                     <Timer />
                   </IconWrapper>
                   <Typography variant='body2' color='textSecondary' fontWeight={600}>
@@ -304,7 +308,7 @@ const StatsPage = () => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <StatsCard variant='glass'>
-                  <IconWrapper sx={{ color: '#EC4899', background: alpha('#EC4899', 0.1) }}>
+                  <IconWrapper sx={{ color: theme.palette.pink.main, background: alpha(theme.palette.pink.main, 0.1) }}>
                     <EmojiEvents />
                   </IconWrapper>
                   <Typography variant='body2' color='textSecondary' fontWeight={600}>

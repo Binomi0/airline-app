@@ -4,8 +4,55 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import React, { memo } from 'react'
 import type { ChangeEvent } from 'react'
+import { styled, alpha } from '@mui/material/styles'
 
-import styles from 'styles/Gas.module.css'
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    height: '56px',
+    borderRadius: '16px',
+    backgroundColor: alpha(theme.palette.background.paper, 0.05),
+    transition: 'all 0.2s ease-in-out',
+    paddingRight: theme.spacing(1.5),
+    '& fieldset': {
+      borderColor: alpha(theme.palette.divider, 0.1)
+    },
+    '&:hover fieldset': {
+      borderColor: alpha(theme.palette.primary.main, 0.3)
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: theme.palette.primary.main,
+      borderWidth: '2px'
+    },
+    '& input': {
+      padding: '16px 14px',
+      fontSize: '1rem',
+      fontWeight: 600
+    }
+  },
+  '& .MuiInputLabel-root': {
+    color: alpha(theme.palette.text.primary, 0.3),
+    transform: 'translate(14px, 16px) scale(1)',
+    fontWeight: 600,
+    fontSize: '0.9rem',
+    '&.Mui-focused, &.MuiInputLabel-shrink': {
+      color: theme.palette.primary.main,
+      transform: 'translate(14px, -11px) scale(0.75)'
+    }
+  }
+}))
+
+const MaxButton = styled(Button)(({ theme }) => ({
+  minWidth: 'auto',
+  color: theme.palette.primary.main,
+  fontWeight: 800,
+  fontSize: '0.7rem',
+  padding: theme.spacing(0.5, 1.2),
+  borderRadius: '8px',
+  backgroundColor: alpha(theme.palette.primary.main, 0.05),
+  '&:hover': {
+    background: alpha(theme.palette.primary.main, 0.15)
+  }
+}))
 
 const GasForm: React.FC<{
   max: string
@@ -22,71 +69,37 @@ const GasForm: React.FC<{
   }
 
   function handleClick() {
-    const amount = BigInt(value)
-    if (amount === 0n || amount < 0n) return
+    if (!value || isNaN(Number(value))) return
+    const amount = Number(value)
+    if (amount <= 0) return
     setValue('')
     onClick(value)
   }
 
   return (
-    <Stack spacing={2} mt={1}>
-      <TextField
-        size='small'
+    <Stack spacing={2} mt={2}>
+      <StyledTextField
+        fullWidth
         label={label}
         variant='outlined'
         type='number'
         onChange={handleChange}
         value={value}
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '12px',
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            '& fieldset': {
-              borderColor: 'rgba(255, 255, 255, 0.1)'
-            },
-            '&:hover fieldset': {
-              borderColor: 'rgba(255, 255, 255, 0.3)'
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: '#6366f1'
-            }
-          },
-          '& .MuiInputLabel-root': {
-            color: 'rgba(255, 255, 255, 0.5)',
-            '&.Mui-focused': {
-              color: '#6366f1'
-            }
-          },
-          '& .MuiInputBase-input': {
-            color: '#fff'
-          }
-        }}
+        InputLabelProps={{ shrink: true }}
         InputProps={{
           endAdornment: (
-            <Button
-              sx={{
-                minWidth: 'auto',
-                color: '#6366f1',
-                fontWeight: 700,
-                '&:hover': { background: 'rgba(99, 102, 241, 0.1)' }
-              }}
+            <MaxButton
               onClick={() => {
                 setValue(max)
               }}
               size='small'
             >
               MAX
-            </Button>
+            </MaxButton>
           )
         }}
       />
-      <Button
-        className={styles.premiumButton}
-        disabled={loading || !value}
-        onClick={handleClick}
-        size='small'
-        variant='contained'
-      >
+      <Button disabled={loading || !value || Number(value) <= 0} onClick={handleClick} variant='premium' fullWidth>
         {loading ? <CircularProgress size={24} color='inherit' /> : buttonText}
       </Button>
     </Stack>

@@ -8,7 +8,6 @@ class BackendCache {
       const cached = await Cache.findOne({ key })
       if (!cached) return null
 
-      // Mongoose TTL handles expiration, but double-check just in case
       if (new Date() > cached.expireAt) {
         await Cache.deleteOne({ key })
         return null

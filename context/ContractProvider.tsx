@@ -1,4 +1,4 @@
-import React, { createContext, useMemo, ReactNode } from 'react'
+import React, { createContext, useMemo, ReactNode, useContext } from 'react'
 import { getContract, ThirdwebContract } from 'thirdweb'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
@@ -67,3 +67,5 @@ export const ContractProvider = ({ children }: Props) => {
 
   return <ContractContext.Provider value={contracts}>{children}</ContractContext.Provider>
 }
+
+export const useContractProviderContext = () => useContext(ContractContext)

@@ -39,10 +39,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const eventTime = moment.unix(timestamp)
 
-  const airlineData: Record<string, { prefix: string; multiplier: number; prize: number }> = {
-    iberia: { prefix: 'IBE', multiplier: 2.0, prize: 1500 },
-    vueling: { prefix: 'VLG', multiplier: 1.8, prize: 1200 },
-    ryanair: { prefix: 'RYR', multiplier: 1.5, prize: 900 }
+  const airlineData: Record<string, { prefix: string; multiplier: number; prize: number; required: string[] }> = {
+    iberia: { prefix: 'IBE', multiplier: 2.0, prize: 1500, required: ['A320', 'A20N', 'A21N', 'B737'] },
+    vueling: { prefix: 'VLG', multiplier: 1.8, prize: 1200, required: ['A320', 'A20N', 'A21N'] },
+    ryanair: { prefix: 'RYR', multiplier: 1.5, prize: 900, required: ['B737', 'B738', 'B739'] }
   }
 
   const data = airlineData[airlineId] || airlineData.iberia
@@ -70,7 +70,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     callsign: `${data.prefix}${eventTime.format('HH')}${origin === 'LEMD' || (airlineId !== 'iberia' && origin === 'LEBL') ? '1' : '2'}`,
     weight: 15000,
     status: PublicMissionStatus.AVAILABLE,
-    airlineId
+    airlineId,
+    requiredAircrafts: data.required
   }
 
   res.status(200).json(event)

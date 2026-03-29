@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react'
 import Image from 'next/image'
-import { Box, Typography, Button, Stack } from '@mui/material'
+import { Box, Typography, Button, Stack, Paper } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
 import { INft } from 'models/Nft'
 import { getNFTAttributes } from 'utils'
-import styles from 'styles/Hangar.module.css'
 import { useNFTProviderContext } from 'context/NFTProvider'
+import CreateListingModal from 'routes/marketplace/components/CreateListingModal'
+import StatusBadge from 'components/ui/StatusBadge'
+import SpecItem from 'components/ui/SpecItem'
 
 interface Props {
   nft: INft
@@ -33,13 +35,22 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
     [attributes]
   )
 
-  const license = useMemo(() => licenses.find((license) => license.id === licenseId), [licenses, licenseId])
-
+  const license = useMemo(() => licenses.find((lic) => lic.id === licenseId), [licenses, licenseId])
   const price = useMemo(() => attributes.find((attr) => attr.trait_type.toLowerCase() === 'price')?.value, [attributes])
+  const [isListingModalOpen, setIsListingModalOpen] = React.useState(false)
 
   return (
-    <Box className={styles.showcaseContainer}>
-      {/* Cinematic Image Showcase */}
+    <Box
+      sx={(theme) => ({
+        display: 'grid',
+        gridTemplateColumns: { md: '1fr 400px', xs: '1fr' },
+        gap: theme.spacing(5),
+        alignItems: 'center',
+        minHeight: '500px'
+      })}
+    >
+      <CreateListingModal open={isListingModalOpen} onClose={() => setIsListingModalOpen(false)} nft={nft} />
+
       <AnimatePresence mode='wait'>
         <motion.div
           key={nft.id.toString()}
@@ -47,18 +58,10 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: -20, scale: 0.95 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className={styles.imageShowcase}
+          style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
-          <Box className={styles.mainAircraftImageContainer}>
-            <Image
-              src={image}
-              alt={name}
-              fill
-              style={{ objectFit: 'cover' }}
-              className={styles.mainAircraftImage}
-              priority
-            />
-            {/* Glossy Overlay */}
+          <Paper variant='showcaseImage'>
+            <Image src={image} alt={name} fill style={{ objectFit: 'cover' }} priority />
             <Box
               sx={{
                 position: 'absolute',
@@ -72,68 +75,65 @@ const AircraftShowcase: React.FC<Props> = ({ nft, isClaiming, hasAircraft, onCla
                 opacity: 0.4
               }}
             />
-          </Box>
+          </Paper>
         </motion.div>
       </AnimatePresence>
 
-      {/* Technical Specs Panel */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        className={styles.glassCard}
       >
-        <Stack spacing={1}>
-          <Box display='flex' justifyContent='space-between' alignItems='flex-start'>
-            <Typography variant='h4' fontWeight={700} sx={{ fontFamily: 'Sora, sans-serif' }}>
-              {name}
-            </Typography>
-            <Box className={`${styles.statusBadge} ${hasAircraft ? styles.ownedBadge : styles.lockedBadge}`}>
-              {hasAircraft ? 'Propiedad' : 'Disponible'}
+        <Paper variant='gasCard' sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+          <Stack spacing={1}>
+            <Box display='flex' justifyContent='space-between' alignItems='flex-start'>
+              <Typography variant='h4'>{name}</Typography>
+              <StatusBadge status={hasAircraft ? 'success' : 'primary'}>
+                {hasAircraft ? 'Propiedad' : 'Disponible'}
+              </StatusBadge>
             </Box>
+            <Typography variant='body2' color='text.secondary'>
+              {description}
+            </Typography>
+          </Stack>
+
+          <Box mt={1}>
+            {specs.map((spec) => {
+              if (hasAircraft && spec.trait_type.toLowerCase() === 'price') return null
+              return (
+                <SpecItem key={spec.trait_type} label={spec.trait_type.replace('_', ' ')}>
+                  {spec.trait_type.toLowerCase() === 'license' ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      {license && (
+                        <Image
+                          src={license.metadata.image as string}
+                          alt={license.metadata.name as string}
+                          width={24}
+                          height={24}
+                          style={{ borderRadius: '4px' }}
+                        />
+                      )}
+                    </Box>
+                  ) : (
+                    <Typography fontWeight={700} fontSize='0.9rem'>
+                      {spec.trait_type.toLowerCase() === 'price' ? `${spec.value} AIRL` : spec.value}
+                    </Typography>
+                  )}
+                </SpecItem>
+              )
+            })}
           </Box>
-          <Typography variant='body2' color='rgba(255,255,255,0.6)' sx={{ mb: 2 }}>
-            {description}
-          </Typography>
-        </Stack>
 
-        <Box>
-          {specs.map((spec) => {
-            if (hasAircraft && spec.trait_type.toLowerCase() === 'price') return null
-            return (
-              <Box key={spec.trait_type} className={styles.specRow}>
-                <Typography className={styles.specLabel}>{spec.trait_type.replace('_', ' ')}</Typography>
-                {spec.trait_type.toLowerCase() === 'license' ? (
-                  <Box className={styles.specValue}>
-                    <Image
-                      src={license?.metadata.image as string}
-                      alt={license?.metadata.name as string}
-                      width={20}
-                      height={20}
-                    />
-                  </Box>
-                ) : (
-                  <Typography className={styles.specValue}>
-                    {spec.trait_type.toLowerCase() === 'price' ? `${spec.value} AIRL` : spec.value}
-                  </Typography>
-                )}
-              </Box>
-            )
-          })}
-        </Box>
-
-        {!hasAircraft && (
           <Button
+            variant='premium'
             fullWidth
-            variant='contained'
-            size='large'
-            className={styles.claimButton}
-            onClick={onClaim}
-            disabled={isClaiming}
+            onClick={hasAircraft ? () => setIsListingModalOpen(true) : onClaim}
+            disabled={!hasAircraft && isClaiming}
+            sx={{ mt: 2 }}
           >
-            {isClaiming ? 'Procesando...' : `Adquirir por ${price} AIRL`}
+            {hasAircraft ? 'Listar en Marketplace' : isClaiming ? 'Procesando...' : `Adquirir por ${price} AIRL`}
           </Button>
-        )}
+        </Paper>
       </motion.div>
     </Box>
   )

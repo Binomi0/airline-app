@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useMemo } from 'react'
-import { Stack, Box, Typography, Button, CircularProgress, Fade, Container } from '@mui/material'
+import { Stack, Box, Typography, Button, CircularProgress, Fade, Container, useTheme, alpha } from '@mui/material'
 import Image from 'next/image'
 import LockIcon from '@mui/icons-material/Lock'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -206,8 +206,37 @@ const LoginView: FC = () => {
     }
   }, [mode, loading, email, handleSignInFlow, handleSignUpInit, handleVerifyCode])
 
+  const theme = useTheme()
+
+  const loginStyles = useMemo(
+    () => ({
+      '--login-bg': theme.palette.background.default,
+      '--login-primary': theme.palette.primary.main,
+      '--login-secondary': theme.palette.secondary.main,
+      '--login-accent-alpha-15': alpha(theme.palette.primary.main, 0.15),
+      '--login-secondary-alpha-15': alpha(theme.palette.secondary.main, 0.15),
+      '--login-accent-alpha-10': alpha(theme.palette.primary.main, 0.1),
+      '--login-accent-alpha-20': alpha(theme.palette.primary.main, 0.2),
+      '--login-accent-alpha-30': alpha(theme.palette.primary.main, 0.3),
+      '--login-card-bg':
+        theme.palette.mode === 'dark'
+          ? alpha(theme.palette.common.white, 0.03)
+          : alpha(theme.palette.common.black, 0.03),
+      '--login-card-border':
+        theme.palette.mode === 'dark'
+          ? alpha(theme.palette.common.white, 0.08)
+          : alpha(theme.palette.common.black, 0.08),
+      '--login-white-alpha-20': alpha(theme.palette.common.white, 0.2),
+      '--login-white-alpha-05': alpha(theme.palette.common.white, 0.05),
+      '--login-white-alpha-40': alpha(theme.palette.common.white, 0.4),
+      '--login-white-alpha-70': alpha(theme.palette.common.white, 0.7),
+      '--login-text-white': theme.palette.common.white
+    }),
+    [theme]
+  )
+
   return (
-    <Box className={styles.pageContainer}>
+    <Box className={styles.pageContainer} style={loginStyles as React.CSSProperties}>
       <div className={styles.backgroundOverlay} />
       <Container maxWidth='sm' className={styles.container}>
         <Box className={styles.glassCard}>

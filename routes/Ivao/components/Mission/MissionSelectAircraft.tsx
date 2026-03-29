@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography'
 import React, { useMemo } from 'react'
 import { formatNumber } from 'utils'
 import BlockIcon from '@mui/icons-material/Block'
-import { useTheme } from '@mui/material'
 import { ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 import { useRecoilValue } from 'recoil'
 import { INft } from 'models/Nft'
@@ -35,7 +34,6 @@ const MissionSelectAircraft = ({
   hasEnoughFuel,
   requiredGas
 }: Props) => {
-  const theme = useTheme()
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
   const missingAircrafts = useMemo(
     () => aircrafts.filter((a) => ownedAircrafts && !ownedAircrafts.some((o) => o.id.toString() === a.id.toString())),
@@ -101,24 +99,12 @@ const MissionSelectAircraft = ({
         </Box>
 
         <Box>
-          <Typography
-            color={
-              theme.palette.mode === 'dark'
-                ? `${hasEnoughFuel() ? 'success' : 'error'}.light`
-                : `${hasEnoughFuel() ? 'success' : 'error'}.dark`
-            }
-          >
+          <Typography color={hasEnoughFuel() ? 'success.main' : 'error.main'}>
             Combustible disponible:{' '}
             <b>{formatNumber(Number(gasBalance !== undefined ? Number(gasBalance) / 1e18 : 0), 0)} Litros</b>
           </Typography>
           {active && (
-            <Typography
-              color={
-                theme.palette.mode === 'dark'
-                  ? `${hasEnoughFuel() ? 'success' : 'error'}.light`
-                  : `${hasEnoughFuel() ? 'success' : 'error'}.dark`
-              }
-            >
+            <Typography color={hasEnoughFuel() ? 'success.main' : 'error.main'}>
               Combustible requerido: <b>{formatNumber(requiredGas(), 0)} Litros</b>
             </Typography>
           )}

@@ -18,50 +18,44 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
   return (
     <Box
       onClick={() => onSelect(mission)}
-      sx={{
+      style={{
         cursor: 'pointer',
-        mb: '2px',
-        background: isSelected ? alpha(primaryColor, 0.08) : 'rgba(0,0,0,0.8)',
+        marginBottom: '2px',
+        background: isSelected ? alpha(primaryColor, 0.08) : alpha(theme.palette.background.paper, 0.8),
         border: '1px solid',
-        borderColor: isSelected ? alpha(primaryColor, 0.4) : 'rgba(255,255,255,0.05)',
+        borderColor: isSelected ? alpha(primaryColor, 0.4) : alpha(theme.palette.divider, 0.1),
         display: 'flex',
         alignItems: 'center',
-        px: 2,
-        py: 0.3,
+        paddingLeft: theme.spacing(2),
+        paddingRight: theme.spacing(2),
+        paddingTop: theme.spacing(0.3),
+        paddingBottom: theme.spacing(0.3),
         position: 'relative',
         transition: 'all 0.1s ease',
-        '&:hover': {
-          background: alpha(primaryColor, 0.05),
-          borderColor: alpha(primaryColor, 0.3),
-          '& .dot-text': {
-            color: '#fff',
-            textShadow: `0 0 10px ${primaryColor}`
-          }
-        },
         fontFamily: b612Mono.style.fontFamily,
         textTransform: 'uppercase'
       }}
     >
       <Box
-        sx={{
+        style={{
           position: 'absolute',
           top: '50%',
           left: 0,
           right: 0,
           height: '1px',
-          bgcolor: 'rgba(255,255,255,0.015)',
+          backgroundColor: alpha(theme.palette.divider, 0.02),
           zIndex: 1,
           pointerEvents: 'none'
         }}
       />
 
       {/* 1. TIME */}
-      <Box sx={{ minWidth: 80, width: '100%', zIndex: 2 }}>
+      <Box style={{ width: '100%', minWidth: 80, zIndex: 2 }}>
         <Typography
           className='dot-text'
-          sx={{
+          style={{
             fontFamily: 'inherit',
-            color: isSelected ? '#fff' : primaryColor,
+            color: isSelected ? theme.palette.common.white : primaryColor,
             lineHeight: 1,
             opacity: isSelected ? 1 : 0.8
           }}
@@ -71,12 +65,12 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       </Box>
 
       {/* 1.5 CALLSIGN */}
-      <Box sx={{ minWidth: 100, width: '100%', zIndex: 2 }}>
+      <Box style={{ width: '100%', minWidth: 100, zIndex: 2 }}>
         <Typography
           className='dot-text'
-          sx={{
+          style={{
             fontFamily: 'inherit',
-            color: isSelected ? '#fff' : primaryColor,
+            color: isSelected ? theme.palette.common.white : primaryColor,
             lineHeight: 1,
             fontWeight: 'bold',
             opacity: 0.9
@@ -88,21 +82,21 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
 
       {/* 2. ROUTE */}
       <Box
-        sx={{
+        style={{
           minWidth: 200,
           width: '100%',
           zIndex: 2,
           display: 'flex',
           alignItems: 'center',
-          gap: 2
+          gap: theme.spacing(2)
         }}
       >
         <Typography
           className='dot-text'
-          sx={{
+          style={{
             fontFamily: 'inherit',
             fontWeight: 'bold',
-            color: isSelected ? '#fff' : 'primary.main',
+            color: isSelected ? theme.palette.common.white : primaryColor,
             width: 70,
             textAlign: 'left',
             letterSpacing: 1
@@ -110,13 +104,13 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
         >
           {mission.origin}
         </Typography>
-        <Typography sx={{ color: alpha(primaryColor, 0.4), fontSize: '0.9rem' }}>→</Typography>
+        <Typography style={{ color: alpha(primaryColor, 0.4), fontSize: '0.9rem' }}>→</Typography>
         <Typography
           className='dot-text'
-          sx={{
+          style={{
             fontFamily: 'inherit',
             fontWeight: 'bold',
-            color: isSelected ? '#fff' : 'primary.main',
+            color: isSelected ? theme.palette.common.white : primaryColor,
             width: 70,
             textAlign: 'left',
             letterSpacing: 1
@@ -127,30 +121,28 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       </Box>
 
       {/* 3. TYPE (BADGE) */}
-      <Box sx={{ minWidth: 100, width: '100%', zIndex: 2, pl: 1 }}>
+      <Box style={{ minWidth: 100, width: '100%', zIndex: 2, paddingLeft: theme.spacing(1) }}>
         <Chip
           label={mission.type || 'CARGO'}
           size='small'
-          sx={{
+          style={{
             fontFamily: 'inherit',
-            bgcolor: alpha(primaryColor, 0.15),
-            color: isSelected ? '#fff' : 'primary.main',
-            border: '1px solid',
-            borderColor: alpha(primaryColor, 0.4),
-            borderRadius: 1,
-            fontWeight: 'bold',
-            '& .MuiChip-label': { px: 0.8 }
+            backgroundColor: alpha(primaryColor, 0.15),
+            color: isSelected ? theme.palette.common.white : primaryColor,
+            border: `1px solid ${alpha(primaryColor, 0.4)}`,
+            borderRadius: theme.shape.borderRadius,
+            fontWeight: 'bold'
           }}
         />
       </Box>
 
       {/* 4. DISTANCE */}
-      <Box sx={{ minWidth: 90, width: '100%', textAlign: 'right', zIndex: 2 }}>
+      <Box style={{ minWidth: 90, width: '100%', textAlign: 'right', zIndex: 2 }}>
         <Typography
           className='dot-text'
-          sx={{
+          style={{
             fontFamily: 'inherit',
-            color: isSelected ? '#fff' : 'primary.main'
+            color: isSelected ? theme.palette.common.white : primaryColor
           }}
         >
           {mission.distance.toString().padStart(4, '0')} NM
@@ -158,12 +150,12 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       </Box>
 
       {/* 5. PRIZE */}
-      <Box sx={{ minWidth: 120, width: '100%', textAlign: 'right', ml: 3, zIndex: 2 }}>
+      <Box style={{ minWidth: 120, width: '100%', textAlign: 'right', marginLeft: theme.spacing(3), zIndex: 2 }}>
         <Typography
           className='dot-text'
-          sx={{
+          style={{
             fontFamily: 'inherit',
-            color: isSelected ? '#fff' : 'primary.main',
+            color: isSelected ? theme.palette.common.white : primaryColor,
             letterSpacing: 0.5
           }}
         >
@@ -172,10 +164,10 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
       </Box>
 
       {/* 6. SPONSORED / STATUS */}
-      <Box sx={{ minWidth: 100, width: '100%', textAlign: 'right', ml: 2, zIndex: 2 }}>
+      <Box style={{ minWidth: 100, width: '100%', textAlign: 'right', marginLeft: theme.spacing(2), zIndex: 2 }}>
         <Typography
           className='dot-text'
-          sx={{
+          style={{
             fontFamily: 'inherit',
             color:
               mission.rewardMultiplier >= 1.9
@@ -193,12 +185,19 @@ const MissionRow: React.FC<MissionRowProps> = ({ mission, onSelect, isSelected }
         >
           {mission.rewardMultiplier >= 1.9 ? 'TOP FLIGHT' : mission.rewardMultiplier > 0.8 ? 'BOOSTED' : 'SOLO'}
         </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5, mt: -0.5 }}>
+        <Box style={{ display: 'flex', justifyContent: 'flex-end', gap: theme.spacing(0.5), marginTop: -4 }}>
           {mission.originAtcOnStart && (
-            <Typography sx={{ fontSize: '0.7rem', color: 'info.main', opacity: 0.8 }}>ATC ORIGIN</Typography>
+            <Typography variant='caption' style={{ fontSize: '0.7rem', color: theme.palette.info.main, opacity: 0.8 }}>
+              ATC ORIGIN
+            </Typography>
           )}
           {mission.isSponsored && (
-            <Typography sx={{ fontSize: '0.7rem', color: 'success.main', opacity: 0.8 }}>ATC DEST</Typography>
+            <Typography
+              variant='caption'
+              style={{ fontSize: '0.7rem', color: theme.palette.success.main, opacity: 0.8 }}
+            >
+              ATC DEST
+            </Typography>
           )}
         </Box>
       </Box>

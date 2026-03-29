@@ -9,15 +9,15 @@ const StatusOverlay: React.FC = () => {
         bottom: 30,
         left: 30,
         zIndex: 1000,
-        bgcolor: alpha('#0f172a', 0.8),
-        color: '#38bdf8',
+        bgcolor: (theme) => alpha(theme.palette.slate.dark, 0.8),
+        color: 'sky.light',
         px: 2,
         py: 1,
         borderRadius: 2,
         display: 'flex',
         alignItems: 'center',
         gap: 1.5,
-        border: '1px solid rgba(56, 189, 248, 0.3)',
+        border: (theme) => `1px solid ${alpha(theme.palette.sky.main, 0.3)}`,
         fontFamily: 'monospace'
       }}
     >
@@ -25,7 +25,7 @@ const StatusOverlay: React.FC = () => {
         sx={{
           width: 8,
           height: 8,
-          bgcolor: '#38bdf8',
+          bgcolor: 'sky.light',
           borderRadius: '50%',
           animation: 'radar-blink 1s infinite'
         }}
