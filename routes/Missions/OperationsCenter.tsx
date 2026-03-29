@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Grid, Box, Stack, Typography, TextField, InputAdornment, Paper } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import Map from 'components/Map/RadarMap'
@@ -196,7 +196,7 @@ const OperationsCenter = () => {
             {selectedMission ? (
               <FlightDispatch mission={selectedMission} onCancel={() => setSelectedMission(null)} />
             ) : (
-              <EmptyDispatch mission={selectedMission} />
+              <EmptyDispatch />
             )}
           </Box>
         </Grid>
@@ -205,7 +205,7 @@ const OperationsCenter = () => {
   )
 }
 
-const EmptyDispatch = ({ mission }: { mission: PublicMission | null }) => (
+const EmptyDispatch = () => (
   <Paper
     variant='outlined'
     style={{
