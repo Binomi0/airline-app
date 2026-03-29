@@ -25,8 +25,6 @@ const aircrafts = [
 ]
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log('query =>', req.query)
-
   res.status(200).send(aircrafts.find((a) => a.id.toString() === (req.query.tokenId as string)))
 }
 export default handler

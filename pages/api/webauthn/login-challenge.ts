@@ -14,7 +14,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const { data, email } = req.body
-  console.log({ data, email })
 
   if (!data.response.signature) {
     res.status(400).send('Signature not found')
@@ -34,9 +33,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     for (const authenticator of auth.authenticators) {
       const { extensionResult, verification } = await verifySignature(authenticator, data, auth.challenge)
-      console.log({ extensionResult, verification })
       if (verification?.verified) {
-        console.log({ extensionResult })
         verified = true
         prfResult = extensionResult?.prf?.results?.first
         break

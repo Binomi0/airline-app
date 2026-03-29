@@ -30,7 +30,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
     return res.status(200).send(data)
   } catch (err) {
-    console.log('Ha ocurrido un error', err)
+    console.error('Ha ocurrido un error', err)
     return res.status(500).send(err)
   }
 }

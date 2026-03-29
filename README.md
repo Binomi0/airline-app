@@ -1,6 +1,6 @@
 # WeiFly - Decentralized Virtual Airline ✈️
 
-WeiFly is a decentralized virtual airline (DVA) built on Arbitrum, featuring real-time integration via IVAO. It provides a platform where users connect seamlessly using their email and passkey.
+WeiFly is a decentralized virtual airline (DVA) built on Arbitrum (Ethereum L2), featuring real-time integration via Flight Simulators. It provides a platform where users connect seamlessly using their email and passkey.
 
 Our authentication system uses Thirdweb v5 smart accounts, allowing users to mint deterministic wallets (CREATE2) governed by passkeys. Gas for transactions is initially sponsored to allow frictionless onboarding. The session creates a random EOA encrypted locally by the user's passkey.
 
