@@ -45,7 +45,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
           })
 
           if (originCount === 0) {
-            console.log(`[MissionPool] No missions found for ${origin}. Generating on-demand...`)
             await generatePublicMissionPool(origin)
           }
 

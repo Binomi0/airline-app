@@ -13,8 +13,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query
   const apiKey = process.env.IVAO_API_KEY
 
-  console.log('[ATIS API] Fetching ATIS for session:', id)
-
   if (!id) {
     return res.status(400).json({ message: 'Session ID is required' })
   }
@@ -31,7 +29,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         apiKey: apiKey
       }
     })
-    console.log('[ATIS API] Success for session:', id)
     res.status(200).json(response.data)
   } catch (error: unknown) {
     const axiosError = error as AxiosErrorResponse

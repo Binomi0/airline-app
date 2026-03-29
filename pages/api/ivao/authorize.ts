@@ -7,7 +7,6 @@ import { AxiosError } from 'axios'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
-    console.log('req.query =>', req.query)
     const state = (Array.isArray(req.query.state) ? req.query.state[0] : req.query.state) as string
     const code = (Array.isArray(req.query.code) ? req.query.code[0] : req.query.code) as string
 
@@ -48,7 +47,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       tokenData = response.data
-      console.log('tokenData =>', tokenData)
     } catch (error) {
       console.error('[IVAO Authorize] Error exchanging code =>', error)
       const axiosError = error as AxiosError
@@ -58,9 +56,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       })
     }
 
-    console.log('[IVAO Authorize] Starting identity decode...')
     const decoded = jwt.decode(tokenData.access_token, { json: true, complete: true })
-    console.log('[IVAO Authorize] Decoded identity:', decoded ? 'SUCCESS' : 'NULL')
 
     if (!decoded || !decoded.payload || typeof decoded.payload === 'string' || !decoded.payload.sub) {
       console.error('[IVAO Authorize] Invalid code payload or missing sub. Payload:', decoded?.payload)
@@ -68,12 +64,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return
     }
 
-    console.log('[IVAO Authorize] Identity verified. Pilot ID:', decoded.payload.sub)
-
     try {
-      console.log('[IVAO Authorize] Connecting to DB...')
       await connectDB()
-      console.log('[IVAO Authorize] DB Connected. Starting VirtualAirline update for state:', state)
 
       const expiryDate = new Date()
       expiryDate.setSeconds(expiryDate.getSeconds() + (tokenData.expires_in || 3600))
@@ -91,12 +83,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         { upsert: true, returnDocument: 'after' }
       )
 
-      console.log('[IVAO Authorize] VA User updated/created. ID:', vaUser?._id)
-
       if (vaUser?._id) {
-        console.log('[IVAO Authorize] Linking User to VA profile...')
-        const updatedUser = await UserModel.findOneAndUpdate({ userId: state }, { vaUser: vaUser._id })
-        console.log('[IVAO Authorize] User link result:', updatedUser ? 'SUCCESS' : 'USER NOT FOUND')
+        await UserModel.findOneAndUpdate({ userId: state }, { vaUser: vaUser._id })
       }
 
       console.log('[IVAO Authorize] Process finished successfully.')

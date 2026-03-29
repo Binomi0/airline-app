@@ -29,7 +29,6 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
 
       // If no NFTs in DB or forceRefresh, sync with Alchemy
       if (ownedNftsInDb.length === 0 || forceRefresh) {
-        console.log(`[owned.ts] Syncing with Alchemy for ${address}`)
         const { ownedNfts } = await alchemy.nft.getNftsForOwner(address, {
           contractAddresses: [nftAircraftTokenAddress, nftLicenseTokenAddress]
         })
