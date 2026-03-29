@@ -84,7 +84,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       )
 
       if (vaUser?._id) {
-        const updatedUser = await UserModel.findOneAndUpdate({ userId: state }, { vaUser: vaUser._id })
+        await UserModel.findOneAndUpdate({ userId: state }, { vaUser: vaUser._id })
       }
 
       console.log('[IVAO Authorize] Process finished successfully.')
