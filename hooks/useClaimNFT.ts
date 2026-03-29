@@ -4,17 +4,14 @@ import { useCallback, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { walletStore } from 'store/wallet.atom'
 import { userState } from 'store/user.atom'
-import { Hex, prepareContractCall, readContract, sendTransaction, waitForReceipt } from 'thirdweb'
+import { Hex, prepareContractCall, PreparedTransaction, sendBatchTransaction, waitForReceipt } from 'thirdweb'
 import axios from 'config/axios'
 import useWallet from './useWallet'
-import { Account } from 'thirdweb/wallets'
 import { INft } from 'models/Nft'
 
 interface UseClaimNFT {
-  // eslint-disable-next-line no-unused-vars
-  claimAircraftNFT: (nft: INft) => Promise<string | undefined>
-  // eslint-disable-next-line no-unused-vars
-  claimLicenseNFT: (nft: INft) => Promise<string | undefined>
+  claimAircraftNFT: (nft: INft) => Promise<Hex | undefined>
+  claimLicenseNFT: (nft: INft) => Promise<Hex | undefined>
   isClaiming: boolean
 }
 
@@ -27,8 +24,13 @@ const useClaimNFT = (): UseClaimNFT => {
   const { unlockSigner } = useWallet()
 
   const checkAndSetAllowance = useCallback(
-    async (tokenAddress: string, spender: string, amount: bigint, account: Account, ownerAddress: string) => {
-      if (tokenAddress.toLowerCase() === NATIVE_TOKEN) return
+    async (
+      tokenAddress: string,
+      spender: string,
+      amount: bigint,
+      ownerAddress: string
+    ): Promise<PreparedTransaction | undefined> => {
+      if (tokenAddress.toLowerCase() === NATIVE_TOKEN) return undefined
 
       const { data: allowance } = await axios.post('/api/contracts/read', {
         address: tokenAddress,
@@ -36,57 +38,63 @@ const useClaimNFT = (): UseClaimNFT => {
         params: [ownerAddress, spender]
       })
 
-      if (BigInt(allowance) < amount) {
+      const safeAllowance = BigInt(allowance?.toString() ?? '0')
+
+      if (safeAllowance < amount) {
         const tx = prepareContractCall({
           contract: { client: twClient!, chain: twChain!, address: tokenAddress as Hex },
           method: 'function approve(address spender, uint256 amount)',
-          params: [spender, BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')]
+          // Minimum Privilege: Approve ONLY the necessary amount
+          params: [spender, amount]
         })
-        const result = await sendTransaction({ transaction: tx, account })
-        await waitForReceipt(result)
+        return tx as PreparedTransaction
       }
+
+      return undefined
     },
     [twClient, twChain]
   )
 
   const claimNFT = useCallback(
-    async (contractAddress: string, nft: INft) => {
-      let currentSigner = smartSigner
+    async (contractAddress: Hex, nft: INft) => {
+      let account = smartSigner
 
       if (isLocked && user) {
         try {
-          currentSigner = await unlockSigner(user)
+          account = await unlockSigner(user)
         } catch (e) {
           console.error('Failed to unlock signer:', e)
           throw new Error('Wallet must be unlocked to perform transactions')
         }
       }
 
-      if (!currentSigner || !twClient || !twChain || !smartAccountAddress) {
+      if (!account || !twClient || !twChain || !smartAccountAddress) {
         throw new Error('Missing wallet params')
       }
       setIsClaiming(true)
 
       try {
+        const transactions: PreparedTransaction[] = []
         const nftId = BigInt(nft.id)
 
         // Fetch claim condition dynamically
-        const condition = await readContract({
-          contract: { client: twClient, chain: twChain, address: contractAddress as Hex },
+        const { data: condition } = await axios.post('/api/contracts/read', {
+          address: contractAddress,
           method:
             'function claimCondition(uint256) view returns (uint256 startTimestamp, uint256 maxClaimableSupply, uint256 supplyClaimed, uint256 quantityLimitPerWallet, bytes32 merkleRoot, uint256 pricePerToken, address currency, string metadata)',
           params: [nftId]
         })
+        const [, , , rawQuantityLimitPerWallet, , rawPricePerToken, currency] = condition
 
-        const [, , , , , , currency] = condition
-        const pricePerToken = condition[5]
-        const quantityLimitPerWallet = condition[3]
+        // Ensure robust type safety by explicitly parsing values to BigInt
+        const txPricePerToken = BigInt(rawPricePerToken?.toString() ?? '0')
+        const txQuantityLimitPerWallet = BigInt(rawQuantityLimitPerWallet?.toString() ?? '0')
 
-        await checkAndSetAllowance(currency, contractAddress, pricePerToken, currentSigner, currentSigner.address)
+        const approveTx = await checkAndSetAllowance(currency, contractAddress, txPricePerToken, account.address)
 
         const encodedData = encodeAbiParameters([{ type: 'uint256' }], [nftId > 0n ? nftId - 1n : 0n])
 
-        const tx = prepareContractCall({
+        const mintTx = prepareContractCall({
           contract: {
             client: twClient,
             chain: twChain,
@@ -95,25 +103,30 @@ const useClaimNFT = (): UseClaimNFT => {
           method:
             'function claim(address receiver, uint256 tokenId, uint256 quantity, address currency, uint256 pricePerToken, (bytes32[] proof, uint256 quantityLimitPerWallet, uint256 pricePerToken, address currency) allowlistProof, bytes data)',
           params: [
-            currentSigner.address,
+            account.address,
             nftId,
             1n,
             currency,
-            pricePerToken,
+            txPricePerToken,
             {
               proof: ['0x0000000000000000000000000000000000000000000000000000000000000000' as Hex],
-              quantityLimitPerWallet,
-              pricePerToken,
+              quantityLimitPerWallet: txQuantityLimitPerWallet,
+              pricePerToken: txPricePerToken,
               currency
             },
             encodedData as Hex
           ],
-          value: currency.toLowerCase() === NATIVE_TOKEN ? pricePerToken : 0n
-        })
+          value: currency.toLowerCase() === NATIVE_TOKEN ? txPricePerToken : 0n
+        }) as PreparedTransaction
 
-        const result = await sendTransaction({
-          transaction: tx,
-          account: currentSigner
+        if (approveTx) {
+          transactions.push(approveTx)
+        }
+        transactions.push(mintTx)
+
+        const result = await sendBatchTransaction({
+          transactions,
+          account
         })
 
         const receipt = await waitForReceipt(result)
