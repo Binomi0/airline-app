@@ -6,6 +6,7 @@
     "node": ">=24.14.0"
   },
   "packageManager": "pnpm@10.32.1",
+  "packages": [],
   "scripts": {
     "dev": "next dev",
     "prettier": "prettier -w components config context hooks models pages store routes utils types",
