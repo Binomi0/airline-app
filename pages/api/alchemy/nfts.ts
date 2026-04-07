@@ -59,13 +59,12 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
         return res.status(200).send(cachedResponse)
       }
 
-      console.log('NFTS FETCH')
       const response = await alchemy.nft.getNftMetadataBatch([...aircrafts, ...licenses])
       await cache.set(cacheKey, response, 3600) // Cache for 1 hour
       res.status(200).send(response)
       return
     } catch (error) {
-      console.log('NFTS ERROR', error)
+      console.error('NFTS ERROR', error)
       res.status(400).send(error)
       return
     }
@@ -85,7 +84,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       res.status(200).send(response)
       return
     } catch (error) {
-      console.log('NFTS ERROR', error)
+      console.error('NFTS ERROR', error)
       res.status(400).send(error)
       return
     }

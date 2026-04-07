@@ -39,7 +39,7 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
       res.status(error.response.status).send(error.response.data)
       return
     }
-    console.log(err)
+    console.error(err)
     res.status(400).send(error.message)
   }
 }

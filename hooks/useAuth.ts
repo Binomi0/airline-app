@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import useAccountSigner from './useAccountSigner'
 import { deleteCookie } from 'cookies-next'
-import { loginSuccessSwal } from 'lib/swal'
+import { notificationSwal } from 'lib/swal'
 import { useRouter } from 'next/router'
 import { AccountSignerStatus, User } from 'types'
 import { useSetRecoilState } from 'recoil'
@@ -57,7 +57,7 @@ const useAuth = (): UseAuthReturnType => {
         setAuthToken('session_active')
         setUser(data)
         initWallet(data)
-        loginSuccessSwal()
+        notificationSwal('Connected!', 'You are now logged in')
       } catch (err) {
         const error = err as Error
         console.error('err =>', error)
@@ -77,7 +77,7 @@ const useAuth = (): UseAuthReturnType => {
           setAuthToken('session_active')
           setUser(data)
           initWallet(data)
-          loginSuccessSwal()
+          notificationSwal('Connected!', 'You are now logged in')
         }
       } catch (err) {
         console.error('[handleSignUp] Error =>', err)

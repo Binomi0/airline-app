@@ -47,8 +47,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
       })
 
-      console.log({ options })
-
       await Webauthn.findOneAndUpdate({ email: req.body.email }, { $set: { challenge: options.challenge } })
       res.status(200).json(options)
       return
