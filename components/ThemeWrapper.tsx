@@ -1,102 +1,38 @@
 import React, { ReactNode } from 'react'
 import CssBaseline from '@mui/material/CssBaseline'
 import GlobalStyles from '@mui/material/GlobalStyles'
-import {
-  ThemeProvider,
-  Experimental_CssVarsProvider as CssVarsProvider,
-  useColorScheme,
-  experimental_extendTheme as extendTheme,
-  alpha
-} from '@mui/material/styles'
-import { darkTheme, lightTheme } from '../src/theme'
+import { ThemeProvider } from '@mui/material/styles'
 import { useRecoilValue } from 'recoil'
-import { themeStore } from 'store/theme.atom'
-
-const colorSchemes = {
-  colorSchemes: {
-    light: lightTheme,
-    dark: darkTheme
-  }
-}
+import { themeStore } from '@store/theme.atom'
+import { useLeafletStyles } from '@hooks/useLeafletStyles'
+import { getTheme } from '../src/theme'
 
 interface Props {
   children: ReactNode
 }
 
-const ThemeSync = () => {
-  const theme = useRecoilValue(themeStore)
-  const { setMode } = useColorScheme()
-
-  React.useEffect(() => {
-    if (setMode) {
-      setMode(theme)
-    }
-  }, [theme, setMode])
-
-  return null
-}
-
 const ThemeWrapper = ({ children }: Props) => {
   const theme = useRecoilValue(themeStore)
-  const currentTheme = theme === 'dark' ? darkTheme : lightTheme
-  const extendedTheme = extendTheme(colorSchemes)
+  const currentTheme = getTheme(theme)
+  const leafletStyles = useLeafletStyles(currentTheme)
 
   return (
     <ThemeProvider theme={currentTheme}>
       <CssBaseline enableColorScheme />
       <GlobalStyles
         styles={{
-          '.radar-popup .leaflet-popup-content-wrapper': {
-            background: `${currentTheme.palette.background.paper} !important`,
-            color: `${currentTheme.palette.text.primary} !important`,
-            padding: '0 !important',
-            borderRadius: '12px !important',
-            border: `1px solid ${currentTheme.palette.mode === 'dark' ? alpha(currentTheme.palette.sky.main, 0.3) : alpha(currentTheme.palette.common.black, 0.1)} !important`,
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important'
-          },
-          '.radar-popup .leaflet-popup-tip': {
-            background: `${currentTheme.palette.background.paper} !important`,
-            border: `1px solid ${currentTheme.palette.mode === 'dark' ? alpha(currentTheme.palette.sky.main, 0.3) : alpha(currentTheme.palette.common.black, 0.1)} !important`
-          },
-          '.radar-popup .leaflet-popup-content': {
-            margin: '0 !important',
-            width: 'auto !important',
-            padding: '16px !important',
-            paddingRight: '32px !important'
-          },
-          '.radar-popup .leaflet-popup-close-button': {
-            color: `${currentTheme.palette.text.secondary} !important`,
-            top: '8px !important',
-            right: '8px !important',
-            fontSize: '20px !important',
-            zIndex: 1000
-          },
-          '.leaflet-tooltip': {
-            background: `${currentTheme.palette.background.paper} !important`,
-            border: `1px solid ${currentTheme.palette.mode === 'dark' ? alpha(currentTheme.palette.sky.main, 0.2) : alpha(currentTheme.palette.common.black, 0.1)} !important`,
-            boxShadow: `0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px ${currentTheme.palette.mode === 'dark' ? alpha(currentTheme.palette.sky.main, 0.08) : alpha(currentTheme.palette.common.black, 0.05)} !important`,
-            color: `${currentTheme.palette.text.primary} !important`,
-            padding: '12px !important',
-            borderRadius: '10px !important'
-          },
-          '.leaflet-tooltip-top:before': {
-            borderTopColor: `${currentTheme.palette.background.paper} !important`
-          },
-          '.leaflet-tooltip-bottom:before': {
-            borderBottomColor: `${currentTheme.palette.background.paper} !important`
-          },
-          '.leaflet-tooltip-left:before': {
-            borderLeftColor: `${currentTheme.palette.background.paper} !important`
-          },
-          '.leaflet-tooltip-right:before': {
-            borderRightColor: `${currentTheme.palette.background.paper} !important`
-          }
+          '.radar-popup .leaflet-popup-content-wrapper': leafletStyles.popupWrapper,
+          '.radar-popup .leaflet-popup-tip': leafletStyles.popupTip,
+          '.radar-popup .leaflet-popup-content': leafletStyles.popupContent,
+          '.radar-popup .leaflet-popup-close-button': leafletStyles.popupCloseButton,
+          '.leaflet-tooltip': leafletStyles.tooltip,
+          '.leaflet-tooltip-top:before': leafletStyles.tooltipBefore,
+          '.leaflet-tooltip-bottom:before': leafletStyles.tooltipBefore,
+          '.leaflet-tooltip-left:before': leafletStyles.tooltipBefore,
+          '.leaflet-tooltip-right:before': leafletStyles.tooltipBefore
         }}
       />
-      <CssVarsProvider defaultMode={theme} theme={extendedTheme}>
-        <ThemeSync />
-        {children}
-      </CssVarsProvider>
+      {children}
     </ThemeProvider>
   )
 }

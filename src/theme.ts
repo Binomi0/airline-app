@@ -1,6 +1,9 @@
 import { Roboto, Sora, B612_Mono } from 'next/font/google'
-import { createTheme, responsiveFontSizes, ThemeOptions, alpha } from '@mui/material/styles'
-import { grey } from '@mui/material/colors'
+import { createTheme, responsiveFontSizes, ThemeOptions, alpha, Theme } from '@mui/material/styles'
+
+// ============================================
+// 1. CONSTANTES Y CONFIGURACIÓN
+// ============================================
 
 export const AIRLINE_COLORS = {
   iberia: '#E81D2E',
@@ -18,6 +21,7 @@ export const roboto = Roboto({
   display: 'swap',
   fallback: ['Helvetica', 'Arial', 'sans-serif']
 })
+
 export const sora = Sora({
   weight: ['300', '400', '500', '600', '700'],
   subsets: ['latin'],
@@ -30,6 +34,178 @@ export const b612Mono = B612_Mono({
   subsets: ['latin'],
   display: 'swap'
 })
+
+// ============================================
+// 2. PALETA DE COLORES (Función reutilizable)
+// ============================================
+
+function createPalette(mode: 'light' | 'dark') {
+  const baseColors = {
+    primary: {
+      main: '#3B82F6',
+      light: '#60a5fa',
+      dark: '#2563eb'
+    },
+    secondary: {
+      main: '#10B981',
+      light: '#34d399',
+      dark: '#059669'
+    },
+    success: {
+      main: '#10B981',
+      light: '#4ade80',
+      dark: '#059669'
+    },
+    error: {
+      main: '#ef4444',
+      light: '#f87171',
+      dark: '#dc2626'
+    },
+    warning: {
+      main: '#f59e0b',
+      light: '#fbbf24',
+      dark: '#d97706'
+    },
+    info: {
+      main: '#3b82f6',
+      light: '#38bdf8',
+      dark: '#1d4ed8'
+    }
+  }
+
+  const ivaoColors = {
+    hq_event: '#ff4081',
+    rfe: '#7c4dff',
+    pde: '#00e676',
+    generic: '#2196f3'
+  }
+
+  const amberColors = {
+    main: '#F59E0B',
+    light: '#fbbf24',
+    dark: '#d97706'
+  }
+
+  const skyColors = {
+    main: '#0ea5e9',
+    light: '#38bdf8',
+    dark: '#0284c7'
+  }
+
+  const purpleColors = {
+    main: '#8B5CF6',
+    light: '#a78bfa',
+    dark: '#7c3aed'
+  }
+
+  const pinkColors = {
+    main: '#EC4899',
+    light: '#f472b6',
+    dark: '#db2777'
+  }
+
+  const slateColors = {
+    main: '#1e293b',
+    light: '#64748b',
+    dark: '#0f172a'
+  }
+
+  const indigoColors = {
+    main: '#6366f1',
+    light: '#818cf8',
+    dark: '#4f46e5'
+  }
+  const violetColors = {
+    main: '#a855f7',
+    light: '#c084fc',
+    dark: '#9333ea'
+  }
+
+  const airlinesColors = {
+    iberia: AIRLINE_COLORS.iberia,
+    vueling: AIRLINE_COLORS.vueling,
+    ryanair: AIRLINE_COLORS.ryanair,
+    ryanair_yellow: AIRLINE_COLORS.ryanair_yellow
+  }
+
+  const weiflyColors = {
+    home: {
+      hero: {
+        from: mode === 'light' ? '#312e81' : '#e0e7ff',
+        mid: mode === 'light' ? '#4f46e5' : '#a5b4fc',
+        to: mode === 'light' ? '#6366f1' : '#818cf8'
+      }
+    },
+    crowdfunding: {
+      bg: {
+        from: '#0a0f1f',
+        to: '#1a1f35'
+      },
+      primary: '#0a1e3c',
+      secondary: '#2a7de1',
+      accent: '#ff6b35',
+      glass: {
+        bg: 'rgba(255, 255, 255, 0.05)',
+        border: 'rgba(255, 255, 255, 0.1)'
+      },
+      nav: 'rgba(10, 15, 31, 0.8)'
+    },
+    legal: {
+      bg: mode === 'light' ? '#f8fafc' : '#0b0f19',
+      overlay: {
+        from: mode === 'light' ? 'rgba(241, 245, 249, 0.95)' : 'rgba(15, 23, 42, 0.95)',
+        to: mode === 'light' ? 'rgba(226, 232, 240, 0.9)' : 'rgba(30, 41, 59, 0.9)'
+      },
+      glass: {
+        bg: mode === 'light' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.03)'
+      }
+    },
+    launchpad: {
+      bg: mode === 'light' ? '#f8fafc' : '#0b0f19',
+      hero: {
+        from: '#fff',
+        to: '#94a3b8'
+      },
+      primary: '#3B82F6',
+      primaryHover: '#2563eb',
+      accent: '#ff6b35',
+      glass: {
+        bg: mode === 'light' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(17, 24, 39, 0.4)',
+        border: 'rgba(0, 0, 0, 0.1)'
+      },
+      nav: mode === 'light' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(11, 15, 25, 0.8)',
+      card: mode === 'light' ? '#ffffff' : '#111827'
+    },
+    status: {
+      live: '#10b981'
+    }
+  }
+
+  const backgroundColors = {
+    default: mode === 'light' ? '#F3F4F6' : '#0B0F19',
+    paper: mode === 'light' ? '#FFFFFF' : '#111827'
+  }
+
+  return {
+    mode,
+    ...baseColors,
+    background: backgroundColors,
+    indigo: indigoColors,
+    violet: violetColors,
+    slate: slateColors,
+    ivao: ivaoColors,
+    amber: amberColors,
+    sky: skyColors,
+    purple: purpleColors,
+    pink: pinkColors,
+    airlines: airlinesColors,
+    weifly: weiflyColors
+  }
+}
+
+// ============================================
+// 3. TIPOGRAFÍA COMÚN
+// ============================================
 
 const commonTypography: ThemeOptions['typography'] = {
   fontFamily: 'Sora, sans-serif',
@@ -65,6 +241,10 @@ const commonTypography: ThemeOptions['typography'] = {
     fontWeight: 600
   }
 }
+
+// ============================================
+// 4. COMPONENTES COMUNES
+// ============================================
 
 const commonComponents: ThemeOptions['components'] = {
   MuiDrawer: {
@@ -310,7 +490,81 @@ const commonComponents: ThemeOptions['components'] = {
   }
 }
 
-// Module augmentation for custom variants
+// ============================================
+// 5. COMPONENTES APP BAR
+// ============================================
+
+const createAppBarStyle = (mode: 'light' | 'dark') => ({
+  root: ({ theme }: { theme: Theme }) => ({
+    background: alpha(theme.palette.background.default, 0.8),
+    backdropFilter: 'blur(12px)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+    color: mode === 'dark' ? theme.palette.common.white : theme.palette.slate.main,
+    borderRadius: 0
+  })
+})
+
+// ============================================
+// 6. CREACIÓN DE TEMAS
+// ============================================
+
+const createLightTheme = () => {
+  const palette = createPalette('light')
+
+  return createTheme({
+    palette,
+    typography: commonTypography,
+    components: {
+      ...commonComponents,
+      MuiAppBar: {
+        styleOverrides: createAppBarStyle('light')
+      }
+    }
+  })
+}
+
+const createDarkTheme = () => {
+  const palette = createPalette('dark')
+
+  return createTheme({
+    palette,
+    typography: commonTypography,
+    components: {
+      ...commonComponents,
+      MuiAppBar: {
+        styleOverrides: createAppBarStyle('dark')
+      }
+    }
+  })
+}
+
+const lTheme = createLightTheme()
+const dTheme = createDarkTheme()
+
+// Need to define Theme type for casting since it's recursive otherwise
+
+export const darkTheme = responsiveFontSizes(dTheme)
+export const lightTheme = responsiveFontSizes(lTheme)
+
+const theme = {
+  darkTheme,
+  lightTheme
+}
+
+export const getTheme = (_theme: 'dark' | 'light') => {
+  if (_theme === 'dark') {
+    return darkTheme
+  } else if (_theme === 'light') {
+    return lightTheme
+  }
+  throw new Error('Missing Theme ')
+}
+
+// ============================================
+// 7. DECLARACIONES DE MÓDULO
+// ============================================
+
 declare module '@mui/material/Paper' {
   interface PaperPropsVariantOverrides {
     missionsCard: true
@@ -402,6 +656,10 @@ declare module '@mui/material/styles' {
       status: {
         live: string
       }
+      glass: {
+        bg: string
+        border: string
+      }
     }
   }
   interface PaletteOptions {
@@ -475,332 +733,12 @@ declare module '@mui/material/styles' {
       status?: {
         live?: string
       }
+      glass?: PaletteOptions['primary']
     }
   }
 }
-
-// Create a theme instance.
-const lTheme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#3B82F6',
-      light: '#60a5fa',
-      dark: '#2563eb'
-    },
-    secondary: {
-      main: '#10B981',
-      light: '#34d399',
-      dark: '#059669'
-    },
-    success: {
-      main: '#10B981',
-      light: '#4ade80',
-      dark: '#059669'
-    },
-    error: {
-      main: '#ef4444',
-      light: '#f87171',
-      dark: '#dc2626'
-    },
-    warning: {
-      main: '#f59e0b',
-      light: '#fbbf24',
-      dark: '#d97706'
-    },
-    info: {
-      main: '#3b82f6',
-      light: '#38bdf8',
-      dark: '#1d4ed8'
-    },
-    background: {
-      default: '#F3F4F6',
-      paper: '#FFFFFF'
-    },
-    indigo: {
-      main: '#6366f1',
-      light: '#818cf8',
-      dark: '#4f46e5'
-    },
-    violet: {
-      main: '#a855f7',
-      light: '#c084fc',
-      dark: '#9333ea'
-    },
-    slate: {
-      main: '#1e293b',
-      light: '#64748b',
-      dark: '#0f172a'
-    },
-    ivao: {
-      hq_event: '#ff4081',
-      rfe: '#7c4dff',
-      pde: '#00e676',
-      generic: '#2196f3'
-    },
-    amber: {
-      main: '#F59E0B',
-      light: '#fbbf24',
-      dark: '#d97706'
-    },
-    sky: {
-      main: '#0ea5e9',
-      light: '#38bdf8',
-      dark: '#0284c7'
-    },
-    purple: {
-      main: '#8B5CF6',
-      light: '#a78bfa',
-      dark: '#7c3aed'
-    },
-    pink: {
-      main: '#EC4899',
-      light: '#f472b6',
-      dark: '#db2777'
-    },
-    airlines: {
-      iberia: AIRLINE_COLORS.iberia,
-      vueling: AIRLINE_COLORS.vueling,
-      ryanair: AIRLINE_COLORS.ryanair,
-      ryanair_yellow: AIRLINE_COLORS.ryanair_yellow
-    },
-    weifly: {
-      home: {
-        hero: {
-          from: '#312e81',
-          mid: '#4f46e5',
-          to: '#6366f1'
-        }
-      },
-      crowdfunding: {
-        bg: {
-          from: '#0a0f1f',
-          to: '#1a1f35'
-        },
-        primary: '#0a1e3c',
-        secondary: '#2a7de1',
-        accent: '#ff6b35',
-        glass: {
-          bg: 'rgba(255, 255, 255, 0.05)',
-          border: 'rgba(255, 255, 255, 0.1)'
-        },
-        nav: 'rgba(10, 15, 31, 0.8)'
-      },
-      legal: {
-        bg: '#f8fafc',
-        overlay: {
-          from: 'rgba(241, 245, 249, 0.95)',
-          to: 'rgba(226, 232, 240, 0.9)'
-        },
-        glass: {
-          bg: 'rgba(255, 255, 255, 0.7)'
-        }
-      },
-      launchpad: {
-        bg: '#f8fafc',
-        hero: {
-          from: '#fff',
-          to: '#94a3b8'
-        },
-        primary: '#3B82F6',
-        primaryHover: '#2563eb',
-        accent: '#ff6b35',
-        glass: {
-          bg: 'rgba(255, 255, 255, 0.7)',
-          border: 'rgba(0, 0, 0, 0.1)'
-        },
-        nav: 'rgba(255, 255, 255, 0.8)',
-        card: '#ffffff'
-      },
-      status: {
-        live: '#10b981'
-      }
-    }
-  },
-  typography: commonTypography,
-  components: {
-    ...commonComponents,
-    MuiAppBar: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          background: alpha(theme.palette.background.paper, 0.8),
-          backdropFilter: 'blur(12px)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
-          color: theme.palette.slate.main,
-          borderRadius: 0
-        })
-      }
-    }
-  }
-})
-
-// Need to define Theme type for casting since it's recursive otherwise
-
-const dTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#3B82F6',
-      light: '#60a5fa',
-      dark: '#2563eb'
-    },
-    secondary: {
-      main: '#10B981',
-      light: '#34d399',
-      dark: '#059669'
-    },
-    success: {
-      main: '#10B981',
-      light: '#4ade80',
-      dark: '#059669'
-    },
-    error: {
-      main: '#ef4444',
-      light: '#f87171',
-      dark: '#dc2626'
-    },
-    warning: {
-      main: '#f59e0b',
-      light: '#fbbf24',
-      dark: '#d97706'
-    },
-    info: {
-      main: '#3b82f6',
-      light: '#38bdf8',
-      dark: '#1d4ed8'
-    },
-    background: {
-      default: '#0B0F19',
-      paper: '#111827'
-    },
-    grey,
-    indigo: {
-      main: '#6366f1',
-      light: '#818cf8',
-      dark: '#4f46e5'
-    },
-    violet: {
-      main: '#a855f7',
-      light: '#c084fc',
-      dark: '#9333ea'
-    },
-    slate: {
-      main: '#1e293b',
-      light: '#64748b',
-      dark: '#0f172a'
-    },
-    ivao: {
-      hq_event: '#ff4081',
-      rfe: '#7c4dff',
-      pde: '#00e676',
-      generic: '#2196f3'
-    },
-    amber: {
-      main: '#F59E0B',
-      light: '#fbbf24',
-      dark: '#d97706'
-    },
-    sky: {
-      main: '#0ea5e9',
-      light: '#38bdf8',
-      dark: '#0284c7'
-    },
-    purple: {
-      main: '#8B5CF6',
-      light: '#a78bfa',
-      dark: '#7c3aed'
-    },
-    pink: {
-      main: '#EC4899',
-      light: '#f472b6',
-      dark: '#db2777'
-    },
-    airlines: {
-      iberia: AIRLINE_COLORS.iberia,
-      vueling: AIRLINE_COLORS.vueling,
-      ryanair: AIRLINE_COLORS.ryanair,
-      ryanair_yellow: AIRLINE_COLORS.ryanair_yellow
-    },
-    weifly: {
-      home: {
-        hero: {
-          from: '#e0e7ff',
-          mid: '#a5b4fc',
-          to: '#818cf8'
-        }
-      },
-      crowdfunding: {
-        bg: {
-          from: '#0a0f1f',
-          to: '#1a1f35'
-        },
-        primary: '#0a1e3c',
-        secondary: '#2a7de1',
-        accent: '#ff6b35',
-        glass: {
-          bg: 'rgba(255, 255, 255, 0.05)',
-          border: 'rgba(255, 255, 255, 0.1)'
-        },
-        nav: 'rgba(10, 15, 31, 0.8)'
-      },
-      legal: {
-        bg: '#0b0f19',
-        overlay: {
-          from: 'rgba(15, 23, 42, 0.95)',
-          to: 'rgba(30, 41, 59, 0.9)'
-        },
-        glass: {
-          bg: 'rgba(255, 255, 255, 0.03)'
-        }
-      },
-      launchpad: {
-        bg: '#0b0f19',
-        hero: {
-          from: '#fff',
-          to: '#94a3b8'
-        },
-        primary: '#3B82F6',
-        primaryHover: '#2563eb',
-        accent: '#ff6b35',
-        glass: {
-          bg: 'rgba(17, 24, 39, 0.4)',
-          border: 'rgba(255, 255, 255, 0.1)'
-        },
-        nav: 'rgba(11, 15, 25, 0.8)',
-        card: '#111827'
-      },
-      status: {
-        live: '#10b981'
-      }
-    }
-  },
-  typography: commonTypography,
-  components: {
-    ...commonComponents,
-    MuiAppBar: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          background: alpha(theme.palette.background.default, 0.7),
-          backdropFilter: 'blur(10px)',
-          boxShadow: 'none',
-          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-          color: theme.palette.common.white,
-          borderRadius: 0
-        })
-      }
-    }
-  }
-})
 
 // @ts-expect-error - Custom property for AppBar
 dTheme.palette.AppBar = { darkBg: 'rgba(11, 15, 25, 0.7)' }
 
-export const darkTheme = responsiveFontSizes(dTheme)
-export const lightTheme = responsiveFontSizes(lTheme)
-
-const theme = {
-  darkTheme,
-  lightTheme
-}
 export default theme

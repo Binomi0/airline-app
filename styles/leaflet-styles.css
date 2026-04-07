@@ -1,0 +1,49 @@
+/* Estilos de Leaflet con variables CSS para theming */
+.leaflet-popup-content-wrapper {
+  background: var(--leaflet-popup-bg, var(--palette-background-paper));
+  color: var(--leaflet-popup-text, var(--palette-text-primary));
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid var(--leaflet-popup-border);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.leaflet-popup-tip {
+  background: var(--leaflet-popup-bg, var(--palette-background-paper));
+  border: 1px solid var(--leaflet-popup-border);
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  width: auto;
+  padding: 16px;
+  padding-right: 32px;
+}
+
+.leaflet-popup-close-button {
+  color: var(--leaflet-popup-close-color, var(--palette-text-secondary));
+  top: 8px;
+  right: 8px;
+  font-size: 20px;
+  z-index: 1000;
+}
+
+.leaflet-tooltip {
+  background: var(--leaflet-tooltip-bg, var(--palette-background-paper));
+  border: 1px solid var(--leaflet-tooltip-border);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 20px var(--leaflet-tooltip-glow);
+  color: var(--leaflet-tooltip-text, var(--palette-text-primary));
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+  background: var(--leaflet-tooltip-bg, var(--palette-background-paper));
+}

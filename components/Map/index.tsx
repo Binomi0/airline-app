@@ -115,14 +115,14 @@ const TowerControlMap = () => {
           } !important;
         }
         .radar-popup .leaflet-popup-content-wrapper {
-          background: ${muiTheme.palette.background.paper} !important;
-          color: ${muiTheme.palette.text.primary} !important;
-          border: 1px solid ${muiTheme.palette.mode === 'dark' ? alpha(muiTheme.palette.sky.light, 0.4) : alpha(muiTheme.palette.info.main, 0.2)};
+          background: var(--leaflet-popup-bg, var(--palette-background-paper)) !important;
+          color: var(--leaflet-popup-text, var(--palette-text-primary)) !important;
+          border: var(--leaflet-popup-border, 1px solid var(--leaflet-popup-border-color));
           border-radius: 8px;
         }
         .radar-popup .leaflet-popup-tip {
-          background: ${muiTheme.palette.background.paper} !important;
-          border: 1px solid ${muiTheme.palette.mode === 'dark' ? alpha(muiTheme.palette.sky.light, 0.4) : alpha(muiTheme.palette.info.main, 0.2)};
+          background: var(--leaflet-popup-bg, var(--palette-background-paper)) !important;
+          border: var(--leaflet-popup-border, 1px solid var(--leaflet-popup-border-color));
         }
       `}</style>
     </Box>

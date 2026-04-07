@@ -12,7 +12,7 @@ const NAV_ITEMS = [
     link: '/hangar',
     emoji: '✈️',
     title: 'Hangar',
-    desc: 'Compra y vende aeronaves. Gestiona tu flota virtual en la red Arbitrum.'
+    desc: 'Compra y vende aeronaves NFT. Gestiona tu flota virtual en la red Arbitrum.'
   },
   {
     link: '/license',
@@ -24,7 +24,7 @@ const NAV_ITEMS = [
     link: '/gas',
     emoji: '⛽',
     title: 'Gasolinera',
-    desc: 'Genera combustible. Haz staking de AIRL para obtener AIRG y repostar.'
+    desc: 'Genera combustible. Haz staking de AIRL para obtener AIRG y repostar (1 AIRL = 100 AIRG/día).'
   },
   {
     link: '/missions',
@@ -36,7 +36,7 @@ const NAV_ITEMS = [
     link: '/ivao',
     emoji: '🌐',
     title: 'Red de Vuelo',
-    desc: 'Sincronización total. Valida tus vuelos en tiempo real y recibe tus recompensas.'
+    desc: 'Sincronización total. Valida tus vuelos en tiempo real con callsigns y recibe tus recompensas.'
   },
   {
     link: '/stats',
@@ -50,17 +50,17 @@ const FEATURES = [
   {
     icon: '🔐',
     title: 'Cuentas Inteligentes',
-    desc: 'Acceso seguro con Passkeys. Tu identidad y activos protegidos por Smart Accounts de Thirdweb.'
+    desc: 'Acceso seguro con Passkeys. Tu identidad y activos protegidos por Smart Accounts ERC-4337.'
   },
   {
     icon: '⚡',
     title: 'Eficiencia Layer 2',
-    desc: 'Transacciones casi instantáneas y sin apenas comisiones gracias a la red Arbitrum.'
+    desc: 'Transacciones casi instantáneas y con mínimas comisiones gracias a la infraestructura de Arbitrum.'
   },
   {
     icon: '⛽',
     title: 'Economía Circular',
-    desc: 'Un ecosistema sostenible donde el staking de AIRL alimenta tus misiones de vuelo diarias.'
+    desc: 'Un ecosistema sostenible donde el staking de AIRL alimenta tus misiones de vuelo diarias (1 AIRL = 100 AIRG/día).'
   }
 ]
 
@@ -84,8 +84,8 @@ const STEPS = [
 
 const STATS = [
   { value: 'NFT', label: 'Aeronaves Únicas' },
-  { value: 'En Vivo', label: 'Tráfico en Real' },
-  { value: 'AIRL', label: 'Utility Token' },
+  { value: 'En Vivo', label: 'Tráfico en Tiempo Real' },
+  { value: 'AIRL + AIRG', label: 'Gobernanza + Utilidad' },
   { value: 'L2', label: 'Red Arbitrum' }
 ]
 
@@ -109,9 +109,9 @@ const HomeView = () => {
         '--home-title': theme.palette.text.primary,
         '--home-muted': alpha(theme.palette.text.secondary, 0.85),
         '--home-muted-label': alpha(theme.palette.text.secondary, 0.7),
-        '--home-hero-from': theme.palette.weifly.home.hero.from,
-        '--home-hero-mid': theme.palette.weifly.home.hero.mid,
-        '--home-hero-to': theme.palette.weifly.home.hero.to
+        '--home-hero-from': theme.palette.primary.main,
+        '--home-hero-mid': theme.palette.secondary.main,
+        '--home-hero-to': theme.palette.warning.main
       }) as React.CSSProperties,
     [theme]
   )
@@ -122,15 +122,17 @@ const HomeView = () => {
       <section className={styles.hero}>
         <div className={styles.badge}>
           <span />
-          Operaciones Aéreas Descentralizadas · Layer 2
+          Descentralización Aérea · Arbitrum L2 · Vuelos Sincronizados
         </div>
-
         <h1 className={styles.heroTitle}>WeiFly</h1>
-        <p className={styles.heroSubtitle}>La Aerolínea Virtual Evolucionada</p>
-        <p className={styles.heroDescription}>
-          WeiFly es la evolución de las aerolíneas virtuales. Posee activos reales, gestiona tu combustible mediante
-          staking y vuela misiones sincronizadas con rutas aéreas en tiempo real.
-        </p>
+        <p className={styles.heroSubtitle}>WeiFly - La aerolínea virtual descentralizada</p>
+        <div className={styles.heroDescription}>
+          <p>✈️ Juega, vuela y gana con un sistema Play-to-Earn realista y justo.</p>
+          <p>
+            ✅ Cada vuelo cuenta. Nuestra tecnología verifica tu rendimiento en tiempo real y te recompensa al instante.
+          </p>
+          <p>Sin trampas, sin demoras. WeiFly. Tu habilidad al mando, tu recompensa en la red.</p>
+        </div>
 
         <div className={styles.heroCtas}>
           <Link href='/hangar' className={styles.ctaPrimary}>
@@ -143,11 +145,9 @@ const HomeView = () => {
             Obtener Licencia
           </Link>
         </div>
-
         <div className={styles.scrollHint}>Saber más</div>
       </section>
 
-      {/* ── Stats ──────────────────────────────────────────────── */}
       <div className={styles.stats}>
         {STATS.map(({ value, label }) => (
           <div key={label} className={styles.statItem}>
