@@ -8,9 +8,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  LinearProgress,
-  styled
+  LinearProgress
 } from '@mui/material'
+import { styled, alpha } from '@mui/material/styles'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -28,11 +28,11 @@ const incomeSources = [
 ]
 
 const allocation = [
-  { concept: 'Desarrollo', percentage: 30, color: '#2196f3' },
-  { concept: 'Marketing y Crecimiento', percentage: 20, color: '#4caf50' },
-  { concept: 'Seguridad y Auditorías', percentage: 20, color: '#ff9800' },
-  { concept: 'Tesorería (Reserva)', percentage: 20, color: '#9c27b0' },
-  { concept: 'Recompensas Comunitarias', percentage: 10, color: '#f44336' }
+  { concept: 'Desarrollo', percentage: 30, color: 'info.main' },
+  { concept: 'Marketing y Crecimiento', percentage: 20, color: 'success.main' },
+  { concept: 'Seguridad y Auditorías', percentage: 20, color: 'warning.main' },
+  { concept: 'Tesorería (Reserva)', percentage: 20, color: 'purple.main' },
+  { concept: 'Recompensas Comunitarias', percentage: 10, color: 'error.main' }
 ]
 
 const IncomeDistribution = () => {
@@ -93,7 +93,7 @@ const IncomeDistribution = () => {
               sx={{
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: 'rgba(255,255,255,0.1)',
+                backgroundColor: (theme) => alpha(theme.palette.common.white, 0.1),
                 '& .MuiLinearProgress-bar': {
                   backgroundColor: item.color,
                   borderRadius: 4
@@ -104,7 +104,7 @@ const IncomeDistribution = () => {
         ))}
       </Box>
 
-      <Box sx={{ mt: 3, p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+      <Box sx={{ mt: 3, p: 2, bgcolor: (theme) => alpha(theme.palette.common.white, 0.05), borderRadius: 2 }}>
         <Typography variant='caption' display='block' fontStyle='italic'>
           * El capital personal del fundador nunca entra a la tesorería comunitaria. Los ingresos provienen
           exclusivamente de la actividad del protocolo.

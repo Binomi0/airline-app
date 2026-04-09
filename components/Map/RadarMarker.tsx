@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Box, Typography, alpha, Stack, IconButton, CircularProgress } from '@mui/material'
+import { Box, Typography, Stack, IconButton, CircularProgress } from '@mui/material'
+import { alpha, useTheme } from '@mui/material/styles'
 import { Refresh as RefreshIcon } from '@mui/icons-material'
 import Swal from 'sweetalert2'
 import { Marker, Popup, Tooltip } from 'react-leaflet'
@@ -12,7 +13,6 @@ interface RadarMarkerProps {
   isOrigin: boolean
   isDestination: boolean
   onTowerClick: (tower: Atc) => void
-  theme: 'light' | 'dark'
 }
 
 const phoneticMap: Record<string, string> = {
@@ -44,7 +44,8 @@ const phoneticMap: Record<string, string> = {
   Z: 'ZULU'
 }
 
-const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, isDestination, onTowerClick, theme }) => {
+const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, isDestination, onTowerClick }) => {
+  const theme = useTheme()
   const [localAtis, setLocalAtis] = useState(tower.atis)
   const [fetching, setFetching] = useState(false)
   const iconColor = isOrigin ? 'green' : isDestination ? 'red' : 'blue'
@@ -95,7 +96,10 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
 
     keywords.forEach((key) => {
       const regex = new RegExp(`\\b${key}\\b`, 'g')
-      highlighted = highlighted.replace(regex, `<span style="color: #10b981; font-weight: 800;">${key}</span>`)
+      highlighted = highlighted.replace(
+        regex,
+        `<span style="color: ${theme.palette.success.main}; font-weight: 800;">${key}</span>`
+      )
     })
 
     // Highlight revision letters
@@ -104,7 +108,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
       const letter = revisionMatch[1]
       highlighted = highlighted.replace(
         `Information ${letter}`,
-        `Information <span style="color: #38bdf8; font-weight: 900;">${phoneticMap[letter] || letter}</span>`
+        `Information <span style="color: ${theme.palette.info.main}; font-weight: 900;">${phoneticMap[letter] || letter}</span>`
       )
     }
 
@@ -114,7 +118,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
   return (
     <Marker
       position={position}
-      icon={getRadarIcon(iconColor, isOrigin || isDestination)}
+      icon={getRadarIcon(iconColor, isOrigin || isDestination, theme)}
       eventHandlers={{ click: () => onTowerClick(tower) }}
     >
       <Tooltip
@@ -140,14 +144,14 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
               gap: 0.8,
               pb: 1,
               mb: 1,
-              borderBottom: '1px solid rgba(255,255,255,0.08)'
+              borderBottom: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.08)}`
             }}
           >
             <Typography
               sx={{
                 fontSize: 13,
                 fontWeight: 900,
-                background: 'linear-gradient(135deg, #f97316, #10b981)',
+                background: `linear-gradient(135deg, ${theme.palette.amber.main}, ${theme.palette.success.main})`,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 letterSpacing: 1.5,
@@ -161,7 +165,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
               sx={{
                 fontSize: 12,
                 lineHeight: 1,
-                filter: 'drop-shadow(0 0 4px rgba(249,115,22,0.5))'
+                filter: `drop-shadow(0 0 4px ${alpha(theme.palette.amber.main, 0.5)})`
               }}
             >
               ✈️
@@ -174,7 +178,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
               sx={{
                 fontSize: 13,
                 fontWeight: 900,
-                color: '#f8fafc',
+                color: 'text.primary',
                 fontFamily: 'monospace',
                 letterSpacing: 0.5,
                 lineHeight: 1
@@ -185,8 +189,8 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
             {tower.atcSession?.position && (
               <Box
                 sx={{
-                  bgcolor: isOrigin ? '#10b981' : isDestination ? '#ef4444' : '#f97316',
-                  color: '#000',
+                  bgcolor: isOrigin ? 'success.main' : isDestination ? 'error.main' : 'amber.main',
+                  color: (theme) => theme.palette.common.black,
                   px: 0.7,
                   py: 0.15,
                   borderRadius: '4px',
@@ -209,7 +213,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                 <Typography
                   sx={{
                     fontSize: 10,
-                    color: '#10b981',
+                    color: 'success.main',
                     fontWeight: 700,
                     fontFamily: 'monospace',
                     lineHeight: 1
@@ -223,14 +227,16 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
               <Typography
                 sx={{
                   fontSize: 10,
-                  color: '#94a3b8',
+                  color: 'text.secondary',
                   fontFamily: 'monospace',
                   lineHeight: 1,
                   ml: 'auto'
                 }}
               >
                 [COM1]:{' '}
-                <span style={{ color: '#38bdf8', fontWeight: 800 }}>{tower.atcSession.frequency.toFixed(3)}</span>
+                <span style={{ color: theme.palette.info.main, fontWeight: 800 }}>
+                  {tower.atcSession.frequency.toFixed(3)}
+                </span>
               </Typography>
             )}
           </Box>
@@ -242,8 +248,8 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
               alignItems: 'center',
               gap: 0.8,
               py: 0.8,
-              borderTop: '1px solid rgba(255,255,255,0.06)',
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              borderTop: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.06)}`,
+              borderBottom: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.06)}`,
               mb: 1
             }}
           >
@@ -251,7 +257,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
               sx={{
                 fontSize: 15,
                 fontWeight: 900,
-                color: isOrigin ? '#10b981' : isDestination ? '#ef4444' : '#f8fafc',
+                color: isOrigin ? 'success.main' : isDestination ? 'error.main' : 'text.primary',
                 fontFamily: 'monospace',
                 letterSpacing: 1,
                 lineHeight: 1
@@ -263,7 +269,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
             <Typography
               sx={{
                 fontSize: 10,
-                color: '#64748b',
+                color: 'text.secondary',
                 fontWeight: 600,
                 lineHeight: 1,
                 overflow: 'hidden',
@@ -306,7 +312,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                 <Typography
                   sx={{
                     fontSize: 8,
-                    color: '#64748b',
+                    color: 'text.secondary',
                     textTransform: 'uppercase',
                     fontWeight: 700,
                     letterSpacing: 0.5,
@@ -319,7 +325,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                 <Typography
                   sx={{
                     fontSize: 11,
-                    color: stat.label === 'Status' && tower.createdAt ? '#10b981' : '#f8fafc',
+                    color: stat.label === 'Status' && tower.createdAt ? 'success.main' : 'text.primary',
                     fontWeight: 800,
                     fontFamily: 'monospace',
                     lineHeight: 1
@@ -336,9 +342,9 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
       <Popup className='radar-popup'>
         <Box
           sx={{
-            bgcolor: theme === 'dark' ? '#0f172a' : '#fff',
+            bgcolor: 'background.paper',
             p: 1.5,
-            color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+            color: 'text.primary',
             minWidth: 260,
             borderRadius: 2
           }}
@@ -347,23 +353,23 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography
               variant='h6'
-              sx={{ fontWeight: 900, color: '#38bdf8', fontFamily: 'monospace', letterSpacing: 1, lineHeight: 1 }}
+              sx={{ fontWeight: 900, color: 'info.main', fontFamily: 'monospace', letterSpacing: 1, lineHeight: 1 }}
             >
               {tower.callsign}
             </Typography>
             {tower.atcSession?.frequency && (
               <Box
                 sx={{
-                  bgcolor: alpha('#38bdf8', 0.1),
+                  bgcolor: (theme) => alpha(theme.palette.info.main, 0.1),
                   px: 1,
                   py: 0.3,
                   borderRadius: 1,
-                  border: '1px solid rgba(56, 189, 248, 0.3)'
+                  border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.3)}`
                 }}
               >
                 <Typography
                   variant='caption'
-                  sx={{ color: '#38bdf8', fontWeight: 800, fontSize: 11, fontFamily: 'monospace' }}
+                  sx={{ color: 'info.main', fontWeight: 800, fontSize: 11, fontFamily: 'monospace' }}
                 >
                   {tower.atcSession.frequency.toFixed(3)}
                 </Typography>
@@ -376,7 +382,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
             <Typography
               variant='body2'
               sx={{
-                color: theme === 'dark' ? '#f1f5f9' : '#334155',
+                color: 'text.primary',
                 fontWeight: 700,
                 fontSize: 13,
                 lineHeight: 1.2
@@ -392,10 +398,10 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                     sx={{
                       width: 6,
                       height: 6,
-                      bgcolor: '#10b981',
+                      bgcolor: 'success.main',
                       borderRadius: '50%',
                       animation: 'atc-blink 1.5s infinite ease-in-out',
-                      boxShadow: '0 0 4px #10b981',
+                      boxShadow: (theme) => `0 0 4px ${theme.palette.success.main}`,
                       '@keyframes atc-blink': {
                         '0%, 100%': { opacity: 0.4, transform: 'scale(1)' },
                         '50%': { opacity: 1, transform: 'scale(1.2)' }
@@ -404,10 +410,10 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                   />
                   <Typography
                     variant='caption'
-                    sx={{ color: '#64748b', fontSize: 10, display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    sx={{ color: 'text.secondary', fontSize: 10, display: 'flex', alignItems: 'center', gap: 0.5 }}
                   >
                     Active for:
-                    <span style={{ color: '#10b981', fontWeight: 800 }}>
+                    <span style={{ color: theme.palette.success.main, fontWeight: 800 }}>
                       {(() => {
                         const start = new Date(tower.createdAt).getTime()
                         const now = Date.now()
@@ -424,10 +430,10 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                   <Typography
                     variant='caption'
                     sx={{
-                      color: theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)',
+                      color: (theme) => alpha(theme.palette.text.primary, 0.3),
                       fontSize: 9,
                       fontFamily: 'monospace',
-                      bgcolor: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                      bgcolor: (theme) => alpha(theme.palette.text.primary, 0.05),
                       px: 0.6,
                       py: 0.2,
                       borderRadius: 0.5,
@@ -439,7 +445,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                       variant='caption'
                       sx={{
                         fontSize: 10,
-                        color: theme === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.7)',
+                        color: theme.palette.text.secondary,
                         fontWeight: 800
                       }}
                     >
@@ -452,11 +458,17 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
           </Stack>
 
           {/* ATIS Section */}
-          <Box sx={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', pt: 1.5 }}>
+          <Box sx={{ borderTop: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.05)}`, pt: 1.5 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
               <Typography
                 variant='caption'
-                sx={{ color: '#64748b', fontSize: 9, textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.5 }}
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: 9,
+                  textTransform: 'uppercase',
+                  fontWeight: 700,
+                  letterSpacing: 0.5
+                }}
               >
                 ATIS Briefing
               </Typography>
@@ -466,8 +478,8 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                 disabled={fetching}
                 sx={{
                   p: 0,
-                  color: fetching ? '#38bdf8' : '#64748b',
-                  '&:hover': { color: '#38bdf8' }
+                  color: fetching ? 'info.main' : 'text.disabled',
+                  '&:hover': { color: 'info.main' }
                 }}
               >
                 {fetching ? <CircularProgress size={12} color='inherit' /> : <RefreshIcon sx={{ fontSize: 14 }} />}
@@ -479,12 +491,15 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                 sx={{
                   maxHeight: 120,
                   overflowY: 'auto',
-                  bgcolor: theme === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
+                  bgcolor: (theme) => alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.03 : 0.02),
                   p: 1.2,
                   borderRadius: 1,
-                  border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
+                  border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.05)}`,
                   '&::-webkit-scrollbar': { width: '4px' },
-                  '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(56, 189, 248, 0.2)', borderRadius: '4px' }
+                  '&::-webkit-scrollbar-thumb': {
+                    bgcolor: (theme) => alpha(theme.palette.info.main, 0.2),
+                    borderRadius: '4px'
+                  }
                 }}
               >
                 {localAtis.lines.map((line, i) => {
@@ -499,7 +514,7 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
                         display: 'block',
                         fontSize: 11,
                         fontFamily: 'monospace',
-                        color: theme === 'dark' ? '#cbd5e1' : '#475569',
+                        color: 'text.secondary',
                         mb: i === localAtis.lines.length - 1 ? 0 : 1,
                         lineHeight: 1.4,
                         whiteSpace: 'pre-wrap'
@@ -513,14 +528,14 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
             ) : (
               <Box
                 sx={{
-                  bgcolor: 'rgba(255, 255, 255, 0.02)',
+                  bgcolor: (theme) => alpha(theme.palette.common.white, 0.02),
                   p: 1.5,
                   borderRadius: 1,
                   textAlign: 'center',
-                  border: '1px dashed rgba(255, 255, 255, 0.1)'
+                  border: (theme) => `1px dashed ${alpha(theme.palette.common.white, 0.1)}`
                 }}
               >
-                <Typography variant='caption' sx={{ color: '#64748b', fontStyle: 'italic' }}>
+                <Typography variant='caption' sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
                   {fetching ? 'Retrieving latest data...' : 'No ATIS Broadcast Available'}
                 </Typography>
               </Box>
@@ -530,12 +545,12 @@ const RadarMarker: React.FC<RadarMarkerProps> = ({ tower, position, isOrigin, is
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1.5 }}>
                 <Box
                   sx={{
-                    bgcolor: '#10b981',
-                    color: '#000',
+                    bgcolor: 'success.main',
+                    color: (theme) => theme.palette.common.black,
                     px: 1,
                     py: 0.4,
                     borderRadius: 0.5,
-                    boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
+                    boxShadow: (theme) => `0 0 8px ${alpha(theme.palette.success.main, 0.4)}`
                   }}
                 >
                   <Typography

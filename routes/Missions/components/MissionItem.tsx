@@ -39,7 +39,7 @@ const MissionItem: React.FC<{
             <CardHeader
               title={
                 <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                  <Typography variant='h5' color='white' fontWeight='bold'>
+                  <Typography variant='h5' color='text.primary' fontWeight='bold'>
                     {origin} → {destination}
                   </Typography>
                   <Stack direction='row' spacing={1}>
@@ -48,8 +48,9 @@ const MissionItem: React.FC<{
                         label={`+${bonusPercent}%`}
                         size='small'
                         sx={{
-                          background: 'linear-gradient(45deg, #10b981 30%, #34d399 90%)',
-                          color: 'black',
+                          background: (theme) =>
+                            `linear-gradient(45deg, ${theme.palette.success.main} 30%, ${theme.palette.success.light} 90%)`,
+                          color: 'common.black',
                           fontWeight: 'bold',
                           fontSize: '0.65rem'
                         }}
@@ -72,20 +73,20 @@ const MissionItem: React.FC<{
 
               <Stack spacing={1.5}>
                 <Stack direction='row' spacing={1} alignItems='center'>
-                  <FlightTakeoffIcon sx={{ color: 'var(--home-accent)', fontSize: 20 }} />
-                  <Typography variant='body2' color='white'>
+                  <FlightTakeoffIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                  <Typography variant='body2' color='text.primary'>
                     Distancia: <strong>{distance} NM</strong>
                   </Typography>
                 </Stack>
 
                 <Stack direction='row' spacing={1} alignItems='center'>
-                  <MonetizationOnIcon sx={{ color: '#ffd700', fontSize: 20 }} />
+                  <MonetizationOnIcon sx={{ color: 'warning.main', fontSize: 20 }} />
                   <Stack direction='column'>
-                    <Typography variant='body2' color='white'>
+                    <Typography variant='body2' color='text.primary'>
                       Recompensa Total: <strong>{prize.toFixed(2)} AIRL</strong>
                     </Typography>
                     {bonusPercent > 0 && (
-                      <Typography variant='caption' sx={{ color: '#10b981', fontWeight: 'medium' }}>
+                      <Typography variant='caption' sx={{ color: 'success.main', fontWeight: 'medium' }}>
                         Incluye {bonusPercent}% de bonus
                       </Typography>
                     )}
@@ -93,8 +94,8 @@ const MissionItem: React.FC<{
                 </Stack>
 
                 <Stack direction='row' spacing={1} alignItems='center'>
-                  <AccessTimeIcon sx={{ color: '#66bb6a', fontSize: 20 }} />
-                  <Typography variant='body2' color='white'>
+                  <AccessTimeIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                  <Typography variant='body2' color='text.primary'>
                     Ventana:{' '}
                     <strong>
                       {startStr} - {endStr}
@@ -109,7 +110,8 @@ const MissionItem: React.FC<{
                   variant='contained'
                   onClick={() => onSelect(mission._id!)}
                   sx={{
-                    background: 'linear-gradient(45deg, #4f46e5 30%, #6366f1 90%)',
+                    background: (theme) =>
+                      `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`,
                     fontWeight: 'bold',
                     textTransform: 'none'
                   }}

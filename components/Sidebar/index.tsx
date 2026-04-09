@@ -65,6 +65,12 @@ const Sidebar: React.FC = () => {
           selected={router.pathname === '/hangar'}
         />
         <SidebarItem
+          onLink={handleClick('/marketplace')}
+          text='Marketplace'
+          Icon={LocalAirportIcon}
+          selected={router.pathname === '/marketplace'}
+        />
+        <SidebarItem
           onLink={handleClick('/license')}
           text='Licencias'
           Icon={WorkspacePremiumIcon}

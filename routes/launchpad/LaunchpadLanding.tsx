@@ -1,11 +1,11 @@
-import React, { FC, useCallback, useState } from 'react'
+import React, { FC, useCallback, useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRecoilValue } from 'recoil'
 import { userState } from 'store/user.atom'
 import useAuth from 'hooks/useAuth'
 import styles from 'styles/Launchpad.module.css'
-import { CircularProgress } from '@mui/material'
+import { CircularProgress, useTheme, alpha, Typography, Button } from '@mui/material'
 
 const LaunchpadLanding: FC = () => {
   const user = useRecoilValue(userState)
@@ -29,8 +29,28 @@ const LaunchpadLanding: FC = () => {
     [email, handleSignIn]
   )
 
+  const theme = useTheme()
+
+  const dynamicTokens = useMemo(
+    () =>
+      ({
+        '--lp-bg-theme': theme.palette.weifly.launchpad.bg,
+        '--lp-text-theme': theme.palette.text.primary,
+        '--lp-text-muted-theme': theme.palette.text.secondary,
+        '--lp-primary-theme': theme.palette.weifly.launchpad.primary,
+        '--lp-primary-hover-theme': theme.palette.weifly.launchpad.primaryHover,
+        '--lp-accent-theme': theme.palette.weifly.launchpad.accent,
+        '--lp-nav-bg-theme': theme.palette.weifly.launchpad.nav,
+        '--lp-card-bg-theme': theme.palette.weifly.launchpad.card,
+        '--lp-hero-from': theme.palette.weifly.launchpad.hero.from,
+        '--lp-hero-to': theme.palette.weifly.launchpad.hero.to,
+        '--lp-text-white': theme.palette.common.white
+      }) as React.CSSProperties,
+    [theme]
+  )
+
   return (
-    <div className={styles.root}>
+    <div className={styles.root} style={dynamicTokens}>
       {/* ── Header ───────────────────────────────────────────────── */}
       <header className={styles.header}>
         <div className={styles.navContent}>
@@ -47,7 +67,7 @@ const LaunchpadLanding: FC = () => {
             <Link
               href='/crowdfunding'
               className={styles.navLink}
-              style={{ color: 'var(--lp-accent)', fontWeight: 700 }}
+              style={{ color: 'var(--lp-accent-theme)', fontWeight: 700 }}
             >
               Crowdfunding 2.0 🚀
             </Link>
@@ -76,7 +96,20 @@ const LaunchpadLanding: FC = () => {
 
         <div className={styles.heroContent}>
           <div className={styles.heroBadge}>La primera aerolínea virtual descentralizada</div>
-          <h1 className={styles.heroTitle}>Vuela, gana y gobierna los cielos.</h1>
+          <Typography
+            className={styles.heroTitle}
+            sx={{
+              background: `linear-gradient(to bottom, ${theme.palette.weifly.launchpad.hero.from} 0%, ${theme.palette.weifly.launchpad.hero.to} 100%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontSize: 'clamp(2.5rem, 8vw, 5rem)',
+              lineHeight: 1.1,
+              fontWeight: 900,
+              mb: 3
+            }}
+          >
+            Vuela, gana y gobierna los cielos.
+          </Typography>
           <p className={styles.heroSubtitle}>
             Conviértete en piloto. Obtén tu licencia NFT, gestiona tu flota y gana tokens AIRL completando vuelos reales
             en tu simulador favorito.
@@ -93,9 +126,22 @@ const LaunchpadLanding: FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-                <button type='submit' className={styles.heroCtaPrimary} disabled={loading}>
+                <Button
+                  variant='contained'
+                  className={styles.heroCtaPrimary}
+                  sx={{
+                    background: 'var(--lp-primary-theme)',
+                    color: 'common.white',
+                    boxShadow: `0 10px 30px ${alpha(theme.palette.primary.main, 0.3)}`,
+                    '&:hover': {
+                      background: 'var(--lp-primary-hover-theme)'
+                    }
+                  }}
+                  disabled={loading}
+                  type='submit'
+                >
                   {loading ? <CircularProgress size={24} color='inherit' /> : 'Comenzar a Volar'}
-                </button>
+                </Button>
                 <Link href='/crowdfunding' className={styles.heroCtaSecondary}>
                   Crowdfunding 2.0
                 </Link>
@@ -103,10 +149,10 @@ const LaunchpadLanding: FC = () => {
             </form>
           ) : (
             <div className={styles.heroActions}>
-              <Link href='/home' className={styles.heroCtaPrimary}>
+              <Link href='/home' className={styles.heroCtaPrimary} style={{ textDecoration: 'none' }}>
                 Entrar al Hangar
               </Link>
-              <Link href='/crowdfunding' className={styles.heroCtaSecondary}>
+              <Link href='/crowdfunding' className={styles.heroCtaSecondary} style={{ textDecoration: 'none' }}>
                 Participar en Crowdfunding
               </Link>
             </div>
@@ -234,7 +280,7 @@ const LaunchpadLanding: FC = () => {
         <div className={styles.nftsGrid}>
           <div className={styles.nftCard}>
             <div className={styles.nftImageWrapper}>
-              <Image src='/img/license/license4.jpg' alt='Licencia de Piloto' fill objectFit='cover' />
+              <Image src='/img/license/license4.jpg' alt='Licencia de Piloto' fill style={{ objectFit: 'cover' }} />
             </div>
             <div className={styles.nftInfo}>
               <div className={styles.nftTag}>Licencia</div>
@@ -244,7 +290,7 @@ const LaunchpadLanding: FC = () => {
 
           <div className={styles.nftCard}>
             <div className={styles.nftImageWrapper}>
-              <Image src='/img/aircrafts/C172.png' alt='Cessna 172' fill objectFit='cover' />
+              <Image src='/img/aircrafts/C172.png' alt='Cessna 172' fill style={{ objectFit: 'cover' }} />
             </div>
             <div className={styles.nftInfo}>
               <div className={styles.nftTag}>Aeronave</div>
@@ -254,7 +300,7 @@ const LaunchpadLanding: FC = () => {
 
           <div className={styles.nftCard}>
             <div className={styles.nftImageWrapper}>
-              <Image src='/img/aircrafts/B737.png' alt='Boeing 737' fill objectFit='cover' />
+              <Image src='/img/aircrafts/B737.png' alt='Boeing 737' fill style={{ objectFit: 'cover' }} />
             </div>
             <div className={styles.nftInfo}>
               <div className={styles.nftTag}>Aeronave</div>
@@ -264,7 +310,7 @@ const LaunchpadLanding: FC = () => {
 
           <div className={styles.nftCard}>
             <div className={styles.nftImageWrapper}>
-              <Image src='/img/flight_log.png' alt='Flight Achievement' fill objectFit='cover' />
+              <Image src='/img/flight_log.png' alt='Flight Achievement' fill style={{ objectFit: 'cover' }} />
             </div>
             <div className={styles.nftInfo}>
               <div className={styles.nftTag}>Logro</div>
@@ -340,7 +386,7 @@ const LaunchpadLanding: FC = () => {
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerBrand}>
-            <Link href='/' className={styles.logo}>
+            <Link href='/' className={styles.logo} style={{ textDecoration: 'none' }}>
               ✈️ WeiFly
             </Link>
             <p>La aerolínea virtual donde tú eres el dueño. Construida con seguridad Web3 y pasión por el vuelo.</p>

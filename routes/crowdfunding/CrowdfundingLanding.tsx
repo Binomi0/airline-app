@@ -12,10 +12,22 @@ import {
   Verified,
   Groups
 } from '@mui/icons-material'
-import { Box, Container, Grid, Typography, Button, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
+import {
+  Box,
+  Container,
+  Grid,
+  Typography,
+  Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  useTheme,
+  alpha
+} from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import styles from 'styles/Crowdfunding.module.css'
 import { useActiveAccount } from 'thirdweb/react'
+import { useMemo } from 'react'
 
 const maskAddress = (address?: string) => (address ? `${address.slice(0, 5)}...${address.slice(-4)}` : '')
 
@@ -83,18 +95,39 @@ const CrowdfundingLanding = () => {
   const [investorCount] = useState(1234)
   const [investmentAmount, setInvestmentAmount] = useState(1000)
 
+  const theme = useTheme()
+
+  const dynamicTokens = useMemo(
+    () =>
+      ({
+        '--cf-bg-from-theme': theme.palette.weifly.crowdfunding.bg.from,
+        '--cf-bg-to-theme': theme.palette.weifly.crowdfunding.bg.to,
+        '--cf-primary-theme': theme.palette.weifly.crowdfunding.primary,
+        '--cf-secondary-theme': theme.palette.weifly.crowdfunding.secondary,
+        '--cf-accent-theme': theme.palette.weifly.crowdfunding.accent,
+        '--cf-text-theme': theme.palette.common.white,
+        '--cf-text-muted-theme': alpha(theme.palette.common.white, 0.7),
+        '--cf-glass-bg-theme': theme.palette.weifly.crowdfunding.glass.bg,
+        '--cf-glass-border-theme': theme.palette.weifly.crowdfunding.glass.border,
+        '--cf-nav-bg-theme': theme.palette.weifly.crowdfunding.nav,
+        '--cf-secondary-alpha-theme': alpha(theme.palette.weifly.crowdfunding.secondary, 0.5),
+        '--cf-accent-alpha-theme': alpha(theme.palette.weifly.crowdfunding.accent, 0.3)
+      }) as React.CSSProperties,
+    [theme]
+  )
+
   // Tokenomics data
   const distribution = [
-    { label: 'Crowdfunding público', value: 40, color: '#2A7DE1' },
-    { label: 'Reserva ecosistema', value: 20, color: '#FF6B35' },
-    { label: 'Equipo (vesting)', value: 15, color: '#60A5FA' },
-    { label: 'Liquidez Uniswap', value: 10, color: '#34D399' },
-    { label: 'Marketing/Partners', value: 10, color: '#A78BFA' },
-    { label: 'Airdrops comunidad', value: 5, color: '#F472B6' }
+    { label: 'Crowdfunding público', value: 40, color: theme.palette.weifly.crowdfunding.secondary },
+    { label: 'Reserva ecosistema', value: 20, color: theme.palette.weifly.crowdfunding.accent },
+    { label: 'Equipo (vesting)', value: 15, color: theme.palette.info.light },
+    { label: 'Liquidez Uniswap', value: 10, color: theme.palette.success.main },
+    { label: 'Marketing/Partners', value: 10, color: theme.palette.secondary.main },
+    { label: 'Airdrops comunidad', value: 5, color: theme.palette.error.light }
   ]
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} style={dynamicTokens}>
       {/* 1. NAVBAR (Sticky) */}
       <header className={styles.header}>
         <div className={styles.navContent}>
@@ -340,7 +373,7 @@ const CrowdfundingLanding = () => {
                   />
                 )
               })}
-              <text x='200' y='190' textAnchor='middle' fill='#fff' fontSize='24' fontWeight='800'>
+              <text x='200' y='190' textAnchor='middle' fill='var(--cf-text-theme)' fontSize='24' fontWeight='800'>
                 AIRL
               </text>
               <text x='200' y='220' textAnchor='middle' fill='var(--cf-text-muted)' fontSize='14'>
@@ -425,7 +458,7 @@ const CrowdfundingLanding = () => {
                 <Grid item xs={12}>
                   <Box
                     sx={{
-                      borderTop: '1px solid rgba(255,255,255,0.1)',
+                      borderTop: '1px solid var(--cf-glass-border-theme)',
                       pt: 2,
                       display: 'flex',
                       justifyContent: 'space-between'
@@ -434,7 +467,7 @@ const CrowdfundingLanding = () => {
                     <Typography variant='body2' color='var(--cf-text-muted)'>
                       Ganancia diaria estimada:
                     </Typography>
-                    <Typography variant='h6' color='#34D399' className={styles.mono}>
+                    <Typography variant='h6' color='success.main' className={styles.mono}>
                       +{(investmentAmount * 0.05).toFixed(2)} AIRG
                     </Typography>
                   </Box>
@@ -541,21 +574,21 @@ const CrowdfundingLanding = () => {
             <span className={styles.tierPrice}>$1,000</span>
             <ul className={styles.tierList}>
               <li>
-                <Verified sx={{ color: '#34D399', fontSize: 18 }} /> Todo de Cadete
+                <Verified sx={{ color: 'success.main', fontSize: 18 }} /> Todo de Cadete
               </li>
               <li>
-                <Verified sx={{ color: '#34D399', fontSize: 18 }} /> Licencia NFT Nivel 1 (C172)
+                <Verified sx={{ color: 'success.main', fontSize: 18 }} /> Licencia NFT Nivel 1 (C172)
               </li>
               <li>
-                <Verified sx={{ color: '#34D399', fontSize: 18 }} /> 5% bonus tokens
+                <Verified sx={{ color: 'success.main', fontSize: 18 }} /> 5% bonus tokens
               </li>
               <li>
-                <Verified sx={{ color: '#34D399', fontSize: 18 }} /> Acceso Early Beta
+                <Verified sx={{ color: 'success.main', fontSize: 18 }} /> Acceso Early Beta
               </li>
             </ul>
             <Button
               variant='contained'
-              sx={{ background: 'var(--cf-accent)', color: '#fff', borderRadius: '12px', py: 2 }}
+              sx={{ background: 'var(--cf-accent)', color: 'common.white', borderRadius: '12px', py: 2 }}
             >
               Invertir Ahora
             </Button>
@@ -648,15 +681,15 @@ const CrowdfundingLanding = () => {
             <Accordion
               key={i}
               sx={{
-                background: 'var(--cf-glass-bg)',
-                color: '#fff',
-                border: '1px solid var(--cf-glass-border)',
+                background: 'var(--cf-glass-bg-theme)',
+                color: 'common.white',
+                border: '1px solid var(--cf-glass-border-theme)',
                 mb: 2,
                 borderRadius: '16px !important',
                 '&:before': { display: 'none' }
               }}
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#fff' }} />}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'common.white' }} />}>
                 <Typography fontWeight={700}>{faq.q}</Typography>
               </AccordionSummary>
               <AccordionDetails>
@@ -722,9 +755,9 @@ const CrowdfundingLanding = () => {
                     flex: 1,
                     padding: '12px',
                     borderRadius: '8px',
-                    border: '1px solid var(--cf-glass-border)',
-                    background: 'rgba(255,255,255,0.05)',
-                    color: '#fff'
+                    border: '1px solid var(--cf-glass-border-theme)',
+                    background: 'var(--cf-glass-bg-theme)',
+                    color: 'var(--cf-text-theme)'
                   }}
                 />
                 <Button variant='contained' sx={{ background: 'var(--cf-accent)' }}>

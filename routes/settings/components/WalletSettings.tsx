@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Box, Button, Divider, Stack, Tooltip, Typography } from '@mui/material'
+import React, { useCallback } from 'react'
+import { Box, Button, Divider, Paper, Stack, Tooltip, Typography } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import BackupIcon from '@mui/icons-material/Backup'
 import { walletStore } from 'store/wallet.atom'
 import { downloadFile } from 'utils'
@@ -9,7 +10,6 @@ import useWallet from 'hooks/useWallet'
 import { decryptVault, deriveKeyFromPRF } from 'utils/crypto'
 import { Check, Close, Info } from '@mui/icons-material'
 import { User } from 'types'
-import styles from 'styles/Settings.module.css'
 import { getApi } from 'lib/api'
 import { IWallet } from 'models/Wallet'
 import useAccountSigner from 'hooks/useAccountSigner'
@@ -20,7 +20,6 @@ interface Props {
 
 const WalletSettings = ({ user }: Props) => {
   const [wallet, setWallet] = useRecoilState(walletStore)
-  const [hasLocalKey, setHasLocalKey] = useState(false)
   const { getPrivateKey, syncWallet } = useWallet()
   const { verifyCredential } = useAccountSigner()
 
@@ -44,7 +43,7 @@ const WalletSettings = ({ user }: Props) => {
 
       localStorage.setItem(user.id, Buffer.from(vaultData).toString('base64'))
       setWallet((prev) => ({ ...prev, isCloudSynced, isLoaded: true, isLocked: true }))
-      setHasLocalKey(true)
+
       console.log('guardado')
     } catch (error) {
       console.error('Sync wallet error:', error)
@@ -106,32 +105,25 @@ const WalletSettings = ({ user }: Props) => {
     }
   }, [user?.id, user?.email, wallet.smartAccountAddress, verifyCredential])
 
-  useEffect(() => {
-    if (user?.id) {
-      const hasLocal = localStorage.getItem(user.id) || ''
-      if (hasLocal) {
-        setHasLocalKey(true)
-      }
-    }
-  }, [user?.id])
-
   return (
-    <Box className={styles.glassCard} sx={{ height: '100%' }}>
+    <Paper variant='glass' sx={{ height: '100%', p: 4 }}>
       <Stack spacing={3}>
-        <Typography className={styles.sectionHeader}>Wallet Security</Typography>
+        <Typography variant='h6' sx={{ color: 'text.primary', fontWeight: 700 }}>
+          Wallet Security
+        </Typography>
 
         <Stack direction='row' justifyContent='space-between' alignItems='center'>
           <Stack spacing={1}>
-            <Typography sx={{ color: '#fff', fontWeight: 500 }}>Passkey Protection</Typography>
+            <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>Passkey Protection</Typography>
             <Box>
               <Tooltip title={wallet.isLoaded ? 'Active' : 'Not Loaded'}>
                 <Stack alignItems='center' direction='row' spacing={1}>
                   {wallet.isLoaded ? (
-                    <Check fontSize='small' sx={{ color: '#4ade80' }} />
+                    <Check fontSize='small' sx={{ color: 'success.main' }} />
                   ) : (
-                    <Close sx={{ color: '#f87171' }} />
+                    <Close sx={{ color: 'error.main' }} />
                   )}
-                  <Typography variant='caption' sx={{ color: wallet.isLoaded ? '#4ade80' : '#f87171' }}>
+                  <Typography variant='caption' sx={{ color: wallet.isLoaded ? 'success.main' : 'error.main' }}>
                     {wallet.isLoaded ? 'Private key encrypted with Passkey' : 'Security not active'}
                   </Typography>
                 </Stack>
@@ -142,9 +134,9 @@ const WalletSettings = ({ user }: Props) => {
             size='small'
             variant='outlined'
             sx={{
-              borderColor: 'rgba(248, 113, 113, 0.4)',
-              color: '#f87171',
-              '&:hover': { borderColor: '#f87171', background: 'rgba(248, 113, 113, 0.05)' }
+              borderColor: (theme) => alpha(theme.palette.error.main, 0.4),
+              color: 'error.main',
+              '&:hover': { borderColor: 'error.main', background: (theme) => alpha(theme.palette.error.main, 0.05) }
             }}
             onClick={handleExportKey}
           >
@@ -152,24 +144,24 @@ const WalletSettings = ({ user }: Props) => {
           </Button>
         </Stack>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+        <Divider sx={{ borderColor: 'divider', opacity: 0.1 }} />
 
         <Stack direction='row' justifyContent='space-between' alignItems='center'>
           <Stack spacing={1}>
-            <Typography sx={{ color: '#fff', fontWeight: 500 }}>Cloud Sync</Typography>
+            <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>Cloud Sync</Typography>
             <Tooltip title={wallet.isCloudSynced ? 'Backup Active' : 'Backup Missing'}>
               <Stack alignItems='center' direction='row' spacing={1}>
                 {wallet.isCloudSynced ? (
-                  <Check fontSize='small' sx={{ color: '#4ade80' }} />
+                  <Check fontSize='small' sx={{ color: 'success.main' }} />
                 ) : (
-                  <Info fontSize='small' sx={{ color: '#fbbf24' }} />
+                  <Info fontSize='small' sx={{ color: 'warning.main' }} />
                 )}
-                <Typography variant='caption' sx={{ color: wallet.isCloudSynced ? '#4ade80' : '#fbbf24' }}>
+                <Typography variant='caption' sx={{ color: wallet.isCloudSynced ? 'success.main' : 'warning.main' }}>
                   {wallet.isCloudSynced ? 'Encrypted backup active' : 'Backup missing in cloud'}
                 </Typography>
               </Stack>
             </Tooltip>
-            <Typography fontSize='0.75rem' sx={{ color: 'rgba(255, 255, 255, 0.4)', maxWidth: '280px' }}>
+            <Typography fontSize='0.75rem' sx={{ color: 'text.secondary', opacity: 0.4, maxWidth: '280px' }}>
               Allows wallet restoration if you lose access to this device.
             </Typography>
           </Stack>
@@ -178,9 +170,12 @@ const WalletSettings = ({ user }: Props) => {
               size='small'
               variant='outlined'
               sx={{
-                borderColor: '#fbbf24',
-                color: '#fbbf24',
-                '&:hover': { borderColor: '#fff', background: 'rgba(251, 191, 36, 0.05)' }
+                borderColor: 'warning.main',
+                color: 'warning.main',
+                '&:hover': {
+                  borderColor: 'text.primary',
+                  background: (theme) => alpha(theme.palette.warning.main, 0.05)
+                }
               }}
               onClick={handleUploadKey}
             >
@@ -190,14 +185,17 @@ const WalletSettings = ({ user }: Props) => {
               </Stack>
             </Button>
           )}
-          {wallet.isCloudSynced && !hasLocalKey && (
+          {wallet.isCloudSynced && (
             <Button
               size='small'
               variant='outlined'
               sx={{
-                borderColor: '#fbbf24',
-                color: '#fbbf24',
-                '&:hover': { borderColor: '#fff', background: 'rgba(251, 191, 36, 0.05)' }
+                borderColor: 'warning.main',
+                color: 'warning.main',
+                '&:hover': {
+                  borderColor: 'text.primary',
+                  background: (theme) => alpha(theme.palette.warning.main, 0.05)
+                }
               }}
               onClick={handleDownloadKey}
             >
@@ -209,7 +207,7 @@ const WalletSettings = ({ user }: Props) => {
           )}
         </Stack>
       </Stack>
-    </Box>
+    </Paper>
   )
 }
 

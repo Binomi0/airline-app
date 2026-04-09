@@ -1,18 +1,10 @@
-import Swal from 'sweetalert2'
+import Swal, { SweetAlertIcon } from 'sweetalert2'
 import { formatNumber } from 'utils'
 
 // Configuración base con tema
 const getSwalConfig = (): { theme: 'material-ui-dark' | 'material-ui-light' } => ({
   theme: localStorage.getItem('mui-mode') === 'dark' ? 'material-ui-dark' : 'material-ui-light'
 })
-
-export const loginSuccessSwal = async () =>
-  Swal.fire({
-    ...getSwalConfig(),
-    title: 'Connected!',
-    text: 'You are now logged in',
-    icon: 'success'
-  })
 
 export const missingKeySwal = async () =>
   Swal.fire({
@@ -65,12 +57,13 @@ export const backupErrorSwal = async (text?: string) =>
     icon: 'error'
   })
 
-export const errorSwal = async (title: string, text: string) =>
+export const errorSwal = async (title: string, text: string, confirmButtonText?: string) =>
   Swal.fire({
     ...getSwalConfig(),
     title,
     text,
-    icon: 'error'
+    icon: 'error',
+    confirmButtonText: confirmButtonText ?? 'Intentar de nuevo'
   })
 
 export const missingExportKeySwal = async () =>
@@ -146,6 +139,7 @@ export const unstakedSwal = async () =>
     text: 'Funds already claimed from staking, hope your planes are full!',
     icon: 'success'
   })
+
 export const stakedSwal = async () =>
   Swal.fire({
     ...getSwalConfig(),
@@ -238,6 +232,30 @@ export const confirmSwal = async (title: string, text: string) =>
     text,
     icon: 'question',
     showCancelButton: true,
-    confirmButtonText: 'Confirmar',
+    confirmButtonText: 'Confirmar'
+  })
+
+export const questionSwal = async (title: string, text: string, confirmButtonText?: string) =>
+  Swal.fire({
+    ...getSwalConfig(),
+    title,
+    text,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: confirmButtonText ?? 'Continuar',
     cancelButtonText: 'Cancelar'
+  })
+
+export const notificationSwal = async (title: string, text: string, icon: SweetAlertIcon = 'success') =>
+  Swal.fire({
+    ...getSwalConfig(),
+    title,
+    text,
+    icon,
+    toast: true,
+    position: 'bottom-right',
+    timer: 3 * 1000,
+    scrollbarPadding: false,
+    showCloseButton: true,
+    showConfirmButton: false
   })

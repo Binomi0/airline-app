@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #0b0f19; /* Fallback */
+  background: var(--login-bg);
   font-family: 'Sora', sans-serif;
 }
 
@@ -16,7 +16,7 @@
   right: 0;
   bottom: 0;
   background-image:
-    linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%),
+    linear-gradient(135deg, var(--login-accent-alpha-15) 0%, var(--login-secondary-alpha-15) 100%),
     url('https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&q=80&w=2070');
   background-size: cover;
   background-position: center;
@@ -32,10 +32,10 @@
 }
 
 .glassCard {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--login-card-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--login-card-border);
   border-radius: 24px;
   padding: 48px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -45,19 +45,19 @@
 }
 
 .logoWrapper {
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--login-accent-alpha-10);
   padding: 16px;
   border-radius: 20px;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid var(--login-accent-alpha-20);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 20px var(--login-accent-alpha-10);
 }
 
 .primaryButton {
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
-  color: white !important;
+  background: linear-gradient(135deg, var(--login-primary) 0%, var(--login-secondary) 100%) !important;
+  color: var(--login-text-white) !important;
   border-radius: 12px !important;
   padding: 12px 24px !important;
   font-weight: 600 !important;
@@ -69,13 +69,13 @@
 
 .primaryButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 8px 15px var(--login-accent-alpha-30);
   filter: brightness(1.1);
 }
 
 .secondaryButton {
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
+  border: 1px solid var(--login-white-alpha-20) !important;
+  color: var(--login-text-white) !important;
   border-radius: 12px !important;
   padding: 12px 24px !important;
   font-weight: 500 !important;
@@ -86,22 +86,22 @@
 }
 
 .secondaryButton:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
+  background: var(--login-white-alpha-05) !important;
+  border-color: var(--login-white-alpha-40) !important;
 }
 
 .inputWrapper {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 16px;
   padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--login-white-alpha-05);
 }
 
 .mainTitle {
   font-family: 'Trispace', sans-serif !important;
   font-weight: 600 !important;
   letter-spacing: -0.02em !important;
-  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
+  background: linear-gradient(135deg, var(--login-text-white) 0%, var(--login-white-alpha-70) 100%);
   background-clip: text !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -111,7 +111,7 @@
 
 .footerNote {
   opacity: 0.6;
-  color: #fff;
+  color: var(--login-text-white);
 }
 
 @media (max-width: 600px) {

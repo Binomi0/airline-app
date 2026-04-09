@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
+import { alpha } from '@mui/material'
 import React, { FC, KeyboardEvent } from 'react'
 import { validateEmail } from 'utils'
 
@@ -63,7 +64,7 @@ const EmailInput: FC<Props> = ({ onSubmit, onCancel, loading, color }: Props) =>
         disabled={loading}
         inputProps={{
           autoComplete: 'username webauthn',
-          style: { color: 'white', fontFamily: 'Sora' }
+          style: { fontFamily: 'Sora' }
         }}
         name='username'
         color={color}
@@ -74,15 +75,15 @@ const EmailInput: FC<Props> = ({ onSubmit, onCancel, loading, color }: Props) =>
         helperText={error}
         onKeyDown={handleKeyDown}
         sx={{
-          '& .MuiInput-underline:before': { borderBottomColor: 'rgba(255,255,255,0.1)' },
-          '& .MuiInput-underline:after': { borderBottomColor: '#6366f1' },
+          '& .MuiInput-underline:before': { borderBottomColor: 'divider' },
+          '& .MuiInput-underline:after': { borderBottomColor: 'primary.main' },
           '& .MuiInputBase-input': { p: 1 }
         }}
         InputProps={{
           disableUnderline: false,
           endAdornment: emailRef.current?.value ? (
             <IconButton size='small' onClick={handleCancel}>
-              <Close fontSize='small' sx={{ color: 'rgba(255,255,255,0.3)' }} />
+              <Close fontSize='small' sx={{ color: 'text.secondary' }} />
             </IconButton>
           ) : null
         }}
@@ -97,11 +98,12 @@ const EmailInput: FC<Props> = ({ onSubmit, onCancel, loading, color }: Props) =>
           borderRadius: '10px',
           textTransform: 'none',
           fontWeight: 600,
-          background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)',
+          background: (theme) =>
+            `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+          boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
           '&:hover': {
             filter: 'brightness(1.1)',
-            boxShadow: '0 6px 16px rgba(99, 102, 241, 0.4)'
+            boxShadow: (theme) => `0 6px 16px ${alpha(theme.palette.primary.main, 0.4)}`
           }
         }}
       >

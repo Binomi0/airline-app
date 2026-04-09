@@ -1,12 +1,11 @@
 .paper {
-  /* background: var(--mui-palette-gradient); */
-  background: linear-gradient(to bottom left, var(--mui-palette-grey-500), var(--mui-palette-grey-900));
+  background: linear-gradient(to bottom left, var(--ivao-grey-500), var(--ivao-grey-900));
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
   width: 100%;
   border-radius: 0;
-  border-bottom: 1px solid var(--mui-palette-grey-A700);
+  border-bottom: 1px solid var(--ivao-border);
   transition: all 125ms ease-out;
 }
 
@@ -32,5 +31,5 @@
   cursor: pointer;
 }
 .icon:hover {
-  color: #d6b455;
+  color: var(--mui-palette-amber-main);
 }

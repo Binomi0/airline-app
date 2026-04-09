@@ -1,14 +1,17 @@
 .root {
-  --lp-bg: #030712;
-  --lp-text: #f9fafb;
-  --lp-text-muted: #9ca3af;
-  --lp-primary: #3b82f6;
-  --lp-primary-hover: #2563eb;
-  --lp-accent: #f59e0b; /* Orange/Gold */
-  --lp-glass-bg: rgba(255, 255, 255, 0.03);
-  --lp-glass-border: rgba(255, 255, 255, 0.08);
-  --lp-nav-bg: rgba(3, 7, 18, 0.8);
-  --lp-card-bg: rgba(17, 24, 39, 0.7);
+  --lp-bg: var(--lp-bg-theme);
+  --lp-text: var(--lp-text-theme);
+  --lp-text-muted: var(--lp-text-muted-theme);
+  --lp-primary: var(--lp-primary-theme);
+  --lp-primary-hover: var(--lp-primary-hover-theme);
+  --lp-accent: var(--lp-accent-theme);
+  --lp-glass-bg: var(--lp-glass-bg-theme);
+  --lp-glass-border: var(--lp-glass-border-theme);
+  --lp-nav-bg: var(--lp-nav-bg-theme);
+  --lp-card-bg: var(--lp-card-bg-theme);
+  --lp-hero-from: var(--lp-hero-from);
+  --lp-hero-to: var(--lp-hero-to);
+  --lp-text-white: var(--lp-text-white);
 
   background-color: var(--lp-bg);
   color: var(--lp-text);
@@ -49,7 +52,7 @@
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+  background: linear-gradient(135deg, var(--lp-hero-from) 0%, var(--lp-hero-to) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -83,7 +86,7 @@
 
 .navCta {
   background: var(--lp-primary);
-  color: white;
+  color: var(--lp-text-white);
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 600;
@@ -142,7 +145,7 @@
 .heroBadge {
   display: inline-block;
   padding: 6px 16px;
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(59, 130, 246, 0.1); /* This is an alpha of primary, sticking for now */
   border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 100px;
   color: var(--lp-primary);
@@ -159,7 +162,7 @@
   font-weight: 900;
   margin-bottom: 24px;
   letter-spacing: -0.03em;
-  background: linear-gradient(to bottom, #fff 0%, #94a3b8 100%);
+  background: linear-gradient(to bottom, var(--lp-hero-from) 0%, var(--lp-hero-to) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -184,7 +187,7 @@
 .heroCtaPrimary {
   padding: 16px 32px;
   background: var(--lp-primary);
-  color: white;
+  color: var(--lp-text-white);
   border-radius: 12px;
   font-weight: 700;
   font-size: 1.1rem;
@@ -201,9 +204,9 @@
 
 .heroCtaSecondary {
   padding: 16px 32px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.05); /* Sticking for now, it's alpha glass */
   border: 1px solid var(--lp-glass-border);
-  color: white;
+  color: var(--lp-text-white);
   border-radius: 12px;
   font-weight: 600;
   font-size: 1.1rem;
@@ -229,7 +232,7 @@
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--lp-glass-border);
-  color: white;
+  color: var(--lp-text-white);
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
@@ -458,7 +461,7 @@
 
 .nftImageWrapper {
   aspect-ratio: 1;
-  background: #111827;
+  background: var(--lp-card-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -544,7 +547,7 @@
 .partnerLogo {
   font-size: 1.25rem;
   font-weight: 800;
-  color: white;
+  color: var(--lp-text-white);
   letter-spacing: 0.05em;
 }
 
@@ -643,7 +646,7 @@
 }
 
 .footerLinks a:hover {
-  color: white;
+  color: var(--lp-text-white);
 }
 
 .footerBottom {

@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { useRecoilValue } from 'recoil'
-import { themeStore } from 'store/theme.atom'
 import { userState } from 'store/user.atom'
-import styles from '../../styles/Home.module.css'
+import styles from 'styles/Home.module.css'
 import LiveDashboard from './components/LiveDashboard'
 import PilotRankings from './components/PilotRankings'
+import { useTheme, alpha } from '@mui/material/styles'
+import { useMemo } from 'react'
 
 const NAV_ITEMS = [
   {
@@ -88,46 +89,35 @@ const STATS = [
   { value: 'L2', label: 'Red Arbitrum' }
 ]
 
-/** Tokens que cambian entre dark y light mode */
-const THEME_TOKENS: Record<'dark' | 'light', React.CSSProperties> = {
-  dark: {
-    '--home-bg': '#0b0f19',
-    '--home-bg-alt': 'rgba(15,18,28,0.6)',
-    '--home-border': 'rgba(255,255,255,0.06)',
-    '--home-border-card': 'rgba(255,255,255,0.07)',
-    '--home-accent': '#6366f1',
-    '--home-accent-soft': 'rgba(99,102,241,0.12)',
-    '--home-accent-text': '#a5b4fc',
-    '--home-title': '#e2e8f0',
-    '--home-muted': 'rgba(148,163,184,0.85)',
-    '--home-muted-label': 'rgba(148,163,184,0.7)',
-    '--home-hero-from': '#e0e7ff',
-    '--home-hero-mid': '#a5b4fc',
-    '--home-hero-to': '#818cf8'
-  } as React.CSSProperties,
-  light: {
-    '--home-bg': '#f3f4f6',
-    '--home-bg-alt': 'rgba(255,255,255,0.65)',
-    '--home-border': 'rgba(0,0,0,0.07)',
-    '--home-border-card': 'rgba(0,0,0,0.08)',
-    '--home-accent': '#4f46e5',
-    '--home-accent-soft': 'rgba(79,70,229,0.09)',
-    '--home-accent-text': '#4f46e5',
-    '--home-title': '#111827',
-    '--home-muted': 'rgba(55,65,81,0.85)',
-    '--home-muted-label': 'rgba(55,65,81,0.65)',
-    '--home-hero-from': '#312e81',
-    '--home-hero-mid': '#4f46e5',
-    '--home-hero-to': '#6366f1'
-  } as React.CSSProperties
-}
-
 const HomeView = () => {
-  const theme = useRecoilValue(themeStore)
   const user = useRecoilValue(userState)
+  const theme = useTheme()
+
+  const dynamicTokens = useMemo(
+    () =>
+      ({
+        '--home-bg': theme.palette.background.default,
+        '--home-bg-alt':
+          theme.palette.mode === 'dark'
+            ? alpha(theme.palette.background.paper, 0.6)
+            : alpha(theme.palette.background.paper, 0.65),
+        '--home-border': alpha(theme.palette.divider, 0.07),
+        '--home-border-card': alpha(theme.palette.divider, 0.08),
+        '--home-accent': theme.palette.primary.main,
+        '--home-accent-soft': alpha(theme.palette.primary.main, 0.12),
+        '--home-accent-text': theme.palette.primary.light,
+        '--home-title': theme.palette.text.primary,
+        '--home-muted': alpha(theme.palette.text.secondary, 0.85),
+        '--home-muted-label': alpha(theme.palette.text.secondary, 0.7),
+        '--home-hero-from': theme.palette.weifly.home.hero.from,
+        '--home-hero-mid': theme.palette.weifly.home.hero.mid,
+        '--home-hero-to': theme.palette.weifly.home.hero.to
+      }) as React.CSSProperties,
+    [theme]
+  )
 
   return (
-    <div className={styles.root} style={THEME_TOKENS[theme]}>
+    <div className={styles.root} style={dynamicTokens}>
       {/* ── Hero ───────────────────────────────────────────────── */}
       <section className={styles.hero}>
         <div className={styles.badge}>

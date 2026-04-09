@@ -24,7 +24,13 @@ const MCDUView = ({ pilot, onDisconnect }: Props) => {
 
       <Stack direction='row' justifyContent='center' sx={{ fontFamily: 'B612 Mono', zIndex: 10 }}>
         <Stack justifyContent='space-between' sx={{ zIndex: 1 }}>
-          <Box width={640} height={480} bgcolor='secondary.dark' p={2} sx={{ boxShadow: '0 0 100px inset #000' }}>
+          <Box
+            width={640}
+            height={480}
+            bgcolor='secondary.dark'
+            p={2}
+            sx={{ boxShadow: (theme) => `0 0 100px inset ${theme.palette.common.black}` }}
+          >
             <Stack direction='row' justifyContent='space-between'>
               <Typography paragraph sx={{ fontFamily: 'B612 Mono' }}>
                 Connected, tracking... {pilot.callsign}

@@ -2,6 +2,7 @@ import React from 'react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { Container, Typography, Box, Paper, Grid, Chip } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import RoadmapTimeline from 'components/Roadmap/RoadmapTimeline'
 import IncomeDistribution from 'components/Roadmap/IncomeDistribution'
 import TreasuryStructure from 'components/Roadmap/TreasuryStructure'
@@ -29,7 +30,8 @@ const RoadmapPage: NextPage = () => {
             sx={{
               fontWeight: 900,
               fontSize: { xs: '3rem', md: '5rem' },
-              background: 'linear-gradient(90deg, #fff 0%, #aaa 100%)',
+              background: (theme) =>
+                `linear-gradient(90deg, ${theme.palette.common.white} 0%, ${theme.palette.grey[400]} 100%)`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               lineHeight: 1.1,
@@ -50,7 +52,7 @@ const RoadmapPage: NextPage = () => {
                 py: 2.5,
                 borderRadius: 2,
                 fontSize: '0.9rem',
-                boxShadow: '0 0 20px rgba(76, 175, 80, 0.3)'
+                boxShadow: (theme) => `0 0 20px ${alpha(theme.palette.success.main, 0.3)}`
               }}
             />
           </Box>
@@ -81,7 +83,7 @@ const RoadmapPage: NextPage = () => {
                 p: { xs: 4, md: 6 },
                 height: '100%',
                 borderRadius: 4,
-                border: '1px solid rgba(255,255,255,0.05)'
+                border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.05)}`
               }}
             >
               <Typography variant='h4' gutterBottom sx={{ fontWeight: 900, mb: 4, fontFamily: 'Sora, sans-serif' }}>
@@ -98,7 +100,7 @@ const RoadmapPage: NextPage = () => {
                 p: { xs: 4, md: 6 },
                 height: '100%',
                 borderRadius: 4,
-                border: '1px solid rgba(255,255,255,0.05)'
+                border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.05)}`
               }}
             >
               <Typography variant='h4' gutterBottom sx={{ fontWeight: 900, mb: 4, fontFamily: 'Sora, sans-serif' }}>
@@ -114,8 +116,9 @@ const RoadmapPage: NextPage = () => {
               sx={{
                 p: 6,
                 borderRadius: 4,
-                background: 'linear-gradient(rgba(255,255,255,0.05), rgba(76, 175, 80, 0.05))',
-                border: '1px solid rgba(76, 175, 80, 0.2)'
+                background: (theme) =>
+                  `linear-gradient(${alpha(theme.palette.common.white, 0.05)}, ${alpha(theme.palette.success.main, 0.05)})`,
+                border: (theme) => `1px solid ${alpha(theme.palette.success.main, 0.2)}`
               }}
             >
               <Typography variant='h4' gutterBottom sx={{ fontWeight: 900, mb: 2, fontFamily: 'Sora, sans-serif' }}>
@@ -130,10 +133,10 @@ const RoadmapPage: NextPage = () => {
                     <Paper
                       sx={{
                         p: 3,
-                        bgcolor: 'rgba(255,255,255,0.02)',
+                        bgcolor: (theme) => alpha(theme.palette.common.white, 0.02),
                         textAlign: 'center',
                         borderRadius: 2,
-                        border: '1px solid rgba(255,255,255,0.05)'
+                        border: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.05)}`
                       }}
                     >
                       <Typography

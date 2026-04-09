@@ -1,8 +1,13 @@
-import L from 'leaflet'
-import { alpha } from '@mui/material/styles'
+import * as L from 'leaflet'
+import { Theme, alpha } from '@mui/material/styles'
 
-export const getRadarIcon = (color: string, isSelected: boolean) => {
-  const mainColor = color === 'green' ? '#10b981' : color === 'red' ? '#ef4444' : '#38bdf8'
+export const getRadarIcon = (color: string, isSelected: boolean, theme: Theme) => {
+  const mainColor =
+    color === 'green'
+      ? theme.palette.success.main
+      : color === 'red'
+        ? theme.palette.error.main
+        : theme.palette.info.main
   const size = isSelected ? 36 : 24
 
   return L.divIcon({

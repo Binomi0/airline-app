@@ -17,7 +17,6 @@ let nextCall: Moment
 
 //     return accCode ? { ...acc, [currentCode]: acc[currentCode] + 1 } : { ...acc, [currentCode]: 1 }
 //   }, {} as Record<string, number>)
-//   console.log({ result })
 // }
 
 const checkDuplicates = async (Model: typeof AtcModel | typeof PilotModel, field: string) => {

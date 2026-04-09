@@ -1,14 +1,14 @@
 .root {
-  --cf-bg-from: #0a0f1f;
-  --cf-bg-to: #1a1f35;
-  --cf-primary: #0a1e3c;
-  --cf-secondary: #2a7de1;
-  --cf-accent: #ff6b35;
-  --cf-text: #ffffff;
-  --cf-text-muted: #e0e0e0;
-  --cf-glass-bg: rgba(255, 255, 255, 0.05);
-  --cf-glass-border: rgba(255, 255, 255, 0.1);
-  --cf-nav-bg: rgba(10, 15, 31, 0.8);
+  --cf-bg-from: var(--cf-bg-from-theme);
+  --cf-bg-to: var(--cf-bg-to-theme);
+  --cf-primary: var(--cf-primary-theme);
+  --cf-secondary: var(--cf-secondary-theme);
+  --cf-accent: var(--cf-accent-theme);
+  --cf-text: var(--cf-text-theme);
+  --cf-text-muted: var(--cf-text-muted-theme);
+  --cf-glass-bg: var(--cf-glass-bg-theme);
+  --cf-glass-border: var(--cf-glass-border-theme);
+  --cf-nav-bg: var(--cf-nav-bg-theme);
 
   background: linear-gradient(135deg, var(--cf-bg-from) 0%, var(--cf-bg-to) 100%);
   color: var(--cf-text);
@@ -75,7 +75,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #fff;
+  color: var(--cf-text);
   text-decoration: none;
 }
 
@@ -142,13 +142,13 @@
 
 .btnInvertir {
   background: var(--cf-accent);
-  color: white;
+  color: var(--cf-text);
   padding: 12px 24px;
   border-radius: 12px;
   font-weight: 700;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); /* Need to pass this as variable if possible, but for now keeping it as it's a shadow and needs alpha */
 }
 
 .btnInvertir:hover {
@@ -183,7 +183,7 @@
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   text-align: center;
   margin-bottom: 60px;
-  background: linear-gradient(to bottom, #fff 0%, #9ca3af 100%);
+  background: linear-gradient(to bottom, var(--cf-text) 0%, var(--cf-text-muted) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -222,10 +222,10 @@
 
 .particle {
   position: absolute;
-  background: linear-gradient(90deg, #fff, transparent);
+  background: linear-gradient(90deg, var(--cf-text), transparent);
   border-radius: 99px;
   filter: blur(1px);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); /* Keeping white shadow for visual effect */
 }
 
 .heroContent {
@@ -295,9 +295,9 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--cf-secondary), #60a5fa);
+  background: linear-gradient(90deg, var(--cf-secondary), var(--cf-secondary-theme-light, #60a5fa)); /* Fallback for now */
   width: 45%; /* Dynamic */
-  box-shadow: 0 0 20px rgba(42, 125, 225, 0.5);
+  box-shadow: 0 0 20px var(--cf-secondary-alpha-theme);
   transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -317,12 +317,12 @@
   font-size: 1.2rem;
   text-decoration: none;
   transition: all 0.3s;
-  box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 10px 30px var(--cf-accent-alpha-theme);
 }
 
 .btnPrimary:hover {
   transform: translateY(-4px);
-  box-shadow: 0 15px 40px rgba(255, 107, 53, 0.5);
+  box-shadow: 0 15px 40px var(--cf-accent-alpha-theme);
 }
 
 .btnSecondary {
@@ -411,7 +411,7 @@
 
 .solutionCard:hover {
   transform: translateY(-10px);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08); /* Keeping this slight highlight */
   border-color: var(--cf-secondary);
 }
 
@@ -592,7 +592,7 @@
   text-align: left;
   border: none;
   background: none;
-  color: white;
+  color: var(--cf-text);
   font-weight: 700;
   font-size: 1.1rem;
   cursor: pointer;
@@ -619,5 +619,5 @@
   font-weight: 800;
   box-shadow: 0 10px 40px rgba(255, 107, 53, 0.5);
   text-decoration: none;
-  color: white;
+  color: var(--cf-text);
 }

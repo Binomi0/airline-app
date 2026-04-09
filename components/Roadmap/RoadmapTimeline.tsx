@@ -102,7 +102,7 @@ const RoadmapTimeline = () => {
                 transition: 'all 0.3s ease'
               }}
             >
-              {isCurrent && <Box sx={{ width: 8, height: 8, bgcolor: '#fff', borderRadius: '50%' }} />}
+              {isCurrent && <Box sx={{ width: 8, height: 8, bgcolor: 'common.white', borderRadius: '50%' }} />}
             </Box>
 
             {/* Content Card */}
@@ -119,7 +119,7 @@ const RoadmapTimeline = () => {
                   width: '100%',
                   border: isCurrent
                     ? `1px solid ${alpha(theme.palette.primary.main, 0.5)}`
-                    : '1px solid rgba(255,255,255,0.05)',
+                    : (theme) => `1px solid ${alpha(theme.palette.common.white, 0.05)}`,
                   boxShadow: isCurrent ? `0 10px 40px ${alpha(theme.palette.primary.main, 0.1)}` : 'none',
                   position: 'relative',
                   overflow: 'hidden',
@@ -151,11 +151,12 @@ const RoadmapTimeline = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                   <Avatar
                     sx={{
-                      bgcolor: isCurrent ? 'primary.main' : 'rgba(255,255,255,0.05)',
-                      color: isCurrent ? '#fff' : 'text.secondary',
+                      bgcolor: (theme) => (isCurrent ? 'primary.main' : alpha(theme.palette.common.white, 0.05)),
+                      color: (theme) => (isCurrent ? theme.palette.common.white : 'text.secondary'),
                       width: 48,
                       height: 48,
-                      boxShadow: isCurrent ? '0 4px 12px rgba(0,0,0,0.2)' : 'none'
+                      boxShadow: (theme) =>
+                        isCurrent ? `0 4px 12px ${alpha(theme.palette.common.black, 0.2)}` : 'none'
                     }}
                   >
                     {phase.icon}
@@ -196,7 +197,8 @@ const RoadmapTimeline = () => {
                         sx={{
                           borderRadius: 1,
                           fontWeight: 700,
-                          borderColor: isCurrent ? alpha(theme.palette.primary.main, 0.3) : 'rgba(255,255,255,0.1)',
+                          borderColor: (theme) =>
+                            isCurrent ? alpha(theme.palette.primary.main, 0.3) : alpha(theme.palette.common.white, 0.1),
                           fontSize: '0.7rem'
                         }}
                       />
@@ -210,7 +212,7 @@ const RoadmapTimeline = () => {
                     alignItems: 'center',
                     gap: 1.5,
                     pt: 2,
-                    borderTop: '1px solid rgba(255,255,255,0.05)'
+                    borderTop: (theme) => `1px solid ${alpha(theme.palette.common.white, 0.05)}`
                   }}
                 >
                   <Box>

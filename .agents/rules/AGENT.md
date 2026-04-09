@@ -7,3 +7,5 @@ Follow material ui style guide by google.
 Avoid using `sx` prop in mui components, extend theme instead.
 use useQuery for data fetching.
 Use safe types, do not use any
+Handle small components, avoid files with more than 250 lines.
+Avoid using styled components anymore, search for a matc or refactor to generic component

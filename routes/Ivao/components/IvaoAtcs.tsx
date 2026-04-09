@@ -84,7 +84,8 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
     <Box
       minWidth={300}
       height='calc(100vh - 64px)'
-      borderRight='1px solid var(--mui-palette-grey-800)'
+      borderRight='1px solid'
+      borderColor='divider'
       sx={{ overflow: 'auto', overflowX: 'hidden', scrollbarWidth: 'none' }}
     >
       <Paper className={styles.textFieldBox}>
@@ -120,7 +121,11 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
           selected={selected === atc.callsign}
           sx={{
             opacity: atc.status === AtcStatus.DISCONNECTED ? 0.6 : 1,
-            borderLeft: atc.status === AtcStatus.DISCONNECTED ? '4px solid var(--mui-palette-error-main)' : 'none'
+            borderLeft: (theme) =>
+              atc.status === AtcStatus.DISCONNECTED ? `4px solid ${theme.palette.error.main}` : 'none',
+            '--ivao-grey-500': (theme) => theme.palette.grey[500],
+            '--ivao-grey-900': (theme) => theme.palette.grey[900],
+            '--ivao-border': (theme) => theme.palette.divider
           }}
         >
           <Stack direction='row' justifyContent='space-between' p={1}>
@@ -128,7 +133,7 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
               <Typography variant='subtitle1'>
                 {atc.atcPosition?.airportId || atc.callsign.split('_')[0]}{' '}
                 {atc.atcPosition?.atcCallsign && (
-                  <Typography fontWeight={300} variant='caption' color='gray'>
+                  <Typography fontWeight={300} variant='caption' color='text.secondary'>
                     {atc.atcPosition.atcCallsign.split('Tower')[0]}
                   </Typography>
                 )}
@@ -179,35 +184,28 @@ const IvaoAtcs = ({ start, end, onSelect }: Props) => {
 
 export default IvaoAtcs
 
-const StyledPaper = styled(Paper)<{ selected: boolean }>`
-  background: ${({ selected, theme }) =>
-    selected
-      ? theme.palette.mode === 'dark'
-        ? theme.palette.grey[800]
-        : theme.palette.grey[500]
-      : theme.palette.mode === 'dark'
-        ? theme.palette.grey[900]
-        : theme.palette.grey[100]};
-  /* background: ${({ theme }) =>
-    `linear-gradient(to bottom left, ${
-      theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
-    }, ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.common.white});`}; */
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
-  width: 100%;
-  border-radius: 0;
-  border-bottom: 1px solid var(--mui-palette-grey-A700);
-  transition: all 125ms ease-out;
-
-  &:hover {
-    filter: brightness(80%);
-    background: var(--mui-overlays-1);
-
-    /* background: linear-gradient(to top right, #19203f, #303d79); */
+const StyledPaper = styled(Paper, {
+  shouldForwardProp: (prop) => prop !== 'selected'
+})<{ selected: boolean }>(({ theme, selected }) => ({
+  background: selected
+    ? theme.palette.mode === 'dark'
+      ? theme.palette.grey[800]
+      : theme.palette.grey[300]
+    : theme.palette.mode === 'dark'
+      ? theme.palette.grey[900]
+      : theme.palette.background.paper,
+  overflowY: 'auto',
+  overflowX: 'hidden',
+  scrollbarWidth: 'none',
+  width: '100%',
+  borderRadius: 0,
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  transition: 'all 125ms ease-out',
+  '&:hover': {
+    filter: 'brightness(90%)',
+    background: theme.palette.action.hover
+  },
+  '&:active': {
+    background: theme.palette.error.main
   }
-
-  &:active {
-    background: red;
-  }
-`
+}))

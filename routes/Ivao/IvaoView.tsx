@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState } from 'react'
+import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
 import { User } from 'types'
 // import { filterLEOrigins } from 'utils'
 import { useLiveFlightProviderContext } from 'context/LiveFlightProvider'
@@ -30,6 +30,8 @@ import useMission from 'hooks/useMission'
 import { ivaoUserAuthStore } from 'store/ivaoUserAuth.atom'
 import { aircraftNftStore, ownedAircraftNftStore } from 'store/aircraftNFT.atom'
 import IvaoEvents from './components/IvaoEvents'
+import { useTheme, alpha } from '@mui/material'
+import styles from './styles/ivao.module.css'
 
 const getMetar = async (callsign: string, ivaoAuthToken?: string | null) =>
   axios
@@ -45,6 +47,7 @@ interface Props {
 }
 
 const IvaoView = ({ user: _user }: Props) => {
+  const theme = useTheme()
   const { isLoading: _loading, initIvaoAuth, initIvaoData } = useVaProviderContext()
   const router = useRouter()
   const { live } = useLiveFlightProviderContext()
@@ -59,6 +62,16 @@ const IvaoView = ({ user: _user }: Props) => {
   const [metar, setMetar] = useState<string>('')
   const ownedAircrafts = useRecoilValue(ownedAircraftNftStore)
   const aircrafts = useRecoilValue(aircraftNftStore)
+
+  const dynamicTokens = useMemo(
+    () =>
+      ({
+        '--ivao-grey-500': theme.palette.grey[500],
+        '--ivao-grey-900': theme.palette.grey[900],
+        '--ivao-border': alpha(theme.palette.divider, 0.12)
+      }) as React.CSSProperties,
+    [theme]
+  )
 
   const isAllowed = (distance?: number) => hasRequirement(aircrafts ?? [], distance ?? 0, aircraft)
 
@@ -130,38 +143,25 @@ const IvaoView = ({ user: _user }: Props) => {
         setBooking(true)
         if (!authToken) throw new Error('Missing auth token')
         handleRequestFlight()
-        // customProtocolCheck(
-        //   `weifly://`,
-        //   () => {
-        //     console.log('App is not installed in user system')
-        //     // TODO: Show popup to download weifly app
-        //   },
-        //   () => {
-        //     setHasApp(true)
-        //     console.log('App ready to open in user system')
-        //     window.open(`weifly://token=${authToken}`)
-        //   },
-        //   5000
-        // )
       }
     },
     [setBooking, authToken, handleRequestFlight]
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (live) {
       router.push('/live')
     }
   }, [live, router])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (ivaoAuthToken === undefined) {
       initIvaoAuth()
       initIvaoData()
     }
   }, [ivaoAuthToken, initIvaoAuth, initIvaoData])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (router.query.start) {
       setStart(router.query.start as string)
     }
@@ -170,14 +170,14 @@ const IvaoView = ({ user: _user }: Props) => {
     }
   }, [router])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (ownedAircrafts && ownedAircrafts.length > 0) {
       setAircraft('0')
     }
   }, [ownedAircrafts])
 
   return (
-    <Stack direction='row'>
+    <Stack direction='row' style={dynamicTokens}>
       <IvaoAtcs onSelect={handleSelectAtc} start={start} end={end} />
 
       <Container>
@@ -193,7 +193,7 @@ const IvaoView = ({ user: _user }: Props) => {
                   <Typography variant='h4' textTransform='uppercase'>
                     Start
                   </Typography>
-                  <Paper>
+                  <Paper className={styles.paper}>
                     <Box p={1} bgcolor='success.main' borderRadius={1}>
                       <Typography fontWeight={600}>{start}</Typography>
                     </Box>
@@ -219,7 +219,7 @@ const IvaoView = ({ user: _user }: Props) => {
                 <Typography variant='h4' textTransform='uppercase'>
                   End
                 </Typography>
-                <Paper>
+                <Paper className={styles.paper}>
                   <Box p={1} bgcolor='info.dark' borderRadius={1}>
                     <Typography fontWeight={600}>{end}</Typography>
                   </Box>
@@ -227,8 +227,6 @@ const IvaoView = ({ user: _user }: Props) => {
               </Box>
             )}
           </Stack>
-
-          {/* <IvaoLogin /> */}
 
           <Box mt={4}>
             <Mission
@@ -255,8 +253,6 @@ const IvaoView = ({ user: _user }: Props) => {
             start={start}
             end={end}
           />
-
-          {/* <IvaoPilots /> */}
         </Box>
       </Container>
     </Stack>

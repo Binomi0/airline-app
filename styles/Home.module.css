@@ -1,18 +1,18 @@
 /* ─── Theme tokens (override por modo) ──────────────────────────── */
 .root {
-  --c-bg: var(--home-bg, #0b0f19);
-  --c-bg-alt: var(--home-bg-alt, rgba(15, 18, 28, 0.6));
-  --c-border: var(--home-border, rgba(255, 255, 255, 0.06));
-  --c-border-card: var(--home-border-card, rgba(255, 255, 255, 0.07));
-  --c-accent: var(--home-accent, #6366f1);
-  --c-accent-soft: var(--home-accent-soft, rgba(99, 102, 241, 0.18));
-  --c-accent-text: var(--home-accent-text, #a5b4fc);
-  --c-title: var(--home-title, #e2e8f0);
-  --c-muted: var(--home-muted, rgba(148, 163, 184, 0.8));
-  --c-muted-label: var(--home-muted-label, rgba(148, 163, 184, 0.7));
-  --c-hero-grad-from: var(--home-hero-from, #e0e7ff);
-  --c-hero-grad-mid: var(--home-hero-mid, #a5b4fc);
-  --c-hero-grad-to: var(--home-hero-to, #818cf8);
+  --c-bg: var(--home-bg);
+  --c-bg-alt: var(--home-bg-alt);
+  --c-border: var(--home-border);
+  --c-border-card: var(--home-border-card);
+  --c-accent: var(--home-accent);
+  --c-accent-soft: var(--home-accent-soft);
+  --c-accent-text: var(--home-accent-text);
+  --c-title: var(--home-title);
+  --c-muted: var(--home-muted);
+  --c-muted-label: var(--home-muted-label);
+  --c-hero-grad-from: var(--home-hero-from);
+  --c-hero-grad-mid: var(--home-hero-mid);
+  --c-hero-grad-to: var(--home-hero-to);
   background: var(--c-bg);
 }
 
@@ -126,7 +126,7 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   background: linear-gradient(135deg, var(--c-accent), var(--c-accent-text));
-  color: #fff;
+  color: var(--c-bg);
   text-decoration: none;
   transition:
     opacity 150ms ease,
@@ -606,8 +606,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 10px #10b981;
+  background: var(--home-accent);
+  box-shadow: 0 0 10px var(--home-accent);
   animation: pulse 2s infinite;
 }
 
