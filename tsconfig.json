@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -13,12 +17,26 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "jsxImportSource": "react",
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "material": ["./lib/mui/"]
+      "material": [
+        "./lib/mui/"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "next-auth.d.ts", "**/*.ts", "**/*.tsx", "global.d.ts", "next.config.js"],
-  "exclude": ["node_modules", "staking-contract"]
+  "include": [
+    "next-env.d.ts",
+    "next-auth.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.jsx",
+    "global.d.ts",
+    "next.config.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "staking-contract"
+  ]
 }
